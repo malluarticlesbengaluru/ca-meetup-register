@@ -9,7 +9,9 @@
 (()=>{
 const RM=matchMedia("(prefers-reduced-motion:reduce)"),FINE=matchMedia("(hover:hover) and (pointer:fine)");
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),rnd=(a,b)=>a+Math.random()*(b-a);
-const COL=["#F0A000","#20C8A0","#D82890","#7820E0","#3050F0","#FFC857"];
+const COL0=["#F0A000","#20C8A0","#D82890","#7820E0","#3050F0","#FFC857"];
+/* the particle colours come from the page theme (the CSS variable --fx, six #RRGGBB colours); the list above is the fallback */
+const cols=()=>{try{const v=getComputedStyle(document.documentElement).getPropertyValue("--fx").split(",").map(x=>x.trim());return v.length===6&&v.every(x=>/^#[0-9a-fA-F]{6}$/.test(x))?v:COL0}catch(_){return COL0}};
 const TUNE={particlesPhone:12,particlesDesktop:20,alphaMin:.12,alphaMax:.34,tilt:[6,8]};   /* the numbers worth changing */
 let live=null,played=false;
 const sprite=c=>{const o=document.createElement("canvas");o.width=o.height=64;const g=o.getContext("2d"),r=g.createRadialGradient(32,32,0,32,32,32);
@@ -49,10 +51,10 @@ function mount(){
 
   /* ---- 3. background particles: a fixed canvas BEHIND the page content (main sits above it), so they can never be drawn on a card ---- */
   const cv=document.createElement("canvas");cv.id="fxc";cv.setAttribute("aria-hidden","true");document.body.insertBefore(cv,document.body.firstChild);
-  const cx=cv.getContext("2d"),spr=COL.map(sprite);let W=0,H=0;
+  const cx=cv.getContext("2d");let spr=cols().map(sprite),W=0,H=0;on(document,"themechange",()=>{spr=cols().map(sprite)});
   const size=()=>{const dpr=Math.min(devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0)};size();on(window,"resize",size);
   const N=innerWidth<520?TUNE.particlesPhone:TUNE.particlesDesktop;
-  const P=Array.from({length:N},()=>({x:rnd(0,W),y:rnd(0,H),r:rnd(4,12),vy:rnd(-18,-6),ph:rnd(0,6.3),sw:rnd(6,20),sp:rnd(.2,.6),c:Math.random()*COL.length|0,a:rnd(TUNE.alphaMin,TUNE.alphaMax)}));
+  const P=Array.from({length:N},()=>({x:rnd(0,W),y:rnd(0,H),r:rnd(4,12),vy:rnd(-18,-6),ph:rnd(0,6.3),sw:rnd(6,20),sp:rnd(.2,.6),c:Math.random()*6|0,a:rnd(TUNE.alphaMin,TUNE.alphaMax)}));
 
   /* ---- 4. desktop only: tilt + glare, and the logo's heads follow the pointer ---- */
   const desk=FINE.matches&&inner;let gl=null,px=-999,py=-999,over=false,tx=0,ty=0,gx=0,gy=0,lx=0,ly=0,tilted=false;

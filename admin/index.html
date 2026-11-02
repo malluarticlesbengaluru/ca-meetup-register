@@ -87,6 +87,11 @@ body.shopen{overflow:hidden}.sheet-bg{position:fixed;inset:0;background:rgba(0,8
 .ov button{background:#fff;color:#111;border-color:#fff;min-width:220px;margin-top:12px;font-size:1.05rem;padding:14px 18px}.ov button.line{background:transparent;color:#fff;border-color:#fff}.ov img{max-width:100%;max-height:50vh;border-radius:10px;margin-top:10px}
 @media(prefers-reduced-motion:reduce){.sheet{animation:none}.flash{animation:none;box-shadow:0 0 0 3px var(--accent)}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.themes{display:grid;gap:8px;margin:6px 0 4px}
+.th{display:flex;align-items:center;gap:12px;margin:0!important;padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;min-width:0}
+.th.on{border-color:var(--accent);background:rgba(240,160,0,.08)}.th input{flex:0 0 auto;margin:0}.th>span:last-child{min-width:0}
+.th:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+.sw3{display:flex;flex:0 0 auto;border-radius:8px;overflow:hidden;border:1px solid var(--line3,rgba(255,255,255,.25))}.sw3 i{display:block;width:22px;height:30px}
 </style></head>
 <body><header class="top"><div><img src="../assets/logo-mark.png" alt="" width="41" height="28"><span>Mallu Articles Bengaluru</span><small>Organiser</small></div></header><div class="kasavu"></div><main id="app"></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
@@ -157,7 +162,7 @@ const rank=t=>t.kind==="coordinator"?0:(t.ticket_no==null?2:1);
 const live=()=>people().filter(p=>!p.transferred_out_at);
 const fdt=iso=>iso?new Date(iso).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",hour:"numeric",minute:"2-digit",hour12:true}):"–";
 function tAge(iso){const h=(Date.now()-new Date(iso).getTime())/36e5;return h<1?Math.max(1,Math.round(h*60))+" min":h<48?Math.round(h)+" h":Math.round(h/24)+" days"}
-const TERR={NOT_ALLOWED:"Only admins can do this.",INVALID_TRANSFER:"That transfer no longer exists. The page was refreshed.",NOT_PENDING:"This transfer is no longer waiting for an admin (someone else may have handled it). The page was refreshed.",NOT_ACTIVE:"This code is no longer active.",NO_BUYER:"No buyer has applied yet.",
+const TERR={NOT_ALLOWED:"Only admins can do this.",INVALID_THEME:"That theme name is not one the database knows. Reload this page and try again.",INVALID_TRANSFER:"That transfer no longer exists. The page was refreshed.",NOT_PENDING:"This transfer is no longer waiting for an admin (someone else may have handled it). The page was refreshed.",NOT_ACTIVE:"This code is no longer active.",NO_BUYER:"No buyer has applied yet.",
   CALL_NOT_CONFIRMED:"Tick “I phoned the seller” first.",PAYMENT_NOT_VERIFIED:"Verify the buyer's payment first.",NOT_PUBLIC:"This only applies to public transfers.",ALREADY_REQUESTED:"Payment was already requested.",NOT_SUBMITTED:"The buyer has not uploaded a payment screenshot yet.",ALREADY_VERIFIED:"The payment is already verified.",INVALID_AMOUNT:"Type the amount that actually arrived (₹1 to ₹10,00,000).",
   SELLER_CHECKED_IN:"The seller has already entered the hall, so this ticket cannot be transferred. Reject this transfer.",SELLER_ALREADY_TRANSFERRED:"This ticket was already transferred.",SELLER_TICKET_INVALID:"The seller's ticket is no longer valid (booking not confirmed, or the ticket changed). Reject this transfer.",BUYER_BOOKING_INVALID:"The buyer's booking is no longer valid. Reject this transfer.",
   INVALID_HOURS:"Hours must be between 1 and 168.",INVALID_NOTE:"The note is too long (300 characters at most).",INVALID_REFERENCE:"Type a reference of 3 to 80 characters (for example the UPI transaction ID).",ALREADY_PAID:"The seller is already marked as paid.",NOT_DONE:"The transfer is not completed yet.",ALREADY_RETURNED:"Already marked as returned.",NO_RETURN_DUE:"No return is due for this transfer.",
@@ -401,6 +406,7 @@ function vSettings(){const s=S.settings;
   ${evCard(s)}
   ${trCard(s)}
   ${ipCard(s)}
+  ${themeCard(s)}
   ${aboutCard(s)}
   ${emailCard(s)}
   ${feedbackCard(s)}
@@ -647,6 +653,14 @@ function trCard(s){
   <label for="thours">How long a transfer code stays valid (hours, 1 to 168)</label><input id="thours" type="number" min="1" max="168" value="${s.private_code_hours}">
   <p class="mute" style="margin:4px 0">You can extend any code later from the Transfers tab. The price a public buyer is asked is the “Price per person” above.</p>
   <p><button id="tsave">Save transfer settings</button></p></div>`}
+/* colour theme of the PUBLIC page (r2_15). The swatches are only a preview: bg / card / accent of each theme. The card is hidden until r2_15 has been run. */
+const THEME_LIST=[["navy","Midnight Navy (the original)","Dark navy with amber","#081020","#101838","#F0A000"],["emerald","Emerald Night","Dark forest green with gold","#06231B","#0C3126","#E3B341"],["charcoal","Charcoal & Mint","Graphite with mint","#1C1F24","#262B32","#4FE3B1"],["mango","Mango Fiesta","Sunshine yellow with chilli red","#FFF6D6","#FFFFFF","#DD3328"],["sky","Sky Day","Sky blue with sunny yellow","#EAF4FF","#FFFFFF","#1E6FE0"],["terracotta","Terracotta Earth","Clay, sand and cream","#F5E9DA","#FFF8EE","#B5502B"]];
+function themeCard(s){
+  if(s.theme===undefined)return"";
+  return `<div class="card"><h2>Colour theme</h2>
+  <p class="mute" style="margin-top:0">The colours of the public registration site (Home, the form, payment, tickets and the ticket picture). The staff pages are not affected. A visitor sees the change the next time the page opens or refreshes.</p>
+  <div class="themes" role="radiogroup" aria-label="Colour theme">${THEME_LIST.map(t=>`<label class="th ${s.theme===t[0]?"on":""}" style="font-weight:400"><input type="radio" name="theme" value="${t[0]}" ${s.theme===t[0]?"checked":""}><span class="sw3"><i style="background:${t[3]}"></i><i style="background:${t[4]}"></i><i style="background:${t[5]}"></i></span><span><b>${esc(t[1])}</b><br><span class="mute">${esc(t[2])}</span></span></label>`).join("")}</div>
+  <p><button id="themesave">Save theme</button></p></div>`}
 function aboutCard(s){
   if(s.show_about===undefined)return"";
   return `<div class="card"><h2>About link</h2>
@@ -958,6 +972,7 @@ document.addEventListener("click",async e=>{const t=e.target,id=t.id;
     if(r.error)return toast(terr(r.error),6000);await load();view();return toast("Transfer settings saved")}
   if(id==="askemailsave"){const r=await db.rpc("admin_set_ask_email",{p_ask:$("#askemail").checked});if(r.error)return toast(terr(r.error),6000);await load();view();return toast("Email setting saved")}
   if(id==="askfbsave"){const r=await db.rpc("admin_set_ask_feedback",{p_ask:$("#askfb").checked});if(r.error)return toast(terr(r.error),6000);await load();view();return toast("Feedback setting saved")}
+  if(id==="themesave"){const c=document.querySelector('input[name="theme"]:checked');if(!c)return toast("Pick a theme first");const r=await db.rpc("admin_set_theme",{p_theme:c.value});if(r.error)return toast(terr(r.error),6000);await load();view();return toast("Theme saved. The public site now uses it")}
   if(id==="aboutsave"){const r=await db.rpc("admin_set_show_about",{p_show:$("#aboutshow").checked});if(r.error)return toast(terr(r.error),6000);await load();view();return toast("About link saved")}
   if(id==="ipsave"){const n=+$("#ipth").value;if(!(n>=2&&n<=1000))return toast("Use a number from 2 to 1000",4000);
     const r=await db.rpc("admin_set_transfer_settings",{p_ip_threshold:n});if(r.error)return toast(terr(r.error),6000);await load();view();return toast("Saved")}

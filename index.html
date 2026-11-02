@@ -536,7 +536,7 @@ function vForm(){
     <label for="t${i}">Phone number</label><div class="pf"><span aria-hidden="true">+91</span><input type="tel" class="ph" id="t${i}" data-i="${i}" data-k="phone" value="${esc(p.phone)}" inputmode="numeric" placeholder="10-digit mobile number" autocomplete="${i?"off":"tel-national"}" aria-label="Phone number, 10 digits, India +91"></div>
     ${askEmail()?`<label for="e${i}">Email address</label><input type="text" id="e${i}" data-i="${i}" data-k="email" value="${esc(p.email)}" maxlength="120" inputmode="email" autocapitalize="off" autocomplete="${i?"off":"email"}" placeholder="you@example.com">
     <p class="note" style="margin:6px 0 0">Only the organisers can see this. We will use it to share event updates, or to reach you if there is an issue with your booking.</p>`:""}
-    <div class="lbl">Where are you currently based?</div><div class="opts">${opt(i,"loc","In Bengaluru",p.loc)}${opt(i,"loc","Outside Bengaluru",p.loc)}</div>
+    <div class="lbl">Are you currently based in Bengaluru?</div><div class="opts">${opt(i,"loc","Yes",p.loc)}${opt(i,"loc","No",p.loc)}</div>
     <div class="lbl">Will you be attending?</div><div class="opts">${opt(i,"att","Surely",p.att)}${opt(i,"att","Most probably",p.att)}</div>
     <div class="lbl">Food preference</div><div class="opts">${opt(i,"food","Veg",p.food)}${opt(i,"food","Non-veg",p.food)}</div>
     </div>`;

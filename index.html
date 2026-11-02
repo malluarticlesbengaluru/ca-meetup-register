@@ -198,6 +198,54 @@ button.big{padding:18px 16px}
 .tile:nth-child(1){--tc:var(--orange)}.tile:nth-child(2){--tc:var(--violet)}.tile:nth-child(3){--tc:var(--teal)}.tile:nth-child(4){--tc:var(--pink)}
 .tile .ic{font-size:1.5rem;line-height:1}.tile b{display:block;margin:8px 0 4px;color:#fff;font-weight:800}.tile span{font-size:.92rem;line-height:1.45;color:var(--mute)}
 .when{margin-top:6px}
+/* ===== Home page, Ehsaas'26 redesign (Nov 2026). Everything is scoped to .home or body[data-step="home"] so no other screen is touched.
+   Dark only, as decided on 27 Oct 2026. The numbers worth changing are the --h* colours just below. ===== */
+body[data-step="home"]{background:#0B1226}
+body[data-step="home"] main{max-width:none;padding:0 0 env(safe-area-inset-bottom,0px)}
+.home{--hnavy:#061651;--hnavy2:#12308F;--hamber:#FFA300;--hamber2:#FFC24D;--hcard:#141F3B;--hink:#E8ECF6;--hmute:#9AA5BE;--hline:#243154;--heb:#8FA8FF;color:var(--hink);font-family:var(--sans);overflow-x:clip}
+.home h1,.home h2,.home h3{margin:0;line-height:1.15;letter-spacing:-.01em;color:#fff}
+.hw{max-width:1040px;margin:0 auto;padding:0 22px}
+.hhead{position:sticky;top:0;z-index:10;background:rgba(6,22,81,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:12px 0;padding-top:calc(12px + env(safe-area-inset-top,0px))}
+.hhead .hw{display:flex;align-items:center;gap:12px;color:#fff}.hhead img{width:40px;height:auto;display:block}
+.hbrand b{font-weight:800;letter-spacing:.02em}.hbrand small{display:block;color:var(--hamber);font-size:.66rem;letter-spacing:.2em}
+.hhero{position:relative;overflow:hidden;padding:58px 0 66px;background:linear-gradient(160deg,#040F3A,#061651 55%,#0C2278);text-align:center;color:#fff}
+.hhero-photo{position:absolute;inset:0;background:url(assets/home-hero.jpg) 50% 30%/cover no-repeat}
+.hhero-photo:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,15,58,.55),rgba(6,22,81,.3) 45%,rgba(6,22,81,.85))}
+.hblob{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none}.hb1{width:380px;height:380px;background:rgba(255,163,0,.26);top:-140px;right:-110px}.hb2{width:280px;height:280px;background:rgba(70,100,240,.34);bottom:-120px;left:-80px}
+.hhero .hw{position:relative;z-index:2}
+.hlogo{margin-bottom:18px}.hbadge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,163,0,.16);border:1px solid rgba(255,163,0,.4);color:var(--hamber);font-weight:700;font-size:.82rem;padding:6px 16px;border-radius:99px;margin-bottom:22px}.hbadge i{width:7px;height:7px;background:var(--hamber);border-radius:50%}
+.hpres{margin:0 0 6px;font-weight:700;color:var(--hamber2);letter-spacing:.04em}
+.home .hhero h1{font-size:clamp(3rem,13vw,5rem);font-weight:800;margin:0;text-shadow:0 4px 30px rgba(4,15,58,.9)}.home h1 em{font-style:normal;color:var(--hamber)}
+.hlede{margin:14px auto 0;max-width:34ch;font-size:1.15rem;color:#D7DEF5;text-shadow:0 1px 14px rgba(4,15,58,.9)}
+.home section{padding:50px 0}.hsec{text-align:center;max-width:56ch;margin:0 auto 30px}.hsec p{color:var(--hmute);margin:12px 0 0}
+.heyebrow{color:var(--heb);font-weight:700;font-size:.82rem;margin:0 0 8px}.home h2{font-size:clamp(1.5rem,4vw,2rem)}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}.hstats{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.hc{background:var(--hcard);border:1px solid var(--hline);border-radius:16px;padding:20px}
+.hgrid .hc{transition:transform .2s,box-shadow .2s}.hgrid .hc:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.hem{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--hnavy),var(--hnavy2));display:grid;place-items:center;font-size:1.4rem;margin-bottom:12px}
+.hc h3{font-size:1.02rem;margin-bottom:6px}.hc p{margin:0;color:var(--hmute);font-size:.92rem;line-height:1.5}
+.hstat b{display:block;font-size:1.25rem;line-height:1.25;color:#fff}.hstat>span{display:block;margin-bottom:6px;font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--heb)}
+a.htap{display:block;position:relative;text-decoration:none;color:inherit;cursor:pointer;transition:border-color .2s,transform .2s}a.htap:hover{border-color:var(--hamber)}
+.htap em{display:block;margin-top:8px;font-style:normal;font-weight:700;font-size:.85rem;color:var(--heb)}
+.hposter{margin:0 auto;max-width:460px;border-radius:20px;overflow:hidden;border:3px solid var(--hamber);box-shadow:0 20px 50px rgba(0,0,0,.45);background:#2a0a14}.hposter img{display:block;width:100%;height:auto;cursor:zoom-in}
+.hcap{margin:12px 0 0;text-align:center;font-size:.85rem;font-weight:700;color:var(--heb)}
+.hsponsor{max-width:520px;margin:0 auto;text-align:center;border-top:4px solid var(--hamber)}.hsponsor h2{font-size:1.35rem;margin-bottom:10px}.hsponsor p{margin:0 0 16px;color:var(--hmute)}.hsponsor .heyebrow{margin-bottom:6px}.hsponsor .hcap{margin-top:12px}
+.hticket{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--hnavy),var(--hnavy2));border-radius:22px;padding:34px 26px;color:#fff;max-width:520px;margin:0 auto}
+.hticket:after{content:"";position:absolute;top:-60px;right:-60px;width:210px;height:210px;background:rgba(255,163,0,.18);border-radius:50%}.hticket>*{position:relative;z-index:1}.hticket .heyebrow{color:#8FA8FF}
+.hticket dl{margin:18px 0 0;display:grid;gap:12px}.hticket dt{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--hamber)}.hticket dd{margin:2px 0 0;font-weight:700;color:#fff}
+.hjoin{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:24px;text-align:center}.hjoin p{margin:0 0 16px;color:#C9D3EE;font-size:.9rem}
+.home button.hbtn{display:block;width:100%;padding:15px 26px;border-radius:99px;font:800 1rem var(--sans)}
+.home button.hbtn+button.hbtn{margin-top:12px}
+.home button.hbtn.hamber{background:linear-gradient(135deg,var(--hamber),#F08A2E);color:var(--hnavy);border:0;box-shadow:0 10px 30px rgba(255,163,0,.4)}
+.home button.hbtn.ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.35)}
+.home .hnote{text-align:center;margin:18px 0 0;color:var(--hmute)}
+.hfoot{padding:30px 0 88px;text-align:center;background:var(--hnavy);color:#C9D3EE;font-size:.9rem}.hfoot b{color:#fff}
+.home button.hfab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;width:auto;padding:13px 22px;}
+.hlb{position:fixed;inset:0;z-index:30;background:rgba(4,8,24,.92);display:grid;place-items:center;padding:16px;cursor:zoom-out}.hlb img{max-width:100%;max-height:100%;border-radius:12px}
+.home :focus-visible{outline:3px solid var(--hamber);outline-offset:2px}
+@media(prefers-reduced-motion:no-preference){
+.hblob{animation:hfl 10s ease-in-out infinite}.hb2{animation-duration:13s;animation-direction:reverse}@keyframes hfl{50%{transform:translate(26px,-30px) scale(1.1)}}
+.hhero .hw>*{animation:hup .7s ease both}.hhero .hw>*:nth-child(2){animation-delay:.08s}.hhero .hw>*:nth-child(3){animation-delay:.16s}.hhero .hw>*:nth-child(4){animation-delay:.24s}.hhero .hw>*:nth-child(5){animation-delay:.32s}@keyframes hup{from{opacity:0;transform:translateY(22px)}}}
 </style></head>
 <body>
 <header class="top"><div><img src="assets/logo-mark.png" alt="" width="44" height="30"><span>Mallu Articles Bengaluru</span></div></header>
@@ -211,10 +259,11 @@ button.big{padding:18px 16px}
 /* ===== CONFIG: change these in one place ===== */
 const CONFIG={
   eventName:"Ehsaas'26",
-  eventLine:"Sun 22 Nov 2026, 2 PM · Savoury Business Hotel, Madiwala",
+  eventLine:"Sun 22 Nov 2026, 2 PM · Bloom Creative Zone, Haralur",
   ticketDate:"Sunday, 22 November 2026",          // shown on the ticket
+  eventStartISO:"2026-11-22T14:00:00+05:30",       // backup start time for "Add to calendar" (the live time comes from Admin > Settings)
   ticketTime:"2:00 PM",                            // shown on the ticket
-  ticketVenue:"Savoury Business Hotel, Madiwala",  // shown on the ticket
+  ticketVenue:"Bloom Creative Zone, Haralur",  // shown on the ticket
   organiserName:"Mallu Articles Bengaluru",        // shown on the ticket
   ticketTagline:"MALAYALEE CA MEETUP · BENGALURU", // small line at the top of the ticket
   // The UPI ID, the payee name and the organisers' WhatsApp number are NOT here any more:
@@ -363,6 +412,7 @@ function render(){
   reveal();
   if(window.LogoFluid){const l=document.getElementById("logo"),f=document.getElementById("logo-fallback");if(l){try{l.removeAttribute("hidden");LogoFluid.mount(l,{jiggle:false,replay:false});if(f)f.hidden=true}catch(_){l.setAttribute("hidden","");if(f)f.hidden=false}}}
   if(window.HomeFX){try{if(S.step==="home")HomeFX.mount();else HomeFX.unmount()}catch(_){}}   /* home-page motion only */
+  try{if(S.step==="home")homeMount();else homeUnmount()}catch(_){}
   if(window.PageFX){try{PageFX.enter(S.step)}catch(_){}}   /* short entrance when a screen changes (not on a redraw of the same screen) */
 }
 /* scroll reveal: cards below the fold fade and rise in as they are scrolled to (skipped for reduced motion) */
@@ -378,40 +428,82 @@ function reveal(){
 const aboutBtn=()=>`<button class="big ghost" id="go-about">About ${esc(CONFIG.organiserName)}</button>`;
 /* Live values (event date, time and venue; the About button) are patched into the Home card IN PLACE. Rebuilding the whole card
    each time an answer arrives restarted its fade-in and the logo animation and jumped the page back to the top. */
+function evShort(){const p=evParts({day:"numeric",month:"long",year:"numeric"});return p?p.day+" "+p.month+" "+p.year:CONFIG.ticketDate.replace(/^[A-Za-z]+,\s*/,"")}
+/* "Add to calendar" and "Open in Maps" follow the LIVE date and venue (Admin > Settings); the CONFIG values are only the backup */
+function evCalUrl(){
+  const s=new Date((S.ev&&S.ev.event_at)||CONFIG.eventStartISO);if(isNaN(s))return"";
+  const f=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d+/,""),e=new Date(s.getTime()+3*3600*1000);
+  return"https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(CONFIG.eventName)+"&dates="+f(s)+"/"+f(e)+"&details="+encodeURIComponent(CONFIG.organiserName+" meetup for professionals")+"&location="+encodeURIComponent(evVenue()+", Bengaluru")}
+function evMapUrl(){return"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(evVenue()+", Bengaluru")}
 function refreshHome(){
-  const ev={d:evDate(),t:evTime(),v:evVenue()};
+  const ev={d:evDate(),t:evTime(),v:evVenue(),s:evShort()};
   document.querySelectorAll("#app [data-ev]").forEach(el=>{const x=ev[el.dataset.ev];if(el.textContent!==x)el.textContent=x});
-  const dd=document.querySelectorAll("#app .when dd");
-  if(dd.length===3){const v=[evDate(),evTime(),evVenue()];dd.forEach((el,i)=>{if(el.textContent!==v[i])el.textContent=v[i]})}
+  const cal=document.getElementById("home-cal"),map=document.getElementById("home-map");
+  if(cal){const u=evCalUrl();if(u&&cal.getAttribute("href")!==u)cal.setAttribute("href",u)}
+  if(map){const u=evMapUrl();if(map.getAttribute("href")!==u)map.setAttribute("href",u)}
   const tk=document.getElementById("go-tickets"),ab=document.getElementById("go-about"),want=!!(S.flags&&S.flags.show_about);
-  if(want&&!ab&&tk)tk.insertAdjacentHTML("afterend",aboutBtn());
+  if(want&&!ab&&tk)tk.insertAdjacentHTML("afterend",hAbout());
   else if(!want&&ab)ab.remove();
 }
+/* the event name in the big heading: "Ehsaas'26" is drawn as Ehsaas + a coloured ’26 */
+function nameHtml(){const m=/^(.*?)['’](\d{2,4})$/.exec(CONFIG.eventName);return m?esc(m[1])+"<em>’"+esc(m[2])+"</em>":esc(CONFIG.eventName)}
+const hAbout=()=>`<button class="big hbtn ghost" id="go-about">About ${esc(CONFIG.organiserName)}</button>`;
 function vHome(){
-  const n=getMine().length,E=esc(CONFIG.eventName);
-  return `<section class="invite hero"><div class="photo" aria-hidden="true"></div><div class="band"></div><div class="inner"><div class="logo-wrap"><img id="logo-fallback" src="assets/logo-mark.png" alt="Mallu Articles Bengaluru logo" width="128" height="87"><svg class="logo" id="logo" viewBox="0 0 360 244" role="img" aria-label="Mallu Articles Bengaluru logo" hidden><defs><filter id="goo" filterUnits="userSpaceOnUse" x="-200" y="-150" width="760" height="550"><feGaussianBlur id="gooBlur" in="SourceGraphic" stdDeviation="0"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/></filter></defs><g filter="url(#goo)"><path id="hl" fill="#FA9E01"/><path id="hr" fill="#FCFCFC"/><path id="bl" fill="#FCFCFC"/><path id="br" fill="#FFA701"/></g><path id="dr" fill="#9A9999"/></svg></div>
-  <p class="pres">${esc(CONFIG.organiserName)} presents</p>
-  <h1>${E}</h1>
-  <div class="orn"><i></i><b></b><i></i></div>
-  <p class="tag">A meetup for professionals</p>
-  </div><div class="band"></div></section>
-  <div class="card"><h2 class="c1">Back for another meetup</h2>
-  <p>${esc(CONFIG.organiserName)} is bringing you another meetup for professionals, following last year's <b>Chai, Chill and Chartered</b>. The love and joy you shared with us that day stayed with us, and it is the reason we have planned this year's programme with even more care.</p>
-  <p>Expect a relaxed day of good company: friendly conversations, activities, good food and a few icebreakers to help you meet people you might not have met otherwise.</p></div>
-  <div class="card"><h2 class="c2">What's in store</h2><div class="tiles">
-  <div class="tile"><div class="ic">🍽️</div><b>Food</b><span>Good food to share and enjoy together.</span></div>
-  <div class="tile"><div class="ic">🎶</div><b>Music</b><span>Music to set the mood and bring everyone together.</span></div>
-  <div class="tile"><div class="ic">🎯</div><b>Activities</b><span>Icebreakers and activities to meet new faces.</span></div>
-  <div class="tile"><div class="ic">🎲</div><b>Games</b><span>Friendly games, plenty of laughs and a little healthy competition.</span></div></div></div>
-  <div class="card"><h2 class="c3">When &amp; where</h2>
-  <p>Join us on <b data-ev="d">${esc(evDate())}</b> at <b data-ev="t">${esc(evTime())}</b>, at <b data-ev="v">${esc(evVenue())}</b>, Bengaluru.</p></div>
-  <div class="card fee"><h2 class="c4">Sponsored, with a small contribution</h2>
-  <p>We're happy to share that ${E} is sponsored this year. To cover the total expenses of the programme, we will be collecting a contribution from interested participants. The exact amount is shown when you register.</p></div>
-  <div class="card summary"><h2 class="c1">Event summary</h2>
-  <dl class="when"><div><dt>Date</dt><dd>${esc(evDate())}</dd></div><div><dt>Time</dt><dd>${esc(evTime())}</dd></div><div><dt>Venue</dt><dd>${esc(evVenue())}</dd></div></dl>
-  <div class="row col" style="gap:12px;margin-top:18px"><button class="big" id="go-register">Register now</button>
-  <button class="big ghost" id="go-tickets">Ticket Status</button>${S.flags&&S.flags.show_about?aboutBtn():""}</div></div>`+
-  (n?`<p class="note" style="text-align:center;margin-top:18px">${n===1?"Your booking is":n+" bookings are"} saved on this device. Open Tickets and enter your phone number to view ${n===1?"it":"them"}.</p>`:"");
+  const n=getMine().length,E=esc(CONFIG.eventName).replace(/&#39;|'/g,"’"),O=esc(CONFIG.organiserName);
+  return `<div class="home">
+  <header class="hhead"><div class="hw"><img src="assets/logo-mark.png" alt="" width="40" height="27"><div class="hbrand"><b>${O.toUpperCase().replace(/ BENGALURU$/,"")}</b><small>BENGALURU</small></div></div></header>
+  <div class="hhero"><div class="hhero-photo" aria-hidden="true"></div><div class="hblob hb1"></div><div class="hblob hb2"></div>
+  <div class="hw"><div class="logo-wrap hlogo"><img id="logo-fallback" src="assets/logo-mark.png" alt="Mallu Articles Bengaluru logo" width="128" height="87"><svg class="logo" id="logo" viewBox="0 0 360 244" role="img" aria-label="Mallu Articles Bengaluru logo" hidden><defs><filter id="goo" filterUnits="userSpaceOnUse" x="-200" y="-150" width="760" height="550"><feGaussianBlur id="gooBlur" in="SourceGraphic" stdDeviation="0"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/></filter></defs><g filter="url(#goo)"><path id="hl" fill="#FA9E01"/><path id="hr" fill="#FCFCFC"/><path id="bl" fill="#FCFCFC"/><path id="br" fill="#FFA701"/></g><path id="dr" fill="#9A9999"/></svg></div>
+  <p class="hpres">${O} presents</p>
+  <h1 aria-label="${E}">${nameHtml()}</h1>
+  <p class="hlede">A meetup for professionals</p></div></div>
+
+  <section id="story"><div class="hw"><div class="hsec rv"><h2>Back for another meetup</h2>
+  <p>${O} is bringing you the 2026 meetup, <b>${E}</b>, following last year’s <b>Chai, Chill and Chartered</b>. The love and joy every single one of you shared that day stood with us, and is the reason we are bringing it again this year, with even more planning.</p></div></div></section>
+
+  <section style="padding-top:0"><div class="hw"><figure class="hposter rv" style="margin-top:0"><img id="home-poster" src="assets/ehsaas-poster.jpg" width="1000" height="1251" alt="${E} event poster" loading="lazy"></figure><p class="hcap">Tap the poster to enlarge</p></div></section>
+
+  <section style="padding-top:0"><div class="hw"><div class="hsec rv"><p class="heyebrow">On the day</p><h2>What’s in store</h2></div>
+  <div class="hgrid">
+  <div class="hc rv"><div class="hem">🤝</div><h3>Networking</h3><p>Meet fellow professionals from across Bengaluru and build connections that last.</p></div>
+  <div class="hc rv"><div class="hem">🎤</div><h3>Stage programs</h3><p>A lineup of stage moments to enjoy and cheer on together.</p></div>
+  <div class="hc rv"><div class="hem">🎲</div><h3>Games and activities</h3><p>Icebreakers, friendly games and plenty of laughs.</p></div>
+  <div class="hc rv"><div class="hem">🍽️</div><h3>Meals and refreshments</h3><p>Good food and refreshments to share and enjoy together.</p></div></div></div></section>
+
+  <section style="padding-top:0"><div class="hw"><div class="hsec rv"><p class="heyebrow">Save the date</p><h2>When &amp; where</h2></div>
+  <div class="hgrid hstats">
+  <a class="hc hstat htap rv" id="home-cal" href="${esc(evCalUrl())}" target="_blank" rel="noopener"><span>Date and Time</span><b><span data-ev="d">${esc(evDate())}</span> · <span data-ev="t">${esc(evTime())}</span></b><em>Tap to add to calendar</em></a>
+  <a class="hc hstat htap rv" id="home-map" href="${esc(evMapUrl())}" target="_blank" rel="noopener"><span>Venue</span><b><span data-ev="v">${esc(evVenue())}</span></b><em>Tap to open in Google Maps</em></a></div></div></section>
+
+  <section style="padding-top:0" id="home-sponsor"><div class="hw"><div class="hc hsponsor rv"><p class="heyebrow">Our sponsor</p><h2>Thank you for the support</h2><p>${SPONSOR.name?"We’re happy to announce <b>"+esc(SPONSOR.name)+"</b> is sponsoring "+E+".":"We’re happy to announce our sponsor for "+E+"."} Their support helps bring this meetup to you, and the remaining expenses are covered by a contribution from participants, shown when you register.</p><figure class="hposter" id="home-sp-fig" style="margin:0 auto"><img id="home-sp-img" src="${esc(SPONSOR.src)}" alt="Sponsor poster for ${E}"></figure><p class="hcap" id="home-sp-cap">Tap the poster to enlarge</p></div></div></section>
+
+  <section style="padding-top:0"><div class="hw"><div class="hticket rv" id="home-join">
+  <div class="hjoin"><p>Ready to join us? Reserve your spot, or check a ticket you already booked.</p>
+  <button class="big hbtn hamber" id="go-register">Register now</button><button class="big hbtn ghost" id="go-tickets">Ticket Status</button>${S.flags&&S.flags.show_about?hAbout():""}</div></div>`+
+  (n?`<p class="note hnote">${n===1?"Your booking is":n+" bookings are"} saved on this device. Open Tickets and enter your phone number to view ${n===1?"it":"them"}.</p>`:"")+`</div></section>
+
+  <footer class="hfoot"><div class="hw"><b>${O}</b> · ${E}</div></footer>
+  <button class="big hbtn hamber hfab" id="home-fab">Register now</button></div>`;
+}
+/* Home behaviour: reveal on scroll, the floating Register button, scroll hint, poster zoom, optional sponsor card. Torn down on every other screen. */
+let homeAC=null;
+const SPONSOR={src:"assets/sponsorfolder.jpg",name:""};   /* the sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
+function homeUnmount(){if(homeAC){homeAC.abort();homeAC=null}}
+function zoomImg(src){const d=document.createElement("div");d.className="hlb";d.innerHTML='<img alt="">';d.firstChild.src=src;d.onclick=()=>d.remove();document.body.appendChild(d)}
+function homeMount(){
+  homeUnmount();const root=document.querySelector("#app .home");if(!root)return;
+  homeAC=new AbortController();const sig=homeAC.signal,on=(t,e,f)=>t&&t.addEventListener(e,f,{signal:sig});
+  const rv=[...root.querySelectorAll(".rv")],showAll=()=>rv.forEach(e=>e.classList.add("in"));
+  try{
+    if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion:reduce)").matches)showAll();
+    else{const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.1});rv.forEach(e=>io.observe(e));sig.addEventListener("abort",()=>io.disconnect())}
+  }catch(_){showAll()}
+  on(root.querySelector("#home-fab"),"click",()=>{const t=document.getElementById("home-join");if(t)t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"center"})});
+  on(root.querySelector("#home-poster"),"click",e=>zoomImg(e.target.src));
+  const sp=root.querySelector("#home-sp-img");
+  if(sp){const gone=()=>{const f=root.querySelector("#home-sp-fig"),c=root.querySelector("#home-sp-cap");if(f)f.remove();if(c)c.remove()};
+    on(sp,"error",gone);if(sp.complete&&sp.naturalWidth===0&&sp.getAttribute("src"))setTimeout(()=>{if(sp.naturalWidth===0&&sp.complete)gone()},0);
+    on(sp,"click",()=>zoomImg(SPONSOR.src))}
 }
 function vAbout(){return head("About "+esc(CONFIG.organiserName),"Coming soon")+`<div class="card"><p style="margin:0">We're putting this page together. Please check back soon.</p></div><div class="row"><button class="ghost" id="go-home">Home</button></div>`}
 function loadFlags(){return db.rpc("get_site_flags").then(r=>{S.flags=r.error?null:r.data}).catch(()=>{S.flags=null})}

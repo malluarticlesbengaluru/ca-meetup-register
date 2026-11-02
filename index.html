@@ -479,11 +479,11 @@ function vHome(){
 
   <section style="padding-top:0"><div class="hw"><div class="hticket rv" id="home-join">
   <div class="hjoin"><p>Ready to join us? Reserve your spot, or check a ticket you already booked.</p>
-  <button class="big hbtn hamber" id="go-register">Register now</button><button class="big hbtn ghost" id="go-tickets">Ticket Status</button>${S.flags&&S.flags.show_about?hAbout():""}</div></div>`+
+  <button class="big hbtn hamber" id="go-register">Register now - ₹250</button><button class="big hbtn ghost" id="go-tickets">Ticket Status</button>${S.flags&&S.flags.show_about?hAbout():""}</div></div>`+
   (n?`<p class="note hnote">${n===1?"Your booking is":n+" bookings are"} saved on this device. Open Tickets and enter your phone number to view ${n===1?"it":"them"}.</p>`:"")+`</div></section>
 
   <footer class="hfoot"><div class="hw"><b>${O}</b> · ${E}</div></footer>
-  <button class="big hbtn hamber hfab" id="home-fab">Register now</button></div>`;
+  <button class="big hbtn hamber hfab" id="home-fab">Register now - ₹250</button></div>`;
 }
 /* Home behaviour: reveal on scroll, the floating Register button, scroll hint, poster zoom, optional sponsor card. Torn down on every other screen. */
 let homeAC=null;

@@ -2292,3 +2292,110 @@ end $function$;
 
 revoke all on function public.lookup_tickets(text, text) from public, anon, authenticated, service_role;
 grant execute on function public.lookup_tickets(text, text) to anon, authenticated;
+
+
+-- ============================================================================
+-- Release 2, piece 15: the "What best describes you?" question on the registration form
+-- Written 2 Nov 2026. Tested on the scratch database before use. REQUIRES r2_01 to r2_14. Safe to run twice.
+--
+-- What changes for the registration form (submit_booking):
+--   * NEW answer per person: occ = 'Article Assistant' | 'Employee' | 'Student' | 'Others'
+--     and occ_detail = what they typed (exam, firm / company, or anything for Others), 1 to 100 characters.
+--     Both are required. They are saved on the ticket in two new columns: occupation, occupation_detail.
+--   * The email is no longer asked on the registration form and is NOT read or stored any more
+--     (even if an old page still sends one). Emails already collected stay where they are (ticket_emails, admin-only).
+--   * "Will you be attending?" is no longer asked. tickets.attendance may now be empty (NULL).
+--     Old rows keep the answer they already have.
+--   * Everything else in submit_booking is exactly as it was (closed / pause / grace, group size, cap, name, phone,
+--     location, food, screenshot check, booking code, IP flag).
+--
+-- NOT changed on purpose: the TRANSFER form and transfer_submit still ask for email (when the Email switch is on)
+-- and attendance. The Email switch in Admin > Settings keeps working for the transfer form.
+--
+-- ORDER: run this SQL first, then publish the new index.html (the new page sends occ / occ_detail, which the OLD
+-- submit_booking would ignore while still demanding an email and attendance, so the old function would refuse every booking).
+-- ============================================================================
+
+alter table public.tickets add column if not exists occupation text;
+alter table public.tickets add column if not exists occupation_detail text;
+
+alter table public.tickets drop constraint if exists tickets_occupation_check;
+alter table public.tickets add constraint tickets_occupation_check
+  check (occupation is null or occupation in ('Article Assistant', 'Employee', 'Student', 'Others'));
+
+alter table public.tickets drop constraint if exists tickets_occupation_detail_check;
+alter table public.tickets add constraint tickets_occupation_detail_check
+  check (occupation_detail is null or char_length(occupation_detail) between 1 and 100);
+
+-- the two columns go together: both filled (new bookings) or both empty (old bookings, transfers)
+alter table public.tickets drop constraint if exists tickets_occupation_pair_check;
+alter table public.tickets add constraint tickets_occupation_pair_check
+  check ((occupation is null) = (occupation_detail is null));
+
+-- attendance is no longer asked: allow it to be empty (its allowed-values rule stays and ignores NULL)
+alter table public.tickets alter column attendance drop not null;
+
+create or replace function public.submit_booking(p_submission_id uuid, p_people jsonb, p_screenshot_path text)
+ returns jsonb
+ language plpgsql
+ security definer
+ set search_path to 'public'
+as $function$
+declare s settings%rowtype; b bookings%rowtype; n int; used int; r record; code text; pi jsonb;
+begin
+  select * into b from bookings where submission_id = p_submission_id;
+  if found then return _booking_json(b.id); end if;
+
+  select * into s from settings where id = 1 for update;
+  select * into b from bookings where submission_id = p_submission_id;
+  if found then return _booking_json(b.id); end if;
+
+  pi := _pause_info(s);
+  if (not s.is_open or (pi->>'in_pause')::boolean or now() > s.deadline) then
+    -- closed right now: only people who were already filling the form get the grace minutes (+30 s for upload time)
+    if _grace_until(s, p_submission_id, interval '30 seconds') is null then
+      raise exception 'REGISTRATION_CLOSED';
+    end if;
+  end if;
+  if p_people is null or jsonb_typeof(p_people) <> 'array' then raise exception 'INVALID_DATA'; end if;
+  n := jsonb_array_length(p_people);
+  if n < 1 or n > s.max_group then raise exception 'INVALID_GROUP_SIZE'; end if;
+
+  select count(*) into used from tickets t join bookings bk on bk.id = t.booking_id where bk.status <> 'rejected' and t.transferred_out_at is null;
+  if used + n > s.cap then raise exception 'NOT_ENOUGH_SPOTS'; end if;
+
+  for r in select value from jsonb_array_elements(p_people) loop
+    if length(trim(coalesce(r.value->>'name',''))) not between 1 and 80 then raise exception 'INVALID_NAME'; end if;
+    if coalesce(r.value->>'phone','') !~ '^[0-9]{10}$' then raise exception 'INVALID_PHONE'; end if;
+    if coalesce(r.value->>'occ','') not in ('Article Assistant','Employee','Student','Others') then raise exception 'INVALID_OCCUPATION'; end if;
+    if length(trim(coalesce(r.value->>'occ_detail',''))) not between 1 and 100 then raise exception 'INVALID_OCCUPATION_DETAIL'; end if;
+    if coalesce(r.value->>'loc','') not in ('In Bengaluru','Outside Bengaluru') then raise exception 'INVALID_LOCATION'; end if;
+    if coalesce(r.value->>'food','') not in ('Veg','Non-veg') then raise exception 'INVALID_FOOD'; end if;
+  end loop;
+
+  if p_screenshot_path is null or p_screenshot_path not like p_submission_id::text || '%'
+     or not exists (select 1 from storage.objects where bucket_id = 'payment-proofs' and name = p_screenshot_path)
+  then raise exception 'SCREENSHOT_MISSING'; end if;
+
+  loop
+    code := upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 8));
+    exit when not exists (select 1 from bookings where booking_code = code);
+  end loop;
+
+  insert into bookings (booking_code, submission_id, people_count, amount_expected, screenshot_path)
+  values (code, p_submission_id, n, n * s.price_per_head, p_screenshot_path) returning * into b;
+  insert into booking_ips (booking_id, ip, raw) values (b.id, _client_ip(), _client_ip_raw());   -- flag only, never blocks
+
+  -- one ticket per person, in the order listed (no email, no attendance any more)
+  for r in select value, ord from jsonb_array_elements(p_people) with ordinality as e(value, ord) order by ord loop
+    insert into tickets (secret, booking_id, name, phone, location, food, occupation, occupation_detail)
+    values (substr(replace(gen_random_uuid()::text, '-', ''), 1, 12), b.id,
+            trim(r.value->>'name'), r.value->>'phone', r.value->>'loc', r.value->>'food',
+            r.value->>'occ', trim(r.value->>'occ_detail'));
+  end loop;
+
+  return _booking_json(b.id);
+end $function$;
+
+revoke all on function public.submit_booking(uuid, jsonb, text) from public, anon, authenticated, service_role;
+grant execute on function public.submit_booking(uuid, jsonb, text) to anon, authenticated;

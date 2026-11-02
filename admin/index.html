@@ -97,7 +97,7 @@ const SIMILAR_BITS=8;                // images differing by <= this many of 1024
 const db=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true}});
 const $=s=>document.querySelector(s),esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const pad=n=>String(n).padStart(3,"0"),inr=n=>"₹"+Number(n||0).toLocaleString("en-IN");
-const S={staff:null,tab:"overview",bookings:[],tickets:[],scans:[],settings:null,mode:"both",f:{q:"",food:"",loc:"",att:"",pay:"",type:"",review:false,here:""},msg:"",charts:[],scanning:false,alert:null,log:[],payOpen:false,
+const S={staff:null,tab:"overview",bookings:[],tickets:[],scans:[],settings:null,mode:"both",f:{q:"",food:"",loc:"",role:"",pay:"",type:"",review:false,here:""},msg:"",charts:[],scanning:false,alert:null,log:[],payOpen:false,
   emails:{},emailsOk:false,fb:[],fbOk:false,transfers:[],buyers:[],tReady:false,money:null,ipf:null,showMoved:false};
 function toast(t,ms){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),ms||2400)}
 
@@ -237,17 +237,17 @@ function vOverview(){
     S.charts.push(new Chart($(id),{type:"pie",data:{labels,datasets:[{data,backgroundColor:colors,borderColor:"#0A2219",borderWidth:3,hoverOffset:6}]},plugins:[pctLabels],options:{maintainAspectRatio:false,devicePixelRatio:Math.max(window.devicePixelRatio||1,2),plugins:{legend:{display:false}}}}))};
   mk("#c1","Food",["Veg","Non-veg"],cnt("food",["Veg","Non-veg"]),["#2FD39B","#E86818"]);
   mk("#c2","Location",["In Bengaluru","Outside Bengaluru"],cnt("location",["In Bengaluru","Outside Bengaluru"]),["#4D78FF","#C0307E"]);
-  mk("#c3","Attendance",["Surely","Most probably"],cnt("attendance",["Surely","Most probably"]),["#F0A000","#9A55F0"]);
+  mk("#c3","Role",["Article Assistant","Employee","Student","Others"],cnt("occupation",["Article Assistant","Employee","Student","Others"]),["#F0A000","#9A55F0","#2FD39B","#E86818"]);
 }
 function filtBar(withPeople){
-  const f=S.f,o=(v,l)=>`<option value="${v}" ${f.pay===v?"selected":""}>${l}</option>`,n=[f.pay,f.food,f.loc,f.att,f.type,f.here].filter(Boolean).length;
+  const f=S.f,o=(v,l)=>`<option value="${v}" ${f.pay===v?"selected":""}>${l}</option>`,n=[f.pay,f.food,f.loc,f.role,f.type,f.here].filter(Boolean).length;
   if(!withPeople)return `<div class="bar"><input id="q" type="search" placeholder="Search name, phone or booking ID" value="${esc(f.q)}" style="flex:1 1 240px"><label style="margin:0"><input type="checkbox" id="frev" ${f.review?"checked":""}> Needs review only</label></div>`;
   return `<div class="bar"><input id="q" type="search" placeholder="Search name, phone, ticket or booking ID" value="${esc(f.q)}" style="flex:1 1 240px"></div>
   <details class="flt" ${n?"open":""}><summary>Filters${n?" ("+n+" on)":""}</summary><div class="bar">
   <select id="fpay" aria-label="Payment">${o("","All payments")}${o("pending","Pending")}${o("paid","Paid")}${o("rejected","Rejected")}</select>
   <select id="ffood" aria-label="Food"><option value="">Food: all</option><option ${f.food==="Veg"?"selected":""}>Veg</option><option ${f.food==="Non-veg"?"selected":""}>Non-veg</option></select>
   <select id="floc" aria-label="Location"><option value="">Location: all</option><option ${f.loc==="In Bengaluru"?"selected":""}>In Bengaluru</option><option ${f.loc==="Outside Bengaluru"?"selected":""}>Outside Bengaluru</option></select>
-  <select id="fatt" aria-label="Attendance"><option value="">Attendance: all</option><option ${f.att==="Surely"?"selected":""}>Surely</option><option ${f.att==="Most probably"?"selected":""}>Most probably</option></select>
+  <select id="frole" aria-label="Role"><option value="">Role: all</option>${["Article Assistant","Employee","Student","Others"].map(v=>`<option ${f.role===v?"selected":""}>${v}</option>`).join("")}</select>
   <select id="fhere" aria-label="Present at the event"><option value="">Present: all</option><option value="yes" ${f.here==="yes"?"selected":""}>Present at the event</option><option value="no" ${f.here==="no"?"selected":""}>Not present yet</option></select>
   <select id="ftype" aria-label="Type"><option value="">Type: all</option><option value="guest" ${f.type==="guest"?"selected":""}>Guests only</option><option value="coordinator" ${f.type==="coordinator"?"selected":""}>Coordinators only</option></select>
   ${S.tickets.some(t=>t.transferred_out_at)?`<label style="margin:0;font-weight:600;display:flex;align-items:center;gap:8px"><input type="checkbox" id="fmoved" ${S.showMoved?"checked":""}> Show transferred tickets</label>`:""}</div></details>
@@ -278,21 +278,21 @@ function tBookings(){
     <div class="bk-a"><button class="ghost" data-shot="${b.id}">Screenshot</button>${b.status!=="paid"?`<button data-st="paid" data-b="${b.id}">Paid</button>`:""}${b.status!=="rejected"?`<button class="bad" data-st="rejected" data-b="${b.id}">Reject</button>`:""}${b.status!=="pending"?`<button class="ghost" data-st="pending" data-b="${b.id}">Pending</button>`:""}</div></div>`}).join("")+`</div>${rows.length?"":'<p class="mute">Nothing to show.</p>'}`;
 }
 function filteredPeople(){const f=S.f,q=f.q.toLowerCase();
-  return people().filter(p=>(S.showMoved||!p.transferred_out_at)&&(!f.pay||p.b.status===f.pay)&&(!f.food||p.food===f.food)&&(!f.loc||p.location===f.loc)&&(!f.att||p.attendance===f.att)&&(!f.type||p.kind===f.type)&&(!f.here||(f.here==="yes")===!!p.checked_in_at)&&(!q||p.name.toLowerCase().includes(q)||p.phone.includes(q)||tlabel(p).toLowerCase().includes(q)||(p.b.booking_code||"").toLowerCase().includes(q)))}
+  return people().filter(p=>(S.showMoved||!p.transferred_out_at)&&(!f.pay||p.b.status===f.pay)&&(!f.food||p.food===f.food)&&(!f.loc||p.location===f.loc)&&(!f.role||p.occupation===f.role)&&(!f.type||p.kind===f.type)&&(!f.here||(f.here==="yes")===!!p.checked_in_at)&&(!q||p.name.toLowerCase().includes(q)||p.phone.includes(q)||tlabel(p).toLowerCase().includes(q)||(p.b.booking_code||"").toLowerCase().includes(q)))}
 function vPeople(){$("#v").innerHTML=filtBar(true)+`<div id="tbl"></div>`;tPeople()}
 function tPeople(){const r=filteredPeople(),here=r.filter(p=>p.checked_in_at).length;
   const tag=t=>`<span class="tg">${esc(t)}</span>`;
   $("#tbl").innerHTML=`<p class="mute" style="margin:0 0 8px">${r.length} people shown${here?" · "+here+" present":""}</p><div class="pcs">`+r.map(p=>{
     const em=S.emailsOk&&S.emails[p.id]?`<a href="mailto:${esc(S.emails[p.id])}">${esc(S.emails[p.id])}</a>`:(S.emailsOk?'<span class="mute">no email</span>':"");
-    if(p.transferred_out_at)return `<div class="card pc moved" data-pid="${p.id}"><div class="pc-h"><div><b>${esc(p.name)}</b><div class="mute">${esc(tlabel(p))} · Guest</div></div><span class="pill">Transferred</span></div><div class="mute">Transferred to another person</div><div class="pc-c"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>${em}</div><div class="pc-t">${tag(p.location)}${tag(p.attendance)}${tag(p.food)}<button class="tg lk2" data-sheet="booking:${p.booking_id}">${esc(p.b.booking_code)} ›</button></div></div>`;
+    if(p.transferred_out_at)return `<div class="card pc moved" data-pid="${p.id}"><div class="pc-h"><div><b>${esc(p.name)}</b><div class="mute">${esc(tlabel(p))} · Guest</div></div><span class="pill">Transferred</span></div><div class="mute">Transferred to another person</div><div class="pc-c"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>${em}</div>${p.occupation_detail?`<div class="mute">${esc(p.occupation_detail)}</div>`:""}<div class="pc-t">${tag(p.location)}${p.occupation?tag(p.occupation):""}${tag(p.food)}<button class="tg lk2" data-sheet="booking:${p.booking_id}">${esc(p.b.booking_code)} ›</button></div></div>`;
     const co=p.kind==="coordinator",old=co?(p.ticket_no!=null?`guest ${"E26-"+pad(p.ticket_no)} cancelled`:""):(p.prev_coord_no!=null?`coordinator ${"E26-"+pad(p.prev_coord_no)+"C"} cancelled`:"");
     return `<div class="card pc ${co?"co":""}" data-pid="${p.id}"><div class="pc-h"><div><b>${esc(p.name)}</b><div class="mute">${esc(tlabel(p))} · ${co?"Coordinator":"Guest"}${old?` · ${esc(old)}`:""}</div></div><span class="pill p-${p.b.status}">${p.b.status}</span></div>
-    <div class="pc-c"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>${em}</div>
-    <div class="pc-t">${tag(p.location)}${tag(p.attendance)}${tag(p.food)}${S.msgOk&&S.tm[p.id]?tag("✉ "+msgName(S.tm[p.id])):""}${S.pzOk&&S.pz[p.id]?tag("🎲 picked"):""}<button class="tg lk2" data-sheet="booking:${p.booking_id}">${esc(p.b.booking_code)} ›</button></div>
+    <div class="pc-c"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>${em}</div>${p.occupation_detail?`<div class="mute">${esc(p.occupation_detail)}</div>`:""}
+    <div class="pc-t">${tag(p.location)}${p.occupation?tag(p.occupation):""}${tag(p.food)}${S.msgOk&&S.tm[p.id]?tag("✉ "+msgName(S.tm[p.id])):""}${S.pzOk&&S.pz[p.id]?tag("🎲 picked"):""}<button class="tg lk2" data-sheet="booking:${p.booking_id}">${esc(p.b.booking_code)} ›</button></div>
     <div class="pc-a">${p.checked_in_at?`<span class="here">✔ Present</span><button class="sm ghost" data-undo="${p.id}">Undo</button>`:""}${p.b.status==="rejected"?"":co?`<button class="sm ghost" data-co="remove" data-t="${p.id}">Remove coordinator</button>`:`<button class="sm ghost" data-co="make" data-t="${p.id}">Make coordinator</button>`}</div></div>`}).join("")+`</div>${r.length?"":'<p class="mute">Nobody matches.</p>'}`}
-function csv(){const r=filteredPeople(),h=["Ticket No.","Type","Name","Phone",...(S.emailsOk?["Email"]:[]),"Location","Attendance","Food","Booking ID","Payment","Expected amount","Present","Checked in at",...(S.showMoved?["Transferred to another person"]:[])];
+function csv(){const r=filteredPeople(),h=["Ticket No.","Type","Name","Phone",...(S.emailsOk?["Email"]:[]),"Location","Role","Role details","Food","Booking ID","Payment","Expected amount","Present","Checked in at",...(S.showMoved?["Transferred to another person"]:[])];
   const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-  const rows=r.map(p=>[tlabel(p),p.kind==="coordinator"?"Coordinator":"Guest",p.name,p.phone,...(S.emailsOk?[S.emails[p.id]||""]:[]),p.location,p.attendance,p.food,p.b.booking_code,p.b.status,p.b.amount_expected,p.checked_in_at?"Yes":"No",p.checked_in_at||"",...(S.showMoved?[p.transferred_out_at?"Yes":"No"]:[])]);
+  const rows=r.map(p=>[tlabel(p),p.kind==="coordinator"?"Coordinator":"Guest",p.name,p.phone,...(S.emailsOk?[S.emails[p.id]||""]:[]),p.location,p.occupation,p.occupation_detail,p.food,p.b.booking_code,p.b.status,p.b.amount_expected,p.checked_in_at?"Yes":"No",p.checked_in_at||"",...(S.showMoved?[p.transferred_out_at?"Yes":"No"]:[])]);
   const txt="\ufeff"+[h].concat(rows).map(x=>x.map(q).join(",")).join("\r\n"),a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([txt],{type:"text/csv;charset=utf-8"}));a.download="meetup-registrations.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 async function shots(items){
@@ -838,7 +838,7 @@ const nav=st=>{try{history.replaceState({...history.state,y:window.scrollY},"")}
   if(tabChanged)view();else renderSheet()};
 const openSheet=(type,id)=>nav({tab:S.tab,sheets:S.sheets.concat([{type,id}])});
 function gotoTab(tab,type,id){const who=type==="person"?people().find(x=>x.id===id):null;
-  if(tab==="people"){S.f={q:"",food:"",loc:"",att:"",pay:"",type:"",review:false,here:""};if(who&&who.transferred_out_at)S.showMoved=true;if(type==="pf"){const[k,v]=id.split("=");S.f[k]=v}}
+  if(tab==="people"){S.f={q:"",food:"",loc:"",role:"",pay:"",type:"",review:false,here:""};if(who&&who.transferred_out_at)S.showMoved=true;if(type==="pf"){const[k,v]=id.split("=");S.f[k]=v}}
   if(tab==="bookings"){S.f={...S.f,q:"",pay:type==="bf"?id:"",review:false}}
   nav({tab,sheets:[]});
   const el=type==="person"||type==="booking"?document.querySelector(`[data-${type==="person"?"pid":"bid"}="${id}"]`):null;
@@ -855,7 +855,7 @@ function pSheet(id){
   return {title:p.name,html:`<div class="mute">${esc(tlabel(p))} · ${co?"Coordinator":"Guest"}</div>
   <div class="srs">${row("Payment",`<span class="pill p-${p.b.status}">${esc(p.b.status||"")}</span>`)}
   ${row("Phone",`<a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>`)}${S.emailsOk?row("Email",em?`<a href="mailto:${esc(em)}">${esc(em)}</a>`:'<span class="mute">none</span>'):""}
-  ${p.location!==undefined?row("Location",esc(p.location)):""}${p.attendance!==undefined?row("Attendance",esc(p.attendance)):""}${row("Food",esc(p.food))}
+  ${p.location!==undefined?row("Location",esc(p.location)):""}${p.occupation?row("Role",esc(p.occupation)):""}${p.occupation_detail?row("Role details",esc(p.occupation_detail)):""}${row("Food",esc(p.food))}
   ${row("At the event",p.transferred_out_at?'<span class="mute">ticket transferred away</span>':p.checked_in_at?`<b style="color:var(--ok)">✔ Present</b> <span class="mute">${esc(fdt(p.checked_in_at))}</span>`:'<span class="mute">not yet</span>')}
   ${row("Booking",lk("booking",p.booking_id,p.b.booking_code||"–"))}
   ${adm&&S.msgOk&&!p.transferred_out_at?row("Message",`<select data-pmsg="1" data-pid="${esc(p.id)}" aria-label="Message for ${esc(p.name)}"><option value="">None</option>${S.msgs.map(x=>`<option value="${x.id}" ${S.tm[p.id]===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select>`):""}
@@ -989,7 +989,7 @@ document.addEventListener("change",e=>{const t=e.target;
   if(t.id==="mode"){S.mode=t.value;view()}
   if(t.id==="fmoved"){S.showMoved=t.checked;tPeople()}
   if(t.dataset.tcall){tcall("admin_transfer_confirm_call",{p_transfer:t.dataset.tcall,p_confirmed:t.checked},t.checked?"Call confirmed":"Call tick removed")}
-  if(["fpay","ffood","floc","fatt","ftype","fhere","frev"].includes(t.id)){S.f.pay=$("#fpay")?.value??S.f.pay;if($("#ffood")){S.f.food=$("#ffood").value;S.f.loc=$("#floc").value;S.f.att=$("#fatt").value;S.f.type=$("#ftype").value;S.f.here=$("#fhere").value}if($("#frev"))S.f.review=$("#frev").checked;S.tab==="people"?tPeople():tBookings()}});
+  if(["fpay","ffood","floc","frole","ftype","fhere","frev"].includes(t.id)){S.f.pay=$("#fpay")?.value??S.f.pay;if($("#ffood")){S.f.food=$("#ffood").value;S.f.loc=$("#floc").value;S.f.role=$("#frole").value;S.f.type=$("#ftype").value;S.f.here=$("#fhere").value}if($("#frev"))S.f.review=$("#frev").checked;S.tab==="people"?tPeople():tBookings()}});
 document.addEventListener("input",e=>{if(e.target.id==="lbody"){S.mf.lot.body=e.target.value;return}if(e.target.id==="lhead"){S.mf.lot.head=e.target.value;return}if(e.target.id==="ln"){S.mf.lot.n=e.target.value;return}if(e.target.id==="mname"){S.mf.name=e.target.value;return}if(e.target.id==="mbody"){S.mf.body=e.target.value;return}if(e.target.id==="gfq"){S.gfind=e.target.value;gResults();return}if(e.target.id==="gq"){S.gq=e.target.value;gSearch();return}if(e.target.id==="q"){S.f.q=e.target.value;S.tab==="people"?tPeople():tBookings()}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.target.id==="pw"||e.target.id==="em"))$("#login").click()});
 boot();

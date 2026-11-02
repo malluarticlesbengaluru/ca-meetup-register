@@ -112,7 +112,7 @@ tickets|4|booking_id|uuid|t|
 tickets|5|name|text|t|
 tickets|6|phone|text|t|
 tickets|7|location|text|t|
-tickets|8|attendance|text|t|
+tickets|8|attendance|text|f|
 tickets|9|food|text|t|
 tickets|10|checked_in_at|timestamp with time zone|f|
 tickets|11|checked_in_by|uuid|f|
@@ -127,6 +127,8 @@ tickets|19|prev_coord_no|integer|f|
 tickets|20|prev_coord_secret|text|f|
 tickets|21|transferred_out_at|timestamp with time zone|f|
 tickets|22|transferred_from|uuid|f|
+tickets|23|occupation|text|f|
+tickets|24|occupation_detail|text|f|
 transfer_buyers|1|id|uuid|t|gen_random_uuid()
 transfer_buyers|2|transfer_id|uuid|t|
 transfer_buyers|3|submission_id|uuid|t|
@@ -236,6 +238,9 @@ tickets | tickets_food_check | CHECK ((food = ANY (ARRAY['Veg'::text, 'Non-veg':
 tickets | tickets_kind_chk | CHECK ((((kind = 'guest'::text) AND (coord_no IS NULL)) OR ((kind = 'coordinator'::text) AND (coord_no IS NOT NULL))))
 tickets | tickets_location_check | CHECK ((location = ANY (ARRAY['In Bengaluru'::text, 'Outside Bengaluru'::text])))
 tickets | tickets_marked_by_fkey | FOREIGN KEY (marked_by) REFERENCES auth.users(id)
+tickets | tickets_occupation_check | CHECK (((occupation IS NULL) OR (occupation = ANY (ARRAY['Article Assistant'::text, 'Employee'::text, 'Student'::text, 'Others'::text]))))
+tickets | tickets_occupation_detail_check | CHECK (((occupation_detail IS NULL) OR ((char_length(occupation_detail) >= 1) AND (char_length(occupation_detail) <= 100))))
+tickets | tickets_occupation_pair_check | CHECK (((occupation IS NULL) = (occupation_detail IS NULL)))
 tickets | tickets_phone_check | CHECK ((phone ~ '^[0-9]{10}$'::text))
 tickets | tickets_pkey | PRIMARY KEY (id)
 tickets | tickets_ticket_no_key | UNIQUE (ticket_no)
@@ -1771,7 +1776,7 @@ CREATE OR REPLACE FUNCTION public.submit_booking(p_submission_id uuid, p_people 
  SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
-declare s settings%rowtype; b bookings%rowtype; n int; used int; r record; code text; pi jsonb; tid uuid;
+declare s settings%rowtype; b bookings%rowtype; n int; used int; r record; code text; pi jsonb;
 begin
   select * into b from bookings where submission_id = p_submission_id;
   if found then return _booking_json(b.id); end if;
@@ -1797,10 +1802,9 @@ begin
   for r in select value from jsonb_array_elements(p_people) loop
     if length(trim(coalesce(r.value->>'name',''))) not between 1 and 80 then raise exception 'INVALID_NAME'; end if;
     if coalesce(r.value->>'phone','') !~ '^[0-9]{10}$' then raise exception 'INVALID_PHONE'; end if;
-    if s.ask_email and (length(trim(coalesce(r.value->>'email',''))) not between 5 and 120
-       or lower(trim(r.value->>'email')) !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$') then raise exception 'INVALID_EMAIL'; end if;
+    if coalesce(r.value->>'occ','') not in ('Article Assistant','Employee','Student','Others') then raise exception 'INVALID_OCCUPATION'; end if;
+    if length(trim(coalesce(r.value->>'occ_detail',''))) not between 1 and 100 then raise exception 'INVALID_OCCUPATION_DETAIL'; end if;
     if coalesce(r.value->>'loc','') not in ('In Bengaluru','Outside Bengaluru') then raise exception 'INVALID_LOCATION'; end if;
-    if coalesce(r.value->>'att','') not in ('Surely','Most probably') then raise exception 'INVALID_ATTENDANCE'; end if;
     if coalesce(r.value->>'food','') not in ('Veg','Non-veg') then raise exception 'INVALID_FOOD'; end if;
   end loop;
 
@@ -1817,13 +1821,12 @@ begin
   values (code, p_submission_id, n, n * s.price_per_head, p_screenshot_path) returning * into b;
   insert into booking_ips (booking_id, ip, raw) values (b.id, _client_ip(), _client_ip_raw());   -- flag only, never blocks
 
-  -- one ticket per person, in the order listed; the email goes to the admin-only table ticket_emails
+  -- one ticket per person, in the order listed (no email, no attendance any more)
   for r in select value, ord from jsonb_array_elements(p_people) with ordinality as e(value, ord) order by ord loop
-    insert into tickets (secret, booking_id, name, phone, location, attendance, food)
+    insert into tickets (secret, booking_id, name, phone, location, food, occupation, occupation_detail)
     values (substr(replace(gen_random_uuid()::text, '-', ''), 1, 12), b.id,
-            trim(r.value->>'name'), r.value->>'phone', r.value->>'loc', r.value->>'att', r.value->>'food')
-    returning id into tid;
-    if s.ask_email then insert into ticket_emails (ticket_id, email) values (tid, lower(trim(r.value->>'email'))); end if;
+            trim(r.value->>'name'), r.value->>'phone', r.value->>'loc', r.value->>'food',
+            r.value->>'occ', trim(r.value->>'occ_detail'));
   end loop;
 
   return _booking_json(b.id);

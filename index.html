@@ -299,7 +299,7 @@ const db={
 function uuid(){if(crypto.randomUUID)return crypto.randomUUID();
   return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=crypto.getRandomValues(new Uint8Array(1))[0]&15;return(c==="x"?r:(r&3|8)).toString(16)})}
 const askEmail=()=>!(S.flags&&S.flags.ask_email===false);
-function blank(){return{name:"",phone:"",email:"",loc:"",att:"",food:""}}
+function blank(){return{name:"",phone:"",occ:"",occd:"",occFor:"",loc:"",food:""}}
 const S={step:"home",status:null,friends:false,n:1,people:[blank()],file:null,sid:uuid(),errs:[],payErr:"",busy:false,result:null,
   tk:{q:"",phone:"",msg:"",busy:false,res:null,nf:false,code:"",ph:""},ti:null,cur:null,cv:[],pay:null,payLoading:false,payFail:false,payChanged:false};
 const $=s=>document.querySelector(s);
@@ -313,7 +313,14 @@ const getMine=()=>LS.get("mm_mine",[]);
 function remember(key,code,max){const l=LS.get(key,[]).filter(c=>c!==code);l.unshift(code);LS.set(key,l.slice(0,max))}
 const normCode=t=>String(t||"").toUpperCase().replace(/O/g,"0").replace(/[\s-]/g,"");
 function setN(n){S.n=n;while(S.people.length<n)S.people.push(blank());S.people.length=n}
-function opt(i,k,v,cur){return `<label><input type="radio" name="p${i}_${k}" data-i="${i}" data-k="${k}" value="${v}" ${cur===v?"checked":""}><span>${v}</span></label>`}
+function opt(i,k,v,cur,lab){return `<label><input type="radio" name="p${i}_${k}" data-i="${i}" data-k="${k}" value="${v}" ${cur===v?"checked":""}><span>${lab||v}</span></label>`}
+// "What best describes you?": the four choices, the follow-up question for each, and the grey sample text inside the box
+const OCC={"Article Assistant":{q:"Which firm or company do you work in?",ph:"CA article at ABC & Co.",err:"Enter the firm or company you work in"},
+  "Employee":{q:"Which company do you work in?",ph:"Company name",err:"Enter the company you work in"},
+  "Student":{q:"Which exam are you attempting?",ph:"Approaching CA Finals",err:"Enter the exam you are attempting"},
+  "Others":{q:"Tell us what you do",ph:"Type here",err:"Tell us what you do"}};
+function occBox(i,p){const o=OCC[p.occ];if(!o)return"";
+  return `<label for="od${i}">${esc(o.q)}</label><input type="text" id="od${i}" data-i="${i}" data-k="occd" value="${esc(p.occd)}" maxlength="100" placeholder="${esc(o.ph)}" autocomplete="off">`}
 /* ===== event date, time and venue: set by admins in Admin > Settings. CONFIG values are the backup if it can't be loaded ===== */
 let evAt=0;
 async function loadEvent(){
@@ -534,10 +541,9 @@ function vForm(){
     h+=`<div class="card"><h2 class="c${i%5}">${S.n>1?"Person "+(i+1):"Your details"}</h2>
     <label for="n${i}">Full name</label><input type="text" id="n${i}" data-i="${i}" data-k="name" value="${esc(p.name)}" maxlength="80" autocomplete="${i?"off":"name"}">
     <label for="t${i}">Phone number</label><div class="pf"><span aria-hidden="true">+91</span><input type="tel" class="ph" id="t${i}" data-i="${i}" data-k="phone" value="${esc(p.phone)}" inputmode="numeric" placeholder="10-digit mobile number" autocomplete="${i?"off":"tel-national"}" aria-label="Phone number, 10 digits, India +91"></div>
-    ${askEmail()?`<label for="e${i}">Email address</label><input type="text" id="e${i}" data-i="${i}" data-k="email" value="${esc(p.email)}" maxlength="120" inputmode="email" autocapitalize="off" autocomplete="${i?"off":"email"}" placeholder="you@example.com">
-    <p class="note" style="margin:6px 0 0">Only the organisers can see this. We will use it to share event updates, or to reach you if there is an issue with your booking.</p>`:""}
-    <div class="lbl">Are you currently based in Bengaluru?</div><div class="opts">${opt(i,"loc","Yes",p.loc)}${opt(i,"loc","No",p.loc)}</div>
-    <div class="lbl">Will you be attending?</div><div class="opts">${opt(i,"att","Surely",p.att)}${opt(i,"att","Most probably",p.att)}</div>
+    <div class="lbl">What best describes you?</div><div class="opts">${Object.keys(OCC).map(k=>opt(i,"occ",k,p.occ)).join("")}</div>
+    <div id="ob${i}">${occBox(i,p)}</div>
+    <div class="lbl">Are you currently based in Bengaluru?</div><div class="opts">${opt(i,"loc","In Bengaluru",p.loc,"Yes")}${opt(i,"loc","Outside Bengaluru",p.loc,"No")}</div>
     <div class="lbl">Food preference</div><div class="opts">${opt(i,"food","Veg",p.food)}${opt(i,"food","Non-veg",p.food)}</div>
     </div>`;
   });
@@ -547,15 +553,15 @@ function validate(){
   const e=[];S.people.forEach((p,i)=>{const w=S.n>1?"Person "+(i+1)+": ":"";
     if(!p.name.trim())e.push(w+"Please enter a name");
     if(!/^\d{10}$/.test(p.phone))e.push(w+"Enter a valid 10-digit phone number");
-    if(!p.loc)e.push(w+"Select where you are currently based");
-    if(!p.att)e.push(w+"Select Surely or Most probably");
-    if(!p.food)e.push(w+"Select Veg or Non-veg");
-    if(askEmail()&&!okMail(p.email))e.push(w+"Enter a valid email address")});
+    if(!p.occ)e.push(w+"Select Article Assistant, Employee, Student or Others");
+    else if(!p.occd.trim())e.push(w+OCC[p.occ].err);
+    if(!p.loc)e.push(w+"Select whether you are currently based in Bengaluru");
+    if(!p.food)e.push(w+"Select Veg or Non-veg")});
   return e;
 }
 function vSummary(){
   return head("Check your details","Please make sure everything is correct. Food and hall arrangements are planned from these details.")+
-  `<div class="card">`+S.people.map((p,i)=>`<div class="who"><div class="who-n"><span class="who-i">${i+1}</span><div><b>${esc(p.name.trim())}</b><div class="note">+91 ${esc(p.phone)}${askEmail()&&p.email.trim()?"<br>"+esc(p.email.trim()):""}</div></div></div><div class="tags"><span>${esc(p.loc)}</span><span>${esc(p.att)}</span><span>${esc(p.food)}</span></div></div>`).join("")+`</div>
+  `<div class="card">`+S.people.map((p,i)=>`<div class="who"><div class="who-n"><span class="who-i">${i+1}</span><div><b>${esc(p.name.trim())}</b><div class="note">+91 ${esc(p.phone)}<br>${esc(p.occ)}: ${esc(p.occd.trim())}</div></div></div><div class="tags"><span>${esc(p.loc)}</span><span>${esc(p.food)}</span></div></div>`).join("")+`</div>
   <div class="card tot"><div><b>Total payable</b><div class="note">${S.n} × ₹${price()}</div></div><div class="tot-a">₹${total()}</div></div>
   <div class="row"><button class="ghost" id="edit">Edit details</button><button id="topay">Continue to pay</button></div>`;
 }
@@ -1018,7 +1024,7 @@ async function submit(){
       const up=await db.storage.from("payment-proofs").upload(path,blob,{contentType:blob.type,upsert:false});
       if(up.error&&!/exist|duplicate|409/i.test((up.error.message||"")+(up.error.statusCode||"")))throw up.error;
       const{data,error}=await db.rpc("submit_booking",{p_submission_id:S.sid,
-        p_people:S.people.map(p=>({name:p.name.trim(),phone:p.phone,email:askEmail()?p.email.trim().toLowerCase():"",loc:p.loc,att:p.att,food:p.food})),p_screenshot_path:path});
+        p_people:S.people.map(p=>({name:p.name.trim(),phone:p.phone,occ:p.occ,occ_detail:p.occd.trim(),loc:p.loc,food:p.food})),p_screenshot_path:path});
       if(error)throw error;
       S.result=data;S.step="done";resetBookingForm();
       try{localStorage.setItem("mm_last",JSON.stringify({code:data.booking_code}))}catch(_){}
@@ -1049,6 +1055,7 @@ document.addEventListener("input",e=>{const t=e.target;
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.target.id==="bq"||e.target.id==="tkph")){e.preventDefault();doSearch()}if(e.key==="Enter"&&e.target.id==="xb_c"){e.preventDefault();xOpenCode()}});
 document.addEventListener("change",e=>{const t=e.target;
   if(t.id==="fr"){S.friends=t.checked;setN(t.checked?2:1);render()}
+  else if(t.dataset&&t.dataset.k==="occ"){const i=+t.dataset.i,p=S.people[i];if(p.occFor!==p.occ){p.occd="";p.occFor=p.occ}const b=document.getElementById("ob"+i);if(b)b.innerHTML=occBox(i,p)}
   else if(t.name==="cnt"){setN(+t.value);render()}
   else if(t.dataset&&t.dataset.x&&t.type==="radio"){S.xb[t.dataset.x]=t.value}
   else if(t.dataset&&t.dataset.fb==="rating"&&S.fb){S.fb.rating=+t.value}

@@ -1718,23 +1718,15 @@ function drawTicket(c,t,code){
   x.save();rr(x,0,0,W,H,52);x.clip();
   // stage: dark base, crimson glow behind the title, spotlight rays from the top
   let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,BG.mid);g.addColorStop(.5,BG.lo);g.addColorStop(1,"#0B0206");x.fillStyle=g;x.fillRect(0,0,W,H);
-  g=x.createRadialGradient(W/2,300,20,W/2,300,800);g.addColorStop(0,BG.hi);g.addColorStop(1,"rgba(0,0,0,0)");x.globalAlpha=.95;x.fillStyle=g;x.fillRect(0,0,W,1100);x.globalAlpha=1;
-  x.save();x.translate(W/2,-70);
-  for(let i=-7;i<=7;i++){const a=i*.17,w=.034;g=x.createRadialGradient(0,0,0,0,0,960);g.addColorStop(0,RAY+".26)");g.addColorStop(1,RAY+"0)");x.fillStyle=g;
-    x.beginPath();x.moveTo(0,0);x.lineTo(1000*Math.sin(a-w),1000*Math.cos(a-w));x.lineTo(1000*Math.sin(a+w),1000*Math.cos(a+w));x.closePath();x.fill()}
-  x.restore();
-  // sparks and soft bokeh (the same on every ticket)
-  let sd=7;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647};
-  for(let i=0;i<12;i++){const px=rnd()*W,py=rnd()*900,r=22+rnd()*46;g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,RAY+".16)");g.addColorStop(1,RAY+"0)");x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill()}
-  for(let i=0;i<110;i++){const px=rnd()*W,py=Math.pow(rnd(),1.4)*1060,r=.5+rnd()*2.2;x.fillStyle="rgba(255,228,170,"+(.18+rnd()*.6).toFixed(2)+")";x.beginPath();x.arc(px,py,r,0,7);x.fill()}
+  g=x.createRadialGradient(W/2,300,20,W/2,300,800);g.addColorStop(0,BG.hi);g.addColorStop(1,"rgba(0,0,0,0)");x.globalAlpha=.7;x.fillStyle=g;x.fillRect(0,0,W,1100);x.globalAlpha=1;
   // stub shade
   x.fillStyle="rgba(0,0,0,.30)";x.fillRect(0,1100,W,H-1100);
   // foil bars and frame
-  g=x.createLinearGradient(0,0,W,0);[G[0],G[1],G[2],G[1],G[0]].forEach((cl,i)=>g.addColorStop(i/4,cl));x.fillStyle=g;x.fillRect(0,0,W,10);x.fillRect(0,H-10,W,10);
+  g=x.createLinearGradient(0,0,W,0);[G[0],G[1],G[2],G[1],G[0]].forEach((cl,i)=>g.addColorStop(i/4,cl));
   x.lineWidth=4;x.strokeStyle=foil(0,0,W,H);rr(x,24,24,W-48,H-48,40);x.stroke();
-  dia(W/2,24,15,foil(0,0,0,40));dia(W/2,H-24,15,foil(0,H-40,0,H));
+  
   // logo with a halo
-  g=x.createRadialGradient(W/2,128,10,W/2,128,230);g.addColorStop(0,RAY+".34)");g.addColorStop(1,RAY+"0)");x.fillStyle=g;x.fillRect(0,0,W,360);
+  g=x.createRadialGradient(W/2,128,10,W/2,128,230);g.addColorStop(0,RAY+".14)");g.addColorStop(1,RAY+"0)");x.fillStyle=g;x.fillRect(0,0,W,360);
   if(LOGO){const lw=160,lh=lw*LOGO.height/LOGO.width;x.drawImage(LOGO,(W-lw)/2,62,lw,lh)}
   // badge with flanking lines
   const kind=coord?"COORDINATOR":"MEMBER";x.font="600 26px "+FF;try{x.letterSpacing="8px"}catch(_){}const pw=x.measureText(kind).width+72;try{x.letterSpacing="0px"}catch(_){}
@@ -1744,19 +1736,18 @@ function drawTicket(c,t,code){
   txt(x,CONFIG.ticketTagline,W/2+2,322,22,"500",BLUSH,"center",5);
   // the title, in glowing foil
   const ts=fit(x,CONFIG.eventName,780,170,64,"700",FD);
-  x.save();x.shadowColor=TINT+".65)";x.shadowBlur=56;txt(x,CONFIG.eventName,W/2,472,ts,"700",sheen(472,ts),"center",0,FD);x.restore();
-  txt(x,CONFIG.eventName,W/2,472,ts,"700",sheen(472,ts),"center",0,FD);
+    txt(x,CONFIG.eventName,W/2,472,ts,"700",sheen(472,ts),"center",0,FD);
   txt(x,"presented by "+CONFIG.organiserName,W/2,528,30,"italic 500",BLUSH,"center",0,FD);
   // details in a glass panel
   x.fillStyle="rgba(255,255,255,.05)";rr(x,64,560,W-128,310,30);x.fill();x.lineWidth=2;x.strokeStyle=foil(64,560,W-64,870);x.globalAlpha=.6;x.stroke();x.globalAlpha=1;
   [["DATE",evDate()],["TIME",evTime()],["VENUE",evVenue()]].forEach((r,i)=>{
-    const y=614+i*92;dia(96,y-8,7,GOLD);txt(x,r[0],114,y,21,"600",GOLD,"left",6);
+    const y=614+i*92;txt(x,r[0],114,y,21,"600",GOLD,"left",6);
     const sz=fit(x,r[1],690,40,24,"500");txt(x,r[1],114,y+46,sz,"500",CREAM,"left",0);
     if(i<2){x.strokeStyle=TINT+".22)";x.lineWidth=1.5;x.beginPath();x.moveTo(90,y+66);x.lineTo(W-90,y+66);x.stroke()}});
   // attendee
-  dia(96,914,7,GOLD);txt(x,"ATTENDEE",114,922,21,"600",GOLD,"left",6);
+  txt(x,"ATTENDEE",114,922,21,"600",GOLD,"left",6);
   const ns=fit(x,t.name,730,86,36,"700",FD);
-  x.save();x.shadowColor=TINT+".4)";x.shadowBlur=24;txt(x,t.name,96,1002,ns,"700",CREAM,"left",0,FD);x.restore();
+  txt(x,t.name,96,1002,ns,"700",CREAM,"left",0,FD);
   const veg=t.food==="Veg",fc=veg?"#4BE38A":"#FF6B6B",ft=veg?"Veg":"Non-veg";x.font="600 32px "+FF;const fw=64+x.measureText(ft).width+30;
   x.fillStyle=veg?"rgba(75,227,138,.14)":"rgba(255,107,107,.14)";rr(x,96,1024,fw,50,25);x.fill();x.lineWidth=2.5;x.strokeStyle=fc;rr(x,96,1024,fw,50,25);x.stroke();
   x.lineWidth=4;rr(x,114,1035,28,28,6);x.stroke();x.fillStyle=fc;x.beginPath();x.arc(128,1049,6.5,0,7);x.fill();txt(x,ft,160,1058,32,"600",CREAM,"left",0);
@@ -1766,13 +1757,13 @@ function drawTicket(c,t,code){
   x.lineWidth=3;x.strokeStyle=GOLD;x.globalAlpha=.9;x.beginPath();x.arc(0,1100,40,-Math.PI/2,Math.PI/2);x.stroke();x.beginPath();x.arc(W,1100,40,Math.PI/2,Math.PI*1.5);x.stroke();x.globalAlpha=1;
   // stub
   x.fillStyle="rgba(255,255,255,.04)";rr(x,64,1124,W-128,312,30);x.fill();x.lineWidth=2;x.strokeStyle=foil(64,1124,W-64,1436);x.globalAlpha=.6;x.stroke();x.globalAlpha=1;
-  dia(96,1180,7,GOLD);txt(x,"TICKET NUMBER",114,1188,21,"600",GOLD,"left",6);
+  txt(x,"TICKET NUMBER",114,1188,21,"600",GOLD,"left",6);
   const tl=t.label||"—",ls=fit(x,tl,400,100,40,"600");
-  x.save();x.shadowColor=TINT+".55)";x.shadowBlur=30;txt(x,tl,100,1296,ls,"600",sheen(1296,ls),"left",2);x.restore();txt(x,tl,100,1296,ls,"600",sheen(1296,ls),"left",2);
+  txt(x,tl,100,1296,ls,"600",sheen(1296,ls),"left",2);
   txt(x,"Admits one person, one entry",100,1356,28,"italic 500",BLUSH,"left",0,FD);
   txt(x,"Show this QR at the entry",100,1396,24,"400","rgba(246,215,198,.72)","left",0);
   // QR (unchanged content and level; black on a white plate with a wide quiet zone)
-  x.save();x.shadowColor=TINT+".6)";x.shadowBlur=36;x.fillStyle="#fff";rr(x,536,1140,280,280,24);x.fill();x.restore();
+  x.fillStyle="#fff";rr(x,536,1140,280,280,24);x.fill();
   x.lineWidth=3;x.strokeStyle=foil(536,1140,816,1420);rr(x,536,1140,280,280,24);x.stroke();
   if(t.secret&&t.label){
     const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k=Math.floor(240/m),o=536+(280-m*k)/2,p=1140+(280-m*k)/2;

@@ -861,6 +861,16 @@ body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="t
 body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) button.chip{font:700 .8rem/1 var(--sans);padding:10px 14px;min-height:40px}
 body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) canvas.tk{border:1px solid var(--glass-b)}
 </style>
+<style id="burg-sponsor-slide">
+/* ===== Sponsor slider (test style B): the Moments slider look, with the thank-you card as slide 1 and the video as slide 2 ===== */
+.bhome .bh-spslider{--ih:auto;border-radius:28px;background:linear-gradient(135deg,var(--deep),rgba(140,24,56,.55));transition:height .6s cubic-bezier(.65,0,.25,1)}
+.bhome .bh-spslider .bh-track{align-items:flex-start}
+.bhome .bh-spslider .bh-spsl{flex:0 0 100%;min-width:0;margin:0}
+.bhome .bh-spslider .bh-sponsor{border:0;border-radius:0;background:none;padding:46px 26px 38px}
+.bhome .bh-spslider .bh-spvid{display:block;background:#0C0206}
+.bhome .bh-spslider .bh-spvid video{display:block;width:100%;height:auto;max-height:560px;background:#0C0206;object-fit:contain}
+@media(min-width:760px){.bhome .bh-spslider .bh-sponsor{padding:46px 44px 40px}}
+</style>
 </head>
 <body>
 <header class="top"><div><img src="assets/burg-logo.png" alt="" width="44" height="30"><span>Mallu Articles Bengaluru</span></div></header>
@@ -1153,7 +1163,7 @@ ${spots}
 <div class="bh-step bh-rv"><h3>Pay by UPI</h3><p>We calculate the total and open your UPI app. Upload the screenshot and you’re done.</p></div>
 <div class="bh-step bh-rv"><h3>Get your QR ticket</h3><p>Once verified, download your ticket and show it at the gate.</p></div></div></div></section>
 
-<section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-sponsor bh-rv">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you. The remaining costs are covered by a small contribution from participants, shown when you register.</p>${SPONSOR.video?`<figure class="bh-svid" id="home-sp-vfig"><video id="home-sp-video" src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="metadata" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video></figure>`:""}${SPONSOR.src?`<figure class="bh-spfig" id="home-sp-fig"><img id="home-sp-img" src="${esc(SPONSOR.src)}" alt="Sponsor poster for ${E}"></figure><p class="bh-hint" id="home-sp-cap">Tap the poster to enlarge</p>`:""}</div></div></div></section>
+<section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-slider bh-spslider bh-rv" id="sp-slider" role="region" aria-roledescription="carousel" aria-label="Our co-sponsor"><div class="bh-track" id="sp-track"><div class="bh-spsl bh-sponsor" aria-roledescription="slide" aria-label="1 of 2">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you. The remaining costs are covered by a small contribution from participants, shown when you register.</p></div></div>${SPONSOR.video?`<div class="bh-spsl bh-spvid" id="home-sp-vfig" aria-roledescription="slide" aria-label="2 of 2"><video id="home-sp-video" data-src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="none" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video></div>`:""}</div>${SPONSOR.video?`<div class="bh-dots" id="sp-dots"><button type="button" aria-label="Show the thank-you card" aria-current="true"></button><button type="button" aria-label="Show the video"></button></div>`:""}</div></div></section>
 
 <section id="moments"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">Our meetups</p><h2>Moments we’ve <i>shared.</i></h2></div>
 <div class="bh-slider bh-rv" id="bh-slider" role="region" aria-roledescription="carousel" aria-label="Photos from our past meetups"><div class="bh-track" id="bh-track">
@@ -1177,7 +1187,7 @@ ${ret?`<p class="bh-note">${n===1?"Your booking is saved on this device. Enter y
 /* Home behaviour: the clicks (poster zoom, the floating Register button, the optional sponsor card). The movement (reveal on scroll, countdowns,
    the floating button appearing, the count-down of the spots) is assets/home-fx.js. Torn down on every other screen. */
 let homeAC=null;
-const SPONSOR={src:"assets/sponsorfolder.jpg",name:"Eagles Institute of Management",logo:"assets/burg-sponsor-logo.png",video:"assets/sponsor-video.mp4"};   /* Co-sponsor. NAME and LOGO also show at the very bottom of Home ("Co-sponsored by ..."): edit them here and replace assets/sponsor-logo.png; empty strings hide that line. VIDEO plays in the co-sponsor card: put the file at assets/sponsor-video.mp4 (an MP4 with H.264 video and AAC sound plays on every phone); until the file exists the video is simply left out. Set video to "" to never show one. The sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
+const SPONSOR={src:"",name:"Eagles Institute of Management",logo:"assets/burg-sponsor-logo.png",video:"assets/sponsor-video.mp4"};   /* Co-sponsor. NAME and LOGO also show at the very bottom of Home ("Co-sponsored by ..."): edit them here and replace assets/sponsor-logo.png; empty strings hide that line. VIDEO plays in the co-sponsor card: put the file at assets/sponsor-video.mp4 (an MP4 with H.264 video and AAC sound plays on every phone); until the file exists the video is simply left out. Set video to "" to never show one. The sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
 function homeUnmount(){if(homeAC){homeAC.abort();homeAC=null}}
 /* a picture opens in the motion script's lightbox (it grows out of the poster); the plain zoom is the backup */
 function homeMount(){
@@ -1217,7 +1227,24 @@ function homeMount(){
     on(fab,"click",()=>{const t=document.getElementById("home-join");if(t)t.scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})})}
   /* the optional sponsor video and poster: dropped quietly when the file is missing; the video pauses when scrolled out of view */
   const sv=root.querySelector("#home-sp-video");
-  if(sv){const gone=()=>{const x=root.querySelector("#home-sp-vfig");if(x)x.remove()};
+  const lz=()=>{if(sv&&sv.dataset.src){sv.preload="metadata";sv.src=sv.dataset.src;sv.removeAttribute("data-src")}};   /* the video file is only fetched when the visitor scrolls near it */
+  if(sv){try{const lo=new IntersectionObserver(es=>{if(es[0].isIntersecting){lz();lo.disconnect()}},{rootMargin:"600px 0px"});lo.observe(sv);sig.addEventListener("abort",()=>lo.disconnect())}catch(_){lz()}}
+  /* the sponsor slider: slide 1 the thank-you card, slide 2 the video. Dots and swipe only (no auto-advance, so it never moves away from a playing video). */
+  const ssl=root.querySelector("#sp-slider"),str=root.querySelector("#sp-track"),sdt=[].slice.call(root.querySelectorAll("#sp-dots button")),sls=[].slice.call(root.querySelectorAll("#sp-track>.bh-spsl"));
+  let sc=0,sx=0,ssw=false,sblk=false;
+  function sgo(n){if(!str||!sdt.length)return;sc=Math.max(0,Math.min(sdt.length-1,n));str.style.transform="translateX(-"+sc*100+"%)";
+    sdt.forEach((d,i)=>d.setAttribute("aria-current",String(i===sc)));sls.forEach((s,i)=>{try{s.inert=i!==sc}catch(_){}});
+    if(sc===1)lz();if(sc!==1&&sv&&!sv.paused)sv.pause();sfit()}
+  /* the slider is exactly as tall as the slide being shown, so the video never sits in empty bars; it follows any later size change (fonts, rotation, the video's own size) */
+  function sfit(){if(!ssl||!sls[sc])return;const cs=getComputedStyle(ssl),b=cs.boxSizing==="border-box"?parseFloat(cs.borderTopWidth)+parseFloat(cs.borderBottomWidth):0;ssl.style.height=(sls[sc].offsetHeight+b)+"px"}
+  if(ssl&&str&&sdt.length){sgo(0);
+    try{const ro=new ResizeObserver(sfit);sls.forEach(s=>ro.observe(s));sig.addEventListener("abort",()=>ro.disconnect())}catch(_){}
+    on(window,"resize",sfit);if(sv)on(sv,"loadedmetadata",sfit);
+    sdt.forEach((d,i)=>on(d,"click",()=>sgo(i)));
+    on(ssl,"touchstart",e=>{const t=e.touches[0],v=e.target.closest&&e.target.closest("video");sblk=false;if(v){const r=v.getBoundingClientRect();if(t.clientY>r.bottom-64)sblk=true}sx=t.clientX},{passive:true});   /* a swipe that starts on the video's control bar is the seek bar, not the slider */
+    on(ssl,"touchend",e=>{if(sblk)return;const d=e.changedTouches[0].clientX-sx;if(Math.abs(d)>40){ssw=true;sgo(sc+(d<0?1:-1))}},{passive:true});
+    on(ssl,"click",e=>{if(ssw){e.stopPropagation();e.preventDefault();ssw=false}},{capture:true})}
+  if(sv){const gone=()=>{const x=root.querySelector("#home-sp-vfig"),d=root.querySelector("#sp-dots");if(x)x.remove();if(d)d.remove();if(str)str.style.transform="";if(ssl)ssl.style.height="";sdt.length=0};   /* file missing: the slider quietly becomes the plain thank-you card */
     on(sv,"error",gone);if(sv.error)gone();
     try{const io=new IntersectionObserver(es=>{if(!es[0].isIntersecting&&!sv.paused)sv.pause()},{threshold:.25});io.observe(sv);sig.addEventListener("abort",()=>io.disconnect())}catch(_){}}
   const sp=root.querySelector("#home-sp-img");

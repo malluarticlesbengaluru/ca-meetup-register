@@ -240,6 +240,7 @@ a.htap{display:block;position:relative;text-decoration:none;color:inherit;cursor
 .home button.hbtn.hamber{background:linear-gradient(135deg,var(--hamber),#F08A2E);color:var(--hnavy);border:0;box-shadow:0 10px 30px rgba(255,163,0,.4)}
 .home button.hbtn.ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.35)}
 .home .hnote{text-align:center;margin:18px 0 0;color:var(--hmute)}
+.hfoot .hspons{margin:14px 0 0;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:.85rem;color:var(--hmute)}.hfoot .hspons b{color:var(--hamber2)}.hfoot .hspons img{display:block;width:auto;height:64px;max-width:150px;object-fit:contain;padding:6px 10px;border-radius:12px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.3)}
 .hfoot{padding:30px 0 88px;text-align:center;background:var(--hnavy);color:#C9D3EE;font-size:.9rem}.hfoot b{color:#fff}
 .home button.hfab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;width:auto;padding:13px 22px;}
 .hlb{position:fixed;inset:0;z-index:30;background:rgba(4,8,24,.92);display:grid;place-items:center;padding:16px;cursor:zoom-out}.hlb img{max-width:100%;max-height:100%;border-radius:12px}
@@ -486,6 +487,7 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .fxstub>a.hc:first-child:after{display:block!important;content:"";position:absolute;right:-50px;top:-50px;left:auto;bottom:auto;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,163,0,.22),transparent 70%);z-index:0}
 .fxstub>a.hc+a.hc:after{display:block!important;content:"";position:absolute;right:-50px;top:-50px;left:auto;bottom:auto;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(143,168,255,.25),transparent 70%);z-index:0}
 .fxstub>a.hc>*{position:relative;z-index:1}
+.fxstub>a.hc>.fxr{position:absolute;z-index:2}   /* the press ripple must stay out of the layout: as a relative child it made the card as tall as the ripple */
 .fxic{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;margin-bottom:14px;background:rgba(255,163,0,.14);border:1px solid rgba(255,163,0,.4);color:var(--hamber)}
 .fxstub>a.hc+a.hc .fxic{background:rgba(143,168,255,.14);border-color:rgba(143,168,255,.45);color:var(--heb)}
 .fxic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -550,6 +552,13 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .fx .home.again .hhero .hw>*,.fx .home.again .fxc,.fx .home.again .fxlw{animation:none}
 .fx .home.again .hhero h1 em .fxc{animation:fxGlow 4.5s ease-in-out infinite;animation-delay:0s}
 .fx .home.again .fxcue{display:none}
+/* Date and Venue cards on a touch screen: a finger that lands on a card to scroll must not lift it (touch makes :hover stick) */
+@media (hover:none),(pointer:coarse){
+.fxstub>a.htap,.fxstub>a.htap:hover,.fxstub>a.htap:active{transform:none!important;scale:1!important;-webkit-tap-highlight-color:transparent}
+.fxstub>a.htap:hover{background-color:var(--hcard);border-color:var(--hline)}
+.fxstub>a.hc:first-child:hover{border-top-color:var(--hamber)}
+.fxstub>a.hc+a.hc:hover{border-top-color:transparent;background:linear-gradient(90deg,#FF8AD0,#B58CFF) top left/100% 3px no-repeat border-box,var(--hcard)}
+}
 </style>
 <style>
 /* ===== Register form screen (Nov 2026 redesign, from Ehsaas26-Form-demo-1). Scoped to .fpage, #fbar and body[data-step="form"]: no other screen is touched. ===== */
@@ -640,7 +649,7 @@ body[data-step="form"] .toast{bottom:calc(96px + env(safe-area-inset-bottom,0px)
 <main id="app"></main>
 <div id="fbar" class="fbar"></div>
 <script src="assets/logo-fluid.js?v=2"></script>
-<script src="assets/home-fx.js?v=3"></script>
+<script src="assets/home-fx.js?v=4"></script>
 <script src="assets/page-fx.js?v=1"></script>
 <script>
 /* ===== CONFIG: change these in one place ===== */
@@ -880,7 +889,6 @@ function vHome(){
   <div class="hw"><div class="logo-wrap hlogo"><img id="logo-fallback" src="assets/logo-mark.png" alt="Mallu Articles Bengaluru logo" width="128" height="87"><svg class="logo" id="logo" viewBox="0 0 360 244" role="img" aria-label="Mallu Articles Bengaluru logo" hidden><defs><filter id="goo" filterUnits="userSpaceOnUse" x="-200" y="-150" width="760" height="550"><feGaussianBlur id="gooBlur" in="SourceGraphic" stdDeviation="0"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/></filter></defs><g filter="url(#goo)"><path id="hl" fill="#FA9E01"/><path id="hr" fill="#FCFCFC"/><path id="bl" fill="#FCFCFC"/><path id="br" fill="#FFA701"/></g><path id="dr" fill="#9A9999"/></svg></div>
   <p class="hpres">${O} presents</p>
   <h1 aria-label="${E}">${nameHtml()}</h1>
-  <div class="hfacts"><span data-ev="v">${esc(evVenue())}</span></div>
   <div class="hcta">
     <button class="big hbtn hamber" id="hero-register">${esc(P)}</button>
     <button class="big hbtn ghost" id="hero-tickets"${ret?"":" hidden"}>Register another booking</button>
@@ -919,13 +927,13 @@ function vHome(){
   <div class="fxbig rv" role="timer" aria-label="Countdown to the meetup"><div style="--i:0"><b>00</b><span>days</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:1"><b>00</b><span>hours</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:2"><b>00</b><span>minutes</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:3"><b>00</b><span>seconds</span><i></i><em class="fxsh" style="font-style:normal"></em></div></div>
   </div></div></section>
 
-  <footer class="hfoot"><div class="hw"><b>${O}</b> · ${E}</div></footer>
+  <footer class="hfoot"><div class="hw"><b>${O}</b> · ${E}${SPONSOR.name||SPONSOR.logo?`<div class="hspons"><span>Sponsored by${SPONSOR.name?` <b>${esc(SPONSOR.name)}</b>`:""}</span>${SPONSOR.logo?`<img src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Sponsor")} logo" width="64" height="64" onerror="this.remove()">`:""}</div>`:""}</div></footer>
   <button class="big hbtn hamber hfab" id="home-fab">${ret?"View my ticket":"Register now"}</button></div>`;
 }
 /* Home behaviour: the clicks (poster zoom, the floating Register button, the optional sponsor card). The movement (reveal on scroll, countdowns,
    the floating button appearing, the count-down of the spots) is assets/home-fx.js. Torn down on every other screen. */
 let homeAC=null;
-const SPONSOR={src:"assets/sponsorfolder.jpg",name:""};   /* the sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
+const SPONSOR={src:"assets/sponsorfolder.jpg",name:"ABC DEFGH",logo:"assets/sponsor-logo.png"};   /* The sponsor NAME and LOGO below also show at the very bottom of Home ("Sponsored by ..."): to change them, edit name and logo here and replace assets/sponsor-logo.png. Clear name and logo (empty strings) to hide that line. The sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
 function homeUnmount(){if(homeAC){homeAC.abort();homeAC=null}}
 function zoomImg(src){const d=document.createElement("div");d.className="hlb";d.innerHTML='<img alt="">';d.firstChild.src=src;d.onclick=()=>d.remove();document.body.appendChild(d);requestAnimationFrame(()=>d.classList.add("on"))}
 /* a picture opens in the motion script's lightbox (it grows out of the poster); the plain zoom is the backup */

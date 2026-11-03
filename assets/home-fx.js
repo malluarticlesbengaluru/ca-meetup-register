@@ -72,7 +72,7 @@ function mount(){
   unmount();const root=$("#app .home");if(!root)return;
   const ac=new AbortController(),on=(t,e,f,o)=>t&&t.addEventListener(e,f,{...o,signal:ac.signal}),timers=[],cleanups=[];
   const hero=$(".hhero",root),head=$(".hhead",root),photo=$(".hhero-photo",root),fab=$("#home-fab",root),join=$("#home-join",root);
-  if(!hero||!head)return;
+  if(!hero)return;   /* the home page has no top bar any more, so the header is optional here */
   played=true;
   let cv=null,tickNow=null;
 
@@ -82,7 +82,7 @@ function mount(){
   const sp=$("#story p",root);let words=[];if(sp){if(!sp.dataset.fx){sp.dataset.fx=1;splitWords(sp,"fxsw")}words=$$(".fxsw",sp)}
 
   /* the progress line in the header */
-  const prog=document.createElement("i");prog.className="fxprog";prog.setAttribute("aria-hidden","true");head.appendChild(prog);
+  const prog=document.createElement("i");prog.className="fxprog";prog.setAttribute("aria-hidden","true");if(head)head.appendChild(prog);
 
   /* the scroll cue */
   const cue=document.createElement("div");cue.className="fxcue";cue.setAttribute("aria-hidden","true");hero.appendChild(cue);
@@ -140,7 +140,7 @@ function mount(){
   let ticking=false,litN=0;
   function frame(){ticking=false;const y=scrollY,max=document.documentElement.scrollHeight-innerHeight,vh=innerHeight;
     prog.style.transform=`scaleX(${max>0?clamp(y/max):0})`;
-    head.classList.toggle("sc",y>24);
+    if(head)head.classList.toggle("sc",y>24);
     if(!RM&&photo&&y<hero.offsetHeight+120)photo.style.translate=`0 ${Math.min(y*TUNE.parallax,TUNE.parallaxMax)}px`;
     if(y>40)cue.classList.add("gone");
     if(words.length&&!RM){const r=sp.getBoundingClientRect(),p=clamp((vh*.9-r.top)/(r.height+vh*.4)),n=Math.round(p*words.length);

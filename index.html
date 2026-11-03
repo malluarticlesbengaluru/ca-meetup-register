@@ -885,7 +885,6 @@ function vHome(){
     P=ret?"View my ticket":regLabel(),Q=ret?"Register another booking":"View my ticket",
     spots=`<p class="fxspots${sv?"":" nosp"}" data-v="${esc(sv)}"><i></i><span>${sv}</span></p>`;
   return `<div class="home${again?" again":""}${ret?" ret":""}" data-event="${esc(a.event)}" data-skew="${esc(a.skew)}" data-close="${esc(a.close)}">
-  <header class="hhead"><div class="hw"><img src="assets/logo-mark.png" alt="" width="40" height="27"><div class="hbrand"><b>${O.toUpperCase().replace(/ BENGALURU$/,"")}</b><small>BENGALURU</small></div></div></header>
   <div class="hhero"><div class="hhero-photo" aria-hidden="true"></div><div class="hblob hb1"></div><div class="hblob hb2"></div>
   <div class="hw"><div class="logo-wrap hlogo"><img id="logo-fallback" src="assets/logo-mark.png" alt="Mallu Articles Bengaluru logo" width="128" height="87"><svg class="logo" id="logo" viewBox="0 0 360 244" role="img" aria-label="Mallu Articles Bengaluru logo" hidden><defs><filter id="goo" filterUnits="userSpaceOnUse" x="-200" y="-150" width="760" height="550"><feGaussianBlur id="gooBlur" in="SourceGraphic" stdDeviation="0"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/></filter></defs><g filter="url(#goo)"><path id="hl" fill="#FA9E01"/><path id="hr" fill="#FCFCFC"/><path id="bl" fill="#FCFCFC"/><path id="br" fill="#FFA701"/></g><path id="dr" fill="#9A9999"/></svg></div>
   <p class="hpres">${O} presents</p>

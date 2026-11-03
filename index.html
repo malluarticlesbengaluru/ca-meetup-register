@@ -562,87 +562,6 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 }
 </style>
 <style>
-/* ===== Register form screen (Nov 2026 redesign, from Ehsaas26-Form-demo-1). Scoped to .fpage, #fbar and body[data-step="form"]: no other screen is touched. ===== */
-body[data-step="form"]{background:#0B1226;padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
-body[data-step="form"]::before,body[data-step="form"] .top,body[data-step="form"] .kasavu{display:none}
-body[data-step="form"] main{max-width:none;padding:0}
-.fpage,.fbar{--hnavy:#061651;--hamber:#FFA300;--hamber2:#FFC24D;--hcard:#141F3B;--hink:#E8ECF6;--hmute:#9AA5BE;--hline:#243154;--heb:#8FA8FF;--ease:cubic-bezier(.16,1,.3,1)}
-.fpage{color:var(--hink);overflow-x:clip}
-.fpage h1,.fpage h2,.fpage p{margin:0}
-.fpage .hw{max-width:620px;padding:0 18px}
-.fpage .hhead .hw{display:flex;align-items:center;gap:12px;color:#fff}
-/* thin scroll-progress line under the header */
-.fpg{position:absolute;left:0;right:0;bottom:0;height:3px;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#D82890,#7820E0,#20C8A0,#3050F0,#E86818)}
-/* hero with the stepper */
-.fhero{position:relative;overflow:hidden;padding:26px 0 34px;background:linear-gradient(160deg,#040F3A,#061651 55%,#0C2278);color:#fff}
-.fphoto{position:absolute;inset:0;background:url(assets/home-hero.jpg) 50% 30%/cover}
-.fphoto:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,15,58,.8),rgba(6,22,81,.9))}
-.fblob{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none}.fb1{width:300px;height:300px;background:rgba(255,163,0,.24);top:-130px;right:-100px}.fb2{width:240px;height:240px;background:rgba(70,100,240,.34);bottom:-110px;left:-80px}
-.fhero .hw{position:relative;z-index:2}
-.fsteps{display:flex;list-style:none;margin:0 0 22px;padding:0}
-.fsteps li{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;font-size:.78rem;font-weight:700;color:var(--hmute)}
-.fsteps i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:.85rem;border:1.5px solid rgba(255,255,255,.28);background:rgba(6,22,81,.8);position:relative;z-index:1}
-.fsteps li:not(:last-child):after{content:"";position:absolute;top:16px;left:calc(50% + 22px);right:calc(-50% + 22px);height:2px;background:rgba(255,255,255,.2)}
-.fsteps li.done:not(:last-child):after{background:var(--hamber)}
-.fsteps li.done i{background:var(--hamber);border-color:var(--hamber);color:var(--hnavy)}
-.fsteps li.cur{color:#fff}.fsteps li.cur i{border-color:var(--hamber);color:var(--hamber2);box-shadow:0 0 0 5px rgba(255,163,0,.22)}
-.fpage .feb{color:var(--heb);font-weight:700;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;text-align:center}
-.fpage .fhero h1{font:800 clamp(2rem,9vw,2.7rem)/1.1 var(--sans);text-align:center;margin:6px 0 14px;letter-spacing:-.02em;color:#fff;text-shadow:0 4px 30px rgba(4,15,58,.9)}
-.fpage .fhero h1 em{font-style:normal;color:var(--hamber)}
-.ffacts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-.ffacts span{padding:6px 13px;border-radius:99px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.26);font-weight:700;font-size:.84rem;color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.ffacts .amb{background:rgba(255,163,0,.18);border-color:rgba(255,163,0,.5);color:var(--hamber2)}
-.fbody{padding-top:22px}
-/* banners */
-.fpage .bn{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:16px;margin:0 0 14px;background:var(--hcard);border:1px solid var(--hline);font-size:.93rem;color:#D7DEF5}
-.fpage .bn svg{flex:none;width:22px;height:22px;margin-top:2px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.fpage .bn b{color:#fff}.fpage .bn.warn{border-color:rgba(255,163,0,.45);background:rgba(255,163,0,.09)}.fpage .bn.warn svg{color:var(--hamber)}.fpage .bn.info svg{color:var(--heb)}
-.fpage .bn.err{border-color:rgba(255,138,128,.5);background:rgba(255,90,90,.1)}.fpage .bn.err svg{color:var(--err)}.fpage .bn ul{margin:6px 0 0;padding-left:18px}
-.fpage .live{display:inline-block;width:8px;height:8px;border-radius:50%;background:#FF6B5E;margin-right:6px}
-/* cards */
-.fpage .pc{--cc:#20C8A0;--ct:#3FE0B9;--cbg:rgba(32,200,160,.16);position:relative;overflow:hidden;background:var(--hcard);border:1px solid var(--hline);border-top:3px solid var(--cc);border-radius:18px;padding:20px 18px 22px;margin:0 0 16px;box-shadow:0 14px 34px rgba(0,0,0,.28)}
-.fpage .pc.c1{--cc:#D82890;--ct:#FF7BC4;--cbg:rgba(216,40,144,.2)}.fpage .pc.c2{--cc:#7820E0;--ct:#B98BFF;--cbg:rgba(120,32,224,.26)}.fpage .pc.c3{--cc:#E86818;--ct:#FF9A55;--cbg:rgba(232,104,24,.2)}.fpage .pc.c4{--cc:#3050F0;--ct:#8BA0FF;--cbg:rgba(48,80,240,.24)}
-.fpage .pc:before{content:"";position:absolute;right:-50px;top:-50px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--cc) 30%,transparent),transparent 70%);pointer-events:none}
-.pch{display:flex;align-items:center;gap:12px;margin-bottom:6px;position:relative}
-.pch .ico{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--cbg);border:1px solid color-mix(in srgb,var(--cc) 45%,transparent);color:var(--ct)}
-.pch .ico svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.fpage .pch h2{font:800 1.15rem/1.2 var(--sans);color:#fff;display:block}.fpage .pch h2:before{display:none}
-.pch small{display:block;color:var(--hmute);font-size:.82rem;font-weight:500}
-.fpage label,.fpage .lbl{display:block;font-weight:700;font-size:.92rem;margin:18px 0 8px;color:#fff;position:relative}
-.fpage .opts label{margin:0;font-weight:700}
-.fpage input[type=text],.fpage input[type=tel]{width:100%;font:inherit;padding:14px 16px;border:1px solid var(--hline);border-radius:12px;background:rgba(255,255,255,.04);color:#fff}
-.fpage input[type=text]:focus,.fpage input[type=tel]:focus{border-color:var(--hamber);box-shadow:0 0 0 4px rgba(255,163,0,.18);background:rgba(255,255,255,.06);outline:none}
-.fpage .pf{border:1px solid var(--hline);border-radius:12px;background:rgba(255,255,255,.04)}
-.fpage .pf:focus-within{border-color:var(--hamber);box-shadow:0 0 0 4px rgba(255,163,0,.18)}
-.fpage .pf span{border-right:1px solid var(--hline);background:rgba(255,255,255,.06)}
-.fpage .bad input[type=text],.fpage .bad input[type=tel]{border-color:var(--err)}.fpage .bad .pf{border-color:var(--err);box-shadow:0 0 0 3px rgba(255,138,128,.15)}
-.fpage .fe{color:var(--err);font-size:.85rem;margin:6px 0 0;font-weight:600}
-.fpage .opts span{padding:11px 18px}
-.fpage .bad .opts span{border-style:dashed}
-.fpage .sw b{color:#fff}.fpage .sw .n{font-size:.88rem;color:var(--hmute)}
-.fpage .sw input{width:54px;height:32px}.fpage .sw input:after{top:4px;left:4px}
-.focc{animation:fup .35s var(--ease) both}
-@keyframes fup{from{opacity:0;transform:translateY(10px)}}
-.fpage .shake{animation:fshk .4s}@keyframes fshk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-/* sticky action bar (lives outside #app so the entrance animation can never move it) */
-.fbar{position:fixed;left:0;right:0;bottom:0;z-index:12;background:rgba(6,22,81,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.14);padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px))}
-.fbar:empty{display:none}
-.fbar .hw{max-width:620px;margin:0 auto;padding:0 18px;display:flex;align-items:center;gap:12px}
-.ftot{flex:none;line-height:1.15}.ftot small{display:block;color:var(--hmute);font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.ftot b{font:800 1.6rem/1.1 var(--sans);color:var(--hamber)}
-.fbar .fbtn{border:0;border-radius:99px;padding:15px 16px;white-space:nowrap;font:800 1rem var(--sans);color:var(--hnavy);background:linear-gradient(135deg,var(--hamber),#F08A2E);box-shadow:0 10px 30px rgba(255,163,0,.4);flex:1}
-.fbar .fbtn:hover{background:linear-gradient(135deg,var(--hamber),#F08A2E);border-color:transparent;box-shadow:0 10px 30px rgba(255,163,0,.4);transform:translateY(-2px)}
-.fbar .fbtn.fg{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:none;flex:none;padding:15px 16px}
-.fbar .fbtn.fg:hover{background:rgba(255,255,255,.14);border-color:var(--hamber);box-shadow:none}
-html:has(body[data-step="form"]){scroll-padding-bottom:112px}   /* a focused field is never left behind the sticky bar */
-body[data-step="form"] .toast{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
-/* motion (only when html.fx is set, i.e. the visitor has NOT asked for reduced motion) */
-.fx .fhero .hw>*{animation:ffi .8s var(--ease) both}.fx .fhero .hw>*:nth-child(2){animation-delay:.1s}.fx .fhero .hw>*:nth-child(3){animation-delay:.2s}.fx .fhero .hw>*:nth-child(4){animation-delay:.3s}
-.fx .fblob{animation:ffl 10s ease-in-out infinite}.fx .fb2{animation-duration:13s;animation-direction:reverse}
-.fx .fsteps li.cur i{animation:fpulse 2.4s ease-out infinite}
-@keyframes ffi{from{opacity:0;transform:translateY(16px)}}@keyframes ffl{50%{transform:translate(26px,-30px) scale(1.1)}}
-@keyframes fpulse{0%{box-shadow:0 0 0 0 rgba(255,163,0,.5)}70%,100%{box-shadow:0 0 0 12px rgba(255,163,0,0)}}
-</style>
-<style>
 /* ===== Ehsaas'26 Home, BURGUNDY design (Nov 2026). Everything is scoped to .bhome (or body[data-step="home"]) with every class starting bh-,
    so no other screen is touched. The old Home styles above are no longer used by Home. The numbers worth changing are the colours at the top of .bhome. ===== */
 html:has(body[data-step="home"]){background:#1A040C;scroll-behavior:smooth;scroll-padding-top:calc(70px + env(safe-area-inset-top,0px))}
@@ -871,6 +790,126 @@ body:not([data-step="home"]):not([data-step="form"]) .verify{border:1px solid rg
 body:not([data-step="home"]):not([data-step="form"]) #gbar{background:#3B1409;color:#F3D9A0;border-bottom:1px solid rgba(233,178,76,.45)}
 body:not([data-step="home"]):not([data-step="form"]) .toast{background:#4A0A1F;border:1px solid var(--glass-b);color:var(--cream)}
 </style>
+<style id="burg-form">
+/* ===== Register form, BURGUNDY (Nov 2026, Part B, built from the owner's target look "Register - Ehsaas'26"). Replaces the old navy form styles.
+   Scoped to .fpage, .fbar and body[data-step="form"], so no other screen is touched. The date and venue chips of the target are left out on purpose;
+   only the price (and the closing date) chips remain. ===== */
+body[data-step="form"]{background:#1A040C;padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+body[data-step="form"] .top,body[data-step="form"] .kasavu{display:none}
+body[data-step="form"]::before{content:"";position:fixed;left:0;right:0;top:0;bottom:0;height:auto;z-index:-1;pointer-events:none;-webkit-mask-image:none;mask-image:none;
+background:radial-gradient(ellipse 80% 40% at 50% 0,rgba(140,24,56,.75),transparent 70%),radial-gradient(ellipse 70% 40% at 100% 60%,rgba(110,16,46,.5),transparent 70%)}
+body[data-step="form"] main{max-width:none;padding:0}
+html:has(body[data-step="form"]){scroll-padding-top:calc(78px + env(safe-area-inset-top,0px));scroll-padding-bottom:130px}
+.fpage,.fbar{--field:rgba(26,4,12,.55);--err:#FF8F9C;--ease:cubic-bezier(.16,1,.3,1)}
+.fpage{color:var(--cream);font-weight:300;overflow-x:clip}
+.fpage h1,.fpage h2,.fpage p{margin:0}
+.fpage .hw{max-width:620px;margin:0 auto;padding:0 18px}
+.fpage :focus-visible,.fbar :focus-visible{outline:3px solid var(--blush);outline-offset:3px}
+/* header with the scroll-progress line */
+.fpage .hhead{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;padding:0;background:rgba(26,4,12,.82);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.fx .fpage .hhead.sc{background:rgba(26,4,12,.94);box-shadow:0 10px 28px rgba(0,0,0,.4)}
+.fpage .hhead .hw{display:flex;align-items:center;gap:10px;height:54px;color:var(--cream)}
+.fpage .hhead img{height:32px;width:auto;display:block}
+.fpage .hbrand b{font:800 .74rem/1.15 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--cream)}
+.fpage .hbrand small{display:block;color:var(--gold);font:600 .58rem/1.15 var(--sans);letter-spacing:.2em}
+.fpage .hhead:before{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,179,192,.15)}
+.fpage .fpg{position:absolute;left:0;right:0;bottom:0;height:3px;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--gold),var(--ember));border-radius:0 3px 3px 0}
+/* hero: stepper, title, chips (the old photo and glow blobs are not used) */
+.fpage .fhero{position:static;overflow:visible;padding:26px 0 8px;background:none;text-align:center;color:var(--cream)}
+.fpage .fphoto,.fpage .fblob{display:none}
+.fpage .fsteps{list-style:none;margin:0 0 22px;padding:0;display:flex;justify-content:center;align-items:center}
+.fpage .fsteps li{flex:none;display:flex;flex-direction:row;align-items:center;gap:7px;position:static;font:600 .7rem/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--rose)}
+.fpage .fsteps li+li:before{content:"";width:16px;height:1.5px;background:var(--glass-b);margin:0 8px}
+.fpage .fsteps li:not(:last-child):after{display:none}
+.fpage .fsteps i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:800 .76rem/1 var(--sans);font-style:normal;border:1.5px solid var(--glass-b);background:transparent;box-shadow:none}
+.fpage .fsteps li.cur{color:var(--cream)}
+.fpage .fsteps li.cur i,.fpage .fsteps li.done i{background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));color:var(--wine);border:0;box-shadow:none;animation:none}
+.fpage .feb{font:800 .72rem/1 var(--sans);letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin:0 0 10px}
+.fpage .fhero h1{font:900 clamp(1.9rem,8.4vw,2.7rem)/1.1 var(--sans);letter-spacing:-.025em;margin:0;color:var(--cream);text-shadow:none;text-wrap:balance}
+.fpage .fhero h1 i{font:italic 500 1em var(--serif);color:var(--blush);letter-spacing:0}
+.fpage .ffacts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:18px 0 0}
+.fpage .ffacts span{display:inline-flex;align-items:center;gap:7px;background:var(--glass);border:1px solid var(--glass-b);border-radius:99px;padding:8px 13px;font:600 .78rem/1.2 var(--sans);color:var(--cream);-webkit-backdrop-filter:none;backdrop-filter:none}
+.fpage .ffacts .amb{background:rgba(233,178,76,.15);border-color:rgba(233,178,76,.55);color:#F8D58A}
+.fpage .fbody{padding-top:0}
+/* banners */
+.fpage .bn{display:flex;gap:12px;align-items:flex-start;border-radius:16px;padding:14px 16px;margin:14px 0 0;font:300 .88rem/1.5 var(--sans);border:1px solid var(--glass-b);background:var(--glass);color:var(--cream)}
+.fpage .bn svg{width:20px;height:20px;flex:none;margin-top:1px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fpage .bn b{font-weight:800;color:var(--cream)}
+.fpage .bn.info svg{color:var(--blush)}
+.fpage .bn.warn{background:rgba(240,138,60,.14);border-color:rgba(240,138,60,.5);color:#FFC7A0}.fpage .bn.warn svg{color:var(--ember)}.fpage .bn.warn b{color:var(--ember)}
+.fpage .bn.err{background:rgba(255,143,156,.12);border-color:rgba(255,143,156,.55);color:#FFD0D6}.fpage .bn.err svg{color:var(--err)}.fpage .bn.err b{color:var(--err)}
+.fpage .bn ul{margin:6px 0 0;padding-left:18px}
+.fpage .live{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ember);margin-right:6px;animation:fppulse 1.8s infinite}
+@keyframes fppulse{50%{opacity:.25}}
+/* cards */
+.fpage .pc{position:relative;overflow:visible;background:linear-gradient(160deg,rgba(140,24,56,.42),rgba(74,10,31,.62));border:1px solid var(--glass-b);border-radius:24px;padding:22px 20px;margin:16px 0 0;box-shadow:0 18px 40px rgba(0,0,0,.3)}
+.fpage .pc:before{display:none}
+.fpage .pch{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.fpage .pch .ico{flex:none;width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));border:0;color:var(--wine);font:900 1.3rem/1 var(--sans);box-shadow:0 6px 18px rgba(233,178,76,.3)}
+.fpage .pch .ico svg{width:24px;height:24px;fill:none;stroke:var(--wine);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fpage .pch h2{display:block;font:800 1.2rem/1.2 var(--sans);color:var(--cream)}
+.fpage .pch small{display:block;font:italic 500 .95rem/1.4 var(--serif);color:var(--blush);margin-top:2px}
+.fpage .pc>.pch+div{margin-top:0}
+.fpage .pc>div:not(.pch){margin-top:20px}
+.fpage .pc>div[id^="ob"]{margin-top:14px}
+/* labels and fields */
+.fpage label,.fpage .lbl{display:block;font:600 .8rem/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--blush);margin:0 0 8px;position:static}
+.fpage input[type=text],.fpage input[type=tel]{width:100%;height:54px;border-radius:14px;border:1.5px solid var(--glass-b);background:var(--field);color:var(--cream);font:400 16px/1 var(--sans);padding:0 16px;transition:border-color .2s,box-shadow .2s}
+.fpage input::placeholder{color:rgba(246,215,198,.38)}
+.fpage input[type=text]:focus,.fpage input[type=tel]:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 4px rgba(233,178,76,.18);background:var(--field)}
+.fpage input:-webkit-autofill{-webkit-text-fill-color:var(--cream);box-shadow:0 0 0 1000px #2A0A16 inset;caret-color:var(--cream)}
+.fpage .pf{display:flex;border:1.5px solid var(--glass-b);border-radius:14px;background:var(--field);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.fpage .pf:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px rgba(233,178,76,.18)}
+.fpage .pf span{display:grid;place-items:center;padding:0 14px;background:transparent;font:800 .95rem var(--sans);color:var(--gold);border-right:1.5px solid var(--glass-b)}
+.fpage .pf input{letter-spacing:.06em}
+.fpage .fe{display:flex;gap:6px;align-items:center;margin:8px 0 0;font:600 .82rem/1.3 var(--sans);color:var(--err)}
+.fpage .fe:before{content:"!";display:grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--err);color:var(--wine);font-weight:900;font-size:.7rem;flex:none}
+.fpage .focc{margin-top:0}
+/* option boxes: two per row, gold when chosen */
+.fpage .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fpage .opts label{margin:0;position:relative;text-transform:none;letter-spacing:0;font:600 .94rem/1.2 var(--sans);color:var(--cream)}
+.fpage .opts label:last-child:nth-child(odd){grid-column:1/-1}
+.fpage .opts span{display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;padding:10px 12px;text-align:center;border-radius:14px;border:1.5px solid var(--glass-b);background:var(--field);color:var(--cream);font-weight:600;transition:all .18s;transform:none;box-shadow:none}
+.fpage .opts label:hover span{border-color:var(--rose);background:var(--field);transform:none}
+.fpage .bad .opts span{border-color:var(--err)}
+.fpage .opts input:checked+span{background:linear-gradient(135deg,rgba(243,199,102,.22),rgba(240,138,60,.2));border-color:var(--gold);color:#FFE4A8;box-shadow:0 0 0 3px rgba(233,178,76,.14);animation:none}
+.fpage .opts input:focus-visible+span{outline:3px solid var(--blush);outline-offset:2px}
+.fpage .bad input[type=text],.fpage .bad .pf{border-color:var(--err);box-shadow:none}
+.fpage .dot{width:14px;height:14px;border-radius:3px;border:2px solid;display:grid;place-items:center;flex:none}
+.fpage .dot:after{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.fpage .dot.v{color:#5BD98C}.fpage .dot.n{color:#FF6B6B}
+/* friends switch and head-count boxes */
+.fpage .sw{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.fpage .sw b{display:block;font:800 1.02rem/1.25 var(--sans);color:var(--cream)}
+.fpage .sw .n{font:300 .85rem/1.4 var(--sans);opacity:.75;margin-top:2px;color:var(--cream)}
+.fpage .sw input{width:58px;height:34px;flex:none;border-radius:99px;background:var(--field);border:1.5px solid var(--glass-b);transition:all .25s;margin:0}
+.fpage .sw input:after{top:4px;left:4px;width:24px;height:24px;background:var(--cream);box-shadow:none}
+.fpage .sw input:checked{background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));border-color:transparent}
+.fpage .sw input:checked:after{transform:translateX(24px);background:var(--wine)}
+.fpage .cnt{margin-top:18px;padding-top:18px;border-top:1px solid var(--glass-b)}
+.fpage .opts.cnt4{grid-template-columns:repeat(4,1fr)}
+.fpage .opts.cnt4 label:last-child:nth-child(odd){grid-column:auto}
+.fpage .cnt .opts span{font:900 1.2rem var(--sans)}
+.fpage .fnote{text-align:center;font:300 .8rem/1.6 var(--sans);color:var(--rose);margin:22px 0 0}
+/* sticky bottom bar (outside #app so the entrance animation can never move it) */
+.fbar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:rgba(26,4,12,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--glass-b);padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px))}
+.fbar:empty{display:none}
+.fbar .hw{max-width:620px;margin:0 auto;padding:0 18px;display:flex;align-items:center;gap:12px}
+.fbar .ftot{flex:1;min-width:0;line-height:1.1}
+.fbar .ftot small{display:block;font:600 .72rem/1.2 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--rose)}
+.fbar .ftot b{display:block;font:900 1.6rem/1.1 var(--sans);color:var(--gold)}
+.fbar .fbtn{flex:none;display:inline-flex;align-items:center;justify-content:center;border:0;min-height:54px;padding:0 24px;border-radius:99px;white-space:nowrap;font:800 .98rem/1 var(--sans);letter-spacing:0;color:var(--wine);background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember));box-shadow:0 8px 26px rgba(233,178,76,.35)}
+.fbar .fbtn:hover{background:linear-gradient(135deg,#F6D07A,#EDBA58 55%,#F39A52);border-color:transparent;box-shadow:0 10px 30px rgba(233,178,76,.5);transform:translateY(-1px)}
+.fbar .fbtn.fg{padding:0 18px;background:transparent;color:var(--cream);border:1.5px solid rgba(246,215,198,.4);box-shadow:none}
+.fbar .fbtn.fg:hover{background:var(--glass);border-color:rgba(246,215,198,.65);box-shadow:none}
+body[data-step="form"] .toast{left:16px;right:16px;transform:none;bottom:calc(100px + env(safe-area-inset-bottom,0px));max-width:520px;margin:0 auto;background:var(--cream);color:var(--wine);border:0;border-radius:18px;padding:16px 18px;font:600 .9rem/1.45 var(--sans);text-align:left;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+/* motion (only when html.fx is set, i.e. the visitor has NOT asked for reduced motion) */
+.focc{animation:fup .35s var(--ease) both}
+@keyframes fup{from{opacity:0;transform:translateY(10px)}}
+.fpage .shake{animation:fshk .4s}@keyframes fshk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fx .fhero .hw>*{animation:ffi .8s var(--ease) both}.fx .fhero .hw>*:nth-child(2){animation-delay:.1s}.fx .fhero .hw>*:nth-child(3){animation-delay:.2s}.fx .fhero .hw>*:nth-child(4){animation-delay:.3s}
+@keyframes ffi{from{opacity:0;transform:translateY(16px)}}
+</style>
 </head>
 <body>
 <header class="top"><div><img src="assets/burg-logo.png" alt="" width="44" height="30"><span>Mallu Articles Bengaluru</span></div></header>
@@ -941,10 +980,13 @@ const normCode=t=>String(t||"").toUpperCase().replace(/O/g,"0").replace(/[\s-]/g
 function setN(n){S.n=n;while(S.people.length<n)S.people.push(blank());S.people.length=n}
 function opt(i,k,v,cur,lab){return `<label><input type="radio" name="p${i}_${k}" data-i="${i}" data-k="${k}" value="${v}" ${cur===v?"checked":""}><span>${lab||v}</span></label>`}
 // "What best describes you?": the four choices, the follow-up question for each, and the grey sample text inside the box
-const OCC={"Article Assistant":{q:"Which firm or company do you work in?",ph:"CA article at ABC & Co.",err:"Enter the firm or company you work in"},
-  "Employee":{q:"Which company do you work in?",ph:"Company name",err:"Enter the company you work in"},
-  "Student":{q:"Which exam are you attempting?",ph:"Approaching CA Finals",err:"Enter the exam you are attempting"},
-  "Others":{q:"Tell us what you do",ph:"Type here",err:"Tell us what you do"}};
+const OCC={"Article Assistant":{q:"Which firm do you work for?",ph:"CA article at ABC & Co.",err:"Enter the firm you work for"},
+  "Industrial Trainee":{q:"Which company do you work for?",ph:"Company name",err:"Enter the company you work for"},
+  "Employee":{q:"Which company/firm do you work for?",ph:"Company or firm name",err:"Enter the company or firm you work for"},
+  "Student":{q:"Which exam are you approaching?",ph:"Approaching CA Finals",err:"Enter the exam you are approaching"},
+  "Others":{q:"What do you do?",ph:"Type here",err:"Tell us what you do"}};
+/* what the person SEES for each answer; the value saved in the database is the key itself ("Others" stays "Others") */
+const occLab=k=>k==="Others"?"Entrepreneur &amp; Others":k;
 function occBox(i,p){const o=OCC[p.occ];if(!o)return"";
   return `<div class="focc"><label for="od${i}">${esc(o.q)}</label><input type="text" id="od${i}" data-i="${i}" data-k="occd" value="${esc(p.occd)}" maxlength="100" placeholder="${esc(o.ph)}" autocomplete="off">${fErr(i,"occd")}</div>`}
 /* ===== event date, time and venue: set by admins in Admin > Settings. CONFIG values are the backup if it can't be loaded ===== */
@@ -1249,13 +1291,12 @@ const fErr=(i,k)=>S.ferr&&S.ferr[i]&&S.ferr[i][k]?`<p class="fe" role="alert">${
 const fBad=(i,k)=>S.ferr&&S.ferr[i]&&S.ferr[i][k]?"bad":"";
 function fSteps(cur){return `<ol class="fsteps" aria-label="Progress">`+["Details","Review","Payment"].map((n,j)=>`<li class="${j+1<cur?"done":j+1===cur?"cur":""}"${j+1===cur?' aria-current="step"':""}><i>${j+1<cur?"✓":j+1}</i>${n}</li>`).join("")+`</ol>`}
 function fHead(){const O=esc(CONFIG.organiserName);
-  return `<header class="hhead"><div class="hw"><img src="assets/logo-mark.png" alt="" width="40" height="27"><div class="hbrand"><b>${O.toUpperCase().replace(/ BENGALURU$/,"")}</b><small>BENGALURU</small></div></div><div class="fpg" id="fprog" aria-hidden="true"></div></header>`}
+  return `<header class="hhead"><div class="hw"><img src="assets/burg-logo.png" alt="" width="47" height="32"><div class="hbrand"><b>${O.toUpperCase().replace(/ BENGALURU$/,"")}</b><small>BENGALURU</small></div></div><div class="fpg" id="fprog" aria-hidden="true"></div></header>`}
 function fHero(st){
-  const p=evParts({weekday:"short",day:"numeric",month:"short",year:"numeric"}),
-    dt=(p?p.weekday+" "+p.day+" "+p.month+" "+p.year:CONFIG.ticketDate)+" · "+evTime(),cd=closeDate();
+  const cd=closeDate(),E=esc(CONFIG.eventName).replace(/&#39;|'/g,"’");
   return `<div class="fhero"><div class="fphoto" aria-hidden="true"></div><div class="fblob fb1"></div><div class="fblob fb2"></div>
-  <div class="hw">${fSteps(1)}<p class="feb">Registration</p><h1 aria-label="Register for ${esc(CONFIG.eventName)}">Register for ${nameHtml()}</h1>
-  <div class="ffacts"><span>${esc(dt)}</span><span>${esc(evVenue())}</span><span class="amb">₹${st.price_per_head} per person</span>${cd?`<span>Closes ${esc(cd)}</span>`:""}</div></div></div>`}
+  <div class="hw">${fSteps(1)}<p class="feb">Registration</p><h1 aria-label="Register for ${E}">Register for <i>${E}</i></h1>
+  <div class="ffacts"><span class="amb">₹${st.price_per_head} per person</span>${cd?`<span>Closes ${esc(cd)}</span>`:""}</div></div></div>`}
 function fBanners(st){let h="";
   if(st.next_close_at){const ms=new Date(st.next_close_at).getTime()-(Date.now()+skew);
     if(ms>0&&ms<2*3600e3)h+=`<div class="bn info">${fSvg("clock")}<div>Registration will pause briefly at <b>${fmtT(st.next_close_at)}</b> while payments are verified. If you have already started, you will get 10 extra minutes to finish.</div></div>`}
@@ -1267,21 +1308,21 @@ function fBanners(st){let h="";
 function fFriends(){
   if(maxN()<=1)return"";
   let h=`<div class="pc c4"><div class="sw"><div><b>Booking for friends too?</b><div class="n">Add up to ${maxN()} people in a single booking</div></div><input type="checkbox" id="fr" ${S.friends?"checked":""} aria-label="Include friends"></div>`;
-  if(S.friends)h+=`<div class="lbl">How many people in total, including you?</div><div class="opts">`+
-    Array.from({length:maxN()-1},(_,j)=>j+2).map(n=>`<label><input type="radio" name="cnt" value="${n}" ${S.n===n?"checked":""}><span>${n}</span></label>`).join("")+`</div>`;
+  if(S.friends)h+=`<div class="cnt"><div class="lbl">How many people in total, including you?</div><div class="opts cnt4">`+
+    Array.from({length:maxN()-1},(_,j)=>j+2).map(n=>`<label><input type="radio" name="cnt" value="${n}" ${S.n===n?"checked":""}><span>${n}</span></label>`).join("")+`</div></div>`;
   return h+`</div>`}
 function fPerson(i,p){
-  return `<div class="pc ${F_CLS[i%5]}" data-card="${i}"><div class="pch"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true">${F_ICO[i?"group":"user"]}</svg></div><div><h2>${S.n>1?"Person "+(i+1):"Your details"}</h2><small>${i?"Details of your friend":"As you want it on the ticket"}</small></div></div>
+  return `<div class="pc ${F_CLS[i%5]}" data-card="${i}"><div class="pch"><div class="ico">${S.n>1?i+1:`<svg viewBox="0 0 24 24" aria-hidden="true">${F_ICO.user}</svg>`}</div><div><h2>${S.n>1?"Person "+(i+1):"Your details"}</h2><small>${i?"Details of your friend":"As you want it on the ticket"}</small></div></div>
   <div class="${fBad(i,"name")}"><label for="n${i}">Full name</label><input type="text" id="n${i}" data-i="${i}" data-k="name" value="${esc(p.name)}" maxlength="80" autocomplete="${i?"off":"name"}">${fErr(i,"name")}</div>
   <div class="${fBad(i,"phone")}"><label for="t${i}">Phone number</label><div class="pf"><span aria-hidden="true">+91</span><input type="tel" class="ph" id="t${i}" data-i="${i}" data-k="phone" value="${esc(p.phone)}" inputmode="numeric" placeholder="10-digit mobile number" autocomplete="${i?"off":"tel-national"}" aria-label="Phone number, 10 digits, India +91"></div>${fErr(i,"phone")}</div>
-  <div class="${fBad(i,"occ")}"><div class="lbl">What best describes you?</div><div class="opts">${Object.keys(OCC).map(k=>opt(i,"occ",k,p.occ)).join("")}</div>${fErr(i,"occ")}</div>
+  <div class="${fBad(i,"occ")}"><div class="lbl">What best describes you?</div><div class="opts">${Object.keys(OCC).map(k=>opt(i,"occ",k,p.occ,occLab(k))).join("")}</div>${fErr(i,"occ")}</div>
   <div id="ob${i}" class="${fBad(i,"occd")}">${occBox(i,p)}</div>
   <div class="${fBad(i,"loc")}"><div class="lbl">Are you currently based in Bengaluru?</div><div class="opts">${opt(i,"loc","In Bengaluru",p.loc,"Yes")}${opt(i,"loc","Outside Bengaluru",p.loc,"No")}</div>${fErr(i,"loc")}</div>
-  <div class="${fBad(i,"food")}"><div class="lbl">Food preference</div><div class="opts">${opt(i,"food","Veg",p.food)}${opt(i,"food","Non-veg",p.food)}</div>${fErr(i,"food")}</div></div>`}
+  <div class="${fBad(i,"food")}"><div class="lbl">Food preference</div><div class="opts">${opt(i,"food","Veg",p.food,'<i class="dot v"></i>Veg')}${opt(i,"food","Non-veg",p.food,'<i class="dot n"></i>Non-veg')}</div>${fErr(i,"food")}</div></div>`}
 function fBar(){return `<div class="hw"><button type="button" class="fbtn fg" id="go-home">Home</button><div class="ftot"><small>${S.n} ${S.n>1?"people":"person"}</small><b>₹${total()}</b></div><button type="button" class="fbtn" id="review">Review details</button></div>`}
 function vForm(){
   const st=S.status;
-  return `<div class="fpage">${fHead()}${fHero(st)}<div class="hw fbody">${fBanners(st)}${fFriends()}${S.people.map((p,i)=>fPerson(i,p)).join("")}</div></div>`;
+  return `<div class="fpage">${fHead()}${fHero(st)}<div class="hw fbody">${fBanners(st)}${fFriends()}${S.people.map((p,i)=>fPerson(i,p)).join("")}<p class="fnote">Food and hall arrangements are planned from these details, so please double-check them.</p></div></div>`;
 }
 /* one entry per person: {field: message}. An empty object means that person is fine. */
 function validate(){
@@ -1294,7 +1335,7 @@ function validate(){
     return f})}
 function vSummary(){
   return head("Check your details","Please make sure everything is correct. Food and hall arrangements are planned from these details.")+
-  `<div class="card">`+S.people.map((p,i)=>`<div class="who"><div class="who-n"><span class="who-i">${i+1}</span><div><b>${esc(p.name.trim())}</b><div class="note">+91 ${esc(p.phone)}<br>${esc(p.occ)}: ${esc(p.occd.trim())}</div></div></div><div class="tags"><span>${esc(p.loc)}</span><span>${esc(p.food)}</span></div></div>`).join("")+`</div>
+  `<div class="card">`+S.people.map((p,i)=>`<div class="who"><div class="who-n"><span class="who-i">${i+1}</span><div><b>${esc(p.name.trim())}</b><div class="note">+91 ${esc(p.phone)}<br>${occLab(esc(p.occ))}: ${esc(p.occd.trim())}</div></div></div><div class="tags"><span>${esc(p.loc)}</span><span>${esc(p.food)}</span></div></div>`).join("")+`</div>
   <div class="card tot"><div><b>Total payable</b><div class="note">${S.n} × ₹${price()}</div></div><div class="tot-a">₹${total()}</div></div>
   <div class="row"><button class="ghost" id="edit">Edit details</button><button id="topay">Continue to pay</button></div>`;
 }

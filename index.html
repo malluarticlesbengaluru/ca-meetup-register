@@ -231,6 +231,7 @@ a.htap{display:block;position:relative;text-decoration:none;color:inherit;cursor
 .hposter{margin:0 auto;max-width:460px;border-radius:20px;overflow:hidden;border:3px solid var(--hamber);box-shadow:0 20px 50px rgba(0,0,0,.45);background:#2a0a14}.hposter img{display:block;width:100%;height:auto;cursor:zoom-in}
 .hcap{margin:12px 0 0;text-align:center;font-size:.85rem;font-weight:700;color:var(--heb)}
 .hsponsor{max-width:520px;margin:0 auto;text-align:center;border-top:4px solid var(--hamber)}.hsponsor h2{font-size:1.35rem;margin-bottom:10px}.hsponsor p{margin:0 0 16px;color:var(--hmute)}.hsponsor .heyebrow{margin-bottom:6px}.hsponsor .hcap{margin-top:12px}
+.hsvid{margin:0 auto 16px}.hsvid video{display:block;width:100%;max-height:72vh;border-radius:14px;background:#000;object-fit:contain;border:1px solid var(--hline)}
 .hticket{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--hnavy),var(--hnavy2));border-radius:22px;padding:34px 26px;color:#fff;max-width:520px;margin:0 auto}
 .hticket:after{content:"";position:absolute;top:-60px;right:-60px;width:210px;height:210px;background:rgba(255,163,0,.18);border-radius:50%}.hticket>*{position:relative;z-index:1}.hticket .heyebrow{color:#8FA8FF}
 .hticket dl{margin:18px 0 0;display:grid;gap:12px}.hticket dt{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--hamber)}.hticket dd{margin:2px 0 0;font-weight:700;color:#fff}
@@ -896,7 +897,7 @@ function vHome(){
   ${spots}
   </div></div>
 
-  <section><div class="hw"><figure class="hposter rv" style="margin-top:0"><img id="home-poster" src="assets/ehsaas-poster.jpeg" width="1000" height="1251" alt="${E} event poster" loading="lazy"></figure><p class="hcap">Tap the poster to enlarge</p></div></section>
+  <section><div class="hw"><figure class="hposter rv" style="margin-top:0"><img id="home-poster" src="assets/ehsaas-poster.jpg" width="1000" height="1251" alt="${E} event poster" loading="lazy"></figure><p class="hcap">Tap the poster to enlarge</p></div></section>
 
   <section style="padding-top:0"><div class="hw"><div class="hsec rv"><p class="heyebrow">Save the date</p><h2>When &amp; where</h2></div>
   <div class="fxstub">
@@ -913,7 +914,7 @@ function vHome(){
   <section id="story"><div class="hw"><div class="hsec rv"><h2>Back for another meetup</h2>
   <p>Last year’s <b>Chai, Chill and Chartered</b> was full of warmth, and you made it that way. This year we’re back with <b>${E}</b>, planned even more carefully.</p></div></div></section>
 
-  <section style="padding-top:0" id="home-sponsor"><div class="hw"><div class="hc hsponsor rv"><p class="heyebrow">Our sponsor</p><h2>Thank you for the support</h2><p>${SPONSOR.name?"We’re happy to announce <b>"+esc(SPONSOR.name)+"</b> is sponsoring "+E+".":"We’re happy to announce our sponsor for "+E+"."} Their support helps bring this meetup to you, and the remaining expenses are covered by a contribution from participants, shown when you register.</p><figure class="hposter" id="home-sp-fig" style="margin:0 auto"><img id="home-sp-img" src="${esc(SPONSOR.src)}" alt="Sponsor poster for ${E}"></figure><p class="hcap" id="home-sp-cap">Tap the poster to enlarge</p></div></div></section>
+  <section style="padding-top:0" id="home-sponsor"><div class="hw"><div class="hc hsponsor rv"><p class="heyebrow">Our co-sponsor</p><h2>Thank you for the support</h2><p>${SPONSOR.name?"We’re happy to announce <b>"+esc(SPONSOR.name)+"</b> as the co-sponsor of "+E+".":"We’re happy to announce our co-sponsor for "+E+"."} Their support helps bring this meetup to you, and the remaining expenses are covered by a contribution from participants, shown when you register.</p>${SPONSOR.video?`<figure class="hsvid" id="home-sp-vfig"><video id="home-sp-video" src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="metadata" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video></figure>`:""}<figure class="hposter" id="home-sp-fig" style="margin:0 auto"><img id="home-sp-img" src="${esc(SPONSOR.src)}" alt="Sponsor poster for ${E}"></figure><p class="hcap" id="home-sp-cap">Tap the poster to enlarge</p></div></div></section>
 
   <section style="padding-top:0"><div class="hw"><div class="hticket rv" id="home-join">
   <div class="hjoin"><p>Ready to join us? Reserve your spot, or check a ticket you already booked.</p>
@@ -927,13 +928,13 @@ function vHome(){
   <div class="fxbig rv" role="timer" aria-label="Countdown to the meetup"><div style="--i:0"><b>00</b><span>days</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:1"><b>00</b><span>hours</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:2"><b>00</b><span>minutes</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:3"><b>00</b><span>seconds</span><i></i><em class="fxsh" style="font-style:normal"></em></div></div>
   </div></div></section>
 
-  <footer class="hfoot"><div class="hw"><b>${O}</b> · ${E}${SPONSOR.name||SPONSOR.logo?`<div class="hspons"><span>Sponsored by${SPONSOR.name?` <b>${esc(SPONSOR.name)}</b>`:""}</span>${SPONSOR.logo?`<img src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Sponsor")} logo" width="110" height="92" onerror="this.remove()">`:""}</div>`:""}</div></footer>
+  <footer class="hfoot"><div class="hw"><b>${O}</b> · ${E}${SPONSOR.name||SPONSOR.logo?`<div class="hspons"><span>Co-sponsored by${SPONSOR.name?` <b>${esc(SPONSOR.name)}</b>`:""}</span>${SPONSOR.logo?`<img src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Sponsor")} logo" width="110" height="92" onerror="this.remove()">`:""}</div>`:""}</div></footer>
   <button class="big hbtn hamber hfab" id="home-fab">${ret?"View my ticket":"Register now"}</button></div>`;
 }
 /* Home behaviour: the clicks (poster zoom, the floating Register button, the optional sponsor card). The movement (reveal on scroll, countdowns,
    the floating button appearing, the count-down of the spots) is assets/home-fx.js. Torn down on every other screen. */
 let homeAC=null;
-const SPONSOR={src:"assets/sponsorfolder.jpg",name:"Eagles Institute of Management",logo:"assets/sponsor-logo.png"};   /* The sponsor NAME and LOGO below also show at the very bottom of Home ("Sponsored by ..."): to change them, edit name and logo here and replace assets/sponsor-logo.png. Clear name and logo (empty strings) to hide that line. The sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
+const SPONSOR={src:"assets/sponsorfolder.jpg",name:"Eagles Institute of Management",logo:"assets/sponsor-logo.png",video:"assets/sponsor-video.mp4"};   /* Co-sponsor. NAME and LOGO also show at the very bottom of Home ("Co-sponsored by ..."): edit them here and replace assets/sponsor-logo.png; empty strings hide that line. VIDEO plays in the co-sponsor card: put the file at assets/sponsor-video.mp4 (an MP4 with H.264 video and AAC sound plays on every phone); until the file exists the video is simply left out. Set video to "" to never show one. The sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
 function homeUnmount(){if(homeAC){homeAC.abort();homeAC=null}}
 function zoomImg(src){const d=document.createElement("div");d.className="hlb";d.innerHTML='<img alt="">';d.firstChild.src=src;d.onclick=()=>d.remove();document.body.appendChild(d);requestAnimationFrame(()=>d.classList.add("on"))}
 /* a picture opens in the motion script's lightbox (it grows out of the poster); the plain zoom is the backup */
@@ -948,6 +949,10 @@ function homeMount(){
     root.querySelectorAll(".fxcdwrap").forEach(e=>{e.hidden=true})}
   on(root.querySelector("#home-fab"),"click",()=>{const t=document.getElementById("home-join");if(t)t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"center"})});
   on(root.querySelector("#home-poster"),"click",e=>openImg(e.target));
+  const sv=root.querySelector("#home-sp-video");
+  if(sv){const gone=()=>{const f=root.querySelector("#home-sp-vfig");if(f)f.remove()};
+    on(sv,"error",gone);if(sv.error)gone();
+    try{const io=new IntersectionObserver(es=>{if(!es[0].isIntersecting&&!sv.paused)sv.pause()},{threshold:.25});io.observe(sv);sig.addEventListener("abort",()=>io.disconnect())}catch(_){}}   /* it stops by itself when scrolled out of view */
   const sp=root.querySelector("#home-sp-img");
   if(sp){const gone=()=>{const f=root.querySelector("#home-sp-fig"),c=root.querySelector("#home-sp-cap");if(f)f.remove();if(c)c.remove()};
     on(sp,"error",gone);if(sp.complete&&sp.naturalWidth===0&&sp.getAttribute("src"))setTimeout(()=>{if(sp.naturalWidth===0&&sp.complete)gone()},0);

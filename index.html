@@ -1700,56 +1700,88 @@ function foodMark(x,X,Y,veg){const col=veg?"#1f9d55":"#c62828";x.fillStyle="#fff
 let LOGO=null;
 function loadLogo(){return new Promise(r=>{if(LOGO)return r(LOGO);const i=new Image();i.onload=()=>{LOGO=i;r(i)};i.onerror=()=>r(null);i.src="assets/logo-mark.png"})}
 function drawTicket(c,t,code){
-  const coord=t.kind==="coordinator",W=TW,NAVY="#0A2147",AMB="#FFA400",AI="#8A5200",IVO="#FBF7EC";
-  const P=coord?{acc:"#7d1c32",top:"#fff9f4",bot:"#f6e9e0",ink:"#2a1218",mute:"#7a5a5f"}:{acc:NAVY,top:"#fffdf7",bot:"#f6efdc",ink:"#13203B",mute:"#576179"};
-  /* a game message (only present while the organisers have switched messages on) adds a panel under the stub; with no message the ticket is exactly as before */
+  /* DRAMATIC ticket (Nov 2026): burgundy stage, spotlight rays, sparks, gold foil (platinum for coordinators), glass panels, punched stub.
+     Same data as before (date, time, venue, attendee, food, ticket number, QR of "label|secret"); the Booking ID is still NOT on it. */
+  const coord=t.kind==="coordinator",W=TW;
+  const G=coord?["#FFFFFF","#D3DBE8","#8793AA"]:["#FFEBB0","#E9B24C","#B2701C"],GOLD=G[1],CREAM="#F6D7C6",BLUSH="#FFB3C0";
+  const BG=coord?{hi:"#A3153A",mid:"#4A0A1F",lo:"#14030A"}:{hi:"#7A1436",mid:"#3A0B1D",lo:"#12030A"};
+  const TINT=coord?"rgba(211,219,232,":"rgba(233,178,76,",RAY=coord?"rgba(230,236,248,":"rgba(255,214,130,";
   /* two optional panels under the stub, each present only when that ticket has it: the team message and the prize line (the prize is drawn by the organisers).
-     With neither, the ticket is exactly as before. */
+     With neither, the ticket is exactly the base size. */
   const PANELS=[["Your secret message",t.game_message],[String(t.game_prize_heading||"").trim()||"You are a winner!",t.game_prize]].map(a=>[a[0],String(a[1]||"").trim()]).filter(a=>a[1]).map(a=>{const m=msgLines(a[1]);return {label:a[0],ML:m,PH:138+m.lines.length*m.lh}});
   let PY=TH-4;PANELS.forEach((pn,i)=>{pn.y=PY;PY+=pn.PH+(i<PANELS.length-1?18:0)});
-  const H=PANELS.length?PY+34:TH;
+  const H=PANELS.length?PY+54:TH;
   c.width=W;c.height=H;const x=c.getContext("2d");x.clearRect(0,0,W,H);
+  const foil=(x0,y0,x1,y1)=>{const g=x.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,G[0]);g.addColorStop(.5,G[1]);g.addColorStop(1,G[2]);return g};
+  const sheen=(y,sz)=>{const g=x.createLinearGradient(0,y-sz*.85,0,y+sz*.1);g.addColorStop(0,G[0]);g.addColorStop(.55,G[1]);g.addColorStop(1,G[2]);return g};
+  const dia=(X,Y,r,f)=>{x.fillStyle=f;x.beginPath();x.moveTo(X,Y-r);x.lineTo(X+r,Y);x.lineTo(X,Y+r);x.lineTo(X-r,Y);x.closePath();x.fill()};
   x.save();rr(x,0,0,W,H,52);x.clip();
-  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,P.top);g.addColorStop(1,P.bot);x.fillStyle=g;x.fillRect(0,0,W,H);
-  // dark header with the logo
-  x.fillStyle=NAVY;x.fillRect(0,0,W,486);
-  for(let i=0;i<W;i+=44){x.fillStyle=AMB;x.fillRect(i,486,22,14);x.fillStyle=IVO;x.fillRect(i+26,486,14,14)}
-  for(let i=0;i<W;i+=44){x.fillStyle=AMB;x.fillRect(i,H-14,22,14);x.fillStyle=NAVY;x.fillRect(i+26,H-14,14,14)}
-  if(LOGO){const lw=184,lh=lw*LOGO.height/LOGO.width;x.drawImage(LOGO,(W-lw)/2,30,lw,lh)}
-  // badge
-  const kind=coord?"COORDINATOR":"ADMIT ONE";x.font="600 26px "+FF;try{x.letterSpacing="7px"}catch(_){}const pw=x.measureText(kind).width+64;try{x.letterSpacing="0px"}catch(_){}
-  x.fillStyle=coord?IVO:AMB;rr(x,(W-pw)/2,184,pw,52,26);x.fill();txt(x,kind,W/2+3,220,26,"600",coord?"#7d1c32":NAVY,"center",7);
-  txt(x,CONFIG.ticketTagline,W/2+2,272,21,"500","rgba(251,247,236,.78)","center",4);
-  const ts=fit(x,CONFIG.eventName,740,146,60,"700",FD);txt(x,CONFIG.eventName,W/2,412,ts,"700",IVO,"center",0,FD);
-  txt(x,"presented by "+CONFIG.organiserName,W/2,464,30,"italic 500",AMB,"center",0,FD);
-  // frames
-  x.lineWidth=2;x.strokeStyle=AMB;x.globalAlpha=.7;rr(x,44,534,W-88,536,30);x.stroke();rr(x,44,1128,W-88,320,30);x.stroke();x.globalAlpha=1;
-  // details
-  [["Date",evDate()],["Time",evTime()],["Venue",evVenue()]].forEach((r,i)=>{
-    const y=584+i*104;txt(x,r[0],90,y,30,"italic 500",AI,"left",0,FD);
-    const sz=fit(x,r[1],720,40,24,"500");txt(x,r[1],90,y+48,sz,"500",P.ink,"left",0)});
+  // stage: dark base, crimson glow behind the title, spotlight rays from the top
+  let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,BG.mid);g.addColorStop(.5,BG.lo);g.addColorStop(1,"#0B0206");x.fillStyle=g;x.fillRect(0,0,W,H);
+  g=x.createRadialGradient(W/2,300,20,W/2,300,800);g.addColorStop(0,BG.hi);g.addColorStop(1,"rgba(0,0,0,0)");x.globalAlpha=.95;x.fillStyle=g;x.fillRect(0,0,W,1100);x.globalAlpha=1;
+  x.save();x.translate(W/2,-70);
+  for(let i=-7;i<=7;i++){const a=i*.17,w=.034;g=x.createRadialGradient(0,0,0,0,0,960);g.addColorStop(0,RAY+".26)");g.addColorStop(1,RAY+"0)");x.fillStyle=g;
+    x.beginPath();x.moveTo(0,0);x.lineTo(1000*Math.sin(a-w),1000*Math.cos(a-w));x.lineTo(1000*Math.sin(a+w),1000*Math.cos(a+w));x.closePath();x.fill()}
+  x.restore();
+  // sparks and soft bokeh (the same on every ticket)
+  let sd=7;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647};
+  for(let i=0;i<12;i++){const px=rnd()*W,py=rnd()*900,r=22+rnd()*46;g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,RAY+".16)");g.addColorStop(1,RAY+"0)");x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill()}
+  for(let i=0;i<110;i++){const px=rnd()*W,py=Math.pow(rnd(),1.4)*1060,r=.5+rnd()*2.2;x.fillStyle="rgba(255,228,170,"+(.18+rnd()*.6).toFixed(2)+")";x.beginPath();x.arc(px,py,r,0,7);x.fill()}
+  // stub shade
+  x.fillStyle="rgba(0,0,0,.30)";x.fillRect(0,1100,W,H-1100);
+  // foil bars and frame
+  g=x.createLinearGradient(0,0,W,0);[G[0],G[1],G[2],G[1],G[0]].forEach((cl,i)=>g.addColorStop(i/4,cl));x.fillStyle=g;x.fillRect(0,0,W,10);x.fillRect(0,H-10,W,10);
+  x.lineWidth=4;x.strokeStyle=foil(0,0,W,H);rr(x,24,24,W-48,H-48,40);x.stroke();
+  dia(W/2,24,15,foil(0,0,0,40));dia(W/2,H-24,15,foil(0,H-40,0,H));
+  // logo with a halo
+  g=x.createRadialGradient(W/2,128,10,W/2,128,230);g.addColorStop(0,RAY+".34)");g.addColorStop(1,RAY+"0)");x.fillStyle=g;x.fillRect(0,0,W,360);
+  if(LOGO){const lw=160,lh=lw*LOGO.height/LOGO.width;x.drawImage(LOGO,(W-lw)/2,62,lw,lh)}
+  // badge with flanking lines
+  const kind=coord?"COORDINATOR":"MEMBER";x.font="600 26px "+FF;try{x.letterSpacing="8px"}catch(_){}const pw=x.measureText(kind).width+72;try{x.letterSpacing="0px"}catch(_){}
+  const bx=(W-pw)/2;x.fillStyle=foil(bx,206,bx+pw,260);rr(x,bx,206,pw,54,27);x.fill();txt(x,kind,W/2+4,243,26,"600","#2A0A14","center",8);
+  x.lineWidth=2;x.strokeStyle=foil(0,0,W,0);x.globalAlpha=.85;x.beginPath();x.moveTo(70,233);x.lineTo(bx-22,233);x.moveTo(bx+pw+22,233);x.lineTo(W-70,233);x.stroke();x.globalAlpha=1;
+  dia(bx-34,233,7,GOLD);dia(bx+pw+34,233,7,GOLD);
+  txt(x,CONFIG.ticketTagline,W/2+2,322,22,"500",BLUSH,"center",5);
+  // the title, in glowing foil
+  const ts=fit(x,CONFIG.eventName,780,170,64,"700",FD);
+  x.save();x.shadowColor=TINT+".65)";x.shadowBlur=56;txt(x,CONFIG.eventName,W/2,472,ts,"700",sheen(472,ts),"center",0,FD);x.restore();
+  txt(x,CONFIG.eventName,W/2,472,ts,"700",sheen(472,ts),"center",0,FD);
+  txt(x,"presented by "+CONFIG.organiserName,W/2,528,30,"italic 500",BLUSH,"center",0,FD);
+  // details in a glass panel
+  x.fillStyle="rgba(255,255,255,.05)";rr(x,64,560,W-128,310,30);x.fill();x.lineWidth=2;x.strokeStyle=foil(64,560,W-64,870);x.globalAlpha=.6;x.stroke();x.globalAlpha=1;
+  [["DATE",evDate()],["TIME",evTime()],["VENUE",evVenue()]].forEach((r,i)=>{
+    const y=614+i*92;dia(96,y-8,7,GOLD);txt(x,r[0],114,y,21,"600",GOLD,"left",6);
+    const sz=fit(x,r[1],690,40,24,"500");txt(x,r[1],114,y+46,sz,"500",CREAM,"left",0);
+    if(i<2){x.strokeStyle=TINT+".22)";x.lineWidth=1.5;x.beginPath();x.moveTo(90,y+66);x.lineTo(W-90,y+66);x.stroke()}});
   // attendee
-  txt(x,"Attendee",90,902,30,"italic 500",AI,"left",0,FD);
-  const ns=fit(x,t.name,720,80,36,"700",FD);txt(x,t.name,90,980,ns,"700",P.acc,"left",0,FD);
-  const veg=t.food==="Veg";foodMark(x,90,996,veg);txt(x,veg?"Veg":"Non-veg",154,1032,34,"500",P.ink,"left",0);
-  // perforation
-  x.setLineDash([14,12]);x.strokeStyle=AMB;x.globalAlpha=.9;x.lineWidth=3;x.beginPath();x.moveTo(60,1100);x.lineTo(W-60,1100);x.stroke();x.setLineDash([]);x.globalAlpha=1;
-  x.globalCompositeOperation="destination-out";x.beginPath();x.arc(0,1100,34,0,7);x.fill();x.beginPath();x.arc(W,1100,34,0,7);x.fill();x.globalCompositeOperation="source-over";
+  dia(96,914,7,GOLD);txt(x,"ATTENDEE",114,922,21,"600",GOLD,"left",6);
+  const ns=fit(x,t.name,730,86,36,"700",FD);
+  x.save();x.shadowColor=TINT+".4)";x.shadowBlur=24;txt(x,t.name,96,1002,ns,"700",CREAM,"left",0,FD);x.restore();
+  const veg=t.food==="Veg",fc=veg?"#4BE38A":"#FF6B6B",ft=veg?"Veg":"Non-veg";x.font="600 32px "+FF;const fw=64+x.measureText(ft).width+30;
+  x.fillStyle=veg?"rgba(75,227,138,.14)":"rgba(255,107,107,.14)";rr(x,96,1024,fw,50,25);x.fill();x.lineWidth=2.5;x.strokeStyle=fc;rr(x,96,1024,fw,50,25);x.stroke();
+  x.lineWidth=4;rr(x,114,1035,28,28,6);x.stroke();x.fillStyle=fc;x.beginPath();x.arc(128,1049,6.5,0,7);x.fill();txt(x,ft,160,1058,32,"600",CREAM,"left",0);
+  // perforation with punched notches
+  x.setLineDash([14,12]);x.strokeStyle=foil(0,0,W,0);x.globalAlpha=.95;x.lineWidth=3;x.beginPath();x.moveTo(60,1100);x.lineTo(W-60,1100);x.stroke();x.setLineDash([]);x.globalAlpha=1;
+  x.globalCompositeOperation="destination-out";x.beginPath();x.arc(0,1100,40,0,7);x.fill();x.beginPath();x.arc(W,1100,40,0,7);x.fill();x.globalCompositeOperation="source-over";
+  x.lineWidth=3;x.strokeStyle=GOLD;x.globalAlpha=.9;x.beginPath();x.arc(0,1100,40,-Math.PI/2,Math.PI/2);x.stroke();x.beginPath();x.arc(W,1100,40,Math.PI/2,Math.PI*1.5);x.stroke();x.globalAlpha=1;
   // stub
-  txt(x,"Ticket number",90,1196,30,"italic 500",AI,"left",0,FD);
-  const tl=t.label||"—",ls=fit(x,tl,420,84,40,"600");txt(x,tl,90,1278,ls,"600",P.acc,"left",1);
-  txt(x,"Admits one person, one entry",90,1352,30,"italic 500",AI,"left",0,FD);
-  txt(x,"Show this QR at the entry",90,1396,24,"400",P.mute,"left",0);
-  // QR
-  x.fillStyle="#fff";rr(x,556,1148,280,280,24);x.fill();x.lineWidth=2;x.strokeStyle=AMB;x.globalAlpha=.8;x.stroke();x.globalAlpha=1;
+  x.fillStyle="rgba(255,255,255,.04)";rr(x,64,1124,W-128,312,30);x.fill();x.lineWidth=2;x.strokeStyle=foil(64,1124,W-64,1436);x.globalAlpha=.6;x.stroke();x.globalAlpha=1;
+  dia(96,1180,7,GOLD);txt(x,"TICKET NUMBER",114,1188,21,"600",GOLD,"left",6);
+  const tl=t.label||"—",ls=fit(x,tl,400,100,40,"600");
+  x.save();x.shadowColor=TINT+".55)";x.shadowBlur=30;txt(x,tl,100,1296,ls,"600",sheen(1296,ls),"left",2);x.restore();txt(x,tl,100,1296,ls,"600",sheen(1296,ls),"left",2);
+  txt(x,"Admits one person, one entry",100,1356,28,"italic 500",BLUSH,"left",0,FD);
+  txt(x,"Show this QR at the entry",100,1396,24,"400","rgba(246,215,198,.72)","left",0);
+  // QR (unchanged content and level; black on a white plate with a wide quiet zone)
+  x.save();x.shadowColor=TINT+".6)";x.shadowBlur=36;x.fillStyle="#fff";rr(x,536,1140,280,280,24);x.fill();x.restore();
+  x.lineWidth=3;x.strokeStyle=foil(536,1140,816,1420);rr(x,536,1140,280,280,24);x.stroke();
   if(t.secret&&t.label){
-    const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k=Math.floor(240/m),o=556+(280-m*k)/2,p=1148+(280-m*k)/2;
+    const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k=Math.floor(240/m),o=536+(280-m*k)/2,p=1140+(280-m*k)/2;
     x.fillStyle="#000";for(let r=0;r<m;r++)for(let cc=0;cc<m;cc++)if(q.isDark(r,cc))x.fillRect(o+cc*k,p+r*k,k,k);
-  }else txt(x,"Not ready",696,1296,30,"600","#444","center",0);
+  }else txt(x,"Not ready",676,1288,30,"600","#444","center",0);
   PANELS.forEach(pn=>{const y0=pn.y,ML=pn.ML;
-    x.fillStyle="rgba(255,164,0,.13)";rr(x,44,y0,W-88,pn.PH,30);x.fill();x.lineWidth=2;x.strokeStyle=AMB;x.globalAlpha=.8;rr(x,44,y0,W-88,pn.PH,30);x.stroke();x.globalAlpha=1;
-    txt(x,pn.label,W/2,y0+62,fit(x,pn.label,740,30,12,"italic 500",FD),"italic 500",AI,"center",0,FD);
-    ML.lines.forEach((l,i)=>txt(x,l,W/2,y0+116+ML.size+i*ML.lh-ML.size*.2,ML.size,"700",P.acc,"center",0,FD));
+    x.fillStyle=TINT+".10)";rr(x,64,y0,W-128,pn.PH,30);x.fill();x.lineWidth=2;x.strokeStyle=foil(64,y0,W-64,y0+pn.PH);x.globalAlpha=.7;x.stroke();x.globalAlpha=1;
+    txt(x,pn.label,W/2,y0+62,fit(x,pn.label,700,30,12,"italic 500",FD),"italic 500",GOLD,"center",0,FD);
+    ML.lines.forEach((l,i)=>txt(x,l,W/2,y0+116+ML.size+i*ML.lh-ML.size*.2,ML.size,"700",CREAM,"center",0,FD));
   });
   x.restore();
 }
@@ -1762,7 +1794,7 @@ function msgLines(s){
     s.split(/\s+/).filter(Boolean).forEach(add);if(cur)L.push(cur);return L};
   let L=wrap(size);while(L.length>4&&size>30){size-=4;L=wrap(size)}
   return {lines:L,size,lh:Math.round(size*1.3)}}
-const W_MSG=740;
+const W_MSG=700;
 async function drawTickets(){
   await loadEvent();await loadLogo();await qrReady;
   const r=S.cur;S.cv=[];

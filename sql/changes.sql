@@ -2399,3 +2399,47 @@ end $function$;
 
 revoke all on function public.submit_booking(uuid, jsonb, text) from public, anon, authenticated, service_role;
 grant execute on function public.submit_booking(uuid, jsonb, text) to anon, authenticated;
+
+
+
+-- ============================================================================
+-- Release 2, piece 15: a fifth answer to "What best describes you?": "Industrial Trainee"
+-- Written 3 Nov 2026. Run BEFORE publishing the new index.html (the page may be one step behind the database, never ahead).
+-- Safe to run twice. Changes no existing data. Only the list of allowed answers grows:
+--   before: Article Assistant | Employee | Student | Others
+--   after:  Article Assistant | Industrial Trainee | Employee | Student | Others
+-- "Others" is stored exactly as before; the public page now SHOWS it as "Entrepreneur & Others" (a label only).
+--
+-- Two places check the answer, so two changes:
+--   1. the rule on the tickets table (tickets_occupation_check);
+--   2. submit_booking, the function the Register page calls. It is changed by reading the LIVE function, replacing only its list of allowed
+--      answers and saving it again, so nothing else in it can be lost or become out of date. It stops with a message if it does not find
+--      exactly one list to change. Who may run the function (anon, authenticated) is not touched.
+-- ============================================================================
+
+-- 1. the rule on the table
+alter table tickets drop constraint if exists tickets_occupation_check;
+alter table tickets add constraint tickets_occupation_check
+  check (occupation is null or occupation in ('Article Assistant', 'Industrial Trainee', 'Employee', 'Student', 'Others'));
+
+-- 2. the Register function
+do $$
+declare
+  d   text := pg_get_functiondef('public.submit_booking(uuid,jsonb,text)'::regprocedure);
+  old text := $q$not in ('Article Assistant','Employee','Student','Others')$q$;
+  new text := $q$not in ('Article Assistant','Industrial Trainee','Employee','Student','Others')$q$;
+begin
+  if position(new in d) > 0 then
+    raise notice 'submit_booking already accepts Industrial Trainee: nothing to change.';
+    return;
+  end if;
+  if (length(d) - length(replace(d, old, ''))) / length(old) <> 1 then
+    raise exception 'Expected to find the list of answers exactly once in submit_booking. Nothing was changed. Please send this message to Claude.';
+  end if;
+  execute replace(d, old, new);
+  raise notice 'submit_booking now accepts Industrial Trainee.';
+end $$;
+
+-- 3. check (run these two lines; both should say true)
+select (select pg_get_constraintdef(oid) like '%Industrial Trainee%' from pg_constraint where conname = 'tickets_occupation_check') as table_rule_ok,
+       (pg_get_functiondef('public.submit_booking(uuid,jsonb,text)'::regprocedure) like '%Industrial Trainee%') as function_ok;

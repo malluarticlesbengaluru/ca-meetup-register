@@ -690,12 +690,10 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-spots{display:inline-flex;align-items:center;gap:9px;margin-top:22px;background:rgba(240,138,60,.16);border:1px solid rgba(240,138,60,.5);color:var(--ember);border-radius:99px;padding:7px 16px;font:800 .78rem/1 var(--sans);letter-spacing:.06em;text-transform:uppercase}
 .bhome .bh-spots i{width:8px;height:8px;border-radius:50%;background:var(--ember);animation:bh-pulse 1.8s infinite}
 @keyframes bh-pulse{50%{opacity:.25;transform:scale(1.5)}}
-.bhome .bh-count{padding:0 0 20px;margin-top:-28px;position:relative;z-index:3}
 .bhome .bh-cd{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:560px;margin:0 auto}
 .bhome .bh-cd div{background:var(--glass);border:1px solid var(--glass-b);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-radius:18px;padding:16px 4px 12px;text-align:center}
 .bhome .bh-cd b{display:block;font:900 clamp(1.8rem,8vw,2.7rem)/1 var(--sans);color:var(--gold);font-variant-numeric:tabular-nums}
 .bhome .bh-cd span{font:600 .64rem/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--rose)}
-.bhome .bh-cdcap{text-align:center;font:italic 500 1rem var(--serif);color:var(--blush);margin-bottom:14px}
 .bhome .bh-split{display:grid;gap:36px;align-items:center}
 @media(min-width:820px){.bhome .bh-split{grid-template-columns:minmax(0,400px) 1fr;gap:64px}}
 .bhome .bh-poster{border-radius:22px;overflow:hidden;border:1px solid var(--glass-b);box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 0 8px rgba(233,178,76,.08);max-width:420px;margin:0 auto;transform:rotate(-1.4deg);transition:transform .4s}
@@ -773,8 +771,6 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-spots.bh-nosp{display:none}
 .bhome .bh-final .bh-spots{margin:0 0 24px}
 .bhome .bh-note{margin:22px auto 0;max-width:40ch;font:italic 500 .95rem/1.5 var(--serif);color:var(--blush)}
-.bhome .bh-reg{margin:18px auto 0;max-width:560px;text-align:center;font:600 .8rem/1.4 var(--sans);letter-spacing:.06em;color:var(--blush)}
-.bhome .bh-reg b{font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
 .bhome .bh-sponsor .bh-splogo{height:150px;width:auto;margin:0 auto;display:block;filter:drop-shadow(0 6px 22px rgba(0,0,0,.35))}
 .bhome .bh-spfig,.bhome .bh-svid{margin:20px auto 0;max-width:420px;border-radius:18px;overflow:hidden;border:1px solid var(--glass-b)}
 .bhome .bh-spfig img{display:block;width:100%;height:auto;cursor:zoom-in}
@@ -782,6 +778,22 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-sponsor .bh-hint{margin-top:12px}
 @media(min-width:760px){.bhome .bh-spfig,.bhome .bh-svid{margin-left:0}.bhome .bh-sponsor .bh-hint{text-align:left}}
 @media(prefers-reduced-motion:reduce){html:has(body[data-step="home"]){scroll-behavior:auto}}
+
+.bhome .bh-reg{display:block;width:fit-content;max-width:100%;margin:22px auto 0;padding:11px 22px;border-radius:99px;background:var(--glass);border:1px solid var(--glass-b);text-align:center;font:600 .84rem/1.4 var(--sans);letter-spacing:.05em;color:var(--blush)}
+.bhome .bh-reg[hidden]{display:none}
+.bhome .bh-reg b{font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.bhome .bh-grand{position:relative;text-align:center;padding:84px 0 70px;overflow:hidden}
+.bhome .bh-grand:before{content:"";position:absolute;left:50%;top:58%;width:min(900px,140%);aspect-ratio:1;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(233,178,76,.17),rgba(140,24,56,.22) 38%,transparent 68%);pointer-events:none}
+.bhome .bh-grand .bh-w{position:relative}
+.bhome .bh-grand h2{font-size:clamp(2.2rem,8vw,4.2rem);margin-bottom:34px}
+.bhome .bh-grand .bh-cd{max-width:900px;gap:clamp(8px,2vw,24px)}
+.bhome .bh-grand .bh-cd div{padding:clamp(18px,4vw,40px) 4px clamp(14px,3vw,28px);border-radius:clamp(18px,3vw,30px);border:1px solid rgba(233,178,76,.38);background:linear-gradient(180deg,rgba(140,24,56,.55),rgba(74,10,31,.75));box-shadow:0 0 0 1px rgba(255,179,192,.06) inset,0 24px 60px rgba(0,0,0,.5),0 0 54px rgba(233,178,76,.14);animation:bh-glow 4s ease-in-out infinite}
+.bhome .bh-grand .bh-cd div:nth-child(2){animation-delay:.5s}.bhome .bh-grand .bh-cd div:nth-child(3){animation-delay:1s}.bhome .bh-grand .bh-cd div:nth-child(4){animation-delay:1.5s}
+.bhome .bh-grand .bh-cd b{font-size:clamp(2.3rem,12.5vw,7rem);letter-spacing:-.03em;background:linear-gradient(180deg,#FBDD8E,var(--gold) 55%,var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #6d4510) drop-shadow(0 12px 20px rgba(0,0,0,.5))}
+.bhome .bh-grand .bh-cd span{display:block;margin-top:10px;font-size:clamp(.58rem,1.8vw,.85rem);letter-spacing:.26em}
+.bhome .bh-cdwhen{margin-top:30px;font:italic 500 clamp(1.05rem,3.2vw,1.35rem)/1.4 var(--serif);color:var(--blush)}
+@keyframes bh-glow{50%{box-shadow:0 0 0 1px rgba(255,179,192,.06) inset,0 24px 60px rgba(0,0,0,.5),0 0 80px rgba(233,178,76,.3)}}
+@media(prefers-reduced-motion:reduce){.bhome .bh-grand .bh-cd div{animation:none}}
 </style>
 </head>
 <body>
@@ -1045,10 +1057,6 @@ function vHome(){
 ${spots}
 </div></section>
 
-<section class="bh-count"><div class="bh-w"><p class="bh-cdcap">Counting down to ${E.replace(/’\d+$/,"")}</p>
-<div class="bh-cd" id="bh-cd" role="timer" aria-label="Countdown to the meetup"><div><b>00</b><span>days</span></div><div><b>00</b><span>hours</span></div><div><b>00</b><span>mins</span></div><div><b>00</b><span>secs</span></div></div>
-<p class="bh-reg" id="bh-reg" role="timer" aria-label="Time left to register"${a.close?"":" hidden"}>Registration closes in <b>00</b>d <b>00</b>h <b>00</b>m <b>00</b>s</p></div></section>
-
 <section><div class="bh-w bh-split">
 <div class="bh-rv"><figure class="bh-poster" style="margin:0 auto"><img id="home-poster" src="assets/burg-poster.jpg" alt="${E} event poster" width="1121" height="1403" loading="lazy"></figure><p class="bh-hint">TAP THE POSTER TO ENLARGE</p></div>
 <div class="bh-rv"><p class="bh-eyebrow">Save the date</p><h2>Mark your <i>Sunday.</i></h2>
@@ -1083,7 +1091,11 @@ ${spots}
 <section style="padding-top:0"><div class="bh-w"><div class="bh-final bh-rv" id="home-join"><p class="bh-eyebrow">See you there</p><h2>Ready to join <i>us?</i></h2><p class="bh-lede">Reserve your spot, or open a ticket you already booked.</p>
 ${spots}
 <div class="bh-cta"><button class="bh-btn bh-gold" id="go-register" type="button">${esc(P)}</button><button class="bh-btn bh-ghost" id="go-tickets" type="button">${esc(Q)}</button>${S.flags&&S.flags.show_about?hAbout():""}</div>
-${ret?`<p class="bh-note">${n===1?"Your booking is saved on this device. Enter your phone number to view it.":n+" bookings are saved on this device. Open Tickets and enter your phone number to view them."}</p>`:""}</div></div></section>
+${ret?`<p class="bh-note">${n===1?"Your booking is saved on this device. Enter your phone number to view it.":n+" bookings are saved on this device. Open Tickets and enter your phone number to view them."}</p>`:""}</div><p class="bh-reg" id="bh-reg" role="timer" aria-label="Time left to register"${a.close?"":" hidden"}>Registration closes in <b>00</b>d <b>00</b>h <b>00</b>m <b>00</b>s</p></div></section>
+
+<section class="bh-grand" id="bh-grand"><div class="bh-w"><div class="bh-rv"><p class="bh-eyebrow">The countdown</p><h2>Until we <i>meet.</i></h2>
+<div class="bh-cd" id="bh-cd" role="timer" aria-label="Countdown to the meetup"><div><b>00</b><span>days</span></div><div><b>00</b><span>hours</span></div><div><b>00</b><span>mins</span></div><div><b>00</b><span>secs</span></div></div>
+<p class="bh-cdwhen"><span data-ev="d">${esc(evDate())}</span> · <span data-ev="t">${esc(evTime())}</span></p></div></div></section>
 
 <footer class="bh-foot"><div class="bh-w"><b>${O}</b> · ${E}${SPONSOR.name?`<br>Co-sponsored by ${esc(SPONSOR.name)}`:""}<div class="bh-flogos"><img class="bh-fm" src="assets/burg-logo.png" alt="${O} logo">${SPONSOR.logo?`<span class="bh-fsep" aria-hidden="true"></span><img class="bh-fe" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.previousElementSibling.remove();this.remove()">`:""}</div></div></footer>
 <button class="bh-btn bh-gold bh-fab" id="home-fab" type="button">${ret?"View my ticket":"Register now"}</button></div>`;
@@ -1127,7 +1139,7 @@ function homeMount(){
     on(sl,"click",e=>{if(sw){e.stopPropagation();e.preventDefault();sw=false}},{capture:true});
     on(sl,"mouseenter",stop);on(sl,"mouseleave",play);on(document,"visibilitychange",()=>{document.hidden?stop():play()});play();sig.addEventListener("abort",stop)}
   /* the floating Register button: shows after the first screen, hides while the final card or the photos are in view; tapping it scrolls to the final card */
-  const fab=root.querySelector("#home-fab"),watch=[].slice.call(root.querySelectorAll("#home-join,#moments")),vis=new Set();
+  const fab=root.querySelector("#home-fab"),watch=[].slice.call(root.querySelectorAll("#home-join,#moments,#bh-reg,#bh-grand")),vis=new Set();
   function f(){fab.classList.toggle("bh-on",scrollY>innerHeight*.8)}
   if(fab){if("IntersectionObserver" in window&&watch.length){const o2=new IntersectionObserver(es=>{es.forEach(e=>e.isIntersecting?vis.add(e.target):vis.delete(e.target));fab.classList.toggle("bh-off",vis.size>0)});watch.forEach(x=>o2.observe(x));sig.addEventListener("abort",()=>o2.disconnect())}
     on(window,"scroll",f,{passive:true});f();

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#081020">
+<meta name="theme-color" content="#1A040C">
 <link rel="icon" type="image/png" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta property="og:type" content="website"><meta property="og:title" content="Ehsaas'26 – Register"><meta property="og:description" content="Register for Ehsaas'26 by Mallu Articles Bengaluru.">
 <meta property="og:image" content="https://rameezmunirrr-gh.github.io/ca-meetup-register/assets/og-image.jpg"><meta name="twitter:card" content="summary_large_image">
@@ -795,9 +795,85 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 @keyframes bh-glow{50%{box-shadow:0 0 0 1px rgba(255,179,192,.06) inset,0 24px 60px rgba(0,0,0,.5),0 0 80px rgba(233,178,76,.3)}}
 @media(prefers-reduced-motion:reduce){.bhome .bh-grand .bh-cd div{animation:none}}
 </style>
+<style id="burg-theme">
+/* ===== Ehsaas'26 BURGUNDY theme for every screen EXCEPT Home (Nov 2026, Part A: the shared theme) =====
+   Same palette and fonts as the burgundy Home (wine, burgundy, rose, blush, cream, gold; Poppins and Lora italic).
+   Home is not touched: every rule here starts with body:not([data-step="home"]), and Home sets data-step="home".
+   The Register form (data-step="form") only gets the colour variables and the page background in this part; its own look is restyled in Part B.
+   Nothing here changes behaviour: no ids, functions, data attributes or Supabase calls are involved. To tweak the look, change the colours in the first rule. */
+html:has(body:not([data-step="home"])){background:#1A040C}
+body:not([data-step="home"]){--bg:#1A040C;--card:#3A0B1D;--ink:#F6D7C6;--mute:#CBA49B;--brand:#8C1838;--brand-d:#6E1230;--accent:#E9B24C;--accent-ink:#F3C766;
+--line:rgba(255,179,192,.14);--line2:rgba(255,179,192,.24);--line3:rgba(255,179,192,.34);--err:#FF9A8F;--ok:#8DE5B0;--warn:#F3C766;--on:#F6D7C6;--dark:#1A040C;
+--pink:#FFB3C0;--violet:#CF736A;--teal:#E9B24C;--blue:#F6D7C6;--orange:#F08A3C;
+--wine:#1A040C;--deep:#4A0A1F;--burg:#8C1838;--rose:#CF736A;--blush:#FFB3C0;--cream:#F6D7C6;--gold:#E9B24C;--ember:#F08A3C;--glass:rgba(140,24,56,.30);--glass-b:rgba(255,179,192,.22);
+--sans:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;--serif:"Lora",Georgia,serif;color-scheme:dark}
+body[data-step="form"]{background:#1A040C}
+body:not([data-step="home"]):not([data-step="form"])::before{content:"";position:fixed;left:0;right:0;top:0;bottom:0;height:auto;z-index:-1;pointer-events:none;-webkit-mask-image:none;mask-image:none;
+background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transparent 70%),radial-gradient(ellipse 70% 40% at 100% 55%,rgba(110,16,46,.55),transparent 70%),radial-gradient(ellipse 70% 40% at 0 85%,rgba(110,16,46,.5),transparent 70%)}
+body:not([data-step="home"]):not([data-step="form"]) ::selection{background:rgba(233,178,76,.35);color:var(--cream)}
+/* header and page text */
+body:not([data-step="home"]):not([data-step="form"]) .top{background:rgba(26,4,12,.78);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--glass-b)}
+body:not([data-step="home"]):not([data-step="form"]) .top span{font:800 .74rem/1.15 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--cream)}
+body:not([data-step="home"]):not([data-step="form"]) h1{font:900 clamp(2rem,9vw,2.8rem)/1.06 var(--sans);letter-spacing:-.035em;color:var(--cream)}
+body:not([data-step="home"]):not([data-step="form"]) h2{font:800 1.2rem/1.2 var(--sans);letter-spacing:-.01em;color:var(--cream)}
+body:not([data-step="home"]):not([data-step="form"]) .sub{font:italic 500 1.05rem/1.6 var(--serif);color:rgba(246,215,198,.88)}
+body:not([data-step="home"]):not([data-step="form"]) a:not(.btn){color:var(--blush)}
+body:not([data-step="home"]):not([data-step="form"]) .foot{font:600 .74rem/1.6 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--rose)}
+body:not([data-step="home"]):not([data-step="form"]) label,body:not([data-step="home"]):not([data-step="form"]) .lbl{color:var(--cream);font-weight:600}
+body:not([data-step="home"]):not([data-step="form"]) .amt{font:900 3.2rem/1 var(--sans);letter-spacing:-.02em;background:linear-gradient(180deg,#FBDD8E,var(--gold) 55%,var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent}
+body:not([data-step="home"]):not([data-step="form"]) .idcard .amt{font:900 2.4rem/1.1 var(--sans);letter-spacing:.1em}
+body:not([data-step="home"]):not([data-step="form"]) .tot-a{font-family:var(--sans);font-weight:900}
+/* cards */
+body:not([data-step="home"]):not([data-step="form"]) .card{background:linear-gradient(160deg,rgba(140,24,56,.42),rgba(74,10,31,.6));border:1px solid var(--glass-b);border-radius:22px;padding:22px 18px;box-shadow:0 24px 50px -30px rgba(0,0,0,.8)}
+body:not([data-step="home"]):not([data-step="form"]) .idcard{background:linear-gradient(180deg,rgba(140,24,56,.55),rgba(74,10,31,.78));border-color:rgba(233,178,76,.38)}
+body:not([data-step="home"]):not([data-step="form"]) .errbox{background:rgba(255,90,90,.12);border-color:rgba(255,154,143,.5);color:#FFD6D0}
+body:not([data-step="home"]):not([data-step="form"]) .errbox b{color:var(--cream)}
+body:not([data-step="home"]):not([data-step="form"]) .card p{color:rgba(246,215,198,.9)}
+body:not([data-step="home"]):not([data-step="form"]) .card p.note{color:var(--mute)}
+body:not([data-step="home"]):not([data-step="form"]) .card p.err{color:var(--err)}
+body:not([data-step="home"]):not([data-step="form"]) .card h2:before{border-radius:3px}
+/* inputs */
+body:not([data-step="home"]):not([data-step="form"]) input[type=text],body:not([data-step="home"]):not([data-step="form"]) input[type=tel],body:not([data-step="home"]):not([data-step="form"]) input[type=file],body:not([data-step="home"]):not([data-step="form"]) textarea{border:1px solid var(--line2);border-radius:14px;background:rgba(26,4,12,.5);color:var(--ink)}
+body:not([data-step="home"]):not([data-step="form"]) input[type=text]:focus,body:not([data-step="home"]):not([data-step="form"]) input[type=tel]:focus,body:not([data-step="home"]):not([data-step="form"]) textarea:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(233,178,76,.2);background:rgba(26,4,12,.72)}
+body:not([data-step="home"]):not([data-step="form"]) input::placeholder,body:not([data-step="home"]):not([data-step="form"]) textarea::placeholder{color:rgba(246,215,198,.42)}
+body:not([data-step="home"]):not([data-step="form"]) input:-webkit-autofill{-webkit-text-fill-color:var(--ink);box-shadow:0 0 0 1000px #3A0B1D inset;caret-color:var(--ink)}
+body:not([data-step="home"]):not([data-step="form"]) input[type=file]::file-selector-button{border:1px solid var(--gold);border-radius:99px;color:var(--accent-ink);background:transparent}
+body:not([data-step="home"]):not([data-step="form"]) .pf{border:1px solid var(--line2);border-radius:14px;background:rgba(26,4,12,.5)}
+body:not([data-step="home"]):not([data-step="form"]) .pf:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px rgba(233,178,76,.2)}
+body:not([data-step="home"]):not([data-step="form"]) .pf span{background:rgba(140,24,56,.3);border-right:1px solid var(--line2);color:var(--blush)}
+body:not([data-step="home"]):not([data-step="form"]) .sw input{background:rgba(246,215,198,.22)}
+body:not([data-step="home"]):not([data-step="form"]) .sw input:checked{background:var(--gold)}
+/* option chips: outlined cream, filled gold when chosen */
+body:not([data-step="home"]):not([data-step="form"]) .opts span{border:1.5px solid rgba(246,215,198,.4);color:var(--cream);font-weight:600}
+body:not([data-step="home"]):not([data-step="form"]) .opts span:hover{background:var(--glass);transform:translateY(-1px)}
+body:not([data-step="home"]):not([data-step="form"]) .opts input:checked+span{background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember));color:var(--wine);border-color:transparent;box-shadow:0 8px 20px -10px rgba(233,178,76,.7)}
+/* buttons: gold pills, ghost = cream outline */
+body:not([data-step="home"]):not([data-step="form"]) button,body:not([data-step="home"]):not([data-step="form"]) a.btn{font:800 1rem/1.2 var(--sans);letter-spacing:0;border-radius:99px;border:1.5px solid transparent;background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember));color:var(--wine);box-shadow:0 10px 30px rgba(233,178,76,.35)}
+body:not([data-step="home"]):not([data-step="form"]) button:hover,body:not([data-step="home"]):not([data-step="form"]) a.btn:hover{background:linear-gradient(135deg,#F6D07A,#EDBA58 55%,#F39A52);border-color:transparent;box-shadow:0 14px 34px rgba(233,178,76,.5)}
+body:not([data-step="home"]):not([data-step="form"]) button.ghost,body:not([data-step="home"]):not([data-step="form"]) a.btn.ghost{background:transparent;color:var(--cream);border:1.5px solid rgba(246,215,198,.4);box-shadow:none}
+body:not([data-step="home"]):not([data-step="form"]) button.ghost:hover,body:not([data-step="home"]):not([data-step="form"]) a.btn.ghost:hover{background:var(--glass);border-color:rgba(246,215,198,.65);box-shadow:none}
+body:not([data-step="home"]):not([data-step="form"]) button.chip{padding:8px 14px;letter-spacing:.06em;font-weight:700;background:transparent;color:var(--cream);border:1.5px solid rgba(246,215,198,.4);box-shadow:none}
+body:not([data-step="home"]):not([data-step="form"]) button.chip:hover{background:var(--glass);border-color:var(--gold);box-shadow:none}
+body:not([data-step="home"]):not([data-step="form"]) button:disabled{box-shadow:none}
+/* progress bar (Details, Review, Payment) */
+body:not([data-step="home"]):not([data-step="form"]) .steps li{font-weight:600}
+body:not([data-step="home"]):not([data-step="form"]) .steps li.cur{color:var(--cream)}
+body:not([data-step="home"]):not([data-step="form"]) .steps li.cur i{box-shadow:0 0 0 4px rgba(233,178,76,.28)}
+/* confirmation seal, pills, notes, toast */
+body:not([data-step="home"]):not([data-step="form"]) .seal{background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember));box-shadow:0 0 0 6px var(--bg),0 0 0 7px var(--gold)}
+body:not([data-step="home"]):not([data-step="form"]) .pill{border-color:var(--line3)}
+body:not([data-step="home"]):not([data-step="form"]) .p-ok{color:#8DE5B0;background:rgba(80,200,140,.14);border-color:rgba(141,229,176,.45)}
+body:not([data-step="home"]):not([data-step="form"]) .p-wait{color:var(--accent-ink);background:rgba(233,178,76,.14);border-color:rgba(233,178,76,.5)}
+body:not([data-step="home"]):not([data-step="form"]) .p-bad{color:var(--err);background:rgba(255,90,90,.12);border-color:rgba(255,154,143,.45)}
+body:not([data-step="home"]):not([data-step="form"]) .who-i{background:var(--glass);border:1px solid var(--glass-b)}
+body:not([data-step="home"]):not([data-step="form"]) .upi code{background:rgba(26,4,12,.5);border:1px dashed var(--line3);color:var(--cream)}
+body:not([data-step="home"]):not([data-step="form"]) .verify{border:1px solid rgba(233,178,76,.5);background:rgba(233,178,76,.1);color:#F3D9A0}
+body:not([data-step="home"]):not([data-step="form"]) #gbar{background:#3B1409;color:#F3D9A0;border-bottom:1px solid rgba(233,178,76,.45)}
+body:not([data-step="home"]):not([data-step="form"]) .toast{background:#4A0A1F;border:1px solid var(--glass-b);color:var(--cream)}
+</style>
 </head>
 <body>
-<header class="top"><div><img src="assets/logo-mark.png" alt="" width="44" height="30"><span>Mallu Articles Bengaluru</span></div></header>
+<header class="top"><div><img src="assets/burg-logo.png" alt="" width="44" height="30"><span>Mallu Articles Bengaluru</span></div></header>
 <div class="kasavu"></div>
 <div id="gbar" role="status" aria-live="polite" hidden></div>
 <main id="app"></main>

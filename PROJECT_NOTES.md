@@ -108,6 +108,7 @@ The database only accepts the role values **`admin`** and **`gate`**. **Always w
 | `index.html` | Public page (about 80 KB). A `CONFIG` block at the top holds event text, ticket text and the Supabase URL and key. The UPI ID, payee name and WhatsApp number are **not** in the code: they come from the database (`get_payment_info`). See section 6. |
 | `admin/index.html` | The **staff page** (about 112 KB): login for everyone, the admin dashboard (admins) AND the gate scanner (a **Gate** tab; gate staff see only that tab). See section 6. |
 | `gate/index.html` | Only a **forwarder** (about 0.6 KB) to `../admin/#gate`, so old bookmarks keep working. The scanner itself lives in `admin/index.html` since 28 Oct 2026. |
+| `assets/home-fx.js` | Motion for the Home page (letters, countdowns, reveal, particles, poster tilt, confetti). Loaded as `?v=3`: bump the number on every change. Rewritten 3 Nov 2026 for the new Home design. |
 | `assets/` | Logo files: `logo-fluid.js` (animated logo, home page only; load it with `?v=N` and bump N on change), `logo-mark.png` (transparent), `icon-192.png`, `apple-touch-icon.png`, `og-image.jpg` (the WhatsApp link preview). No SVG exists yet. |
 | `.github/workflows/supabase-keepalive.yml` | Keep-alive ping. |
 | `.github/workflows/schema-snapshot.yml` | Nightly database structure snapshot. |

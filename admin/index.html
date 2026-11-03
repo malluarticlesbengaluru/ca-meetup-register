@@ -237,7 +237,7 @@ function vOverview(){
     S.charts.push(new Chart($(id),{type:"pie",data:{labels,datasets:[{data,backgroundColor:colors,borderColor:"#0A2219",borderWidth:3,hoverOffset:6}]},plugins:[pctLabels],options:{maintainAspectRatio:false,devicePixelRatio:Math.max(window.devicePixelRatio||1,2),plugins:{legend:{display:false}}}}))};
   mk("#c1","Food",["Veg","Non-veg"],cnt("food",["Veg","Non-veg"]),["#2FD39B","#E86818"]);
   mk("#c2","Location",["In Bengaluru","Outside Bengaluru"],cnt("location",["In Bengaluru","Outside Bengaluru"]),["#4D78FF","#C0307E"]);
-  mk("#c3","Role",["Article Assistant","Employee","Student","Others"],cnt("occupation",["Article Assistant","Employee","Student","Others"]),["#F0A000","#9A55F0","#2FD39B","#E86818"]);
+  mk("#c3","Role",["Article Assistant","Industrial Trainee","Employee","Student","Others"],cnt("occupation",["Article Assistant","Industrial Trainee","Employee","Student","Others"]),["#F0A000","#4D78FF","#9A55F0","#2FD39B","#E86818"]);
 }
 function filtBar(withPeople){
   const f=S.f,o=(v,l)=>`<option value="${v}" ${f.pay===v?"selected":""}>${l}</option>`,n=[f.pay,f.food,f.loc,f.role,f.type,f.here].filter(Boolean).length;
@@ -247,7 +247,7 @@ function filtBar(withPeople){
   <select id="fpay" aria-label="Payment">${o("","All payments")}${o("pending","Pending")}${o("paid","Paid")}${o("rejected","Rejected")}</select>
   <select id="ffood" aria-label="Food"><option value="">Food: all</option><option ${f.food==="Veg"?"selected":""}>Veg</option><option ${f.food==="Non-veg"?"selected":""}>Non-veg</option></select>
   <select id="floc" aria-label="Location"><option value="">Location: all</option><option ${f.loc==="In Bengaluru"?"selected":""}>In Bengaluru</option><option ${f.loc==="Outside Bengaluru"?"selected":""}>Outside Bengaluru</option></select>
-  <select id="frole" aria-label="Role"><option value="">Role: all</option>${["Article Assistant","Employee","Student","Others"].map(v=>`<option ${f.role===v?"selected":""}>${v}</option>`).join("")}</select>
+  <select id="frole" aria-label="Role"><option value="">Role: all</option>${["Article Assistant","Industrial Trainee","Employee","Student","Others"].map(v=>`<option ${f.role===v?"selected":""}>${v}</option>`).join("")}</select>
   <select id="fhere" aria-label="Present at the event"><option value="">Present: all</option><option value="yes" ${f.here==="yes"?"selected":""}>Present at the event</option><option value="no" ${f.here==="no"?"selected":""}>Not present yet</option></select>
   <select id="ftype" aria-label="Type"><option value="">Type: all</option><option value="guest" ${f.type==="guest"?"selected":""}>Guests only</option><option value="coordinator" ${f.type==="coordinator"?"selected":""}>Coordinators only</option></select>
   ${S.tickets.some(t=>t.transferred_out_at)?`<label style="margin:0;font-weight:600;display:flex;align-items:center;gap:8px"><input type="checkbox" id="fmoved" ${S.showMoved?"checked":""}> Show transferred tickets</label>`:""}</div></details>

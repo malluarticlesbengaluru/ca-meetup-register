@@ -550,12 +550,95 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .fx .home.again .hhero .hw>*,.fx .home.again .fxc,.fx .home.again .fxlw{animation:none}
 .fx .home.again .hhero h1 em .fxc{animation:fxGlow 4.5s ease-in-out infinite;animation-delay:0s}
 .fx .home.again .fxcue{display:none}
-</style></head>
+</style>
+<style>
+/* ===== Register form screen (Nov 2026 redesign, from Ehsaas26-Form-demo-1). Scoped to .fpage, #fbar and body[data-step="form"]: no other screen is touched. ===== */
+body[data-step="form"]{background:#0B1226;padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+body[data-step="form"]::before,body[data-step="form"] .top,body[data-step="form"] .kasavu{display:none}
+body[data-step="form"] main{max-width:none;padding:0}
+.fpage,.fbar{--hnavy:#061651;--hamber:#FFA300;--hamber2:#FFC24D;--hcard:#141F3B;--hink:#E8ECF6;--hmute:#9AA5BE;--hline:#243154;--heb:#8FA8FF;--ease:cubic-bezier(.16,1,.3,1)}
+.fpage{color:var(--hink);overflow-x:clip}
+.fpage h1,.fpage h2,.fpage p{margin:0}
+.fpage .hw{max-width:620px;padding:0 18px}
+.fpage .hhead .hw{display:flex;align-items:center;gap:12px;color:#fff}
+/* thin scroll-progress line under the header */
+.fpg{position:absolute;left:0;right:0;bottom:0;height:3px;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#D82890,#7820E0,#20C8A0,#3050F0,#E86818)}
+/* hero with the stepper */
+.fhero{position:relative;overflow:hidden;padding:26px 0 34px;background:linear-gradient(160deg,#040F3A,#061651 55%,#0C2278);color:#fff}
+.fphoto{position:absolute;inset:0;background:url(assets/home-hero.jpg) 50% 30%/cover}
+.fphoto:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,15,58,.8),rgba(6,22,81,.9))}
+.fblob{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none}.fb1{width:300px;height:300px;background:rgba(255,163,0,.24);top:-130px;right:-100px}.fb2{width:240px;height:240px;background:rgba(70,100,240,.34);bottom:-110px;left:-80px}
+.fhero .hw{position:relative;z-index:2}
+.fsteps{display:flex;list-style:none;margin:0 0 22px;padding:0}
+.fsteps li{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;font-size:.78rem;font-weight:700;color:var(--hmute)}
+.fsteps i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:.85rem;border:1.5px solid rgba(255,255,255,.28);background:rgba(6,22,81,.8);position:relative;z-index:1}
+.fsteps li:not(:last-child):after{content:"";position:absolute;top:16px;left:calc(50% + 22px);right:calc(-50% + 22px);height:2px;background:rgba(255,255,255,.2)}
+.fsteps li.done:not(:last-child):after{background:var(--hamber)}
+.fsteps li.done i{background:var(--hamber);border-color:var(--hamber);color:var(--hnavy)}
+.fsteps li.cur{color:#fff}.fsteps li.cur i{border-color:var(--hamber);color:var(--hamber2);box-shadow:0 0 0 5px rgba(255,163,0,.22)}
+.fpage .feb{color:var(--heb);font-weight:700;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;text-align:center}
+.fpage .fhero h1{font:800 clamp(2rem,9vw,2.7rem)/1.1 var(--sans);text-align:center;margin:6px 0 14px;letter-spacing:-.02em;color:#fff;text-shadow:0 4px 30px rgba(4,15,58,.9)}
+.fpage .fhero h1 em{font-style:normal;color:var(--hamber)}
+.ffacts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.ffacts span{padding:6px 13px;border-radius:99px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.26);font-weight:700;font-size:.84rem;color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.ffacts .amb{background:rgba(255,163,0,.18);border-color:rgba(255,163,0,.5);color:var(--hamber2)}
+.fbody{padding-top:22px}
+/* banners */
+.fpage .bn{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:16px;margin:0 0 14px;background:var(--hcard);border:1px solid var(--hline);font-size:.93rem;color:#D7DEF5}
+.fpage .bn svg{flex:none;width:22px;height:22px;margin-top:2px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fpage .bn b{color:#fff}.fpage .bn.warn{border-color:rgba(255,163,0,.45);background:rgba(255,163,0,.09)}.fpage .bn.warn svg{color:var(--hamber)}.fpage .bn.info svg{color:var(--heb)}
+.fpage .bn.err{border-color:rgba(255,138,128,.5);background:rgba(255,90,90,.1)}.fpage .bn.err svg{color:var(--err)}.fpage .bn ul{margin:6px 0 0;padding-left:18px}
+.fpage .live{display:inline-block;width:8px;height:8px;border-radius:50%;background:#FF6B5E;margin-right:6px}
+/* cards */
+.fpage .pc{--cc:#20C8A0;--ct:#3FE0B9;--cbg:rgba(32,200,160,.16);position:relative;overflow:hidden;background:var(--hcard);border:1px solid var(--hline);border-top:3px solid var(--cc);border-radius:18px;padding:20px 18px 22px;margin:0 0 16px;box-shadow:0 14px 34px rgba(0,0,0,.28)}
+.fpage .pc.c1{--cc:#D82890;--ct:#FF7BC4;--cbg:rgba(216,40,144,.2)}.fpage .pc.c2{--cc:#7820E0;--ct:#B98BFF;--cbg:rgba(120,32,224,.26)}.fpage .pc.c3{--cc:#E86818;--ct:#FF9A55;--cbg:rgba(232,104,24,.2)}.fpage .pc.c4{--cc:#3050F0;--ct:#8BA0FF;--cbg:rgba(48,80,240,.24)}
+.fpage .pc:before{content:"";position:absolute;right:-50px;top:-50px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--cc) 30%,transparent),transparent 70%);pointer-events:none}
+.pch{display:flex;align-items:center;gap:12px;margin-bottom:6px;position:relative}
+.pch .ico{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--cbg);border:1px solid color-mix(in srgb,var(--cc) 45%,transparent);color:var(--ct)}
+.pch .ico svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fpage .pch h2{font:800 1.15rem/1.2 var(--sans);color:#fff;display:block}.fpage .pch h2:before{display:none}
+.pch small{display:block;color:var(--hmute);font-size:.82rem;font-weight:500}
+.fpage label,.fpage .lbl{display:block;font-weight:700;font-size:.92rem;margin:18px 0 8px;color:#fff;position:relative}
+.fpage .opts label{margin:0;font-weight:700}
+.fpage input[type=text],.fpage input[type=tel]{width:100%;font:inherit;padding:14px 16px;border:1px solid var(--hline);border-radius:12px;background:rgba(255,255,255,.04);color:#fff}
+.fpage input[type=text]:focus,.fpage input[type=tel]:focus{border-color:var(--hamber);box-shadow:0 0 0 4px rgba(255,163,0,.18);background:rgba(255,255,255,.06);outline:none}
+.fpage .pf{border:1px solid var(--hline);border-radius:12px;background:rgba(255,255,255,.04)}
+.fpage .pf:focus-within{border-color:var(--hamber);box-shadow:0 0 0 4px rgba(255,163,0,.18)}
+.fpage .pf span{border-right:1px solid var(--hline);background:rgba(255,255,255,.06)}
+.fpage .bad input[type=text],.fpage .bad input[type=tel]{border-color:var(--err)}.fpage .bad .pf{border-color:var(--err);box-shadow:0 0 0 3px rgba(255,138,128,.15)}
+.fpage .fe{color:var(--err);font-size:.85rem;margin:6px 0 0;font-weight:600}
+.fpage .opts span{padding:11px 18px}
+.fpage .bad .opts span{border-style:dashed}
+.fpage .sw b{color:#fff}.fpage .sw .n{font-size:.88rem;color:var(--hmute)}
+.fpage .sw input{width:54px;height:32px}.fpage .sw input:after{top:4px;left:4px}
+.focc{animation:fup .35s var(--ease) both}
+@keyframes fup{from{opacity:0;transform:translateY(10px)}}
+.fpage .shake{animation:fshk .4s}@keyframes fshk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+/* sticky action bar (lives outside #app so the entrance animation can never move it) */
+.fbar{position:fixed;left:0;right:0;bottom:0;z-index:12;background:rgba(6,22,81,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.14);padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px))}
+.fbar:empty{display:none}
+.fbar .hw{max-width:620px;margin:0 auto;padding:0 18px;display:flex;align-items:center;gap:12px}
+.ftot{flex:none;line-height:1.15}.ftot small{display:block;color:var(--hmute);font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.ftot b{font:800 1.6rem/1.1 var(--sans);color:var(--hamber)}
+.fbar .fbtn{border:0;border-radius:99px;padding:15px 16px;white-space:nowrap;font:800 1rem var(--sans);color:var(--hnavy);background:linear-gradient(135deg,var(--hamber),#F08A2E);box-shadow:0 10px 30px rgba(255,163,0,.4);flex:1}
+.fbar .fbtn:hover{background:linear-gradient(135deg,var(--hamber),#F08A2E);border-color:transparent;box-shadow:0 10px 30px rgba(255,163,0,.4);transform:translateY(-2px)}
+.fbar .fbtn.fg{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:none;flex:none;padding:15px 16px}
+.fbar .fbtn.fg:hover{background:rgba(255,255,255,.14);border-color:var(--hamber);box-shadow:none}
+html:has(body[data-step="form"]){scroll-padding-bottom:112px}   /* a focused field is never left behind the sticky bar */
+body[data-step="form"] .toast{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+/* motion (only when html.fx is set, i.e. the visitor has NOT asked for reduced motion) */
+.fx .fhero .hw>*{animation:ffi .8s var(--ease) both}.fx .fhero .hw>*:nth-child(2){animation-delay:.1s}.fx .fhero .hw>*:nth-child(3){animation-delay:.2s}.fx .fhero .hw>*:nth-child(4){animation-delay:.3s}
+.fx .fblob{animation:ffl 10s ease-in-out infinite}.fx .fb2{animation-duration:13s;animation-direction:reverse}
+.fx .fsteps li.cur i{animation:fpulse 2.4s ease-out infinite}
+@keyframes ffi{from{opacity:0;transform:translateY(16px)}}@keyframes ffl{50%{transform:translate(26px,-30px) scale(1.1)}}
+@keyframes fpulse{0%{box-shadow:0 0 0 0 rgba(255,163,0,.5)}70%,100%{box-shadow:0 0 0 12px rgba(255,163,0,0)}}
+</style>
+</head>
 <body>
 <header class="top"><div><img src="assets/logo-mark.png" alt="" width="44" height="30"><span>Mallu Articles Bengaluru</span></div></header>
 <div class="kasavu"></div>
 <div id="gbar" role="status" aria-live="polite" hidden></div>
 <main id="app"></main>
+<div id="fbar" class="fbar"></div>
 <script src="assets/logo-fluid.js?v=2"></script>
 <script src="assets/home-fx.js?v=3"></script>
 <script src="assets/page-fx.js?v=1"></script>
@@ -604,7 +687,7 @@ function uuid(){if(crypto.randomUUID)return crypto.randomUUID();
   return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=crypto.getRandomValues(new Uint8Array(1))[0]&15;return(c==="x"?r:(r&3|8)).toString(16)})}
 const askEmail=()=>!(S.flags&&S.flags.ask_email===false);
 function blank(){return{name:"",phone:"",occ:"",occd:"",occFor:"",loc:"",food:""}}
-const S={step:"home",status:null,friends:false,n:1,people:[blank()],file:null,sid:uuid(),errs:[],payErr:"",busy:false,result:null,
+const S={step:"home",status:null,friends:false,n:1,people:[blank()],file:null,sid:uuid(),errs:[],ferr:null,payErr:"",busy:false,result:null,
   tk:{q:"",phone:"",msg:"",busy:false,res:null,nf:false,code:"",ph:""},ti:null,cur:null,cv:[],pay:null,payLoading:false,payFail:false,payChanged:false};
 const $=s=>document.querySelector(s);
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -624,7 +707,7 @@ const OCC={"Article Assistant":{q:"Which firm or company do you work in?",ph:"CA
   "Student":{q:"Which exam are you attempting?",ph:"Approaching CA Finals",err:"Enter the exam you are attempting"},
   "Others":{q:"Tell us what you do",ph:"Type here",err:"Tell us what you do"}};
 function occBox(i,p){const o=OCC[p.occ];if(!o)return"";
-  return `<label for="od${i}">${esc(o.q)}</label><input type="text" id="od${i}" data-i="${i}" data-k="occd" value="${esc(p.occd)}" maxlength="100" placeholder="${esc(o.ph)}" autocomplete="off">`}
+  return `<div class="focc"><label for="od${i}">${esc(o.q)}</label><input type="text" id="od${i}" data-i="${i}" data-k="occd" value="${esc(p.occd)}" maxlength="100" placeholder="${esc(o.ph)}" autocomplete="off">${fErr(i,"occd")}</div>`}
 /* ===== event date, time and venue: set by admins in Admin > Settings. CONFIG values are the backup if it can't be loaded ===== */
 let evAt=0;
 async function loadEvent(){
@@ -718,11 +801,12 @@ async function checkPay(){
   }catch(_){}
 }
 
-function stepBar(){const i=({form:1,summary:2,pay:3})[S.step];if(!i)return"";
+function stepBar(){const i=({summary:2,pay:3})[S.step];if(!i)return"";
   return `<ol class="steps" aria-label="Progress">`+["Details","Review","Payment"].map((n,j)=>`<li class="${j+1<i?"done":j+1===i?"cur":""}"${j+1===i?' aria-current="step"':""}><i>${j+1<i?"✓":j+1}</i><span>${n}</span></li>`).join("")+`</ol>`}
-function foot(){return S.step==="home"?"":`<p class="foot">${esc(CONFIG.organiserName)}</p>`}
+function foot(){return S.step==="home"||S.step==="form"?"":`<p class="foot">${esc(CONFIG.organiserName)}</p>`}
 function render(){
   const a=$("#app");document.body.dataset.step=S.step;
+  const fb=$("#fbar");if(fb)fb.innerHTML=S.step==="form"?fBar():"";   /* the Register form's sticky bar sits outside #app */
   a.innerHTML=stepBar()+({home:vHome,loading:()=>head("Loading…","One moment."),error:vError,closed:vClosed,form:vForm,summary:vSummary,pay:vPay,done:vDone,tickets:vTickets,ticket:vTicket,about:vAbout,xmenu:vXMenu,xsell:vXSell,xcode:vXCode,xbuy:vXBuy,xform:vXForm,xdone:vXDone,tpay:vTPay})[S.step]()+foot();
   if(S.step==="pay"&&$("#qr"))whenQR(()=>{const c=$("#qr");if(c&&S.step==="pay")drawQR(c,upiLink())});
   if(S.step==="tpay"&&$("#qr"))whenQR(()=>{const c=$("#qr");if(c&&S.step==="tpay")drawQR(c,upiLink(S.xp.amount,"Meetup ticket transfer"))});
@@ -741,7 +825,7 @@ function reveal(){
     if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion:reduce)").matches)return;
     const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.08,rootMargin:"0px 0px -6% 0px"});
     const vh=window.innerHeight;
-    document.querySelectorAll("#app .card").forEach(el=>{if(el.getBoundingClientRect().top>vh*.92){el.classList.add("rv");io.observe(el)}});
+    document.querySelectorAll("#app .card,#app .pc").forEach(el=>{if(el.getBoundingClientRect().top>vh*.92){el.classList.add("rv");io.observe(el)}});
   }catch(_){}
 }
 const aboutBtn=()=>`<button class="big ghost" id="go-about">About ${esc(CONFIG.organiserName)}</button>`;
@@ -872,42 +956,58 @@ function vClosed(){
   if(S.graceLost&&(r==="paused"||r==="not_open"||r==="deadline"))h+=`<div class="card"><b>Your 10-minute window to finish has ended.</b><p class="note">If you have already paid, please don't pay again. Message the organisers with your payment screenshot and they will sort it out.</p>${contactBtn("Hi, I was registering for "+CONFIG.eventName+" when registration closed. I have paid Rs "+total()+" for "+S.n+" person(s). Name: "+((S.people[0]||{}).name||""),"Message the organisers")}</div>`;
   return h+`<div class="row"><button class="ghost" id="retry">Check again</button><button class="ghost" id="go-home">Home</button></div>`;
 }
+/* ---------- Register form (redesign Nov 2026) ---------- */
+const F_ICO={user:'<path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>',group:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M17.2 14c2.4.1 4.3 2 4.3 4.5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',alert:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.1"/>',tick:'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 9h8M8 13h8M8 17h4"/>'};
+const fSvg=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${F_ICO[k]}</svg>`;
+const F_CLS=["","c1","c2","c3","c4"];
+const fHas=a=>!!a&&a.some(f=>Object.keys(f).length>0);
+const fErr=(i,k)=>S.ferr&&S.ferr[i]&&S.ferr[i][k]?`<p class="fe" role="alert">${esc(S.ferr[i][k])}</p>`:"";
+const fBad=(i,k)=>S.ferr&&S.ferr[i]&&S.ferr[i][k]?"bad":"";
+function fSteps(cur){return `<ol class="fsteps" aria-label="Progress">`+["Details","Review","Payment"].map((n,j)=>`<li class="${j+1<cur?"done":j+1===cur?"cur":""}"${j+1===cur?' aria-current="step"':""}><i>${j+1<cur?"✓":j+1}</i>${n}</li>`).join("")+`</ol>`}
+function fHead(){const O=esc(CONFIG.organiserName);
+  return `<header class="hhead"><div class="hw"><img src="assets/logo-mark.png" alt="" width="40" height="27"><div class="hbrand"><b>${O.toUpperCase().replace(/ BENGALURU$/,"")}</b><small>BENGALURU</small></div></div><div class="fpg" id="fprog" aria-hidden="true"></div></header>`}
+function fHero(st){
+  const p=evParts({weekday:"short",day:"numeric",month:"short",year:"numeric"}),
+    dt=(p?p.weekday+" "+p.day+" "+p.month+" "+p.year:CONFIG.ticketDate)+" · "+evTime(),cd=closeDate();
+  return `<div class="fhero"><div class="fphoto" aria-hidden="true"></div><div class="fblob fb1"></div><div class="fblob fb2"></div>
+  <div class="hw">${fSteps(1)}<p class="feb">Registration</p><h1 aria-label="Register for ${esc(CONFIG.eventName)}">Register for ${nameHtml()}</h1>
+  <div class="ffacts"><span>${esc(dt)}</span><span>${esc(evVenue())}</span><span class="amb">₹${st.price_per_head} per person</span>${cd?`<span>Closes ${esc(cd)}</span>`:""}</div></div></div>`}
+function fBanners(st){let h="";
+  if(st.next_close_at){const ms=new Date(st.next_close_at).getTime()-(Date.now()+skew);
+    if(ms>0&&ms<2*3600e3)h+=`<div class="bn info">${fSvg("clock")}<div>Registration will pause briefly at <b>${fmtT(st.next_close_at)}</b> while payments are verified. If you have already started, you will get 10 extra minutes to finish.</div></div>`}
+  if(st.spots_left<=20)h+=`<div class="bn warn">${fSvg("alert")}<div><span class="live"></span><b>Only ${st.spots_left} spot${st.spots_left===1?"":"s"} left.</b> Register soon.</div></div>`;
+  if(lastCode())h+=`<div class="bn">${fSvg("tick")}<div>You already have a booking from this device (Booking ID <b>${esc(lastCode())}</b>). Submitting again will create a new booking.</div></div>`;
+  if(S.errs.length)h+=`<div class="bn err" role="alert">${fSvg("alert")}<div><b>Please correct the following:</b><ul>${S.errs.map(e=>`<li>${esc(e)}</li>`).join("")}</ul></div></div>`;
+  if(fHas(S.ferr))h+=`<div class="bn err" role="alert">${fSvg("alert")}<div><b>Please fix the highlighted fields.</b></div></div>`;
+  return h}
+function fFriends(){
+  if(maxN()<=1)return"";
+  let h=`<div class="pc c4"><div class="sw"><div><b>Booking for friends too?</b><div class="n">Add up to ${maxN()} people in a single booking</div></div><input type="checkbox" id="fr" ${S.friends?"checked":""} aria-label="Include friends"></div>`;
+  if(S.friends)h+=`<div class="lbl">How many people in total, including you?</div><div class="opts">`+
+    Array.from({length:maxN()-1},(_,j)=>j+2).map(n=>`<label><input type="radio" name="cnt" value="${n}" ${S.n===n?"checked":""}><span>${n}</span></label>`).join("")+`</div>`;
+  return h+`</div>`}
+function fPerson(i,p){
+  return `<div class="pc ${F_CLS[i%5]}" data-card="${i}"><div class="pch"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true">${F_ICO[i?"group":"user"]}</svg></div><div><h2>${S.n>1?"Person "+(i+1):"Your details"}</h2><small>${i?"Details of your friend":"As you want it on the ticket"}</small></div></div>
+  <div class="${fBad(i,"name")}"><label for="n${i}">Full name</label><input type="text" id="n${i}" data-i="${i}" data-k="name" value="${esc(p.name)}" maxlength="80" autocomplete="${i?"off":"name"}">${fErr(i,"name")}</div>
+  <div class="${fBad(i,"phone")}"><label for="t${i}">Phone number</label><div class="pf"><span aria-hidden="true">+91</span><input type="tel" class="ph" id="t${i}" data-i="${i}" data-k="phone" value="${esc(p.phone)}" inputmode="numeric" placeholder="10-digit mobile number" autocomplete="${i?"off":"tel-national"}" aria-label="Phone number, 10 digits, India +91"></div>${fErr(i,"phone")}</div>
+  <div class="${fBad(i,"occ")}"><div class="lbl">What best describes you?</div><div class="opts">${Object.keys(OCC).map(k=>opt(i,"occ",k,p.occ)).join("")}</div>${fErr(i,"occ")}</div>
+  <div id="ob${i}" class="${fBad(i,"occd")}">${occBox(i,p)}</div>
+  <div class="${fBad(i,"loc")}"><div class="lbl">Are you currently based in Bengaluru?</div><div class="opts">${opt(i,"loc","In Bengaluru",p.loc,"Yes")}${opt(i,"loc","Outside Bengaluru",p.loc,"No")}</div>${fErr(i,"loc")}</div>
+  <div class="${fBad(i,"food")}"><div class="lbl">Food preference</div><div class="opts">${opt(i,"food","Veg",p.food)}${opt(i,"food","Non-veg",p.food)}</div>${fErr(i,"food")}</div></div>`}
+function fBar(){return `<div class="hw"><button type="button" class="fbtn fg" id="go-home">Home</button><div class="ftot"><small>${S.n} ${S.n>1?"people":"person"}</small><b>₹${total()}</b></div><button type="button" class="fbtn" id="review">Review details</button></div>`}
 function vForm(){
   const st=S.status;
-  let h=head("Register for "+esc(CONFIG.eventName),esc(evLine())+". Registration fee: ₹"+st.price_per_head+" per person."+(closeDate()?" Registration closes on "+closeDate()+".":""));
-  if(st.next_close_at){const ms=new Date(st.next_close_at).getTime()-(Date.now()+skew);
-    if(ms>0&&ms<2*3600e3)h+=`<div class="card note">Registration will pause briefly at <b>${fmtT(st.next_close_at)}</b> while payments are verified. If you have already started, you will get 10 extra minutes to finish.</div>`}
-  if(st.spots_left<=20)h+=`<div class="card"><b>Only ${st.spots_left} spot${st.spots_left===1?"":"s"} left.</b> Register soon.</div>`;
-  if(lastCode())h+=`<div class="card note">You already have a booking from this device (Booking ID <b>${esc(lastCode())}</b>). Submitting again will create a new booking.</div>`;
-  if(S.errs.length)h+=`<div class="card errbox" role="alert"><b>Please correct the following:</b><ul>${S.errs.map(e=>`<li>${esc(e)}</li>`).join("")}</ul></div>`;
-  if(maxN()>1){
-    h+=`<div class="card"><div class="sw"><div><b>Booking for friends too?</b><div class="note">Add up to ${maxN()} people in a single booking</div></div><input type="checkbox" id="fr" ${S.friends?"checked":""} aria-label="Include friends"></div>`;
-    if(S.friends)h+=`<div class="lbl">How many people in total, including you?</div><div class="opts">`+
-      Array.from({length:maxN()-1},(_,j)=>j+2).map(n=>`<label><input type="radio" name="cnt" value="${n}" ${S.n===n?"checked":""}><span>${n}</span></label>`).join("")+`</div>`;
-    h+=`</div>`;
-  }
-  S.people.forEach((p,i)=>{
-    h+=`<div class="card"><h2 class="c${i%5}">${S.n>1?"Person "+(i+1):"Your details"}</h2>
-    <label for="n${i}">Full name</label><input type="text" id="n${i}" data-i="${i}" data-k="name" value="${esc(p.name)}" maxlength="80" autocomplete="${i?"off":"name"}">
-    <label for="t${i}">Phone number</label><div class="pf"><span aria-hidden="true">+91</span><input type="tel" class="ph" id="t${i}" data-i="${i}" data-k="phone" value="${esc(p.phone)}" inputmode="numeric" placeholder="10-digit mobile number" autocomplete="${i?"off":"tel-national"}" aria-label="Phone number, 10 digits, India +91"></div>
-    <div class="lbl">What best describes you?</div><div class="opts">${Object.keys(OCC).map(k=>opt(i,"occ",k,p.occ)).join("")}</div>
-    <div id="ob${i}">${occBox(i,p)}</div>
-    <div class="lbl">Are you currently based in Bengaluru?</div><div class="opts">${opt(i,"loc","In Bengaluru",p.loc,"Yes")}${opt(i,"loc","Outside Bengaluru",p.loc,"No")}</div>
-    <div class="lbl">Food preference</div><div class="opts">${opt(i,"food","Veg",p.food)}${opt(i,"food","Non-veg",p.food)}</div>
-    </div>`;
-  });
-  return h+`<div class="row"><button class="ghost" id="go-home">Home</button><button id="review">Review details</button></div>`;
+  return `<div class="fpage">${fHead()}${fHero(st)}<div class="hw fbody">${fBanners(st)}${fFriends()}${S.people.map((p,i)=>fPerson(i,p)).join("")}</div></div>`;
 }
+/* one entry per person: {field: message}. An empty object means that person is fine. */
 function validate(){
-  const e=[];S.people.forEach((p,i)=>{const w=S.n>1?"Person "+(i+1)+": ":"";
-    if(!p.name.trim())e.push(w+"Please enter a name");
-    if(!/^\d{10}$/.test(p.phone))e.push(w+"Enter a valid 10-digit phone number");
-    if(!p.occ)e.push(w+"Select Article Assistant, Employee, Student or Others");
-    else if(!p.occd.trim())e.push(w+OCC[p.occ].err);
-    if(!p.loc)e.push(w+"Select whether you are currently based in Bengaluru");
-    if(!p.food)e.push(w+"Select Veg or Non-veg")});
-  return e;
-}
+  return S.people.map(p=>{const f={};
+    if(!p.name.trim())f.name="Please enter a name";
+    if(!/^\d{10}$/.test(p.phone))f.phone="Enter a valid 10-digit phone number";
+    if(!p.occ)f.occ="Select what best describes you";else if(!p.occd.trim())f.occd=OCC[p.occ].err;
+    if(!p.loc)f.loc="Select Yes or No";
+    if(!p.food)f.food="Select Veg or Non-veg";
+    return f})}
 function vSummary(){
   return head("Check your details","Please make sure everything is correct. Food and hall arrangements are planned from these details.")+
   `<div class="card">`+S.people.map((p,i)=>`<div class="who"><div class="who-n"><span class="who-i">${i+1}</span><div><b>${esc(p.name.trim())}</b><div class="note">+91 ${esc(p.phone)}<br>${esc(p.occ)}: ${esc(p.occd.trim())}</div></div></div><div class="tags"><span>${esc(p.loc)}</span><span>${esc(p.food)}</span></div></div>`).join("")+`</div>
@@ -1359,7 +1459,7 @@ function compress(file){return new Promise(res=>{
 function resetBookingForm(){
   S.sid=uuid();S.graceLost=false;S.people=[blank()];S.n=1;S.friends=false;
   try{if(S.fileUrl)URL.revokeObjectURL(S.fileUrl)}catch(_){}
-  S.file=null;S.fileUrl=null;S.errs=[];S.payErr="";S.fb=null}
+  S.file=null;S.fileUrl=null;S.errs=[];S.ferr=null;S.payErr="";S.fb=null}
 async function submit(){
   if(S.busy)return;
   if(!S.file){$("#ferr").textContent="Upload your payment screenshot to continue.";return}
@@ -1402,10 +1502,19 @@ document.addEventListener("input",e=>{const t=e.target;
   if(t.dataset.fb==="comment"&&S.fb)S.fb.comment=t.value;
   if(t.dataset.k)S.people[+t.dataset.i][t.dataset.k]=t.value});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.target.id==="bq"||e.target.id==="tkph")){e.preventDefault();doSearch()}if(e.key==="Enter"&&e.target.id==="xb_c"){e.preventDefault();xOpenCode()}});
+/* a chip was chosen: take the red mark and message off that question */
+function fClear(t){const i=+t.dataset.i,k=t.dataset.k,w=t.closest(".bad");if(S.ferr&&S.ferr[i])delete S.ferr[i][k];if(w){w.classList.remove("bad");const f=w.querySelector(".fe");if(f)f.remove()}}
+/* Register form: the thin progress line in the header and the header shadow follow the scroll */
+addEventListener("scroll",()=>{if(S.step!=="form")return;const p=document.getElementById("fprog");if(!p)return;
+  const h=document.documentElement,m=h.scrollHeight-innerHeight;p.style.transform="scaleX("+(m>0?Math.min(1,scrollY/m):0)+")";
+  const hd=document.querySelector(".fpage .hhead");if(hd)hd.classList.toggle("sc",scrollY>8)},{passive:true});
 document.addEventListener("change",e=>{const t=e.target;
-  if(t.id==="fr"){S.friends=t.checked;setN(t.checked?2:1);render()}
-  else if(t.dataset&&t.dataset.k==="occ"){const i=+t.dataset.i,p=S.people[i];if(p.occFor!==p.occ){p.occd="";p.occFor=p.occ}const b=document.getElementById("ob"+i);if(b)b.innerHTML=occBox(i,p)}
-  else if(t.name==="cnt"){setN(+t.value);render()}
+  if(t.id==="fr"){S.friends=t.checked;setN(t.checked?2:1);S.ferr=null;render()}
+  else if(t.dataset&&t.dataset.k==="occ"){const i=+t.dataset.i,p=S.people[i];if(p.occFor!==p.occ){p.occd="";p.occFor=p.occ}
+    fClear(t);if(S.ferr&&S.ferr[i])delete S.ferr[i].occd;
+    const b=document.getElementById("ob"+i);if(b){b.classList.remove("bad");b.innerHTML=occBox(i,p)}}
+  else if(t.dataset&&t.dataset.k&&t.type==="radio"){fClear(t)}
+  else if(t.name==="cnt"){setN(+t.value);S.ferr=null;render()}
   else if(t.dataset&&t.dataset.x&&t.type==="radio"){S.xb[t.dataset.x]=t.value}
   else if(t.dataset&&t.dataset.fb==="rating"&&S.fb){S.fb.rating=+t.value}
   else if(t.id==="xf_ok"){S.xb.consent=t.checked}
@@ -1449,8 +1558,10 @@ document.addEventListener("click",async e=>{const el=e.target.closest("button,a"
   if(id==="dl-all-pdf")downloadAll("pdf");
   if(id==="dl-all-jpg")downloadAll("jpg");
   if(id==="retry"||id==="recheck"){S.graceLost=false;S.step="loading";render();load()}
-  if(id==="review"){S.errs=validate();if(S.errs.length)render();else{S.step="summary";render()}}
-  if(id==="edit"){S.step="form";S.errs=[];render()}
+  if(id==="review"){S.errs=[];S.ferr=validate();
+    if(fHas(S.ferr)){render();const f1=document.querySelector("#app .bad");if(f1){f1.scrollIntoView({behavior:"smooth",block:"center"});f1.classList.add("shake")}}
+    else{S.ferr=null;S.step="summary";render()}}
+  if(id==="edit"){S.step="form";S.errs=[];S.ferr=null;render()}
   if(id==="topay")goPay();
   if(id==="payretry")goPay();
   if(id==="back"&&!S.busy){S.step="summary";render()}

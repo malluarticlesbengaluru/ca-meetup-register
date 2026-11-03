@@ -130,13 +130,13 @@ with sync_playwright() as p:
     # ===== 6. the Register screens are not touched by the Home motion styles
     b, pg, errs = page(p)
     pg.click('#hero-register'); pg.wait_for_selector('#n0'); pg.wait_for_timeout(500)
-    check('form screen: cards are not hidden by the Home reveal rule', pg.evaluate("[...document.querySelectorAll('#app .card')].every(c=>getComputedStyle(c).opacity!=='0')"))
+    check('form screen: cards are not hidden by the Home reveal rule', pg.evaluate("[...document.querySelectorAll('#app .card,#app .pc')].every(c=>getComputedStyle(c).opacity!=='0')"))
     check('form screen: no Home motion leftovers (canvas, progress line)', pg.evaluate("document.querySelectorAll('canvas.fxcanvas,.fxprog,.fxcue').length") == 0)
     b.close()
     # a short window, so the form's cards really are below the fold and the app's own scroll-reveal is armed
     b, pg, errs = page(p, h=420)
     pg.click('#hero-register'); pg.wait_for_selector('#n0'); pg.wait_for_timeout(500)
-    tr = pg.evaluate("[...document.querySelectorAll('#app .card.rv:not(.in)')].map(c=>getComputedStyle(c).transform)")
+    tr = pg.evaluate("[...document.querySelectorAll('#app .pc.rv:not(.in)')].map(c=>getComputedStyle(c).transform)")
     check('form screen: the app\'s own scroll-reveal is untouched (cards below the fold start 22px low, with no Home scaling)', len(tr) > 0 and all(x.startswith('matrix(1, 0, 0, 1, 0, ') and 15 < float(x.rstrip(')').split(',')[-1]) <= 22 for x in tr), tr)
     b.close()
 

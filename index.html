@@ -916,6 +916,53 @@ body[data-step="form"] .toast{left:16px;right:16px;transform:none;bottom:calc(10
 .bhome .bh-grand{padding-top:42px}
 @media(max-width:600px){.bhome section:has(#bh-reg){padding-bottom:23px}}
 </style>
+<style id="burg-flow">
+/* ===== Review and Pay screens, BURGUNDY (Nov 2026, Part B4). Brings them in line with the new Register form:
+   inline stepper, centred title, card header with the gold tile and Lora subtitle, blush uppercase labels, 54px fields, pill banners.
+   Scoped to data-step summary and pay only. Nothing here changes behaviour (no ids, functions or Supabase calls). ===== */
+/* stepper: same look as the form's .fsteps */
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps{justify-content:center;align-items:center;margin:20px 0 6px}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li{flex:none;flex-direction:row;gap:7px;font:600 .7rem/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--rose)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li+li:before{content:"";width:16px;height:1.5px;background:var(--glass-b);margin:0 8px}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li:not(:last-child):after{display:none}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps i{width:26px;height:26px;border-radius:50%;font:800 .76rem/1 var(--sans);border:1.5px solid var(--glass-b);background:transparent}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li.cur{color:var(--cream)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li.cur i,body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li.done i{background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));color:var(--wine);border:0;box-shadow:none}
+/* title block */
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) h1{text-align:center;font:900 clamp(1.9rem,8.4vw,2.7rem)/1.1 var(--sans);letter-spacing:-.025em;margin:18px 0 10px;text-wrap:balance}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .sub{text-align:center;margin:0 auto 22px;max-width:34ch;font:italic 500 .98rem/1.6 var(--serif);color:var(--blush)}
+/* cards with the form's header */
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .card{border-radius:24px;padding:22px 20px;box-shadow:0 18px 40px rgba(0,0,0,.3)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch{display:flex;align-items:center;gap:14px;margin-bottom:20px;text-align:left}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch .ico{flex:none;width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));color:var(--wine);font:900 1.3rem/1 var(--sans);box-shadow:0 6px 18px rgba(233,178,76,.3)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch .ico svg{width:24px;height:24px;fill:none;stroke:var(--wine);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch h2{display:block;margin:0;font:800 1.2rem/1.2 var(--sans);color:var(--cream)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch h2:before{display:none}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch small{display:block;font:italic 500 .95rem/1.4 var(--serif);color:var(--blush);margin-top:2px}
+/* labels and fields */
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) label,body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .lbl{display:block;font:600 .8rem/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--blush);margin:0 0 8px}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) input[type=file]{min-height:54px;border:1.5px solid var(--glass-b);border-radius:14px;background:var(--field,rgba(26,4,12,.55));padding:10px 12px}
+/* Review: people list and total */
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .who{border-bottom:1px solid var(--glass-b)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .who-i{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));border:0;color:var(--wine);font:900 .95rem/1 var(--sans)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .who-n b{font-weight:800;color:var(--cream)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .tags{margin-left:46px}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .tags span{border:1px solid var(--glass-b);background:var(--glass);color:var(--cream);font:600 .78rem/1.2 var(--sans);padding:6px 12px}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .tot{background:linear-gradient(160deg,rgba(233,178,76,.16),rgba(140,24,56,.4));border-color:rgba(233,178,76,.5)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .tot b{font:800 1.05rem/1.2 var(--sans);color:var(--cream)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .tot-a{background:linear-gradient(180deg,#FBDD8E,var(--gold) 55%,var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent}
+/* Pay: amount, QR, UPI line, banners */
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .amt{font-size:2.8rem}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .qr{border:8px solid #fff;border-radius:18px}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .verify{border-radius:16px;font:300 .88rem/1.5 var(--sans);padding:14px 16px}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .verify b{font-weight:800;color:var(--gold)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .upi{margin:0 0 14px}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .upi code{border-radius:12px;padding:12px 14px;font:600 .92rem var(--sans);letter-spacing:.03em}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .errbox{border-radius:16px;padding:14px 16px;font:300 .88rem/1.5 var(--sans)}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .errbox b{font-weight:800}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .row{margin-top:20px}
+body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .row>button{min-height:54px}
+</style>
 </head>
 <body>
 <header class="top"><div><img src="assets/burg-logo.png" alt="" width="44" height="30"><span>Mallu Articles Bengaluru</span></div></header>
@@ -1341,7 +1388,7 @@ function validate(){
     return f})}
 function vSummary(){
   return head("Check your details","Please make sure everything is correct. Food and hall arrangements are planned from these details.")+
-  `<div class="card">`+S.people.map((p,i)=>`<div class="who"><div class="who-n"><span class="who-i">${i+1}</span><div><b>${esc(p.name.trim())}</b><div class="note">+91 ${esc(p.phone)}<br>${occLab(esc(p.occ))}: ${esc(p.occd.trim())}</div></div></div><div class="tags"><span>${esc(p.loc)}</span><span>${esc(p.food)}</span></div></div>`).join("")+`</div>
+  `<div class="card"><div class="pch"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></span><div><h2>Who is coming</h2><small>Check every name and number</small></div></div>`+S.people.map((p,i)=>`<div class="who"><div class="who-n"><span class="who-i">${i+1}</span><div><b>${esc(p.name.trim())}</b><div class="note">+91 ${esc(p.phone)}<br>${occLab(esc(p.occ))}: ${esc(p.occd.trim())}</div></div></div><div class="tags"><span>${esc(p.loc)}</span><span>${esc(p.food)}</span></div></div>`).join("")+`</div>
   <div class="card tot"><div><b>Total payable</b><div class="note">${S.n} × ₹${price()}</div></div><div class="tot-a">₹${total()}</div></div>
   <div class="row"><button class="ghost" id="edit">Edit details</button><button id="topay">Continue to pay</button></div>`;
 }
@@ -1354,13 +1401,13 @@ function vPay(){
   return head("Pay ₹"+total(),S.n+" "+(S.n>1?"people":"person")+" × ₹"+price())+
   (S.payChanged?`<div class="card errbox" role="alert"><b>The payment details were just updated.</b> Please use the QR below. If you have already paid, don't pay again: upload your screenshot and let the organisers know.</div>`:"")+
   (S.payErr?`<div class="card errbox" role="alert">${esc(S.payErr)}</div>`:"")+
-  `<div class="card" style="text-align:center"><div class="amt">₹${total()}</div>${S.pay.payee?`<div class="note">Pay to <b>${esc(S.pay.payee)}</b></div>`:""}${qrc}
+  `<div class="card" style="text-align:center"><div class="pch"><span class="ico">1</span><div><h2>Scan and pay</h2><small>Any UPI app will do</small></div></div><div class="amt">₹${total()}</div>${S.pay.payee?`<div class="note">Pay to <b>${esc(S.pay.payee)}</b></div>`:""}${qrc}
   <p class="note" style="margin:0 0 6px">Scan this QR with any UPI app to pay.<br>Paying from this phone? Take a screenshot of the QR and upload it in your UPI app, or pay to the UPI ID below.</p>
   <p class="verify" role="note"><b>Important:</b> After you scan, check that the UPI ID shown in your app matches the UPI ID below.</p>
   <div class="upi"><code id="uid">${esc(S.pay.upi)}</code><button class="ghost" id="copy">Copy UPI ID</button></div>
   <div class="row"><button id="share">Share QR</button><button class="ghost" id="dl">Download QR</button></div>
   <p class="note">Tap Share QR and choose your UPI app (such as Google Pay or PhonePe) to pay ₹${total()}.</p></div>
-  <div class="card"><label for="shot">Upload your payment screenshot</label><input type="file" id="shot" accept="image/*" ${S.file?'style="display:none"':""}>
+  <div class="card"><div class="pch"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span><div><h2>Upload the proof</h2><small>One screenshot of the payment</small></div></div><label for="shot">Upload your payment screenshot</label><input type="file" id="shot" accept="image/*" ${S.file?'style="display:none"':""}>
   ${S.file&&S.fileUrl?`<div class="note" style="font-size:.95rem">✓ <b>File uploaded</b> · <a href="${esc(S.fileUrl)}" target="_blank" rel="noopener">Tap to view</a> · <label for="shot" style="display:inline;font-weight:400;text-decoration:underline;cursor:pointer">Change</label></div>`:`<div class="note">Required. Please upload an image of your payment confirmation.</div>`}<div class="err" id="ferr"></div></div>
   <div class="row"><button class="ghost" id="back" ${S.busy?"disabled":""}>Back</button><button id="submit">Submit registration</button></div>`;
 }
@@ -1857,7 +1904,7 @@ document.addEventListener("change",e=>{const t=e.target;
 const HOME_GO={"bar-register":"main","hero-register":"main","go-register":"main","hero-tickets":"alt","go-tickets":"alt"};
 document.addEventListener("click",async e=>{const el=e.target.closest("button,a"),id=el?el.id:"",ds=el?el.dataset:{};
   /* Home: the main button registers (or, for a returning visitor, opens their ticket); the second one does the opposite. The ids are shared with other screens, so only on Home. */
-  if(S.step==="home"&&(id==="hero-register"||id==="hero-tickets")){const jt=document.getElementById("home-join");
+  if(S.step==="home"&&(id==="hero-register"||id==="hero-tickets"||id==="bar-register")){const jt=document.getElementById("home-join");
     if(jt){jt.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"center"});return}}
   if(S.step==="home"&&HOME_GO[id]){if((HOME_GO[id]==="main")!==homeRet()){S.step="loading";render();load()}else openTickets("");return}
   if(id==="go-home"){S.step="home";render();loadHomeStatus().then(()=>{if(S.step==="home")refreshHome()})}

@@ -238,7 +238,7 @@ tickets | tickets_food_check | CHECK ((food = ANY (ARRAY['Veg'::text, 'Non-veg':
 tickets | tickets_kind_chk | CHECK ((((kind = 'guest'::text) AND (coord_no IS NULL)) OR ((kind = 'coordinator'::text) AND (coord_no IS NOT NULL))))
 tickets | tickets_location_check | CHECK ((location = ANY (ARRAY['In Bengaluru'::text, 'Outside Bengaluru'::text])))
 tickets | tickets_marked_by_fkey | FOREIGN KEY (marked_by) REFERENCES auth.users(id)
-tickets | tickets_occupation_check | CHECK (((occupation IS NULL) OR (occupation = ANY (ARRAY['Article Assistant'::text, 'Employee'::text, 'Student'::text, 'Others'::text]))))
+tickets | tickets_occupation_check | CHECK (((occupation IS NULL) OR (occupation = ANY (ARRAY['Article Assistant'::text, 'Industrial Trainee'::text, 'Employee'::text, 'Student'::text, 'Others'::text]))))
 tickets | tickets_occupation_detail_check | CHECK (((occupation_detail IS NULL) OR ((char_length(occupation_detail) >= 1) AND (char_length(occupation_detail) <= 100))))
 tickets | tickets_occupation_pair_check | CHECK (((occupation IS NULL) = (occupation_detail IS NULL)))
 tickets | tickets_phone_check | CHECK ((phone ~ '^[0-9]{10}$'::text))
@@ -1802,7 +1802,7 @@ begin
   for r in select value from jsonb_array_elements(p_people) loop
     if length(trim(coalesce(r.value->>'name',''))) not between 1 and 80 then raise exception 'INVALID_NAME'; end if;
     if coalesce(r.value->>'phone','') !~ '^[0-9]{10}$' then raise exception 'INVALID_PHONE'; end if;
-    if coalesce(r.value->>'occ','') not in ('Article Assistant','Employee','Student','Others') then raise exception 'INVALID_OCCUPATION'; end if;
+    if coalesce(r.value->>'occ','') not in ('Article Assistant','Industrial Trainee','Employee','Student','Others') then raise exception 'INVALID_OCCUPATION'; end if;
     if length(trim(coalesce(r.value->>'occ_detail',''))) not between 1 and 100 then raise exception 'INVALID_OCCUPATION_DETAIL'; end if;
     if coalesce(r.value->>'loc','') not in ('In Bengaluru','Outside Bengaluru') then raise exception 'INVALID_LOCATION'; end if;
     if coalesce(r.value->>'food','') not in ('Veg','Non-veg') then raise exception 'INVALID_FOOD'; end if;

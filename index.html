@@ -7,7 +7,7 @@
 <meta property="og:image" content="https://rameezmunirrr-gh.github.io/ca-meetup-register/assets/og-image.jpg"><meta name="twitter:card" content="summary_large_image">
 <title>Ehsaas'26 – Register</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,500&family=Jost:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Lora:ital,wght@1,500&family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Lora:ital,wght@1,500&family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
 <!-- The two libraries load in the background (async) so Home can be drawn without waiting for them; see sbReady and qrReady in the script. -->
 <script async id="qr-lib" src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" onload="window.__qr=1" onerror="window.__qr=2"></script>
 <script async id="sb-lib" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" onload="window.__sb=1" onerror="window.__sb=2"></script>
@@ -104,23 +104,13 @@ input[type=text]:focus-visible,input[type=tel]:focus-visible{outline:none}
 button.chip{padding:8px 14px;border-radius:999px;background:transparent;color:var(--ink);border:1px solid var(--line3);letter-spacing:.06em;font-weight:700;box-shadow:none}
 button.chip:hover{border-color:var(--accent);background:rgba(255,255,255,.06)}
 canvas.tk{display:block;width:100%;height:auto;border-radius:22px;box-shadow:0 26px 50px -22px rgba(0,0,0,.8)}
-/* invitation (home) */
-.invite{background:linear-gradient(160deg,#0B1650,#101838 70%);color:var(--on);border:1px solid var(--line);border-radius:24px;margin:14px 0 22px;overflow:hidden;position:relative;box-shadow:0 34px 64px -36px rgba(0,0,0,.85);animation:rise .8s ease both}
-.invite:before{content:"";position:absolute;right:-70px;top:-70px;width:200px;height:200px;border-radius:50%;background:rgba(240,160,0,.16);pointer-events:none}
-.invite:after{content:"";position:absolute;left:-60px;bottom:30px;width:150px;height:150px;border-radius:50%;background:#281078;opacity:.7;pointer-events:none}
-.invite>*{position:relative;z-index:1}
-.invite .band{height:6px;background:linear-gradient(90deg,var(--pink),var(--violet),var(--teal),var(--blue),var(--orange))}
-.invite .inner{padding:30px 24px 20px;text-align:center}
 /* ===== Home motion (all of it is switched off for visitors who ask their phone for reduced motion; the script is assets/home-fx.js) ===== */
 #fxc{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-.fxl{display:inline-block}.fxw{display:inline-block;white-space:nowrap}
+.fxl{display:inline-block}
 .fxg{position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:soft-light;opacity:var(--go,0);transition:opacity .5s;background:radial-gradient(circle 240px at var(--gx,50%) var(--gy,20%),rgba(255,255,255,.4),transparent 70%)}
 @media(prefers-reduced-motion:no-preference){
-.invite:before{animation:fxA 18s ease-in-out infinite}
-.invite:after{animation:fxB 24s ease-in-out infinite}
 @keyframes fxA{0%,100%{transform:none}50%{transform:translate(-18px,14px) scale(1.08)}}
 @keyframes fxB{0%,100%{transform:none}50%{transform:translate(20px,-16px) scale(1.07)}}
-.invite .band{background:linear-gradient(90deg,var(--pink),var(--violet),var(--teal),var(--blue),var(--orange),var(--pink),var(--violet),var(--teal),var(--blue),var(--orange),var(--pink));background-size:200% 100%;animation:fxFlow 16s linear infinite}
 @keyframes fxFlow{to{background-position:100% 0}}
 .orn b{animation:fxDia 3.8s ease-in-out infinite}
 @keyframes fxDia{0%,100%{transform:rotate(45deg) scale(1);box-shadow:0 0 0 rgba(240,160,0,0)}50%{transform:rotate(45deg) scale(1.35);box-shadow:0 0 12px rgba(240,160,0,.65)}}
@@ -133,15 +123,10 @@ button.big.ghost:after{background:linear-gradient(100deg,transparent,rgba(255,25
 #go-tickets:after{animation-delay:5s}#go-about:after{animation-delay:7s}   /* one after the other down the buttons, never two at once */
 @keyframes fxSh{0%{transform:translateX(-130%) skewX(-18deg)}24%,100%{transform:translateX(340%) skewX(-18deg)}}
 .fxr{position:absolute;border-radius:50%;pointer-events:none;background:rgba(255,255,255,.4)}
-.when>div{transition:background .35s}.when>div.fxh{background:linear-gradient(90deg,rgba(240,160,0,.16),transparent)}
+.when>div{transition:background .35s}
 #go-about{animation:rise .5s ease both}
 }
-.logo-wrap{text-align:center;margin:0 auto 18px}
-.logo-wrap img,.logo-wrap svg{display:block;width:128px;height:auto;margin:0 auto}
-.logo-wrap svg{overflow:visible}
-.logo-wrap [hidden]{display:none!important}
 .pres{font:800 1.05rem/1.3 var(--sans);color:var(--accent);margin:0;letter-spacing:.01em}
-.invite h1{font-size:clamp(3.2rem,16vw,4.8rem);margin:8px 0 0;line-height:1;color:#fff;letter-spacing:-.03em}
 .orn{display:flex;align-items:center;justify-content:center;gap:12px;margin:18px auto 12px;width:230px}
 .orn i{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--accent))}.orn i:last-child{background:linear-gradient(90deg,var(--accent),transparent)}
 .orn b{width:8px;height:8px;background:var(--accent);transform:rotate(45deg)}
@@ -186,18 +171,9 @@ button.big{padding:18px 16px}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes pop{50%{transform:scale(1.07)}}
 @media(prefers-reduced-motion:reduce){.invite,.seal,.opts input:checked+span{animation:none}.rv{opacity:1;transform:none;transition:none}.card h2:before,button,a.btn,.opts span{transition:none}}
-/* ===== Home layout: intro, what's in store, when & where, contribution note, summary card ===== */
-.invite>.photo{position:absolute;inset:0;z-index:0;background:url(assets/ehsaas-crowd.jpg) 50% 28%/cover no-repeat;opacity:.3;-webkit-mask-image:linear-gradient(#000 40%,transparent 100%);mask-image:linear-gradient(#000 40%,transparent 100%);pointer-events:none}
-.invite.hero .inner{padding:40px 24px 44px}
-.invite.hero h1{text-shadow:0 2px 28px rgba(8,16,48,.95)}
-.invite.hero .pres{text-shadow:0 1px 12px rgba(8,16,48,.9)}
 .tag{margin:14px 0 0;color:rgba(224,231,255,.92);font:600 1.02rem/1.4 var(--sans);letter-spacing:.02em;text-shadow:0 1px 12px rgba(8,16,48,.9)}
 .card p{margin:0 0 12px;color:rgba(224,231,255,.9)}.card p:last-child{margin-bottom:0}
 .card.fee{border-top-width:1px;background:linear-gradient(160deg,#151d48,#101838)}
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-.tile{border:1px solid var(--line);border-top:3px solid var(--tc,var(--accent));border-radius:14px;padding:14px 14px 16px;background:rgba(255,255,255,.03)}
-.tile:nth-child(1){--tc:var(--orange)}.tile:nth-child(2){--tc:var(--violet)}.tile:nth-child(3){--tc:var(--teal)}.tile:nth-child(4){--tc:var(--pink)}
-.tile .ic{font-size:1.5rem;line-height:1}.tile b{display:block;margin:8px 0 4px;color:#fff;font-weight:800}.tile span{font-size:.92rem;line-height:1.45;color:var(--mute)}
 .when{margin-top:6px}
 /* ===== Home page, Ehsaas'26 redesign (Nov 2026). Everything is scoped to .home or body[data-step="home"] so no other screen is touched.
    Dark only, as decided on 27 Oct 2026. The numbers worth changing are the --h* colours just below. ===== */
@@ -212,42 +188,20 @@ body[data-step="home"] main{max-width:none;padding:0 0 env(safe-area-inset-botto
 .hhero{position:relative;overflow:hidden;padding:58px 0 66px;background:linear-gradient(160deg,#040F3A,#061651 55%,#0C2278);text-align:center;color:#fff}
 .hhero-photo{position:absolute;inset:0;background:url(assets/home-hero.jpg) 50% 30%/cover no-repeat}
 .hhero-photo:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,15,58,.55),rgba(6,22,81,.3) 45%,rgba(6,22,81,.85))}
-.hblob{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none}.hb1{width:380px;height:380px;background:rgba(255,163,0,.26);top:-140px;right:-110px}.hb2{width:280px;height:280px;background:rgba(70,100,240,.34);bottom:-120px;left:-80px}
 .hhero .hw{position:relative;z-index:2}
-.hlogo{margin-bottom:18px}.hbadge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,163,0,.16);border:1px solid rgba(255,163,0,.4);color:var(--hamber);font-weight:700;font-size:.82rem;padding:6px 16px;border-radius:99px;margin-bottom:22px}.hbadge i{width:7px;height:7px;background:var(--hamber);border-radius:50%}
-.hpres{margin:0 0 6px;font-weight:700;color:var(--hamber2);letter-spacing:.04em}
 .home .hhero h1{font-size:clamp(3rem,13vw,5rem);font-weight:800;margin:0;text-shadow:0 4px 30px rgba(4,15,58,.9)}.home h1 em{font-style:normal;color:var(--hamber)}
 .hlede{margin:14px auto 0;max-width:34ch;font-size:1.15rem;color:#D7DEF5;text-shadow:0 1px 14px rgba(4,15,58,.9)}
-.home section{padding:50px 0}.hsec{text-align:center;max-width:56ch;margin:0 auto 30px}.hsec p{color:var(--hmute);margin:12px 0 0}
-.heyebrow{color:var(--heb);font-weight:700;font-size:.82rem;margin:0 0 8px}.home h2{font-size:clamp(1.5rem,4vw,2rem)}
-.hgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}.hstats{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.home section{padding:50px 0}.home h2{font-size:clamp(1.5rem,4vw,2rem)}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
 .hc{background:var(--hcard);border:1px solid var(--hline);border-radius:16px;padding:20px}
 .hgrid .hc{transition:transform .2s,box-shadow .2s}.hgrid .hc:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.35)}
 .hem{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--hnavy),var(--hnavy2));display:grid;place-items:center;font-size:1.4rem;margin-bottom:12px}
 .hc h3{font-size:1.02rem;margin-bottom:6px}.hc p{margin:0;color:var(--hmute);font-size:.92rem;line-height:1.5}
-.hstat b{display:block;font-size:1.25rem;line-height:1.25;color:#fff}.hstat>span{display:block;margin-bottom:6px;font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--heb)}
-a.htap{display:block;position:relative;text-decoration:none;color:inherit;cursor:pointer;transition:border-color .2s,transform .2s}a.htap:hover{border-color:var(--hamber)}
-.htap em{display:block;margin-top:8px;font-style:normal;font-weight:700;font-size:.85rem;color:var(--heb)}
 .hposter{margin:0 auto;max-width:460px;border-radius:20px;overflow:hidden;border:3px solid var(--hamber);box-shadow:0 20px 50px rgba(0,0,0,.45);background:#2a0a14}.hposter img{display:block;width:100%;height:auto;cursor:zoom-in}
-.hcap{margin:12px 0 0;text-align:center;font-size:.85rem;font-weight:700;color:var(--heb)}
-.hsponsor{max-width:520px;margin:0 auto;text-align:center;border-top:4px solid var(--hamber)}.hsponsor h2{font-size:1.35rem;margin-bottom:10px}.hsponsor p{margin:0 0 16px;color:var(--hmute)}.hsponsor .heyebrow{margin-bottom:6px}.hsponsor .hcap{margin-top:12px}
-.hsvid{margin:0 auto 16px}.hsvid video{display:block;width:100%;max-height:72vh;border-radius:14px;background:#000;object-fit:contain;border:1px solid var(--hline)}
-.hticket{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--hnavy),var(--hnavy2));border-radius:22px;padding:34px 26px;color:#fff;max-width:520px;margin:0 auto}
-.hticket:after{content:"";position:absolute;top:-60px;right:-60px;width:210px;height:210px;background:rgba(255,163,0,.18);border-radius:50%}.hticket>*{position:relative;z-index:1}.hticket .heyebrow{color:#8FA8FF}
-.hticket dl{margin:18px 0 0;display:grid;gap:12px}.hticket dt{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--hamber)}.hticket dd{margin:2px 0 0;font-weight:700;color:#fff}
-.hjoin{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:24px;text-align:center}.hjoin p{margin:0 0 16px;color:#C9D3EE;font-size:.9rem}
-.home button.hbtn{display:block;width:100%;padding:15px 26px;border-radius:99px;font:800 1rem var(--sans)}
-.home button.hbtn+button.hbtn{margin-top:12px}
-.home button.hbtn.hamber{background:linear-gradient(135deg,var(--hamber),#F08A2E);color:var(--hnavy);border:0;box-shadow:0 10px 30px rgba(255,163,0,.4)}
-.home button.hbtn.ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.35)}
-.home .hnote{text-align:center;margin:18px 0 0;color:var(--hmute)}
-.hfoot .hspons{margin:14px 0 0;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:.85rem;color:var(--hmute)}.hfoot .hspons b{color:var(--hamber2)}.hfoot .hspons img{display:block;width:auto;height:92px;max-width:220px;object-fit:contain}
 .hfoot{padding:30px 0 88px;text-align:center;background:var(--hnavy);color:#C9D3EE;font-size:.9rem}.hfoot b{color:#fff}
-.home button.hfab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;width:auto;padding:13px 22px;}
 .hlb{position:fixed;inset:0;z-index:30;background:rgba(4,8,24,.92);display:grid;place-items:center;padding:16px;cursor:zoom-out}.hlb img{max-width:100%;max-height:100%;border-radius:12px}
 .home :focus-visible{outline:3px solid var(--hamber);outline-offset:2px}
-@media(prefers-reduced-motion:no-preference){
-.hblob{animation:hfl 10s ease-in-out infinite}.hb2{animation-duration:13s;animation-direction:reverse}@keyframes hfl{50%{transform:translate(26px,-30px) scale(1.1)}}
+@media(prefers-reduced-motion:no-preference){@keyframes hfl{50%{transform:translate(26px,-30px) scale(1.1)}}
 .hhero .hw>*{animation:hup .7s ease both}.hhero .hw>*:nth-child(2){animation-delay:.08s}.hhero .hw>*:nth-child(3){animation-delay:.16s}.hhero .hw>*:nth-child(4){animation-delay:.24s}.hhero .hw>*:nth-child(5){animation-delay:.32s}@keyframes hup{from{opacity:0;transform:translateY(22px)}}}
 </style>
 <style>
@@ -273,12 +227,8 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .fx .hhero-photo{inset:-10% 0;animation:fxKB 26s ease-in-out infinite alternate;will-change:transform}
 @keyframes fxKB{from{transform:scale(1.02)}to{transform:scale(1.14) translateX(-1.5%)}}
 .fx .hhero{--px:0;--py:0}
-.fx .hb1{translate:calc(var(--px)*-30px) calc(var(--py)*-22px);transition:translate .9s ease-out}
-.fx .hb2{translate:calc(var(--px)*34px) calc(var(--py)*24px);transition:translate .9s ease-out}
 .fx .hhero .hw>*{animation:none}
-.fx .hhero .hw>.hlogo{animation:fxLogo 1s var(--ease) .2s both}
 @keyframes fxLogo{from{opacity:0;transform:translateY(24px) scale(.7)}}
-.fx .hpres{animation:fxPres 1.1s var(--ease) .75s both}
 @keyframes fxPres{from{opacity:0;letter-spacing:.7em;transform:translateY(8px)}to{opacity:1;letter-spacing:.04em}}
 .fx .hhero h1{perspective:700px}
 .fxc{display:inline-block;white-space:pre;animation:fxChar .95s var(--spring) both;animation-delay:calc(1.05s + var(--i)*65ms);transform-origin:50% 100%}
@@ -300,11 +250,7 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .fx .home .rv{opacity:0;transform:translateY(34px) scale(.97);transition:opacity .8s ease var(--d,0s),transform 1s var(--ease) var(--d,0s)}
 .fx .home .rv.in{opacity:1;transform:none}
 .fx .home .rv.rd{transition:transform .28s var(--ease),box-shadow .28s,border-color .2s}
-
-/* ---------- section headings ---------- */
-.fx .hsec.in .heyebrow{animation:fxEye .9s var(--ease) both}
 @keyframes fxEye{from{opacity:0;letter-spacing:.34em}}
-.fx .hsec.in h2{animation:fxWipe 1s var(--ease) .12s both}
 @keyframes fxWipe{from{clip-path:inset(-10px 100% -10px 0);opacity:0;transform:translateY(8px)}to{clip-path:inset(-10px -10px -10px 0)}}
 
 /* ---------- story paragraph: words light up as you read down the page ---------- */
@@ -346,9 +292,6 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 @keyframes fxBob{0%,100%{transform:none}50%{transform:translateY(-6px)}}
 @keyframes fxRoll{0%,55%,100%{transform:none}80%{transform:rotate(360deg) scale(1.12)}}
 @keyframes fxWob{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg) scale(1.06)}}
-
-/* ---------- countdown ---------- */
-.fxcdwrap{max-width:560px;margin:0 auto}
 .fxcdcap{display:flex;align-items:center;justify-content:center;gap:12px;margin:26px 0 16px;color:var(--hamber2);font:800 .95rem var(--sans);letter-spacing:.2em;text-transform:uppercase;text-align:center}
 .fxcdcap::before,.fxcdcap::after{content:"";height:1px;flex:1;max-width:70px;background:linear-gradient(90deg,transparent,var(--hamber))}
 .fxcdcap::after{transform:scaleX(-1)}
@@ -367,16 +310,13 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .fxreg{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 9px;width:max-content;max-width:100%;margin:0 auto;padding:8px 14px;border-radius:99px;background:rgba(20,31,59,.85);border:1px solid var(--hline);font:700 .78rem var(--sans);color:var(--hmute)}
 .fxreg .fxrl{display:inline-flex;align-items:center;gap:8px;color:var(--hink)}
 .fxreg .fxrl::before{content:"";width:8px;height:8px;border-radius:50%;background:#5BE3A0;box-shadow:0 0 0 0 rgba(91,227,160,.6)}
-.fxreg .fxru{display:inline-flex;align-items:baseline;gap:2px;color:var(--hmute)}
 .fxreg b{font:800 .95rem var(--sans);color:#fff;font-variant-numeric:tabular-nums;display:inline-block}
-.fxreg .fxru:nth-of-type(1) b{color:var(--hamber)}
 .fxreg.fxclosed{opacity:.6}.fxreg.fxclosed .fxrl::before{background:#FF8A80;animation:none}
 /* motion (only with html.fx, i.e. not reduced-motion) */
 .fx .fxbig::before{animation:fxBreathe 5s ease-in-out infinite}
 .fx .fxbig>div::before{background-size:100% 100%}
 .fx .fxbig>div{animation:fxCdIn .9s var(--spring,cubic-bezier(.16,1,.3,1)) both;animation-delay:calc(var(--i,0)*110ms)}
 .fx .fxbig:not(.in)>div{animation:none;opacity:0}
-.fx .fxbig>div .fxsh{position:absolute;inset:0;z-index:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.13) 50%,transparent 65%);transform:translateX(-120%);animation:fxShine 6s ease-in-out infinite;animation-delay:calc(var(--i,0)*.35s + 1.2s);pointer-events:none}
 .fx .fxbig>div:last-child{animation:fxCdIn .9s var(--spring,cubic-bezier(.16,1,.3,1)) both,fxPulse 1s ease-in-out 1.4s infinite;animation-delay:calc(var(--i,0)*110ms),1.4s}
 .fx .fxreg .fxrl::before{animation:fxPing 1.8s ease-out infinite}
 .fx .fxflash{animation:fxFlash .6s ease-out}
@@ -386,33 +326,12 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 @keyframes fxPulse{0%,100%{box-shadow:0 18px 40px -18px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.1),0 0 0 0 rgba(255,163,0,0)}50%{box-shadow:0 18px 40px -18px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.1),0 0 26px 2px rgba(255,163,0,.35)}}
 @keyframes fxPing{0%{box-shadow:0 0 0 0 rgba(91,227,160,.6)}100%{box-shadow:0 0 0 9px rgba(91,227,160,0)}}
 @keyframes fxFlash{0%{filter:brightness(1.9)}100%{filter:none}}
-
-/* ---------- sponsor ---------- */
-.fx .hsponsor{position:relative;overflow:hidden}
-.fx .hsponsor:before{content:"";position:absolute;top:0;left:0;height:4px;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);animation:fxEdge 3.6s linear infinite}
 @keyframes fxEdge{from{transform:translateX(-100%)}to{transform:translateX(320%)}}
-
-/* ---------- join card + buttons ---------- */
-.fx .hticket{background:linear-gradient(120deg,var(--hnavy),var(--hnavy2),#1B44C8,var(--hnavy2),var(--hnavy));background-size:300% 100%;animation:fxGrad 14s linear infinite}
 @keyframes fxGrad{to{background-position:-300% 0}}
-.fx .hticket:after{animation:fxFloat 9s ease-in-out infinite}
-.fx .hticket:before{content:"";position:absolute;left:-40px;bottom:-60px;width:170px;height:170px;border-radius:50%;background:rgba(70,100,240,.35);animation:fxFloat 12s ease-in-out infinite reverse}
 @keyframes fxFloat{50%{transform:translate(-18px,16px) scale(1.1)}}
-.fx .hjoin>*{opacity:0;transform:translateY(18px)}
-.fx .hticket.in .hjoin>*{animation:fxUp .8s var(--ease) both}
-.fx .hticket.in .hjoin>:nth-child(1){animation-delay:.25s}.fx .hticket.in .hjoin>:nth-child(2){animation-delay:.4s}
-.fx .hticket.in .hjoin>:nth-child(3){animation-delay:.52s}.fx .hticket.in .hjoin>:nth-child(4){animation-delay:.64s}
 @keyframes fxUp{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
-.fx .home button.hbtn{transition:transform .25s var(--ease),box-shadow .25s,background .25s,border-color .25s}
-.fx .home button.hbtn:hover{transform:translateY(-3px)}
-.fx .home button.hbtn.ghost:hover{border-color:var(--hamber);background:rgba(255,163,0,.12)}
 .fx #go-register{animation-name:fxUp,fxBreath;animation-duration:.8s,2.8s;animation-delay:.4s,1.6s;animation-iteration-count:1,infinite;animation-timing-function:var(--ease),ease-out;animation-fill-mode:both,none}
 @keyframes fxBreath{0%{box-shadow:0 10px 30px rgba(255,163,0,.4),0 0 0 0 rgba(255,163,0,.55)}70%,100%{box-shadow:0 10px 30px rgba(255,163,0,.4),0 0 0 18px rgba(255,163,0,0)}}
-.fx .hticket.in #go-register,.fx .hticket.in .hjoin>button{opacity:1}
-
-/* floating button: appears after the hero, steps aside when the join card is on screen */
-.fx .home button.hfab{opacity:0;transform:translateY(30px) scale(.8);pointer-events:none;transition:opacity .4s,transform .5s var(--spring)}
-.fx .home button.hfab.show{opacity:1;transform:none;pointer-events:auto;animation:fxBreath 2.8s ease-out 1s infinite}
 
 /* ---------- footer ---------- */
 .fx .hfoot .hw{opacity:0;transform:translateY(14px);transition:opacity .9s,transform .9s var(--ease)}
@@ -434,12 +353,6 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .fx .hhero{padding-bottom:92px}
 .hhero{padding-bottom:92px}
 .hlede{max-width:40ch}
-.hfacts{margin:22px auto 0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-.hfacts span{padding:7px 14px;border-radius:99px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);font-weight:700;font-size:.9rem;color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.hcta{margin:22px auto 0;max-width:340px;display:grid;gap:12px}
-.home .hcta button.hbtn+button.hbtn{margin-top:0}
-.fx .hhero .hw>.hfacts{animation:fxIn .8s var(--ease) 2.5s both}
-.fx .hhero .hw>.hcta{animation:fxIn .8s var(--ease) 2.8s both}
 .fx .hhero .hw>.fxspots{animation:fxIn .8s var(--ease) 3.1s both}
 .fxspots{display:inline-flex;align-items:center;gap:9px;margin:16px auto 0;font-weight:700;font-size:.9rem;color:#FFE2A3}
 .fxspots i{flex:none;width:9px;height:9px;border-radius:50%;background:#FF6B5E}
@@ -452,7 +365,6 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .hgrid .hc:nth-child(2){--cc:#D82890;--ct:#FF7BC4;--cbg:rgba(216,40,144,.2)}
 .hgrid .hc:nth-child(3){--cc:#7820E0;--ct:#B98BFF;--cbg:rgba(120,32,224,.26)}
 .hgrid .hc:nth-child(4){--cc:#E86818;--ct:#FF9A55;--cbg:rgba(232,104,24,.2)}
-.hgrid:not(.hstats) .hc{border-top:3px solid var(--cc)}
 .hgrid .hc .hem{background:var(--cbg);border:1px solid color-mix(in srgb,var(--cc) 45%,transparent);color:var(--ct)}
 .hem svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .hem svg .d{fill:currentColor;stroke:none}
@@ -465,10 +377,8 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .fxstub>.hc{position:relative;background:transparent;border:0;border-radius:0;padding:22px;transition:background .25s}
 .fxstub>.hc:first-child{border-radius:20px 20px 0 0}
 .fxstub>.hc:last-child{border-radius:0 0 20px 20px;border-top:2px dashed var(--hline)}
-.fxstub>a.htap:hover{border-color:var(--hline);background:rgba(255,163,0,.07);transform:none}
 .fxstub>.hc:last-child:before,.fxstub>.hc:last-child:after{content:"";position:absolute;top:-12px;width:22px;height:22px;border-radius:50%;background:#0B1226;z-index:2}
 .fxstub>.hc:last-child:before{left:-12px}.fxstub>.hc:last-child:after{right:-12px}
-.fxstub .hstat b{font-size:1.3rem}
 .fx .fxstub>.hc.rd{transition:background .25s,transform .28s var(--ease)}
 @media(min-width:640px){
  .fxstub{grid-template-columns:1fr 1fr}
@@ -483,42 +393,15 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .fxstub>a.hc+a.hc{border-top-color:var(--heb);border-left:1px solid var(--hline);border-radius:20px}
 .fxstub>a.hc:before,.fxstub>a.hc:after{display:none!important}
 .fxstub>a.hc:first-child,.fxstub>a.hc:last-child{border-radius:20px}
-.fxstub>a.htap:hover{border-color:var(--hamber);background:var(--hcard);transform:translateY(-3px)}
-.fxstub>a.hc+a.htap:hover{border-color:var(--heb)}
 .fxstub>a.hc:first-child:after{display:block!important;content:"";position:absolute;right:-50px;top:-50px;left:auto;bottom:auto;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,163,0,.22),transparent 70%);z-index:0}
 .fxstub>a.hc+a.hc:after{display:block!important;content:"";position:absolute;right:-50px;top:-50px;left:auto;bottom:auto;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(143,168,255,.25),transparent 70%);z-index:0}
 .fxstub>a.hc>*{position:relative;z-index:1}
-.fxstub>a.hc>.fxr{position:absolute;z-index:2}   /* the press ripple must stay out of the layout: as a relative child it made the card as tall as the ripple */
-.fxic{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;margin-bottom:14px;background:rgba(255,163,0,.14);border:1px solid rgba(255,163,0,.4);color:var(--hamber)}
-.fxstub>a.hc+a.hc .fxic{background:rgba(143,168,255,.14);border-color:rgba(143,168,255,.45);color:var(--heb)}
-.fxic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.fxstub>a.hstat b{font-size:0;line-height:1}
-.fxstub>a.hstat b span{display:block}
-.fxstub>a.hstat b [data-ev=d]{font-size:clamp(1.45rem,5.4vw,1.85rem);font-weight:800;line-height:1.15;letter-spacing:-.01em;background:linear-gradient(90deg,var(--hamber2),var(--hamber));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
-.fxstub>a.hstat b [data-ev=t]{display:inline-block;margin-top:12px;font-size:1.05rem;font-weight:800;color:var(--hnavy);background:linear-gradient(135deg,var(--hamber),#F08A2E);padding:6px 16px;border-radius:99px;box-shadow:0 6px 18px rgba(255,163,0,.35)}
-.fxstub>a.hstat b [data-ev=v]{font-size:clamp(1.45rem,5.4vw,1.85rem);font-weight:800;line-height:1.15;letter-spacing:-.01em;background:linear-gradient(90deg,#FF8AD0,#B58CFF);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
-.fxstub>a.hstat>span:not(.fxic):not([data-ev]){font-size:.74rem}
+.fxstub>a.hc>.fxr{position:absolute;z-index:2}
 /* Venue card: top bar + accents match the venue name colour */
 .fxstub>a.hc+a.hc,.fxstub>a.hc+a.hc:hover{border-top-color:transparent;background:linear-gradient(90deg,#FF8AD0,#B58CFF) top left/100% 3px no-repeat border-box,var(--hcard)}
-.fxstub>a.hc+a.htap:hover{border-color:#D79CEB;border-top-color:transparent}
-.fxstub>a.hc+a.hc .fxic{background:rgba(255,138,208,.14);border-color:rgba(255,138,208,.45);color:#FF8AD0}
 .fxstub>a.hc+a.hc em{color:#D6A8FF}
 .fxstub>a.hc+a.hc:after{background:radial-gradient(circle,rgba(255,138,208,.24),transparent 70%)!important}
-
-/* ---------- join card: amber-forward, navy main button ---------- */
-.fx .hticket,.hticket{background:linear-gradient(120deg,#FFA300,#FFB733,#F08A2E,#FFB733,#FFA300);background-size:300% 100%;color:#061651}
-.hticket:after{background:rgba(255,255,255,.28)}
-.fx .hticket:before{background:rgba(6,22,81,.12)}
-.hticket .hjoin{background:rgba(255,255,255,.3);border:1px solid rgba(6,22,81,.18)}
-.hticket .hjoin p{color:#061651}
-.hticket .hjoin p.hcost{margin:14px 0 0;font-size:.82rem;color:rgba(6,22,81,.82)}
-.hticket .fxspots{color:#061651;margin:0 auto 16px}
-.home .hticket button.hbtn.hamber{background:#061651;color:#fff;box-shadow:0 10px 26px rgba(6,22,81,.38)}
-.home .hticket button.hbtn.ghost{background:transparent;color:#061651;border:1.5px solid rgba(6,22,81,.55)}
-.fx .home .hticket button.hbtn.ghost:hover{background:rgba(6,22,81,.1);border-color:#061651}
-.fx .hticket #go-register{animation-name:fxUp,fxBreathN}
 @keyframes fxBreathN{0%{box-shadow:0 10px 26px rgba(6,22,81,.38),0 0 0 0 rgba(6,22,81,.45)}70%,100%{box-shadow:0 10px 26px rgba(6,22,81,.38),0 0 0 16px rgba(6,22,81,0)}}
-.fx .hticket.in .hjoin>:nth-child(5){animation-delay:.76s}.fx .hticket.in .hjoin>:nth-child(6){animation-delay:.88s}.fx .hticket.in .hjoin>:nth-child(7){animation-delay:.96s}
 
 
 /* =====================================================================================================================
@@ -527,15 +410,8 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
    ===================================================================================================================== */
 @media(max-width:520px){
  .hhero,.fx .hhero{padding:22px 0 26px}
- .hhero .logo-wrap{margin-bottom:6px}
- .hhero .logo-wrap img,.hhero .logo-wrap svg{width:92px}
- .home .hhero .hpres{font-size:.86rem;margin:0 0 2px}
  .home .hhero h1{font-size:clamp(2.5rem,12vw,3rem)}
  .home .hhero .hlede{margin-top:8px;font-size:.96rem;line-height:1.4;max-width:30ch}
- .hfacts{margin-top:14px;gap:6px}
- .hfacts span{padding:6px 11px;font-size:.78rem}
- .hcta{margin-top:14px;gap:10px}
- .home .hcta button.hbtn{padding:13px 22px;font-size:.98rem}
  .fxspots{margin-top:10px;font-size:.84rem}
  .fxcue{display:none}
  .fx .hhero-photo{inset:-4% 0;animation:fxKBs 26s ease-in-out infinite alternate}
@@ -555,8 +431,6 @@ html.fx{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.2,.9,.3,1.25)}
 .fx .home.again .fxcue{display:none}
 /* Date and Venue cards on a touch screen: a finger that lands on a card to scroll must not lift it (touch makes :hover stick) */
 @media (hover:none),(pointer:coarse){
-.fxstub>a.htap,.fxstub>a.htap:hover,.fxstub>a.htap:active{transform:none!important;scale:1!important;-webkit-tap-highlight-color:transparent}
-.fxstub>a.htap:hover{background-color:var(--hcard);border-color:var(--hline)}
 .fxstub>a.hc:first-child:hover{border-top-color:var(--hamber)}
 .fxstub>a.hc+a.hc:hover{border-top-color:transparent;background:linear-gradient(90deg,#FF8AD0,#B58CFF) top left/100% 3px no-repeat border-box,var(--hcard)}
 }
@@ -1077,7 +951,6 @@ function evParts(o){try{if(!S.ev)return null;const p={};new Intl.DateTimeFormat(
 function evDate(){const p=evParts({weekday:"long",day:"numeric",month:"long",year:"numeric"});return p?p.weekday+", "+p.day+" "+p.month+" "+p.year:CONFIG.ticketDate}
 function evTime(){try{const t=S.ev&&fmtT(S.ev.event_at);if(t)return t}catch(_){}return CONFIG.ticketTime}
 function evVenue(){return(S.ev&&S.ev.venue)||CONFIG.ticketVenue}
-function evLine(){const p=evParts({weekday:"short",day:"numeric",month:"short",year:"numeric"});return p?p.weekday+" "+p.day+" "+p.month+" "+p.year+", "+evTime()+" · "+evVenue():CONFIG.eventLine}
 function head(t,s){return `<h1>${t}</h1><p class="sub">${s}</p>`}
 function closeDate(){try{return new Date(S.status.deadline).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Kolkata"})}catch(_){return""}}
 /* payment details (UPI ID, payee name) and the organisers' WhatsApp number come from the database (Admin > Settings) */
@@ -1095,8 +968,13 @@ async function loadHomeStatus(){
     if(r&&r.data&&!r.error&&typeof r.data==="object"&&S.step==="home"){applyStatus(r.data);stAt=Date.now()}}catch(_){}
 }
 async function load(){
-  await loadEvent();
-  if(!S.pay)await loadPay();
+  /* speed (Nov 2026): event details and payment details are asked at the same time as the status instead of one after the other, and nothing
+     waits for them unless the screen being shown needs them. If Home asked for the status less than a minute ago and registration is open,
+     the form opens at once and the heartbeat (beat) re-checks it straight away. */
+  loadEvent();const py=S.pay?null:loadPay();
+  if(S.step==="loading"&&S.status&&S.status.accepting&&Date.now()-stAt<60000){
+    S.step="form";if(S.n>maxN()){setN(maxN());S.friends=S.n>1}
+    render();beat();return}
   try{
     const{data,error}=await db.rpc("get_public_status",{p_session:S.sid});if(error)throw error;
     applyStatus(data);
@@ -1104,6 +982,7 @@ async function load(){
     else{if(S.step==="loading"||S.step==="closed"||S.step==="error")S.step="form";
       if(S.n>maxN()){setN(maxN());S.friends=S.n>1}}
   }catch(_){S.step="error"}
+  if(py&&(S.step==="closed"||S.step==="error"))await py;   /* these two screens show the organisers' WhatsApp button */
   render();
   if(S.step==="form")beat();
 }
@@ -1186,7 +1065,6 @@ function reveal(){
     document.querySelectorAll("#app .card,#app .pc").forEach(el=>{if(el.getBoundingClientRect().top>vh*.92){el.classList.add("rv");io.observe(el)}});
   }catch(_){}
 }
-const aboutBtn=()=>`<button class="big ghost" id="go-about">About ${esc(CONFIG.organiserName)}</button>`;
 /* Live values (event date, time and venue; the About button) are patched into the Home card IN PLACE. Rebuilding the whole card
    each time an answer arrives restarted its fade-in and the logo animation and jumped the page back to the top. */
 function evShort(){const p=evParts({day:"numeric",month:"long",year:"numeric"});return p?p.day+" "+p.month+" "+p.year:CONFIG.ticketDate.replace(/^[A-Za-z]+,\s*/,"")}
@@ -1253,7 +1131,7 @@ ${spots}
 </div></section>
 
 <section><div class="bh-w bh-split">
-<div class="bh-rv"><figure class="bh-poster" style="margin:0 auto"><img id="home-poster" src="assets/burg-poster.jpg" alt="${E} event poster" width="1121" height="1403" loading="lazy"></figure><p class="bh-hint">TAP THE POSTER TO ENLARGE</p></div>
+<div class="bh-rv"><figure class="bh-poster" style="margin:0 auto"><img id="home-poster" src="assets/burg-poster.jpg" alt="${E} event poster" width="900" height="1126" loading="lazy"></figure><p class="bh-hint">TAP THE POSTER TO ENLARGE</p></div>
 <div class="bh-rv"><p class="bh-eyebrow">Save the date</p><h2>Mark your <i>Sunday.</i></h2>
 <p class="bh-lede" style="margin-top:14px">One afternoon with your people: food, games, stage moments and a long-overdue exhale.</p>
 <div class="bh-facts">
@@ -1301,9 +1179,7 @@ ${ret?`<p class="bh-note">${n===1?"Your booking is saved on this device. Enter y
 let homeAC=null;
 const SPONSOR={src:"assets/sponsorfolder.jpg",name:"Eagles Institute of Management",logo:"assets/burg-sponsor-logo.png",video:"assets/sponsor-video.mp4"};   /* Co-sponsor. NAME and LOGO also show at the very bottom of Home ("Co-sponsored by ..."): edit them here and replace assets/sponsor-logo.png; empty strings hide that line. VIDEO plays in the co-sponsor card: put the file at assets/sponsor-video.mp4 (an MP4 with H.264 video and AAC sound plays on every phone); until the file exists the video is simply left out. Set video to "" to never show one. The sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
 function homeUnmount(){if(homeAC){homeAC.abort();homeAC=null}}
-function zoomImg(src){const d=document.createElement("div");d.className="hlb";d.innerHTML='<img alt="">';d.firstChild.src=src;d.onclick=()=>d.remove();document.body.appendChild(d);requestAnimationFrame(()=>d.classList.add("on"))}
 /* a picture opens in the motion script's lightbox (it grows out of the poster); the plain zoom is the backup */
-function openImg(img){if(window.HomeFX&&HomeFX.lightbox){try{return HomeFX.lightbox(img)}catch(_){}}zoomImg(img.currentSrc||img.src)}
 function homeMount(){
   homeUnmount();const root=document.querySelector("#app .bhome");if(!root)return;
   homeAC=new AbortController();const sig=homeAC.signal,on=(t,e,f,o)=>t&&t.addEventListener(e,f,Object.assign({signal:sig},o||{}));
@@ -1482,7 +1358,6 @@ const XERR={MISMATCH:"The details don't match. Please check the Booking ID, the 
   INVALID_NAME:"Please enter your name.",INVALID_PHONE:"Please enter a 10-digit phone number.",INVALID_EMAIL:"Please enter a valid email address.",FEEDBACK_OFF:"Sorry, we are no longer collecting responses.",EMPTY_FEEDBACK:"Please pick a number or write a few words first.",INVALID_RATING:"Please pick a number from 1 to 5.",INVALID_COMMENT:"That message is too long. Please keep it under 1000 characters.",BOOKING_NOT_FOUND:"We couldn't find this booking.",INVALID_LOCATION:"Please select where you are currently based.",INVALID_ATTENDANCE:"Please select Surely or Most probably.",INVALID_FOOD:"Please select Veg or Non-veg.",INVALID_CONSENT:"Please tick the box to confirm you understand.",INVALID_DATA:"Some details were not accepted. Please check each field.",
   CONTACT_ADMIN:"A buyer has already applied. Only the organisers can end this now. Please contact them.",NOTHING_TO_CANCEL:"There is no active code to cancel.",NOT_ACTIVE:"This transfer is no longer open.",PAYMENT_NOT_REQUESTED:"The organisers haven't asked for payment yet.",ALREADY_SUBMITTED:"You've already uploaded a payment screenshot.",SCREENSHOT_MISSING:"The screenshot didn't upload. Please select it again."};
 const xerr=r=>XERR[r&&r.error]||"Something went wrong. Please try again.";
-const waTxt=t=>contactBtn(t,"Contact the organisers");
 
 /* ---------- Tickets page: Booking ID + phone, every time ---------- */
 const savedIds=()=>{const a=getMine().concat(LS.get("mm_hist",[]));return a.filter((c,i)=>a.indexOf(c)===i).slice(0,12)};
@@ -1537,23 +1412,30 @@ function vTickets(){
 async function doSearch(){
   const T=S.tk,code=normCode(T.q),ph=String(T.phone||"").replace(/\D/g,"");T.msg="";T.res=null;T.nf=false;
   if(!/^[0-9A-F]{8}$/.test(code)||!/^\d{10}$/.test(ph)){T.nf=true;return render()}
-  T.busy=true;render();
+  T.busy=true;render();let more=null;
   try{
     const{data,error}=await db.rpc("lookup_tickets",{p_code:code,p_phone:ph});if(error)throw error;
     if(data&&data.found){
       remember("mm_hist",code,10);
-      if(data.kind==="registration"&&data.status==="paid"){try{const x=await db.rpc("transfer_status",{p_booking_code:code,p_phone:ph});data.xstatus=x.error||!x.data||!x.data.found?null:x.data}catch(_){}}
       T.res=data;T.code=code;T.ph=ph;
+      if(data.kind==="registration"&&data.status==="paid")more=data;
     }else T.nf=true;
   }catch(_){T.msg="We couldn't reach the server. Please check your internet and try again."}
   T.busy=false;const y=window.scrollY;render();window.scrollTo(0,y);
+  /* speed: the booking is already on screen; the "Your transfers" box is added when its own answer arrives */
+  if(more)db.rpc("transfer_status",{p_booking_code:code,p_phone:ph}).then(x=>{
+    more.xstatus=x.error||!x.data||!x.data.found?null:x.data;
+    if(S.step==="tickets"&&T.res===more&&more.xstatus){const y2=window.scrollY;render();window.scrollTo(0,y2)}}).catch(()=>{});
 }
-function openTickets(pre){S.step="tickets";const T=S.tk;T.res=null;T.nf=false;T.msg="";T.phone="";T.q=pre||"";render();(S.pay?Promise.resolve():loadPay()).then(loadTI).then(()=>{if(S.step==="tickets")render()})}
-async function viewTickets(){const T=S.tk;let d=T.res;if(!d)return;
-  /* ask the database again first, so a game message switched on since the page was opened is there; if that fails (no signal) use what is already on screen */
+function openTickets(pre){S.step="tickets";const T=S.tk;ensureTicketFonts();loadLogo();loadEvent();T.res=null;T.nf=false;T.msg="";T.phone="";T.q=pre||"";render();(S.pay?Promise.resolve():loadPay()).then(loadTI).then(()=>{if(S.step==="tickets")render()})}
+async function viewTickets(){const T=S.tk;const d=T.res;if(!d)return;
+  const live=d.tickets.filter(t=>!t.transferred&&t.secret);if(!live.length)return;S.cur={booking_code:d.booking_code,tickets:live};S.step="ticket";render();
+  /* speed: the ticket is drawn at once from what is already on screen. The database is then asked again in the background, so a game message or prize
+     switched on since the page was opened still appears: the ticket is drawn again only if something on it changed. */
   if(T.code&&T.ph){try{const r=await Promise.race([db.rpc("lookup_tickets",{p_code:T.code,p_phone:T.ph}),new Promise((_,j)=>setTimeout(j,4000))]);
-    if(r&&!r.error&&r.data&&r.data.found&&r.data.kind===d.kind){r.data.xstatus=d.xstatus;T.res=r.data;d=r.data}}catch(_){}}
-  const live=d.tickets.filter(t=>!t.transferred&&t.secret);if(!live.length)return;S.cur={booking_code:d.booking_code,tickets:live};S.step="ticket";render()}
+    if(r&&!r.error&&r.data&&r.data.found&&r.data.kind===d.kind){r.data.xstatus=d.xstatus;T.res=r.data;
+      const nl=r.data.tickets.filter(t=>!t.transferred&&t.secret),sig=a=>JSON.stringify(a.map(t=>[t.label,t.secret,t.name,t.food,t.game_message||"",t.game_prize||"",t.game_prize_heading||""]));
+      if(nl.length&&S.step==="ticket"&&S.cur&&S.cur.booking_code===d.booking_code&&sig(nl)!==sig(S.cur.tickets)){S.cur={booking_code:d.booking_code,tickets:nl};render()}}}catch(_){}}}
 
 /* ---------- Transfer tickets ---------- */
 S.xs={mode:"private",code:"",ticket:"",phone:"",upi:"",busy:false,err:"",res:null};S.xb={};S.xp={};
@@ -1696,7 +1578,6 @@ function rr(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);
 const FF='"Jost",Arial,sans-serif',FD='"Fraunces",Georgia,serif';
 function txt(x,s,X,Y,size,wt,col,al,sp,fam){x.font=wt+" "+size+"px "+(fam||FF);x.fillStyle=col;x.textAlign=al||"left";x.textBaseline="alphabetic";try{x.letterSpacing=(sp||0)+"px"}catch(_){}x.fillText(s,X,Y);try{x.letterSpacing="0px"}catch(_){}}
 function fit(x,s,maxW,size,min,wt,fam){let z=size;for(;z>min;z-=2){x.font=wt+" "+z+"px "+(fam||FF);if(x.measureText(s).width<=maxW)break}return z}
-function foodMark(x,X,Y,veg){const col=veg?"#1f9d55":"#c62828";x.fillStyle="#fff";rr(x,X,Y,48,48,8);x.fill();x.lineWidth=5;x.strokeStyle=col;rr(x,X+2.5,Y+2.5,43,43,6);x.stroke();x.fillStyle=col;x.beginPath();x.arc(X+24,Y+24,11,0,7);x.fill()}
 let LOGO=null;
 function loadLogo(){return new Promise(r=>{if(LOGO)return r(LOGO);const i=new Image();i.onload=()=>{LOGO=i;r(i)};i.onerror=()=>r(null);i.src="assets/logo-mark.png"})}
 function drawTicket(c,t,code){
@@ -1786,11 +1667,24 @@ function msgLines(s){
   let L=wrap(size);while(L.length>4&&size>30){size-=4;L=wrap(size)}
   return {lines:L,size,lh:Math.round(size*1.3)}}
 const W_MSG=700;
+/* The ticket fonts (Fraunces, Jost) are not in the page's first stylesheet any more; they are fetched here, once, as soon as the Tickets screen opens,
+   so they are usually there before the person has typed their Booking ID. */
+let tfP=null;
+function ensureTicketFonts(){
+  if(tfP)return tfP;
+  tfP=new Promise(res=>{const l=document.createElement("link");l.rel="stylesheet";
+    l.href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,500&family=Jost:wght@400;500;600&display=swap";
+    l.onload=()=>res(true);l.onerror=()=>{tfP=null;res(false)};document.head.appendChild(l);setTimeout(()=>res(false),8000)})
+  .then(async ok=>{try{if(document.fonts&&document.fonts.load)await Promise.all(['700 60px "Fraunces"','600 40px "Fraunces"','italic 500 30px "Fraunces"','400 30px "Jost"','500 30px "Jost"','600 30px "Jost"'].map(f=>document.fonts.load(f)))}catch(_){}return ok});
+  return tfP}
 async function drawTickets(){
-  await loadEvent();await loadLogo();await qrReady;
-  const r=S.cur;S.cv=[];
-  try{if(document.fonts&&document.fonts.load)await Promise.all(['700 60px "Fraunces"','600 40px "Fraunces"','italic 500 30px "Fraunces"','400 30px "Jost"','500 30px "Jost"','600 30px "Jost"'].map(f=>document.fonts.load(f)))}catch(_){}
+  if(!S.ev)await loadEvent();   /* already asked for at start; only waits here if it never arrived */
+  await Promise.all([loadLogo(),qrReady,ensureTicketFonts()]);
+  const r=S.cur;S.cv=[];if(!r||S.step!=="ticket")return;
+  const key=()=>evDate()+"|"+evTime()+"|"+evVenue(),k0=key();
   r.tickets.forEach((t,i)=>{const c=document.getElementById("tc"+i);if(c){drawTicket(c,t,r.booking_code);S.cv[i]=c}});
+  /* if the organisers changed the date, time or venue meanwhile, draw again with the new details */
+  loadEvent().then(()=>{if(S.step==="ticket"&&key()!==k0)drawTickets().catch(()=>{})});
 }
 
 /* ---------- downloads (JPG / PDF) ---------- */

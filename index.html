@@ -7,7 +7,7 @@
 <meta property="og:image" content="https://rameezmunirrr-gh.github.io/ca-meetup-register/assets/og-image.jpg"><meta name="twitter:card" content="summary_large_image">
 <title>Ehsaas'26 – Register</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,500&family=Jost:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,500&family=Jost:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Lora:ital,wght@1,500&family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
 <!-- The two libraries load in the background (async) so Home can be drawn without waiting for them; see sbReady and qrReady in the script. -->
 <script async id="qr-lib" src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" onload="window.__qr=1" onerror="window.__qr=2"></script>
 <script async id="sb-lib" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" onload="window.__sb=1" onerror="window.__sb=2"></script>
@@ -642,6 +642,147 @@ body[data-step="form"] .toast{bottom:calc(96px + env(safe-area-inset-bottom,0px)
 @keyframes ffi{from{opacity:0;transform:translateY(16px)}}@keyframes ffl{50%{transform:translate(26px,-30px) scale(1.1)}}
 @keyframes fpulse{0%{box-shadow:0 0 0 0 rgba(255,163,0,.5)}70%,100%{box-shadow:0 0 0 12px rgba(255,163,0,0)}}
 </style>
+<style>
+/* ===== Ehsaas'26 Home, BURGUNDY design (Nov 2026). Everything is scoped to .bhome (or body[data-step="home"]) with every class starting bh-,
+   so no other screen is touched. The old Home styles above are no longer used by Home. The numbers worth changing are the colours at the top of .bhome. ===== */
+html:has(body[data-step="home"]){background:#1A040C;scroll-behavior:smooth;scroll-padding-top:calc(70px + env(safe-area-inset-top,0px))}
+body[data-step="home"]{background:transparent}
+body[data-step="home"]::before{content:"";position:fixed;left:0;right:0;top:0;bottom:0;height:auto;z-index:-1;pointer-events:none;-webkit-mask-image:none;mask-image:none;
+background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transparent 70%),radial-gradient(ellipse 70% 40% at 100% 55%,rgba(110,16,46,.55),transparent 70%),radial-gradient(ellipse 70% 40% at 0 85%,rgba(110,16,46,.5),transparent 70%)}
+.bhome{--wine:#1A040C;--deep:#4A0A1F;--burg:#8C1838;--rose:#CF736A;--blush:#FFB3C0;--cream:#F6D7C6;--gold:#E9B24C;--ember:#F08A3C;--glass:rgba(140,24,56,.30);--glass-b:rgba(255,179,192,.22);
+--sans:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;--serif:"Lora",Georgia,serif;color:var(--cream);font:300 16px/1.65 var(--sans);overflow-x:clip;-webkit-font-smoothing:antialiased}
+.bhome section{padding:68px 0}
+/*SKIP *,*:before,*:after*/
+.bhome h1,.bhome h2,.bhome h3,.bhome p{margin:0}
+.bhome h2{text-wrap:balance}
+.bhome .bh-w{max-width:1040px;margin:0 auto;padding:0 22px}
+.bhome .bh-eyebrow{font:800 .74rem/1 var(--sans);letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.bhome h2{font:900 clamp(1.9rem,6vw,2.9rem)/1.08 var(--sans);letter-spacing:-.02em;color:var(--cream)}
+.bhome h2 i{font:italic 500 1em var(--serif);color:var(--blush);letter-spacing:0}
+.bhome .bh-lede{font:italic 500 1.12rem/1.6 var(--serif);color:var(--cream);opacity:.85;max-width:44ch}
+@media(max-width:600px){.bhome section{padding:46px 0}.bhome .bh-head{margin-bottom:22px}.bhome .bh-w{padding:0 18px}}
+.bhome .bh-head{margin-bottom:34px}
+.bhome .bh-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(26,4,12,.78);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--glass-b)}
+.bhome .bh-bar .bh-w{display:flex;align-items:center;justify-content:space-between;height:58px}
+.bhome .bh-bar img{height:34px;width:auto;display:block}
+.bhome .bh-brand{display:flex;align-items:center;gap:10px;font:800 .78rem/1.15 var(--sans);letter-spacing:.14em;text-transform:uppercase}
+.bhome .bh-brand small{display:block;color:var(--gold);font-weight:600;letter-spacing:.2em;font-size:.6rem}
+.bhome .bh-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;font:800 1rem/1 var(--sans);padding:17px 30px;border-radius:99px;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.bhome .bh-gold{background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember));color:var(--wine);box-shadow:0 10px 34px rgba(233,178,76,.38)}
+.bhome .bh-gold:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(233,178,76,.5)}
+.bhome .bh-ghost{background:transparent;color:var(--cream);border:1.5px solid rgba(246,215,198,.4)}
+.bhome .bh-ghost:hover{background:var(--glass)}
+.bhome .bh-sm{padding:11px 20px;font-size:.84rem}
+.bhome :focus-visible{outline:3px solid var(--blush);outline-offset:3px}
+.bhome .bh-hero{position:relative;overflow:hidden;text-align:center;padding:54px 0 70px}
+.bhome .bh-hero:before{content:"";position:absolute;inset:0;background:url(assets/burg-hero.jpg) 50% 30%/cover no-repeat;opacity:.34;mix-blend-mode:luminosity}
+.bhome .bh-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(74,10,31,.55),rgba(74,10,31,.35) 40%,var(--wine) 98%)}
+.bhome .bh-hero .bh-w{position:relative;z-index:2}
+.bhome .bh-hero .bh-logo{width:104px;height:auto;margin:0 auto 20px;display:block;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5))}
+.bhome .bh-pres{font:600 .7rem/1.4 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--blush)}
+.bhome h1{font:900 clamp(3rem,15vw,9rem)/.95 var(--sans);letter-spacing:-.045em;margin:16px 0 14px;color:var(--cream)}
+.bhome h1 em{font-style:normal;background:linear-gradient(180deg,#FBDD8E,var(--gold) 50%,var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #8a5a14) drop-shadow(0 14px 18px rgba(0,0,0,.5))}
+.bhome .bh-tag{font:italic 500 clamp(1.1rem,3.6vw,1.45rem)/1.4 var(--serif);color:var(--cream);margin:0 auto 26px;max-width:30ch}
+.bhome .bh-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:32px}
+.bhome .bh-chip{display:inline-flex;align-items:center;gap:9px;background:var(--glass);border:1px solid var(--glass-b);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:99px;padding:10px 18px;font:600 .88rem/1.2 var(--sans)}
+.bhome .bh-chip svg{width:18px;height:18px;fill:none;stroke:var(--gold);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.bhome .bh-cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.bhome .bh-spots{display:inline-flex;align-items:center;gap:9px;margin-top:22px;background:rgba(240,138,60,.16);border:1px solid rgba(240,138,60,.5);color:var(--ember);border-radius:99px;padding:7px 16px;font:800 .78rem/1 var(--sans);letter-spacing:.06em;text-transform:uppercase}
+.bhome .bh-spots i{width:8px;height:8px;border-radius:50%;background:var(--ember);animation:bh-pulse 1.8s infinite}
+@keyframes bh-pulse{50%{opacity:.25;transform:scale(1.5)}}
+.bhome .bh-count{padding:0 0 20px;margin-top:-28px;position:relative;z-index:3}
+.bhome .bh-cd{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:560px;margin:0 auto}
+.bhome .bh-cd div{background:var(--glass);border:1px solid var(--glass-b);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-radius:18px;padding:16px 4px 12px;text-align:center}
+.bhome .bh-cd b{display:block;font:900 clamp(1.8rem,8vw,2.7rem)/1 var(--sans);color:var(--gold);font-variant-numeric:tabular-nums}
+.bhome .bh-cd span{font:600 .64rem/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--rose)}
+.bhome .bh-cdcap{text-align:center;font:italic 500 1rem var(--serif);color:var(--blush);margin-bottom:14px}
+.bhome .bh-split{display:grid;gap:36px;align-items:center}
+@media(min-width:820px){.bhome .bh-split{grid-template-columns:minmax(0,400px) 1fr;gap:64px}}
+.bhome .bh-poster{border-radius:22px;overflow:hidden;border:1px solid var(--glass-b);box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 0 8px rgba(233,178,76,.08);max-width:420px;margin:0 auto;transform:rotate(-1.4deg);transition:transform .4s}
+.bhome .bh-poster:hover{transform:rotate(0)}
+.bhome .bh-poster img{display:block;width:100%;height:auto;cursor:zoom-in}
+.bhome .bh-hint{text-align:center;font:600 .78rem var(--sans);color:var(--rose);margin-top:16px;letter-spacing:.06em}
+.bhome .bh-facts{display:grid;gap:12px;margin:26px 0}
+.bhome .bh-fact{display:flex;gap:16px;align-items:center;text-decoration:none;color:inherit;background:var(--glass);border:1px solid var(--glass-b);border-radius:18px;padding:18px 20px;transition:border-color .2s,transform .2s}
+.bhome a.bh-fact:hover{border-color:var(--gold);transform:translateX(4px)}
+.bhome .bh-fact .bh-ic{width:46px;height:46px;border-radius:14px;background:var(--burg);display:grid;place-items:center;flex:none}
+.bhome .bh-fact svg{width:22px;height:22px;fill:none;stroke:var(--cream);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bhome .bh-fact small{display:block;font:800 .66rem/1 var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--blush);margin-bottom:5px}
+.bhome .bh-fact b{display:block;font:800 1.08rem/1.3 var(--sans);color:var(--cream)}
+.bhome .bh-fact em{display:block;font:600 .8rem var(--sans);color:var(--gold);font-style:normal;margin-top:3px}
+.bhome .bh-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.bhome .bh-card{position:relative;overflow:hidden;background:linear-gradient(160deg,rgba(140,24,56,.42),rgba(74,10,31,.6));border:1px solid var(--glass-b);border-radius:22px;padding:26px 24px;transition:transform .25s,border-color .25s}
+.bhome .bh-card:hover{transform:translateY(-6px);border-color:var(--rose)}
+.bhome .bh-card:before{content:attr(data-n);position:absolute;right:16px;top:6px;font:900 4.4rem/1 var(--sans);color:rgba(207,115,106,.14)}
+.bhome .bh-card .bh-ic{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--burg),var(--deep));border:1px solid var(--glass-b);display:grid;place-items:center;margin-bottom:18px}
+.bhome .bh-card svg{width:26px;height:26px;fill:none;stroke:var(--gold);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.bhome .bh-card h3{font:800 1.12rem/1.25 var(--sans);margin-bottom:8px;color:var(--cream)}
+.bhome .bh-card p{font-size:.93rem;color:var(--cream);opacity:.8}
+@media(max-width:600px){.bhome .bh-cards{grid-template-columns:1fr 1fr;gap:12px}.bhome .bh-card{padding:18px 16px}.bhome .bh-card:before{font-size:3rem;right:10px}.bhome .bh-card .bh-ic{width:42px;height:42px;border-radius:13px;margin-bottom:12px}.bhome .bh-card svg{width:22px;height:22px}.bhome .bh-card h3{font-size:.98rem}.bhome .bh-card p{font-size:.82rem;line-height:1.5}}
+.bhome .bh-slider{--ih:clamp(340px,60vw,540px);position:relative;border-radius:28px;overflow:hidden;border:1px solid var(--glass-b);background:linear-gradient(180deg,var(--wine),var(--deep));touch-action:pan-y}
+.bhome .bh-track{display:flex;transition:transform .7s cubic-bezier(.65,0,.25,1)}
+.bhome .bh-sl{position:relative;flex:0 0 100%;margin:0;display:flex;flex-direction:column}
+.bhome .bh-sl img{display:block;width:100%;height:var(--ih);object-fit:cover;object-position:50% 70%;cursor:zoom-in}
+.bhome .bh-sl:after{content:"";position:absolute;left:0;right:0;top:calc(var(--ih) - 150px);height:150px;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(26,4,12,.96))}
+.bhome .bh-sl .bh-txt{position:relative;z-index:2;margin-top:-34px;padding:0 24px 30px;pointer-events:none}
+.bhome .bh-sl h3{font:900 clamp(1.9rem,6vw,2.9rem)/1.08 var(--sans);letter-spacing:-.02em;color:var(--cream)}
+.bhome .bh-sl h3 i{font:italic 500 1em var(--serif);color:var(--blush);letter-spacing:0}
+.bhome .bh-sl p:not(.bh-eyebrow){font:italic 500 1.1rem/1.6 var(--serif);max-width:52ch;margin-top:14px}
+.bhome .bh-sl b{font-weight:500;color:var(--gold)}
+.bhome .bh-dots{position:absolute;top:12px;right:12px;z-index:5;display:flex;background:rgba(26,4,12,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:99px;padding:0 4px}
+.bhome .bh-dots button{width:32px;height:32px;background:none;border:0;padding:0;cursor:pointer;display:grid;place-items:center}
+.bhome .bh-dots button:before{content:"";width:9px;height:9px;border-radius:99px;background:rgba(246,215,198,.55);transition:all .3s}
+.bhome .bh-dots button[aria-current=true]:before{width:26px;background:var(--gold)}
+.bhome .bh-steps{display:grid;gap:14px;counter-reset:s}
+@media(min-width:760px){.bhome .bh-steps{grid-template-columns:repeat(3,1fr)}}
+.bhome .bh-step{counter-increment:s;background:linear-gradient(160deg,rgba(140,24,56,.42),rgba(74,10,31,.6));border:1px solid var(--glass-b);border-radius:22px;padding:26px 24px}
+.bhome .bh-step:before{content:counter(s);display:block;font:900 3.6rem/1 var(--sans);background:linear-gradient(180deg,#FBDD8E,var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:10px}
+.bhome .bh-step h3{font:800 1.08rem var(--sans);margin-bottom:6px}
+.bhome .bh-step p{font-size:.93rem;opacity:.8}
+@media(max-width:759px){.bhome .bh-step{display:grid;grid-template-columns:48px 1fr;column-gap:14px;align-items:center;padding:18px 18px}.bhome .bh-step:before{grid-row:span 2;font-size:2.8rem;margin:0}.bhome .bh-step{row-gap:0}}
+.bhome .bh-sponsor{display:grid;gap:24px;align-items:center;text-align:center;background:linear-gradient(135deg,var(--deep),rgba(140,24,56,.55));border:1px solid var(--glass-b);border-radius:28px;padding:34px 26px}
+@media(min-width:760px){.bhome .bh-sponsor{grid-template-columns:auto 1fr;text-align:left;padding:38px 44px;gap:44px}}
+.bhome .bh-sponsor h2{font-size:clamp(1.5rem,4.5vw,2rem);margin-bottom:10px}
+.bhome .bh-sponsor p{opacity:.82}
+.bhome .bh-final{text-align:center;background:radial-gradient(ellipse 70% 100% at 50% 100%,rgba(233,178,76,.2),transparent 70%),linear-gradient(180deg,var(--deep),var(--wine));border:1px solid var(--glass-b);border-radius:32px;padding:56px 24px}
+.bhome .bh-final h2{margin-bottom:12px}
+.bhome .bh-final .bh-lede{margin:0 auto 28px}
+.bhome .bh-foot{padding:34px 0 110px;text-align:center;font:600 .78rem/1.8 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--rose)}
+.bhome .bh-foot b{color:var(--cream)}
+.bhome .bh-flogos{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:22px}
+.bhome .bh-flogos img{display:block;width:auto}
+.bhome .bh-flogos .bh-fm{height:46px}
+.bhome .bh-flogos .bh-fe{height:58px}
+.bhome .bh-fsep{width:1.5px;height:40px;background:var(--glass-b)}
+.bhome .bh-fab{position:fixed;left:16px;right:16px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:25;max-width:420px;margin:0 auto;transform:translateY(140%);transition:transform .35s}
+.bhome .bh-fab.bh-on{transform:none}
+.bhome .bh-fab.bh-off{transform:translateY(140%)}
+.bh-lb{position:fixed;inset:0;z-index:40;background:rgba(26,4,12,.94);display:grid;place-items:center;padding:16px;cursor:zoom-out}
+.bh-lb img{max-width:100%;max-height:100%;border-radius:14px}
+.bhome .bh-rv{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.bhome .bh-rv.bh-in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.bhome .bh-rv{opacity:1;transform:none;transition:none}.bhome .bh-spots i{animation:none}}
+.bhome .bh-sm{font-size:.84rem}
+.bhome button.bh-btn{width:auto;letter-spacing:0;overflow:visible}
+.bhome button.bh-gold:hover{background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember));border-color:transparent}
+.bhome button.bh-ghost{box-shadow:none}
+.bhome button.bh-ghost:hover{border-color:rgba(246,215,198,.4);box-shadow:none;transform:none}
+.bhome .bh-dots button,.bhome .bh-dots button:hover{box-shadow:none;transform:none;overflow:visible}
+.bhome .bh-dots button:hover{background:none}
+.bhome .bh-fab{width:calc(100% - 32px)}
+.bhome .bh-spots.bh-nosp{display:none}
+.bhome .bh-final .bh-spots{margin:0 0 24px}
+.bhome .bh-note{margin:22px auto 0;max-width:40ch;font:italic 500 .95rem/1.5 var(--serif);color:var(--blush)}
+.bhome .bh-reg{margin:18px auto 0;max-width:560px;text-align:center;font:600 .8rem/1.4 var(--sans);letter-spacing:.06em;color:var(--blush)}
+.bhome .bh-reg b{font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.bhome .bh-sponsor .bh-splogo{height:150px;width:auto;margin:0 auto;display:block;filter:drop-shadow(0 6px 22px rgba(0,0,0,.35))}
+.bhome .bh-spfig,.bhome .bh-svid{margin:20px auto 0;max-width:420px;border-radius:18px;overflow:hidden;border:1px solid var(--glass-b)}
+.bhome .bh-spfig img{display:block;width:100%;height:auto;cursor:zoom-in}
+.bhome .bh-svid video{display:block;width:100%;max-height:72vh;background:#000;object-fit:contain}
+.bhome .bh-sponsor .bh-hint{margin-top:12px}
+@media(min-width:760px){.bhome .bh-spfig,.bhome .bh-svid{margin-left:0}.bhome .bh-sponsor .bh-hint{text-align:left}}
+@media(prefers-reduced-motion:reduce){html:has(body[data-step="home"]){scroll-behavior:auto}}
+</style>
 </head>
 <body>
 <header class="top"><div><img src="assets/logo-mark.png" alt="" width="44" height="30"><span>Mallu Articles Bengaluru</span></div></header>
@@ -857,8 +998,14 @@ function spotsView(){const st=S.status;if(!st)return"";
   if(st.closed_reason==="full")return"All spots are taken";
   const n=st.spots_left;return st.accepting&&n>0&&n<=20?`Only <b data-to="${n}">${n}</b> spot${n===1?"":"s"} left`:""}
 function homeAttrs(){const st=S.status;return{event:evIso(),skew:String(typeof skew==="number"?skew:0),close:st&&st.accepting&&st.deadline?st.deadline:""}}
+/* ===== Home, burgundy design. Replaces the old Home markup. The ids the rest of the page relies on are kept:
+   hero-register, hero-tickets, go-register, go-tickets, go-about, home-cal, home-map, home-join, home-fab, and data-ev="..." on every live text. ===== */
+const BH_IC={cal:'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',pin:'<svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>'};
+function evChip(){const p=evParts({weekday:"short",day:"numeric",month:"short",year:"numeric"});return(p?p.weekday+", "+p.day+" "+p.month+" "+p.year:CONFIG.ticketDate)+" · "+evTime()}
+/* "Register yourself, or bring up to N friends": N follows the live group limit (max_group counts the person registering) */
+function frText(){const m=S.status&&S.status.max_group>0?S.status.max_group:5,f=Math.max(0,m-1);return f>0?"Register yourself, or bring up to "+f+" friend"+(f===1?"":"s")+" in one booking.":"Fill in your details in one quick booking."}
 function refreshHome(){
-  const ev={d:evDate(),t:evTime(),v:evVenue(),s:evShort()};
+  const ev={d:evDate(),t:evTime(),v:evVenue(),s:evShort(),c:evChip()};
   document.querySelectorAll("#app [data-ev]").forEach(el=>{const x=ev[el.dataset.ev];if(el.textContent!==x)el.textContent=x});
   const cal=document.getElementById("home-cal"),map=document.getElementById("home-map");
   if(cal){const u=evCalUrl();if(u&&cal.getAttribute("href")!==u)cal.setAttribute("href",u)}
@@ -866,96 +1013,133 @@ function refreshHome(){
   const tk=document.getElementById("go-tickets"),ab=document.getElementById("go-about"),want=!!(S.flags&&S.flags.show_about);
   if(want&&!ab&&tk)tk.insertAdjacentHTML("afterend",hAbout());
   else if(!want&&ab)ab.remove();
-  const root=document.querySelector("#app .home");if(!root)return;
-  /* the countdowns read these three attributes (assets/home-fx.js) */
+  const root=document.querySelector("#app .bhome");if(!root)return;
+  /* the countdowns read these three attributes (see homeMount) */
   const a=homeAttrs();root.dataset.event=a.event;root.dataset.skew=a.skew;root.dataset.close=a.close;
   /* the main Register buttons carry the live price (a returning visitor's main button says View my ticket and is left alone) */
   if(!homeRet()){const l=regLabel();["hero-register","go-register"].forEach(id=>{const b=document.getElementById(id);if(b&&b.textContent!==l)b.textContent=l})}
-  /* the spots lines are patched in place, only when the text changes (so the count-down does not replay) */
+  /* the spots lines are patched in place, only when the text changes */
   const v=spotsView();
-  root.querySelectorAll(".fxspots").forEach(p=>{const s=p.querySelector("span");if(!s)return;p.classList.toggle("nosp",!v);if(p.dataset.v!==v){p.dataset.v=v;s.innerHTML=v}});
-  if(window.HomeFX){try{HomeFX.refresh()}catch(_){}}
+  root.querySelectorAll(".bh-spots").forEach(p=>{const s=p.querySelector("span");if(!s)return;p.classList.toggle("bh-nosp",!v);if(p.dataset.v!==v){p.dataset.v=v;s.innerHTML=v}});
+  root.querySelectorAll("[data-fr]").forEach(el=>{const t=frText();if(el.textContent!==t)el.textContent=t});
 }
+const hAbout=()=>`<button class="bh-btn bh-ghost" id="go-about" type="button">About us</button>`;
 /* the event name in the big heading: "Ehsaas'26" is drawn as Ehsaas + a coloured ’26 */
 function nameHtml(){const m=/^(.*?)['’](\d{2,4})$/.exec(CONFIG.eventName);return m?esc(m[1])+"<em>’"+esc(m[2])+"</em>":esc(CONFIG.eventName)}
-const hAbout=()=>`<button class="big hbtn ghost" id="go-about">About us</button>`;
 function vHome(){
-  const n=getMine().length,ret=n>0,E=esc(CONFIG.eventName).replace(/&#39;|'/g,"’"),O=esc(CONFIG.organiserName),a=homeAttrs(),
-    again=!!(window.HomeFX&&HomeFX.seen&&HomeFX.seen()),sv=spotsView(),
+  const n=getMine().length,ret=n>0,E=esc(CONFIG.eventName).replace(/&#39;|'/g,"’"),O=esc(CONFIG.organiserName),a=homeAttrs(),sv=spotsView(),
     P=ret?"View my ticket":regLabel(),Q=ret?"Register another booking":"View my ticket",
-    spots=`<p class="fxspots${sv?"":" nosp"}" data-v="${esc(sv)}"><i></i><span>${sv}</span></p>`;
-  return `<div class="home${again?" again":""}${ret?" ret":""}" data-event="${esc(a.event)}" data-skew="${esc(a.skew)}" data-close="${esc(a.close)}">
-  <div class="hhero"><div class="hhero-photo" aria-hidden="true"></div><div class="hblob hb1"></div><div class="hblob hb2"></div>
-  <div class="hw"><div class="logo-wrap hlogo"><img id="logo-fallback" src="assets/logo-mark.png" alt="Mallu Articles Bengaluru logo" width="128" height="87"><svg class="logo" id="logo" viewBox="0 0 360 244" role="img" aria-label="Mallu Articles Bengaluru logo" hidden><defs><filter id="goo" filterUnits="userSpaceOnUse" x="-200" y="-150" width="760" height="550"><feGaussianBlur id="gooBlur" in="SourceGraphic" stdDeviation="0"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/></filter></defs><g filter="url(#goo)"><path id="hl" fill="#FA9E01"/><path id="hr" fill="#FCFCFC"/><path id="bl" fill="#FCFCFC"/><path id="br" fill="#FFA701"/></g><path id="dr" fill="#9A9999"/></svg></div>
-  <p class="hpres">${O} presents</p>
-  <h1 aria-label="${E}">${nameHtml()}</h1>
-  <div class="hcta">
-    <button class="big hbtn hamber" id="hero-register">${esc(P)}</button>
-    <button class="big hbtn ghost" id="hero-tickets"${ret?"":" hidden"}>Register another booking</button>
-  </div>
-  ${spots}
-  </div></div>
+    spots=`<p class="bh-spots${sv?"":" bh-nosp"}" data-v="${esc(sv)}"><i></i><span>${sv}</span></p>`,
+    brand=O.replace(/\s+Bengaluru$/i,""),
+    spLogo=SPONSOR.logo?`<img class="bh-splogo" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.remove()">`:"";
+  return `<div class="bhome${ret?" ret":""}" data-event="${esc(a.event)}" data-skew="${esc(a.skew)}" data-close="${esc(a.close)}">
+<header class="bh-bar"><div class="bh-w"><div class="bh-brand"><img src="assets/burg-logo.png" alt="${O} logo" width="50" height="34"><span>${esc(brand)}<small>BENGALURU</small></span></div><button class="bh-btn bh-gold bh-sm" id="bar-register" type="button">${ret?"View my ticket":"Register"}</button></div></header>
 
-  <section><div class="hw"><figure class="hposter rv" style="margin-top:0"><img id="home-poster" src="assets/ehsaas-poster.jpeg" width="1000" height="1251" alt="${E} event poster" loading="lazy"></figure><p class="hcap">Tap the poster to enlarge</p></div></section>
+<section class="bh-hero" style="padding-bottom:70px"><div class="bh-w">
+<img class="bh-logo" src="assets/burg-logo.png" alt="" width="104" height="70">
+<p class="bh-pres">${O} presents</p>
+<h1 aria-label="${E}">${nameHtml()}</h1>
+<p class="bh-tag">Where strangers feel like home.</p>
+<div class="bh-chips"><span class="bh-chip">${BH_IC.cal}<span data-ev="c">${esc(evChip())}</span></span><span class="bh-chip">${BH_IC.pin}<span data-ev="v">${esc(evVenue())}</span></span></div>
+<div class="bh-cta"><button class="bh-btn bh-gold" id="hero-register" type="button">${esc(P)}</button><button class="bh-btn bh-ghost" id="hero-tickets" type="button">${esc(Q)}</button></div>
+${spots}
+</div></section>
 
-  <section style="padding-top:0"><div class="hw"><div class="hsec rv"><p class="heyebrow">Save the date</p><h2>When &amp; where</h2></div>
-  <div class="fxstub">
-  <a class="hc hstat htap rv" id="home-cal" href="${esc(evCalUrl())}" target="_blank" rel="noopener"><i class="fxic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></i><span>Date and time</span><b><span data-ev="d">${esc(evDate())}</span> · <span data-ev="t">${esc(evTime())}</span></b><em>Add to calendar</em></a>
-  <a class="hc hstat htap rv" id="home-map" href="${esc(evMapUrl())}" target="_blank" rel="noopener"><i class="fxic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg></i><span>Venue</span><b><span data-ev="v">${esc(evVenue())}</span></b><em>Open in Maps</em></a></div></div></section>
+<section class="bh-count"><div class="bh-w"><p class="bh-cdcap">Counting down to ${E.replace(/’\d+$/,"")}</p>
+<div class="bh-cd" id="bh-cd" role="timer" aria-label="Countdown to the meetup"><div><b>00</b><span>days</span></div><div><b>00</b><span>hours</span></div><div><b>00</b><span>mins</span></div><div><b>00</b><span>secs</span></div></div>
+<p class="bh-reg" id="bh-reg" role="timer" aria-label="Time left to register"${a.close?"":" hidden"}>Registration closes in <b>00</b>d <b>00</b>h <b>00</b>m <b>00</b>s</p></div></section>
 
-  <section style="padding-top:0"><div class="hw"><div class="hsec rv"><p class="heyebrow">On the day</p><h2>What’s in store</h2></div>
-  <div class="hgrid">
-  <div class="hc rv"><div class="hem"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M17.2 14c2.4.1 4.3 2 4.3 4.5"/></svg></div><h3>Networking</h3><p>Meet fellow professionals from across Bengaluru and build connections that last.</p></div>
-  <div class="hc rv"><div class="hem"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></div><h3>Stage programs</h3><p>A lineup of stage moments to enjoy and cheer on together.</p></div>
-  <div class="hc rv"><div class="hem"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3.5"/><circle class="d" cx="8.6" cy="8.6" r="1.3"/><circle class="d" cx="15.4" cy="8.6" r="1.3"/><circle class="d" cx="12" cy="12" r="1.3"/><circle class="d" cx="8.6" cy="15.4" r="1.3"/><circle class="d" cx="15.4" cy="15.4" r="1.3"/></svg></div><h3>Games and activities</h3><p>Icebreakers, friendly games and plenty of laughs.</p></div>
-  <div class="hc rv"><div class="hem"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v6a2.5 2.5 0 0 0 5 0V3M8.5 3v18"/><path d="M17 21V3c-2.3 1.2-3.5 3.7-3.5 7v3.5H17"/></svg></div><h3>Meals and refreshments</h3><p>Good food and refreshments to share and enjoy together.</p></div></div></div></section>
+<section><div class="bh-w bh-split">
+<div class="bh-rv"><figure class="bh-poster" style="margin:0 auto"><img id="home-poster" src="assets/burg-poster.jpg" alt="${E} event poster" width="1121" height="1403" loading="lazy"></figure><p class="bh-hint">TAP THE POSTER TO ENLARGE</p></div>
+<div class="bh-rv"><p class="bh-eyebrow">Save the date</p><h2>Mark your <i>Sunday.</i></h2>
+<p class="bh-lede" style="margin-top:14px">One afternoon with your people: food, games, stage moments and a long-overdue exhale.</p>
+<div class="bh-facts">
+<a class="bh-fact" id="home-cal" href="${esc(evCalUrl())}" target="_blank" rel="noopener"><span class="bh-ic">${BH_IC.cal}</span><span><small>Date and time</small><b><span data-ev="d">${esc(evDate())}</span><br><span data-ev="t">${esc(evTime())}</span> onwards</b><em>Add to calendar →</em></span></a>
+<a class="bh-fact" id="home-map" href="${esc(evMapUrl())}" target="_blank" rel="noopener"><span class="bh-ic">${BH_IC.pin}</span><span><small>Venue</small><b data-ev="v">${esc(evVenue())}</b><em>Open in Maps →</em></span></a></div>
+</div></div></section>
 
-  <section id="story"><div class="hw"><div class="hsec rv"><h2>Back for another meetup</h2>
-  <p>Last year’s <b>Chai, Chill and Chartered</b> was full of warmth, and you made it that way. This year we’re back with <b>${E}</b>, planned even more carefully.</p></div></div></section>
+<section style="padding-top:0"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">On the day</p><h2>Four reasons to <i>show up.</i></h2></div>
+<div class="bh-cards">
+<div class="bh-card bh-rv" data-n="1"><div class="bh-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M17.2 14c2.4.1 4.3 2 4.3 4.5"/></svg></div><h3>Meet your people</h3><p>Fellow CA, CMA and ACCA folks from across Bengaluru. Real conversations, real connections.</p></div>
+<div class="bh-card bh-rv" data-n="2"><div class="bh-ic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></div><h3>Stage programs</h3><p>A lineup of performances and moments to enjoy, and to cheer on together.</p></div>
+<div class="bh-card bh-rv" data-n="3"><div class="bh-ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="8.6" cy="8.6" r="1.3"/><circle cx="15.4" cy="8.6" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="8.6" cy="15.4" r="1.3"/><circle cx="15.4" cy="15.4" r="1.3"/></svg></div><h3>Games &amp; fun</h3><p>Icebreakers, friendly games and plenty of laughs. No articleship talk required.</p></div>
+<div class="bh-card bh-rv" data-n="4"><div class="bh-ic"><svg viewBox="0 0 24 24"><path d="M6 3v6a2.5 2.5 0 0 0 5 0V3M8.5 3v18"/><path d="M17 21V3c-2.3 1.2-3.5 3.7-3.5 7v3.5H17"/></svg></div><h3>Food &amp; refreshments</h3><p>Good food and good company, shared at one long table.</p></div>
+</div></div></section>
 
-  <section style="padding-top:0" id="home-sponsor"><div class="hw"><div class="hc hsponsor rv"><p class="heyebrow">Our co-sponsor</p><h2>Thank you for the support</h2><p>${SPONSOR.name?"We’re happy to announce <b>"+esc(SPONSOR.name)+"</b> as the co-sponsor of "+E+".":"We’re happy to announce our co-sponsor for "+E+"."} Their support helps bring this meetup to you, and the remaining expenses are covered by a contribution from participants, shown when you register.</p>${SPONSOR.video?`<figure class="hsvid" id="home-sp-vfig"><video id="home-sp-video" src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="metadata" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video></figure>`:""}<figure class="hposter" id="home-sp-fig" style="margin:0 auto"><img id="home-sp-img" src="${esc(SPONSOR.src)}" alt="Sponsor poster for ${E}"></figure><p class="hcap" id="home-sp-cap">Tap the poster to enlarge</p></div></div></section>
+<section style="padding-top:0"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">How it works</p><h2>Booked in <i>three taps.</i></h2></div>
+<div class="bh-steps">
+<div class="bh-step bh-rv"><h3>Add your group</h3><p data-fr>${esc(frText())}</p></div>
+<div class="bh-step bh-rv"><h3>Pay by UPI</h3><p>We calculate the total and open your UPI app. Upload the screenshot and you’re done.</p></div>
+<div class="bh-step bh-rv"><h3>Get your QR ticket</h3><p>Once verified, download your ticket and show it at the gate.</p></div></div></div></section>
 
-  <section style="padding-top:0"><div class="hw"><div class="hticket rv" id="home-join">
-  <div class="hjoin"><p>Ready to join us? Reserve your spot, or check a ticket you already booked.</p>
-  ${spots}
-  <button class="big hbtn hamber" id="go-register">${esc(P)}</button><button class="big hbtn ghost" id="go-tickets">${Q}</button>${S.flags&&S.flags.show_about?hAbout():""}
-  ${ret?`<p class="hcost hret">${n===1?"Your booking is saved on this device. Enter your phone number to view it.":n+" bookings are saved on this device. Open Tickets and enter your phone number to view them."}</p>`:""}</div></div></div></section>
+<section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-sponsor bh-rv">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you. The remaining costs are covered by a small contribution from participants, shown when you register.</p>${SPONSOR.video?`<figure class="bh-svid" id="home-sp-vfig"><video id="home-sp-video" src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="metadata" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video></figure>`:""}${SPONSOR.src?`<figure class="bh-spfig" id="home-sp-fig"><img id="home-sp-img" src="${esc(SPONSOR.src)}" alt="Sponsor poster for ${E}"></figure><p class="bh-hint" id="home-sp-cap">Tap the poster to enlarge</p>`:""}</div></div></div></section>
 
-  <section style="padding-top:0"><div class="hw"><div class="fxcdwrap">
-  <div class="fxreg rv" role="timer" aria-label="Time left to register"${a.close?"":" hidden"}><span class="fxrl">Registration open for:</span><span class="fxru"><b>00</b>d</span><span class="fxru"><b>00</b>h</span><span class="fxru"><b>00</b>m</span><span class="fxru"><b>00</b>s</span></div>
-  <p class="fxcdcap rv">Countdown to the meetup</p>
-  <div class="fxbig rv" role="timer" aria-label="Countdown to the meetup"><div style="--i:0"><b>00</b><span>days</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:1"><b>00</b><span>hours</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:2"><b>00</b><span>minutes</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:3"><b>00</b><span>seconds</span><i></i><em class="fxsh" style="font-style:normal"></em></div></div>
-  </div></div></section>
+<section id="moments"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">Our meetups</p><h2>Moments we’ve <i>shared.</i></h2></div>
+<div class="bh-slider bh-rv" id="bh-slider" role="region" aria-roledescription="carousel" aria-label="Photos from our past meetups"><div class="bh-track" id="bh-track">
+<figure class="bh-sl" aria-roledescription="slide" aria-label="1 of 2"><img src="assets/burg-moment-chai.jpg" alt="The crowd at Chai, Chill and Chartered" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">Last year</p><h3>Chai, Chill <i>and</i> Chartered</h3><p>It was full of warmth, and you made it that way. This year we’re back with <b>${E}</b>, planned even more carefully.</p></figcaption></figure>
+<figure class="bh-sl" aria-roledescription="slide" aria-label="2 of 2"><img src="assets/burg-moment-mizaaniya.jpg" alt="The crowd at Mizaaniya 1.0, our Iftar meet" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">March 2026 · Iftar meet</p><h3>Mizaaniya <i>1.0</i></h3><p>An evening of Iftar, laughter and good company, with the whole community around one table.</p></figcaption></figure>
+</div><div class="bh-dots" id="bh-dots"><button type="button" aria-label="Show Chai, Chill and Chartered" aria-current="true"></button><button type="button" aria-label="Show Mizaaniya 1.0"></button></div></div></div></section>
 
-  <footer class="hfoot"><div class="hw"><b>${O}</b> · ${E}${SPONSOR.name||SPONSOR.logo?`<div class="hspons"><span>Co-sponsored by${SPONSOR.name?` <b>${esc(SPONSOR.name)}</b>`:""}</span>${SPONSOR.logo?`<img src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Sponsor")} logo" width="110" height="92" onerror="this.remove()">`:""}</div>`:""}</div></footer>
-  <button class="big hbtn hamber hfab" id="home-fab">${ret?"View my ticket":"Register now"}</button></div>`;
+<section style="padding-top:0"><div class="bh-w"><div class="bh-final bh-rv" id="home-join"><p class="bh-eyebrow">See you there</p><h2>Ready to join <i>us?</i></h2><p class="bh-lede">Reserve your spot, or open a ticket you already booked.</p>
+${spots}
+<div class="bh-cta"><button class="bh-btn bh-gold" id="go-register" type="button">${esc(P)}</button><button class="bh-btn bh-ghost" id="go-tickets" type="button">${esc(Q)}</button>${S.flags&&S.flags.show_about?hAbout():""}</div>
+${ret?`<p class="bh-note">${n===1?"Your booking is saved on this device. Enter your phone number to view it.":n+" bookings are saved on this device. Open Tickets and enter your phone number to view them."}</p>`:""}</div></div></section>
+
+<footer class="bh-foot"><div class="bh-w"><b>${O}</b> · ${E}${SPONSOR.name?`<br>Co-sponsored by ${esc(SPONSOR.name)}`:""}<div class="bh-flogos"><img class="bh-fm" src="assets/burg-logo.png" alt="${O} logo">${SPONSOR.logo?`<span class="bh-fsep" aria-hidden="true"></span><img class="bh-fe" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.previousElementSibling.remove();this.remove()">`:""}</div></div></footer>
+<button class="bh-btn bh-gold bh-fab" id="home-fab" type="button">${ret?"View my ticket":"Register now"}</button></div>`;
 }
+
 /* Home behaviour: the clicks (poster zoom, the floating Register button, the optional sponsor card). The movement (reveal on scroll, countdowns,
    the floating button appearing, the count-down of the spots) is assets/home-fx.js. Torn down on every other screen. */
 let homeAC=null;
-const SPONSOR={src:"assets/sponsorfolder.jpg",name:"Eagles Institute of Management",logo:"assets/sponsor-logo.png",video:"assets/sponsor-video.mp4"};   /* Co-sponsor. NAME and LOGO also show at the very bottom of Home ("Co-sponsored by ..."): edit them here and replace assets/sponsor-logo.png; empty strings hide that line. VIDEO plays in the co-sponsor card: put the file at assets/sponsor-video.mp4 (an MP4 with H.264 video and AAC sound plays on every phone); until the file exists the video is simply left out. Set video to "" to never show one. The sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
+const SPONSOR={src:"assets/sponsorfolder.jpg",name:"Eagles Institute of Management",logo:"assets/burg-sponsor-logo.png",video:"assets/sponsor-video.mp4"};   /* Co-sponsor. NAME and LOGO also show at the very bottom of Home ("Co-sponsored by ..."): edit them here and replace assets/sponsor-logo.png; empty strings hide that line. VIDEO plays in the co-sponsor card: put the file at assets/sponsor-video.mp4 (an MP4 with H.264 video and AAC sound plays on every phone); until the file exists the video is simply left out. Set video to "" to never show one. The sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
 function homeUnmount(){if(homeAC){homeAC.abort();homeAC=null}}
 function zoomImg(src){const d=document.createElement("div");d.className="hlb";d.innerHTML='<img alt="">';d.firstChild.src=src;d.onclick=()=>d.remove();document.body.appendChild(d);requestAnimationFrame(()=>d.classList.add("on"))}
 /* a picture opens in the motion script's lightbox (it grows out of the poster); the plain zoom is the backup */
 function openImg(img){if(window.HomeFX&&HomeFX.lightbox){try{return HomeFX.lightbox(img)}catch(_){}}zoomImg(img.currentSrc||img.src)}
 function homeMount(){
-  homeUnmount();const root=document.querySelector("#app .home");if(!root)return;
-  homeAC=new AbortController();const sig=homeAC.signal,on=(t,e,f)=>t&&t.addEventListener(e,f,{signal:sig});
-  /* if the motion script is missing or failed, show everything plainly: no motion styles, no countdowns (they would sit at 00) */
-  if(!(window.HomeFX&&HomeFX.info&&HomeFX.info().mounted)){
-    document.documentElement.classList.remove("fx");
-    root.querySelectorAll(".rv").forEach(e=>e.classList.add("in"));
-    root.querySelectorAll(".fxcdwrap").forEach(e=>{e.hidden=true})}
-  on(root.querySelector("#home-fab"),"click",()=>{const t=document.getElementById("home-join");if(t)t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"center"})});
-  on(root.querySelector("#home-poster"),"click",e=>openImg(e.target));
+  homeUnmount();const root=document.querySelector("#app .bhome");if(!root)return;
+  homeAC=new AbortController();const sig=homeAC.signal,on=(t,e,f,o)=>t&&t.addEventListener(e,f,Object.assign({signal:sig},o||{}));
+  const RM=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  /* sections fade in as they come into view (everything just shows if the browser can't do that) */
+  const rv=[].slice.call(root.querySelectorAll(".bh-rv"));
+  if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("bh-in");io.unobserve(e.target)}}),{threshold:.12});rv.forEach(el=>io.observe(el));sig.addEventListener("abort",()=>io.disconnect())}
+  else rv.forEach(el=>el.classList.add("bh-in"));
+  /* the two countdowns: to the meetup, and (only while registration has a deadline) to the end of registration */
+  const cd=[].slice.call(root.querySelectorAll("#bh-cd b")),rg=root.querySelector("#bh-reg"),rb=rg?[].slice.call(rg.querySelectorAll("b")):[],pad=n=>String(n).padStart(2,"0");
+  const put=(els,s)=>[Math.floor(s/86400),Math.floor(s%86400/3600),Math.floor(s%3600/60),s%60].forEach((n,i)=>{const x=pad(n);if(els[i]&&els[i].textContent!==x)els[i].textContent=x});
+  function tick(){const now=Date.now()+(+root.dataset.skew||0),t=Date.parse(root.dataset.event);
+    if(!isNaN(t))put(cd,Math.max(0,Math.floor((t-now)/1000)));
+    if(rg){const c=root.dataset.close?Date.parse(root.dataset.close):NaN;if(isNaN(c)||c<=now)rg.hidden=true;else{rg.hidden=false;put(rb,Math.floor((c-now)/1000))}}}
+  tick();const ti=setInterval(tick,1000);sig.addEventListener("abort",()=>clearInterval(ti));
+  /* tapping a picture opens it large; Esc or a tap closes it */
+  function big(src){const d=document.createElement("div");d.className="bh-lb";d.innerHTML='<img alt="">';d.firstChild.src=src;d.onclick=()=>d.remove();document.body.appendChild(d)}
+  on(document,"keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".bh-lb").forEach(x=>x.remove())});
+  sig.addEventListener("abort",()=>document.querySelectorAll(".bh-lb").forEach(x=>x.remove()));
+  root.querySelectorAll(".bh-poster img,.bh-sl img,#home-sp-img").forEach(im=>on(im,"click",()=>big(im.currentSrc||im.src)));
+  /* the photo slider: dots, swipe, and a slow auto-advance that stops on hover and when the tab is hidden */
+  const tr=root.querySelector("#bh-track"),dt=[].slice.call(root.querySelectorAll("#bh-dots button")),sl=root.querySelector("#bh-slider");let cur=0,timer=null,sw=false,x0=0;
+  function go(n){cur=(n+dt.length)%dt.length;tr.style.transform="translateX(-"+cur*100+"%)";dt.forEach((d,i)=>d.setAttribute("aria-current",String(i===cur)))}
+  function stop(){clearInterval(timer)}function play(){stop();if(!RM&&dt.length>1)timer=setInterval(()=>go(cur+1),5000)}
+  if(tr&&sl){dt.forEach((d,i)=>on(d,"click",()=>{go(i);play()}));
+    on(sl,"touchstart",e=>{x0=e.touches[0].clientX;stop()},{passive:true});
+    on(sl,"touchend",e=>{const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40){sw=true;go(cur+(d<0?1:-1))}play()},{passive:true});
+    on(sl,"click",e=>{if(sw){e.stopPropagation();e.preventDefault();sw=false}},{capture:true});
+    on(sl,"mouseenter",stop);on(sl,"mouseleave",play);on(document,"visibilitychange",()=>{document.hidden?stop():play()});play();sig.addEventListener("abort",stop)}
+  /* the floating Register button: shows after the first screen, hides while the final card or the photos are in view; tapping it scrolls to the final card */
+  const fab=root.querySelector("#home-fab"),watch=[].slice.call(root.querySelectorAll("#home-join,#moments")),vis=new Set();
+  function f(){fab.classList.toggle("bh-on",scrollY>innerHeight*.8)}
+  if(fab){if("IntersectionObserver" in window&&watch.length){const o2=new IntersectionObserver(es=>{es.forEach(e=>e.isIntersecting?vis.add(e.target):vis.delete(e.target));fab.classList.toggle("bh-off",vis.size>0)});watch.forEach(x=>o2.observe(x));sig.addEventListener("abort",()=>o2.disconnect())}
+    on(window,"scroll",f,{passive:true});f();
+    on(fab,"click",()=>{const t=document.getElementById("home-join");if(t)t.scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})})}
+  /* the optional sponsor video and poster: dropped quietly when the file is missing; the video pauses when scrolled out of view */
   const sv=root.querySelector("#home-sp-video");
-  if(sv){const gone=()=>{const f=root.querySelector("#home-sp-vfig");if(f)f.remove()};
+  if(sv){const gone=()=>{const x=root.querySelector("#home-sp-vfig");if(x)x.remove()};
     on(sv,"error",gone);if(sv.error)gone();
-    try{const io=new IntersectionObserver(es=>{if(!es[0].isIntersecting&&!sv.paused)sv.pause()},{threshold:.25});io.observe(sv);sig.addEventListener("abort",()=>io.disconnect())}catch(_){}}   /* it stops by itself when scrolled out of view */
+    try{const io=new IntersectionObserver(es=>{if(!es[0].isIntersecting&&!sv.paused)sv.pause()},{threshold:.25});io.observe(sv);sig.addEventListener("abort",()=>io.disconnect())}catch(_){}}
   const sp=root.querySelector("#home-sp-img");
-  if(sp){const gone=()=>{const f=root.querySelector("#home-sp-fig"),c=root.querySelector("#home-sp-cap");if(f)f.remove();if(c)c.remove()};
-    on(sp,"error",gone);if(sp.complete&&sp.naturalWidth===0&&sp.getAttribute("src"))setTimeout(()=>{if(sp.naturalWidth===0&&sp.complete)gone()},0);
-    on(sp,"click",()=>openImg(sp))}
+  if(sp){const gone=()=>{const x=root.querySelector("#home-sp-fig"),c=root.querySelector("#home-sp-cap");if(x)x.remove();if(c)c.remove()};
+    on(sp,"error",gone);if(sp.complete&&sp.naturalWidth===0&&sp.getAttribute("src"))setTimeout(()=>{if(sp.naturalWidth===0&&sp.complete)gone()},0)}
 }
 function vAbout(){return head("About "+esc(CONFIG.organiserName),"Coming soon")+`<div class="card"><p style="margin:0">We're putting this page together. Please check back soon.</p></div><div class="row"><button class="ghost" id="go-home">Home</button></div>`}
 function loadFlags(){return db.rpc("get_site_flags").then(r=>{S.flags=r.error?null:r.data}).catch(()=>{S.flags=null})}
@@ -1535,7 +1719,7 @@ document.addEventListener("change",e=>{const t=e.target;
     else{try{if(P.fileUrl)URL.revokeObjectURL(P.fileUrl)}catch(_){}P.file=f||null;P.fileUrl=f?URL.createObjectURL(f):null;P.err="";render()}}
   else if(t.id==="shot"){const f=t.files[0];
     if(f&&(!f.type.startsWith("image/")||f.size>25*1048576)){$("#ferr").textContent="Choose an image file (a screenshot or photo).";t.value="";S.file=null;S.fileUrl=null}else{try{if(S.fileUrl)URL.revokeObjectURL(S.fileUrl)}catch(_){}S.file=f||null;S.fileUrl=f?URL.createObjectURL(f):null;S.payErr="";render()}}});
-const HOME_GO={"hero-register":"main","go-register":"main","hero-tickets":"alt","go-tickets":"alt"};
+const HOME_GO={"bar-register":"main","hero-register":"main","go-register":"main","hero-tickets":"alt","go-tickets":"alt"};
 document.addEventListener("click",async e=>{const el=e.target.closest("button,a"),id=el?el.id:"",ds=el?el.dataset:{};
   /* Home: the main button registers (or, for a returning visitor, opens their ticket); the second one does the opposite. The ids are shared with other screens, so only on Home. */
   if(S.step==="home"&&HOME_GO[id]){if((HOME_GO[id]==="main")!==homeRet()){S.step="loading";render();load()}else openTickets("");return}

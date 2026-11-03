@@ -240,7 +240,7 @@ a.htap{display:block;position:relative;text-decoration:none;color:inherit;cursor
 .home button.hbtn.hamber{background:linear-gradient(135deg,var(--hamber),#F08A2E);color:var(--hnavy);border:0;box-shadow:0 10px 30px rgba(255,163,0,.4)}
 .home button.hbtn.ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.35)}
 .home .hnote{text-align:center;margin:18px 0 0;color:var(--hmute)}
-.hfoot .hspons{margin:14px 0 0;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:.85rem;color:var(--hmute)}.hfoot .hspons b{color:var(--hamber2)}.hfoot .hspons img{display:block;width:auto;height:64px;max-width:150px;object-fit:contain;padding:6px 10px;border-radius:12px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.hfoot .hspons{margin:14px 0 0;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:.85rem;color:var(--hmute)}.hfoot .hspons b{color:var(--hamber2)}.hfoot .hspons img{display:block;width:auto;height:92px;max-width:220px;object-fit:contain}
 .hfoot{padding:30px 0 88px;text-align:center;background:var(--hnavy);color:#C9D3EE;font-size:.9rem}.hfoot b{color:#fff}
 .home button.hfab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;width:auto;padding:13px 22px;}
 .hlb{position:fixed;inset:0;z-index:30;background:rgba(4,8,24,.92);display:grid;place-items:center;padding:16px;cursor:zoom-out}.hlb img{max-width:100%;max-height:100%;border-radius:12px}
@@ -927,13 +927,13 @@ function vHome(){
   <div class="fxbig rv" role="timer" aria-label="Countdown to the meetup"><div style="--i:0"><b>00</b><span>days</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:1"><b>00</b><span>hours</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:2"><b>00</b><span>minutes</span><i></i><em class="fxsh" style="font-style:normal"></em></div><div style="--i:3"><b>00</b><span>seconds</span><i></i><em class="fxsh" style="font-style:normal"></em></div></div>
   </div></div></section>
 
-  <footer class="hfoot"><div class="hw"><b>${O}</b> · ${E}${SPONSOR.name||SPONSOR.logo?`<div class="hspons"><span>Sponsored by${SPONSOR.name?` <b>${esc(SPONSOR.name)}</b>`:""}</span>${SPONSOR.logo?`<img src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Sponsor")} logo" width="64" height="64" onerror="this.remove()">`:""}</div>`:""}</div></footer>
+  <footer class="hfoot"><div class="hw"><b>${O}</b> · ${E}${SPONSOR.name||SPONSOR.logo?`<div class="hspons"><span>Sponsored by${SPONSOR.name?` <b>${esc(SPONSOR.name)}</b>`:""}</span>${SPONSOR.logo?`<img src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Sponsor")} logo" width="110" height="92" onerror="this.remove()">`:""}</div>`:""}</div></footer>
   <button class="big hbtn hamber hfab" id="home-fab">${ret?"View my ticket":"Register now"}</button></div>`;
 }
 /* Home behaviour: the clicks (poster zoom, the floating Register button, the optional sponsor card). The movement (reveal on scroll, countdowns,
    the floating button appearing, the count-down of the spots) is assets/home-fx.js. Torn down on every other screen. */
 let homeAC=null;
-const SPONSOR={src:"assets/sponsorfolder.jpg",name:"ABC DEFGH",logo:"assets/sponsor-logo.png"};   /* The sponsor NAME and LOGO below also show at the very bottom of Home ("Sponsored by ..."): to change them, edit name and logo here and replace assets/sponsor-logo.png. Clear name and logo (empty strings) to hide that line. The sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
+const SPONSOR={src:"assets/sponsorfolder.jpg",name:"Eagles Institute of Management",logo:"assets/sponsor-logo.png"};   /* The sponsor NAME and LOGO below also show at the very bottom of Home ("Sponsored by ..."): to change them, edit name and logo here and replace assets/sponsor-logo.png. Clear name and logo (empty strings) to hide that line. The sponsor card is always shown. Put the poster at this path (assets/sponsorfolder.jpg); until it exists only the poster part is left out. Put the sponsor's name in name to mention it. */
 function homeUnmount(){if(homeAC){homeAC.abort();homeAC=null}}
 function zoomImg(src){const d=document.createElement("div");d.className="hlb";d.innerHTML='<img alt="">';d.firstChild.src=src;d.onclick=()=>d.remove();document.body.appendChild(d);requestAnimationFrame(()=>d.classList.add("on"))}
 /* a picture opens in the motion script's lightbox (it grows out of the poster); the plain zoom is the backup */

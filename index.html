@@ -910,6 +910,12 @@ body[data-step="form"] .toast{left:16px;right:16px;transform:none;bottom:calc(10
 .fx .fhero .hw>*{animation:ffi .8s var(--ease) both}.fx .fhero .hw>*:nth-child(2){animation-delay:.1s}.fx .fhero .hw>*:nth-child(3){animation-delay:.2s}.fx .fhero .hw>*:nth-child(4){animation-delay:.3s}
 @keyframes ffi{from{opacity:0;transform:translateY(16px)}}
 </style>
+<style id="burg-home-gap">
+/* Home: the gap between the "Registration closes in" line and the next heading is half of what it was (152 px -> 76 px; phones 130 px -> 65 px) */
+.bhome section:has(#bh-reg){padding-bottom:34px}
+.bhome .bh-grand{padding-top:42px}
+@media(max-width:600px){.bhome section:has(#bh-reg){padding-bottom:23px}}
+</style>
 </head>
 <body>
 <header class="top"><div><img src="assets/burg-logo.png" alt="" width="44" height="30"><span>Mallu Articles Bengaluru</span></div></header>
@@ -1851,6 +1857,8 @@ document.addEventListener("change",e=>{const t=e.target;
 const HOME_GO={"bar-register":"main","hero-register":"main","go-register":"main","hero-tickets":"alt","go-tickets":"alt"};
 document.addEventListener("click",async e=>{const el=e.target.closest("button,a"),id=el?el.id:"",ds=el?el.dataset:{};
   /* Home: the main button registers (or, for a returning visitor, opens their ticket); the second one does the opposite. The ids are shared with other screens, so only on Home. */
+  if(S.step==="home"&&(id==="hero-register"||id==="hero-tickets")){const jt=document.getElementById("home-join");
+    if(jt){jt.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"center"});return}}
   if(S.step==="home"&&HOME_GO[id]){if((HOME_GO[id]==="main")!==homeRet()){S.step="loading";render();load()}else openTickets("");return}
   if(id==="go-home"){S.step="home";render();loadHomeStatus().then(()=>{if(S.step==="home")refreshHome()})}
   if(id==="go-about"){S.step="about";render()}

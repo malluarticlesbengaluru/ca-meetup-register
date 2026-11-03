@@ -921,47 +921,71 @@ body[data-step="form"] .toast{left:16px;right:16px;transform:none;bottom:calc(10
    inline stepper, centred title, card header with the gold tile and Lora subtitle, blush uppercase labels, 54px fields, pill banners.
    Scoped to data-step summary and pay only. Nothing here changes behaviour (no ids, functions or Supabase calls). ===== */
 /* stepper: same look as the form's .fsteps */
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps{justify-content:center;align-items:center;margin:20px 0 6px}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li{flex:none;flex-direction:row;gap:7px;font:600 .7rem/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--rose)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li+li:before{content:"";width:16px;height:1.5px;background:var(--glass-b);margin:0 8px}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li:not(:last-child):after{display:none}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps i{width:26px;height:26px;border-radius:50%;font:800 .76rem/1 var(--sans);border:1.5px solid var(--glass-b);background:transparent}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li.cur{color:var(--cream)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li.cur i,body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .steps li.done i{background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));color:var(--wine);border:0;box-shadow:none}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .steps{justify-content:center;align-items:center;margin:20px 0 6px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .steps li{flex:none;flex-direction:row;gap:7px;font:600 .7rem/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--rose)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .steps li+li:before{content:"";width:16px;height:1.5px;background:var(--glass-b);margin:0 8px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .steps li:not(:last-child):after{display:none}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .steps i{width:26px;height:26px;border-radius:50%;font:800 .76rem/1 var(--sans);border:1.5px solid var(--glass-b);background:transparent}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .steps li.cur{color:var(--cream)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .steps li.cur i,body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .steps li.done i{background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));color:var(--wine);border:0;box-shadow:none}
 /* title block */
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) h1{text-align:center;font:900 clamp(1.9rem,8.4vw,2.7rem)/1.1 var(--sans);letter-spacing:-.025em;margin:18px 0 10px;text-wrap:balance}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .sub{text-align:center;margin:0 auto 22px;max-width:34ch;font:italic 500 .98rem/1.6 var(--serif);color:var(--blush)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) h1{text-align:center;font:900 clamp(1.9rem,8.4vw,2.7rem)/1.1 var(--sans);letter-spacing:-.025em;margin:18px 0 10px;text-wrap:balance}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .sub{text-align:center;margin:0 auto 22px;max-width:34ch;font:italic 500 .98rem/1.6 var(--serif);color:var(--blush)}
 /* cards with the form's header */
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .card{border-radius:24px;padding:22px 20px;box-shadow:0 18px 40px rgba(0,0,0,.3)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch{display:flex;align-items:center;gap:14px;margin-bottom:20px;text-align:left}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch .ico{flex:none;width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));color:var(--wine);font:900 1.3rem/1 var(--sans);box-shadow:0 6px 18px rgba(233,178,76,.3)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch .ico svg{width:24px;height:24px;fill:none;stroke:var(--wine);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch h2{display:block;margin:0;font:800 1.2rem/1.2 var(--sans);color:var(--cream)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch h2:before{display:none}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .pch small{display:block;font:italic 500 .95rem/1.4 var(--serif);color:var(--blush);margin-top:2px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .card{border-radius:24px;padding:22px 20px;box-shadow:0 18px 40px rgba(0,0,0,.3)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .pch{display:flex;align-items:center;gap:14px;margin-bottom:20px;text-align:left}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .pch .ico{flex:none;width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));color:var(--wine);font:900 1.3rem/1 var(--sans);box-shadow:0 6px 18px rgba(233,178,76,.3)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .pch .ico svg{width:24px;height:24px;fill:none;stroke:var(--wine);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .pch h2{display:block;margin:0;font:800 1.2rem/1.2 var(--sans);color:var(--cream)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .pch h2:before{display:none}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .pch small{display:block;font:italic 500 .95rem/1.4 var(--serif);color:var(--blush);margin-top:2px}
 /* labels and fields */
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) label,body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .lbl{display:block;font:600 .8rem/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--blush);margin:0 0 8px}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) input[type=file]{min-height:54px;border:1.5px solid var(--glass-b);border-radius:14px;background:var(--field,rgba(26,4,12,.55));padding:10px 12px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) label,body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .lbl{display:block;font:600 .8rem/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--blush);margin:0 0 8px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) input[type=file]{min-height:54px;border:1.5px solid var(--glass-b);border-radius:14px;background:var(--field,rgba(26,4,12,.55));padding:10px 12px}
 /* Review: people list and total */
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .who{border-bottom:1px solid var(--glass-b)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .who-i{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));border:0;color:var(--wine);font:900 .95rem/1 var(--sans)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .who-n b{font-weight:800;color:var(--cream)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .tags{margin-left:46px}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .tags span{border:1px solid var(--glass-b);background:var(--glass);color:var(--cream);font:600 .78rem/1.2 var(--sans);padding:6px 12px}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .tot{background:linear-gradient(160deg,rgba(233,178,76,.16),rgba(140,24,56,.4));border-color:rgba(233,178,76,.5)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .tot b{font:800 1.05rem/1.2 var(--sans);color:var(--cream)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .tot-a{background:linear-gradient(180deg,#FBDD8E,var(--gold) 55%,var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .who{border-bottom:1px solid var(--glass-b)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .who-i{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#F3C766,var(--gold),var(--ember));border:0;color:var(--wine);font:900 .95rem/1 var(--sans)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .who-n b{font-weight:800;color:var(--cream)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .tags{margin-left:46px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .tags span{border:1px solid var(--glass-b);background:var(--glass);color:var(--cream);font:600 .78rem/1.2 var(--sans);padding:6px 12px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .tot{background:linear-gradient(160deg,rgba(233,178,76,.16),rgba(140,24,56,.4));border-color:rgba(233,178,76,.5)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .tot b{font:800 1.05rem/1.2 var(--sans);color:var(--cream)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .tot-a{background:linear-gradient(180deg,#FBDD8E,var(--gold) 55%,var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent}
 /* Pay: amount, QR, UPI line, banners */
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .amt{font-size:2.8rem}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .qr{border:8px solid #fff;border-radius:18px}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .verify{border-radius:16px;font:300 .88rem/1.5 var(--sans);padding:14px 16px}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .verify b{font-weight:800;color:var(--gold)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .upi{margin:0 0 14px}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .upi code{border-radius:12px;padding:12px 14px;font:600 .92rem var(--sans);letter-spacing:.03em}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .errbox{border-radius:16px;padding:14px 16px;font:300 .88rem/1.5 var(--sans)}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .errbox b{font-weight:800}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .row{margin-top:20px}
-body:is([data-step="summary"],[data-step="pay"]):not([data-step="home"]):not([data-step="form"]) .row>button{min-height:54px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .amt{font-size:2.8rem}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .qr{border:8px solid #fff;border-radius:18px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .verify{border-radius:16px;font:300 .88rem/1.5 var(--sans);padding:14px 16px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .verify b{font-weight:800;color:var(--gold)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .upi{margin:0 0 14px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .upi code{border-radius:12px;padding:12px 14px;font:600 .92rem var(--sans);letter-spacing:.03em}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .errbox{border-radius:16px;padding:14px 16px;font:300 .88rem/1.5 var(--sans)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .errbox b{font-weight:800}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .row{margin-top:20px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .row>button{min-height:54px}
+</style>
+<style id="burg-flow2">
+/* ===== Done, Tickets and Ticket screens, BURGUNDY (Nov 2026, Part B5). Extends Part B4 (burg-flow). The ticket picture (canvas.tk) and the ticket QR are NOT touched. ===== */
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .idcard{text-align:center}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .idcard .pch{justify-content:flex-start}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .idcard .pch+.note{display:none}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .idcard .amt{font-size:2.3rem;letter-spacing:.1em}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .seal{margin-top:22px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) input[type=text]{min-height:54px;border:1.5px solid var(--glass-b);border-radius:14px;background:rgba(26,4,12,.55);font-size:16px;padding:0 16px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .pf{min-height:54px;border:1.5px solid var(--glass-b);border-radius:14px;overflow:hidden}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .pf span{font-weight:800;color:var(--gold)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .card>b{display:block;font:800 1.05rem/1.3 var(--sans);color:var(--cream);margin-bottom:6px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .card .sw{display:flex;align-items:center;justify-content:space-between;gap:12px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .card .sw b{font:800 1.05rem/1.2 var(--sans);color:var(--cream)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .pill{font:700 .74rem/1.2 var(--sans);letter-spacing:.04em;padding:6px 12px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) ul.names{list-style:none;margin:14px 0 4px;padding:0}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) ul.names li{padding:11px 0;border-top:1px solid var(--glass-b);font:600 .95rem/1.4 var(--sans);color:var(--cream)}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) ul.names li .note{font-weight:300}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .err{color:var(--err);font:600 .86rem/1.4 var(--sans);margin-top:10px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .card input[type=text]+label,body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .card .pf+label{margin-top:18px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .card>.pill{margin-bottom:12px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) .chips{gap:8px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) button.chip{font:700 .8rem/1 var(--sans);padding:10px 14px;min-height:40px}
+body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"]):not([data-step="home"]):not([data-step="form"]) canvas.tk{border:1px solid var(--glass-b)}
 </style>
 </head>
 <body>
@@ -1435,9 +1459,9 @@ async function fbSend(){
 function vDone(){
   const r=S.result;
   return '<div class="seal" aria-hidden="true">✓</div>'+head("Registration received","Please save your Booking ID. Once the organisers confirm your payment, open Tickets, enter your Booking ID and phone number, and download your tickets.")+
-  `<div class="card idcard"><div class="note">Booking ID</div><div class="amt" style="letter-spacing:.08em">${esc(r.booking_code)}</div>
+  `<div class="card idcard"><div class="pch"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9a2 2 0 0 0 0 6v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3a2 2 0 0 1 0-6V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1z"/><path d="M13 5v14" stroke-dasharray="2 3"/></svg></span><div><h2>Your Booking ID</h2><small>Keep it somewhere safe</small></div></div><div class="note">Booking ID</div><div class="amt" style="letter-spacing:.08em">${esc(r.booking_code)}</div>
   <div class="row"><button class="ghost" id="copyid">Copy Booking ID</button></div></div>
-  <div class="card"><span class="pill p-wait">Pending verification</span>
+  <div class="card"><div class="pch"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><h2>Payment status</h2><small>We will confirm it soon</small></div></div><span class="pill p-wait">Pending verification</span>
   <p>Your payment of <b>₹${r.amount_expected}</b> is being verified. Ticket numbers are issued once the organisers confirm it.</p>
   <p class="note">Your Booking ID is saved on this device. On another device, open Tickets and enter your Booking ID and phone number.</p></div>
   ${fbCard(r)}
@@ -1501,7 +1525,7 @@ function bookingCard(d){
 function vTickets(){
   const T=S.tk,ids=savedIds();
   let h=head("Tickets","Enter your Booking ID and phone number to view your booking. Tickets can be downloaded once your payment is confirmed. We ask for your phone number to keep your booking secure.");
-  h+=`<div class="card"><label for="bq">Booking ID</label><input type="text" id="bq" value="${esc(T.q)}" maxlength="14" autocapitalize="characters" autocomplete="off" placeholder="e.g. 97FB17B2">
+  h+=`<div class="card"><div class="pch"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><div><h2>Find your booking</h2><small>Booking ID and phone number</small></div></div><label for="bq">Booking ID</label><input type="text" id="bq" value="${esc(T.q)}" maxlength="14" autocapitalize="characters" autocomplete="off" placeholder="e.g. 97FB17B2">
   <label for="tkph">Phone number used in the booking</label>${phoneBox("tkph","",T.phone)}
   <div class="row"><button id="tsearch" ${T.busy?"disabled":""}>${T.busy?"Checking…":"Check"}</button></div>${T.msg?`<div class="err" role="alert">${esc(T.msg)}</div>`:""}</div>`;
   if(ids.length)h+=`<div class="lbl">Booking IDs used on this device <span class="note">(tap to fill)</span></div><div class="chips" style="margin-bottom:14px">${ids.map(c=>`<button class="chip" data-hist="${esc(c)}">${esc(c)}</button>`).join("")}</div>`;

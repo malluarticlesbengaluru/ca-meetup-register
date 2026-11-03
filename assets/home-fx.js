@@ -153,7 +153,8 @@ function mount(){
   const finish=()=>{
     spots();
     /* press ripple on the date and venue cards (buttons get theirs from page-fx.js) */
-    on(root,"pointerdown",e=>{if(RM)return;const b=e.target.closest&&e.target.closest("a.hc");if(!b)return;
+    on(root,"pointerdown",e=>{if(RM)return;if(e.pointerType==="touch")return;   /* a finger landing on the card is usually the start of a scroll, not a tap */
+      const b=e.target.closest&&e.target.closest("a.hc");if(!b)return;
       const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2.2,s=document.createElement("span");s.className="fxr";s.setAttribute("aria-hidden","true");
       s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px;z-index:2`;b.appendChild(s);
       try{s.animate([{transform:"scale(0)",opacity:.5},{transform:"scale(1)",opacity:0}],{duration:650,easing:"ease-out"}).onfinish=()=>s.remove()}catch(_){s.remove()}setTimeout(()=>s.remove(),900)},{passive:true});

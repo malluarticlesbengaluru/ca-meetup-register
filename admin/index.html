@@ -37,7 +37,7 @@ a.lnk{display:inline-flex;align-items:center;text-decoration:none;border:1px sol
 .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:700;border:1px solid var(--line)}
 .p-paid{color:var(--ok);border-color:var(--ok)}.p-pending{color:var(--warn);border-color:var(--warn)}.p-rejected{color:var(--err);border-color:var(--err)}
 .flag{display:block;font-size:.82rem;color:var(--warn);white-space:normal;max-width:300px}
-.modal{position:fixed;inset:0;background:rgba(0,8,5,.82);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto;z-index:9}
+.modal{position:fixed;inset:0;background:rgba(0,8,5,.82);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto;z-index:24}
 .modal .box{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:var(--r);padding:14px;max-width:960px;width:100%}.modal img{max-width:100%;max-height:78vh;border-radius:12px;display:block;margin:6px auto}.two{display:flex;gap:10px;flex-wrap:wrap}.two>div{flex:1 1 300px}
 #toasts{position:fixed;left:0;right:0;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 14px;z-index:40;pointer-events:none}.toast{background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;max-width:100%;text-align:center;animation:up .15s ease-out}
 @media(max-width:560px){.stat b{font-size:1.7rem}.grid{grid-template-columns:1fr 1fr}.pie{height:200px}}
@@ -142,6 +142,13 @@ body:not(.adm) .app{grid-template-columns:minmax(0,1fr)}body:not(.adm) .rail,bod
   .bnav .badge{position:absolute;top:2px;left:calc(50% + 6px);margin:0;min-width:18px;height:18px;line-height:18px;font-size:.68rem;padding:0 5px}
   body.adm #toasts{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 }
+#desk{position:fixed;inset:0;z-index:21;background:var(--bg);display:flex;flex-direction:column}body.deskopen{overflow:hidden}
+.dk-h{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--card)}.dk-h b{flex:1}
+.dk-b{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr)}
+.dk-img{overflow:auto;background:var(--soft);display:flex;align-items:flex-start;justify-content:center;padding:12px}.dk-img img{max-width:100%;border-radius:12px;cursor:zoom-in}.dk-img img.z{max-width:none;width:170%;cursor:zoom-out}
+.dk-i{overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}.dk-amt{font:700 2rem var(--display)}.dk-i .flag{display:block;margin:2px 0}
+.dk-f{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--card)}.dk-f button{flex:1}.dk-f kbd{font:600 .72rem var(--mono);opacity:.7;margin-left:6px}
+@media(max-width:820px){.dk-b{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}.dk-i{max-height:38vh}.dk-f kbd{display:none}.dk-amt{font-size:1.5rem}}
 </style></head>
 <body><div class="app"><nav class="rail" id="rail" aria-label="Main"></nav><main><header class="tbar" id="top"></header><div class="page" id="app"></div></main></div><nav class="bnav" id="bnav" aria-label="Main"></nav><div class="more" id="more" hidden></div><div id="wbar"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
@@ -444,7 +451,7 @@ function filtBar(withPeople){
 }
 function vBookings(){const nT=S.bookings.filter(b=>b.kind==="transfer").length,B=S.bookings.filter(b=>b.kind!=="transfer"),
   c=st=>B.filter(b=>b.status===st).length,chip=(v,l,n)=>`<button class="chip ${S.f.pay===v?"on":""}" data-chip="${v}">${l} <span>${n}</span></button>`;
-  $("#v").innerHTML=`<div class="bar"><input id="q" type="search" placeholder="Search name, phone or booking ID" value="${esc(S.f.q)}" style="flex:1 1 240px"></div>
+  $("#v").innerHTML=`<div class="bar"><input id="q" type="search" placeholder="Search name, phone or booking ID" value="${esc(S.f.q)}" style="flex:1 1 240px">${c("pending")?`<button data-dk="open">Review payments (${c("pending")})</button>`:""}</div>
   <div class="chips">${chip("pending","Pending",c("pending"))}${chip("paid","Paid",c("paid"))}${chip("rejected","Rejected",c("rejected"))}${chip("","All",B.length)}
   <label class="rev"><input type="checkbox" id="frev" ${S.f.review?"checked":""}> Needs review only</label></div>`+(nT?`<p class="mute">${nT} transfer booking${nT===1?"":"s"} not shown here: they have no payment screenshot and are handled in the Transfers tab.</p>`:"")+`<div id="tbl"></div>`;tBookings()}
 function amtRemark(b,s){if(!s)return"";if(!s.amounts)return'<div class="mute">Amount: re-scan to check</div>';
@@ -484,6 +491,42 @@ function csv(){const r=filteredPeople(),h=["Ticket No.","Type","Name","Phone","L
   const rows=r.map(p=>[tlabel(p),p.kind==="coordinator"?"Coordinator":"Guest",p.name,p.phone,p.location,p.occupation,p.occupation_detail,p.food,p.b.booking_code,p.b.status,p.b.amount_expected,p.checked_in_at?"Yes":"No",p.checked_in_at||"",...(S.showMoved?[p.transferred_out_at?"Yes":"No"]:[])]);
   const txt="\ufeff"+[h].concat(rows).map(x=>x.map(q).join(",")).join("\r\n"),a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([txt],{type:"text/csv;charset=utf-8"}));a.download="meetup-registrations.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+/* ---------- payment review desk: one booking at a time, screenshot beside the details, Paid / Reject moves straight to the next ---------- */
+const DK={urls:{}};
+const deskQueue=()=>S.bookings.filter(b=>b.kind!=="transfer"&&b.status==="pending").sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).map(b=>b.id);
+async function deskUrl(b){if(!b||!b.screenshot_path)return null;const c=DK.urls[b.screenshot_path];if(c&&c.t>Date.now()-240000)return c.u;
+  const{data,error}=await db.storage.from("payment-proofs").createSignedUrl(b.screenshot_path,300);if(error)return null;DK.urls[b.screenshot_path]={u:data.signedUrl,t:Date.now()};return data.signedUrl}
+function openDesk(startId){const q=deskQueue();if(!q.length)return toast("Nothing is waiting for review");
+  S.desk={ids:q,i:Math.max(0,q.indexOf(startId)),done:0,busy:false,pushed:false};document.body.classList.add("deskopen");
+  try{history.pushState({...(history.state||{}),desk:1},"");S.desk.pushed=true}catch(_){}renderDesk()}
+function closeDesk(fromPop){const D=S.desk;S.desk=null;document.body.classList.remove("deskopen");const d=document.getElementById("desk");if(d)d.remove();
+  if(D&&D.pushed&&!fromPop){try{history.back()}catch(_){}}}
+function renderDesk(){const D=S.desk;if(!D)return;
+  D.ids=D.ids.filter(id=>bk(id).status==="pending");if(D.i>=D.ids.length)D.i=0;
+  if(!D.ids.length){const n=D.done;closeDesk();return toast(n?"All caught up. "+n+" reviewed.":"Nothing is waiting for review",4000)}
+  let el=document.getElementById("desk");if(!el){el=document.createElement("div");el.id="desk";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","Review payments");document.body.appendChild(el)}
+  const id=D.ids[D.i],b=bk(id),ts=S.tickets.filter(t=>t.booking_id===id),fl=flags()[id]||[];
+  el.innerHTML=`<div class="dk-h"><b>Review payments</b><span class="mute">${D.i+1} of ${D.ids.length} waiting${D.done?" · "+D.done+" done":""}</span><button class="ghost sm" data-dk="close">Close</button></div>
+  <div class="dk-b"><div class="dk-img" id="dkimg"><div class="mute">Loading screenshot…</div></div>
+  <div class="dk-i"><div class="dk-amt">${inr(b.amount_expected)}</div><div><b>${esc(b.booking_code)}</b> <span class="mute">${new Date(b.created_at).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</span></div>
+  <div>${ts.map(t=>`<div><span class="mute">${esc(tlabel(t))}</span> ${esc(t.name)} · <a href="tel:${esc(t.phone)}">${esc(t.phone)}</a></div>`).join("")}</div>
+  <div><span class="mute">Payment ID read</span><br>${idRead(id)}</div>
+  ${fl.length?`<div>${fl.map(x=>`<span class="flag">⚑ ${esc(x)}</span>`).join("")}<button class="ghost sm" data-shot="${esc(id)}">Compare with matching screenshots</button></div>`:""}</div></div>
+  <div class="dk-f"><button class="ghost" data-dk="prev" ${D.ids.length>1?"":"disabled"}>‹ Back <kbd>←</kbd></button><button class="ghost" data-dk="skip" ${D.ids.length>1?"":"disabled"}>Skip <kbd>→</kbd></button><button class="bad" data-dk="reject">Reject <kbd>R</kbd></button><button data-dk="paid">Paid <kbd>P</kbd></button></div>`;
+  deskUrl(b).then(u=>{if(S.desk!==D||D.ids[D.i]!==id)return;const box=document.getElementById("dkimg");if(!box)return;
+    box.innerHTML=u?`<img src="${u}" alt="Payment screenshot ${esc(b.booking_code)}">`:'<p class="err">Could not open the screenshot.</p>'});
+  if(D.ids.length>1)deskUrl(bk(D.ids[(D.i+1)%D.ids.length]))}   // the next one is fetched while this one is being checked
+async function deskAct(kind){const D=S.desk;if(!D||D.busy)return;
+  if(kind==="close")return closeDesk();
+  if(kind==="skip"||kind==="prev"){const n=D.ids.length;if(n>1){D.i=(D.i+(kind==="skip"?1:n-1))%n;renderDesk()}return}
+  D.busy=true;
+  try{const id=D.ids[D.i];
+    if(kind==="reject"&&!await ask({title:"Reject this payment?",text:bk(id).booking_code+" will be marked rejected.",ok:"Reject",danger:true}))return;
+    if(S.desk!==D)return;
+    const r=await db.rpc("set_booking_status",{p_booking:id,p_status:kind==="paid"?"paid":"rejected"});if(r.error)return toast("Failed: "+r.error.message);
+    await sync("core","reg","ip");if(S.desk!==D)return;D.done++;D.ids.splice(D.i,1);if(D.i>=D.ids.length)D.i=0;
+    toast(kind==="paid"?"Marked paid. Ticket numbers given.":"Marked rejected");view({keepForm:true});renderDesk()}
+  finally{D.busy=false}}
 async function shots(items){
   const m=document.createElement("div");m.className="modal";m.innerHTML=`<div class="box"><div class="bar"><b style="flex:1">Payment screenshot</b><button class="sm" id="mx">Close</button></div><div class="two" id="mi">Loading…</div></div>`;document.body.appendChild(m);
   m.onclick=e=>{if(e.target===m||e.target.id==="mx")m.remove()};
@@ -1015,7 +1058,7 @@ function gotoTab(tab,type,id){const who=type==="person"?people().find(x=>x.id===
   nav({tab,sheets:[]});
   const el=type==="person"||type==="booking"?document.querySelector(`[data-${type==="person"?"pid":"bid"}="${id}"]`):null;
   if(el){el.scrollIntoView({block:"center"});el.classList.add("flash")}}
-window.addEventListener("popstate",e=>{if(S.dlgSkip){const f=S.dlgSkip;S.dlgSkip=null;f();return}if(S.dlg){const f=S.dlg;S.dlg=null;f(false,true);return}
+window.addEventListener("popstate",e=>{if(S.dlgSkip){const f=S.dlgSkip;S.dlgSkip=null;f();return}if(S.dlg){const f=S.dlg;S.dlg=null;f(false,true);return}if(S.desk){closeDesk(true);return}
   const st=e.state;if(!S.staff||!st||!st.tab)return;
   const tabChanged=st.tab!==S.tab;S.sheets=(st.sheets||[]).slice();S.tab=st.tab;
   if(tabChanged){view();window.scrollTo(0,st.y||0)}else renderSheet()});
@@ -1091,6 +1134,8 @@ function renderSheet(){
   m.innerHTML=`<div class="sheet${again?" still":""}" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><div class="sh-h">${S.sheets.length>1?'<button class="ghost sm" data-sback="1">‹ Back</button>':""}<h2>${esc(c.title)}</h2><button class="ghost sm" data-sback="1" aria-label="Close">✕</button></div>${c.html}${c.tab?`<p class="sh-f"><button data-gotab="${c.tab[0]}:${c.tab[2]}:${esc(c.tab[3])}">${c.tab[1]}</button></p>`:""}</div>`;
   const sh=m.firstChild;sh.scrollTop=keepY;S.shk=sk}
 document.addEventListener("keydown",e=>{
+  if(S.desk&&!S.dlg&&!document.querySelector(".modal")&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target&&e.target.tagName)||"")&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
+    const k=e.key.toLowerCase(),m={p:"paid",r:"reject",arrowright:"skip",s:"skip",arrowleft:"prev",escape:"close"}[k];if(m){e.preventDefault();deskAct(m);return}}
   if(e.key==="/"&&S.staff&&S.staff.role==="admin"&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target&&e.target.tagName)||"")&&!S.dlg){e.preventDefault();const g=$("#gtop");if(g)g.focus();return}
   if(e.key==="Escape"&&e.target&&e.target.id==="gtop"){e.target.value="";S.gq="";hideS();e.target.blur();return}
   if(e.key==="Escape"&&S.sheets.length)history.back();if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches('[role=button][data-sheet]')){e.preventDefault();const[k,i]=sp(e.target.dataset.sheet,2);openSheet(k,i)}});
@@ -1121,6 +1166,8 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
   if(id==="csv")return csv();
   if(t.dataset.jump){document.getElementById(t.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(t.dataset.chip!==undefined){S.f.pay=t.dataset.chip;vBookings();return}
+  if(t.matches&&t.matches('#dkimg img')){t.classList.toggle('z');return}
+  if(t.dataset.dk){return t.dataset.dk==='open'?openDesk():deskAct(t.dataset.dk)}
   if(t.dataset.shot){const b=bk(t.dataset.shot),F=flags()[b.id]||[],items=[{path:b.screenshot_path,label:b.booking_code}];
     S.scans.filter(s=>s.booking_id!==b.id).forEach(s=>{const o=bk(s.booking_id);if(F.some(x=>x.includes(o.booking_code)))items.push({path:o.screenshot_path,label:o.booking_code+" (flagged match)"})});return shots(items)}
   if(t.dataset.st){const r=await db.rpc("set_booking_status",{p_booking:t.dataset.b,p_status:t.dataset.st});if(r.error)return toast("Failed: "+r.error.message);await sync("core","reg","ip");view();return toast("Marked "+t.dataset.st+(t.dataset.st==="paid"?". Ticket numbers given.":""))}
@@ -1163,7 +1210,7 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
     if(r.error)return toast("Failed: "+r.error.message);await sync("core","reg","log");view({keepForm:true});toast("Settings saved")}
 }
 document.addEventListener("click",async e=>{
-  const b=e.target.closest&&e.target.closest("button"),quick=!b||b.matches(".lk,.chip,.tg,[data-tab],.nav,#theme,#morebtn,[data-sheet],[data-sback],[data-jump],[data-gotab],[data-medit],[data-muse],[data-act],[data-pick],[data-dlg],#camtoggle");
+  const b=e.target.closest&&e.target.closest("button"),quick=!b||b.matches(".lk,.chip,.tg,[data-tab],.nav,#theme,#morebtn,[data-sheet],[data-sback],[data-jump],[data-gotab],[data-medit],[data-muse],[data-act],[data-pick],[data-dlg],[data-dk],#camtoggle");
   if(!quick&&b.dataset.run)return;   // this button is still working on the last tap
   if(!quick)b.dataset.run="1";
   try{await onClick(e)}catch(err){toast("Something went wrong: "+String((err&&err.message)||err).slice(0,120),6000)}
@@ -1183,7 +1230,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.target.id==="pw"|
 const dataSig=()=>JSON.stringify([S.bookings,S.tickets,S.scans,S.settings,S.transfers,S.buyers,S.fb,S.msgs,S.tm,S.pz,S.pzh,S.log,S.alert,S.ipf,S.money]);
 let hiddenAt=0;
 async function autoRefresh(){
-  if(!S.staff||S.staff.role!=="admin"||S.tab==="gate"||S.scanning||S.busy||S.refreshing||S.dlg||document.visibilityState!=="visible")return;
+  if(!S.staff||S.staff.role!=="admin"||S.tab==="gate"||S.scanning||S.busy||S.refreshing||S.dlg||S.desk||document.visibilityState!=="visible")return;
   S.refreshing=true;S.quiet=true;
   try{const m0=S.msg,before=dataSig(),ok=await sync();
     if(!ok){S.msg=m0;return}

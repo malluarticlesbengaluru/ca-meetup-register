@@ -75,7 +75,7 @@ def opn(p, d, tab=None, w=1300, h=900):
     pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'relation' not in m.text else None)
     pg.route('**/*', lambda r: (r.fulfill(body=HTML, content_type='text/html') if r.request.url.endswith('/admin/test.html')
         else r.fulfill(body='/*stub*/', content_type='text/javascript') if r.request.url.endswith('.js') or '/npm/' in r.request.url else r.fulfill(status=204, body='')))
-    pg.add_init_script('window.__DB=' + json.dumps(d) + ';'); pg.add_init_script(MOCK); pg.add_init_script(CH); pg.add_init_script(STATEFUL)
+    pg.add_init_script('window.__DB=' + json.dumps(d) + ';'); pg.add_init_script(MOCK); pg.add_init_script(CH); pg.add_init_script(STATEFUL); pg.add_init_script(DLG_BOT)
     pg.goto('https://example.test/admin/test.html'); pg.wait_for_selector('.tabs')
     if tab: pg.click(f'button[data-tab="{tab}"]'); pg.wait_for_timeout(100)
     return b, pg, errs
@@ -83,7 +83,7 @@ def calls(pg, name=None): return [x for x in pg.evaluate('window.__CALLS||[]') i
 def tm(pg): return pg.evaluate('window.__M.tm')
 def pz(pg): return pg.evaluate('window.__M.pz')
 def lt(pg): return pg.evaluate("(()=>{const t=document.querySelectorAll('.toast');return t.length?t[t.length-1].textContent:''})()")
-def accept(pg): pg.once('dialog', lambda dlg: dlg.accept())
+def accept(pg): auto(pg)
 def counts(pm): 
     c = {}; [c.__setitem__(v, c.get(v, 0) + 1) for v in pm.values()]; return c
 
@@ -97,7 +97,7 @@ with sync_playwright() as p:
     b, pg, errs = opn(p, mdb(T, B), 'messages'); t = pg.inner_text('#v')
     check('2.1 Messages tab appears, with the three messages and 0 people each', pg.query_selector('button[data-tab="messages"]') and 'Tiger' in t and 'Elephant' in t and 'Lion' in t and t.count('0 people') >= 3, t[:300])
     check('2.2 banner says messages are HIDDEN while the switch is off', 'HIDDEN' in t and 'Show messages on tickets' in t)
-    pg.once('dialog', lambda dlg: dlg.dismiss()); pg.click('#mtoggle'); pg.wait_for_timeout(150)
+    auto(pg, False); pg.click('#mtoggle'); pg.wait_for_timeout(350)
     check('2.3 Show: asks first; Cancel changes nothing', not calls(pg, 'admin_set_show_messages'))
     accept(pg); pg.click('#mtoggle'); pg.wait_for_timeout(250)
     check('2.4 Show: after OK the database function gets p_show = true', calls(pg, 'admin_set_show_messages')[-1]['args'] == {'p_show': True}, calls(pg))
@@ -164,7 +164,7 @@ with sync_playwright() as p:
     # replacing existing messages must warn
     b, pg, errs = opn(p, mdb(T, B, assigned=first10), 'messages'); pg.click('#mshuf'); pg.wait_for_timeout(100)
     check('5.9 a full reshuffle over people who already have messages warns that some will be replaced', 'will be replaced' in pg.inner_text('.plan') or 'already have a different' in pg.inner_text('.plan'), pg.inner_text('.plan')[:200])
-    msg = []; pg.once('dialog', lambda dlg: (msg.append(dlg.message), dlg.dismiss())); pg.click('#mplansave'); pg.wait_for_timeout(150)
+    auto(pg, False); pg.click('#mplansave'); pg.wait_for_timeout(350); msg = dlg_msgs(pg)
     check('5.10 the Save question also says so, and Cancel saves nothing', msg and 'replaced' in msg[0] and not calls(pg, 'admin_assign_messages'), msg)
     pg.click('#mplancancel'); check('5.11 Cancel closes the preview', pg.query_selector('.plan') is None); b.close()
     # use only some of the messages
@@ -182,7 +182,7 @@ with sync_playwright() as p:
     pg.select_option('#mscope', 'paid'); accept(pg); pg.click('#mclrall'); pg.wait_for_timeout(350)
     check('6.5 "From everyone" clears all and sends no filters', tm(pg) == {} and calls(pg, 'admin_clear_messages')[-1]['args'] == {'p_message': None, 'p_tickets': None})
     check('6.6 ... and the messages themselves are still there', 'Tiger' in pg.inner_text('#v') and 'Lion' in pg.inner_text('#v'))
-    dl = []; pg.once('dialog', lambda dlg: (dl.append(dlg.message), dlg.accept())); pg.click('[data-mdel="m3"]'); pg.wait_for_timeout(350)
+    dlg_msgs(pg); auto(pg); pg.click('[data-mdel="m3"]'); pg.wait_for_timeout(500); dl = dlg_msgs(pg)
     check('6.7 Delete asks first, then removes the message', dl and 'Lion' in dl[0] and 'Lion' not in pg.inner_text('#v').split('Who has what')[0] and calls(pg, 'admin_delete_message')[-1]['args'] == {'p_id': 'm3'}, dl)
     pg.select_option('#mgive', 'm1'); pg.select_option('#mscope', 'present'); b.close()
     b, pg, errs = opn(p, mdb(Tp, Bp, assigned={f't{n}': 'm1' for n in range(1, 31)}), 'messages'); pg.select_option('#mscope', 'present'); accept(pg); pg.click('#mclrgrp'); pg.wait_for_timeout(350)
@@ -292,7 +292,7 @@ with sync_playwright() as p:
     # winner replaced warning; "take every prize away"
     b, pg, errs = opn(p, mdb(T, B, prizes={'t1': 'old prize', 't2': 'old prize'}), 'messages'); pg.uncheck('#lex'); pg.fill('#lbody', 'new'); pg.fill('#ln', '30'); pg.dispatch_event('#ln', 'change'); pg.wait_for_timeout(100); pg.click('#ldraw'); pg.wait_for_timeout(100)
     check('13.27 the preview warns when some winners already have a prize', 'already has a message line' in pg.inner_text('.plan'))
-    msg = []; pg.once('dialog', lambda dlg: (msg.append(dlg.message), dlg.dismiss())); pg.click('#lsave'); pg.wait_for_timeout(150)
+    auto(pg, False); pg.click('#lsave'); pg.wait_for_timeout(350); msg = dlg_msgs(pg)
     check('13.28 the Save question says the old prize will be replaced, and Cancel saves nothing', msg and 'replaced' in msg[0] and not calls(pg, 'admin_set_prizes'), msg)
     pg.click('#lcancel'); accept(pg); pg.click('#pzclr'); pg.wait_for_timeout(350)
     check('13.29 "Take every prize away" clears all and does not touch team messages', pz(pg) == {} and calls(pg, 'admin_clear_prizes')[-1]['args'] == {'p_tickets': None}); b.close()
@@ -304,7 +304,7 @@ with sync_playwright() as p:
     check('13.40 the heading box exists, is empty, allows 60 characters, and says what happens when left empty', pg.input_value('#lhead') == '' and pg.get_attribute('#lhead', 'maxlength') == '60' and 'You are a winner!' in pg.inner_text('#v'))
     pg.fill('#lbody', 'Find the organiser'); pg.fill('#lhead', '  Secret mission  '); pg.click('#ldraw'); pg.wait_for_timeout(100); pg.click('#ldrawagain'); pg.wait_for_timeout(100)
     check('13.41 a typed heading survives re-drawing the card', pg.input_value('#lhead') == '  Secret mission  ')
-    msg = []; pg.once('dialog', lambda dlg: (msg.append(dlg.message), dlg.accept())); pg.click('#lsave'); pg.wait_for_timeout(350); c = calls(pg, 'admin_set_prizes')[-1]['args']
+    auto(pg); pg.click('#lsave'); pg.wait_for_timeout(500); msg = dlg_msgs(pg); c = calls(pg, 'admin_set_prizes')[-1]['args']
     check('13.42 Save sends the trimmed heading as p_heading, and the Save question names the heading', c['p_heading'] == 'Secret mission' and c['p_body'] == 'Find the organiser' and msg and 'Secret mission' in msg[0], (c, msg))
     check('13.43 the "Picked so far" list shows the heading above the line', 'Secret mission' in pg.inner_text('#v') and 'Find the organiser' in pg.inner_text('#v'))
     wid = list(pz(pg))[0]; pg.evaluate(f"openSheet('person','{wid}')"); pg.wait_for_timeout(100)

@@ -43,7 +43,7 @@ a.lnk{display:inline-flex;align-items:center;text-decoration:none;border:1px sol
 .flag{display:block;font-size:.82rem;color:var(--warn);white-space:normal;max-width:300px}
 .modal{position:fixed;inset:0;background:rgba(0,8,5,.82);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto;z-index:9}
 .modal .box{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:var(--r);padding:14px;max-width:960px;width:100%}.modal img{max-width:100%;max-height:78vh;border-radius:12px;display:block;margin:6px auto}.two{display:flex;gap:10px;flex-wrap:wrap}.two>div{flex:1 1 300px}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;z-index:10;font-weight:700}
+#toasts{position:fixed;left:0;right:0;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 14px;z-index:40;pointer-events:none}.toast{background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;max-width:100%;text-align:center;animation:up .15s ease-out}
 @media(max-width:560px){main{padding:12px 12px 60px}.tabs{margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px}.stat b{font-size:1.7rem}.grid{grid-template-columns:1fr 1fr}.pie{height:200px}}
 .chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 12px}.chip{background:transparent;color:var(--ink);border-color:var(--line);border-radius:999px;min-height:40px;padding:8px 14px}.chip span{display:inline-block;min-width:1.5em;margin-left:4px;padding:0 6px;border-radius:999px;background:var(--card2);color:var(--mute);font-size:.82rem;text-align:center}.chip.on{background:var(--brand);color:var(--on);border-color:var(--brand)}.chip.on span{background:rgba(3,21,14,.18);color:var(--on)}.chips .rev{margin:0 0 0 auto;display:flex;align-items:center;gap:8px;font-weight:600}
 .bks{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}.bk{margin:0;display:flex;flex-direction:column;gap:10px}.bk.st-pending{border-top-color:var(--warn)}.bk.st-paid{border-top-color:var(--ok)}.bk.st-rejected{border-top-color:var(--err)}
@@ -87,8 +87,18 @@ body.shopen{overflow:hidden}.sheet-bg{position:fixed;inset:0;background:rgba(0,8
 .ov button{background:#fff;color:#111;border-color:#fff;min-width:220px;margin-top:12px;font-size:1.05rem;padding:14px 18px}.ov button.line{background:transparent;color:#fff;border-color:#fff}.ov img{max-width:100%;max-height:50vh;border-radius:10px;margin-top:10px}
 @media(prefers-reduced-motion:reduce){.sheet{animation:none}.flash{animation:none;box-shadow:0 0 0 3px var(--accent)}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+#wbar{position:fixed;left:0;top:0;height:3px;width:100%;z-index:50;pointer-events:none;opacity:0;transition:opacity .2s .15s;background:linear-gradient(90deg,transparent,var(--accent),var(--brand),transparent) -50% 0/50% 100% no-repeat}
+body.working #wbar{opacity:1;animation:wbar 1s linear infinite}@keyframes wbar{to{background-position:150% 0}}
+body.working button[data-run]{opacity:.55;pointer-events:none}
+.sheet.still{animation:none}
+.dlg-bg{position:fixed;inset:0;background:rgba(0,8,5,.78);z-index:25;display:flex;align-items:center;justify-content:center;padding:16px}
+.dlg{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:var(--r);padding:16px;width:100%;max-width:440px;max-height:90vh;overflow:auto;animation:up .15s ease-out}.dlg.danger{border-top-color:var(--err)}
+.dlg h2{margin:0 0 8px;font-size:1.15rem}.dlg-t{white-space:pre-line;word-break:break-word}.dlg input{width:100%;margin-top:12px}
+.dlg-a{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}.dlg-a button{flex:1 1 130px}
+@media(max-width:560px){.dlg-bg{align-items:flex-end;padding:0}.dlg{max-width:none;border-radius:20px 20px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
+@media(prefers-reduced-motion:reduce){.dlg,.toast{animation:none}body.working #wbar{animation:none}}
 </style></head>
-<body><header class="top"><div><img src="../assets/logo-mark.png" alt="" width="41" height="28"><span>Mallu Articles Bengaluru</span><small>Organiser</small></div></header><div class="kasavu"></div><main id="app"></main>
+<body><header class="top"><div><img src="../assets/logo-mark.png" alt="" width="41" height="28"><span>Mallu Articles Bengaluru</span><small>Organiser</small></div></header><div class="kasavu"></div><div id="wbar"></div><main id="app"></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.js"></script>
 <script>
@@ -99,7 +109,55 @@ const $=s=>document.querySelector(s),esc=t=>String(t??"").replace(/[&<>"']/g,c=>
 const pad=n=>String(n).padStart(3,"0"),inr=n=>"₹"+Number(n||0).toLocaleString("en-IN");
 const S={staff:null,tab:"overview",bookings:[],tickets:[],scans:[],settings:null,mode:"both",f:{q:"",food:"",loc:"",role:"",pay:"",type:"",review:false,here:""},msg:"",charts:[],scanning:false,alert:null,log:[],payOpen:false,
   emails:{},emailsOk:false,fb:[],fbOk:false,transfers:[],buyers:[],tReady:false,money:null,ipf:null,showMoved:false};
-function toast(t,ms){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),ms||2400)}
+function toast(t,ms){let c=document.getElementById("toasts");if(!c){c=document.createElement("div");c.id="toasts";c.setAttribute("role","status");c.setAttribute("aria-live","polite");document.body.appendChild(c)}
+  const d=document.createElement("div");d.className="toast";d.textContent=t;c.appendChild(d);setTimeout(()=>d.remove(),ms||2400)}
+Object.assign(S,{dlg:null,dlgSkip:null,rt:null,shk:null,refreshing:false,quiet:false});
+
+/* ---------- progress: a thin bar at the top and a guard against double taps while the database is working ---------- */
+let inflight=0;
+const track=async p=>{if(S.quiet)return p;inflight++;document.body.classList.add("working");try{return await p}finally{inflight--;if(!inflight)document.body.classList.remove("working")}};
+{const rawRpc=db.rpc.bind(db);db.rpc=(...a)=>track(rawRpc(...a))}
+
+/* ---------- in-app dialogs (replace the browser's own confirm and prompt boxes) ----------
+   ask({title,text,ok,cancel,danger,input}) resolves true/false, or with the typed text / null when it has an input.
+   Enter confirms, Escape or a tap outside cancels, and the phone's back gesture cancels the dialog instead of leaving the screen behind it. */
+function ask(o){
+  o=o||{};
+  return new Promise(res=>{
+    const prev=document.activeElement,bg=document.createElement("div"),box=document.createElement("div"),inp=o.input?document.createElement("input"):null;
+    bg.className="dlg-bg";box.className="dlg"+(o.danger?" danger":"");box.setAttribute("role","alertdialog");box.setAttribute("aria-modal","true");box.setAttribute("aria-labelledby","dlgt");
+    const h=document.createElement("h2");h.id="dlgt";h.textContent=o.title||(o.input?"Please type":"Please confirm");box.appendChild(h);
+    if(o.text){const p=document.createElement("div");p.className="dlg-t";p.textContent=o.text;box.appendChild(p)}
+    if(inp){const i=o.input;inp.type=i.type||"text";inp.value=i.value||"";if(i.placeholder)inp.placeholder=i.placeholder;if(i.min!=null)inp.min=i.min;if(i.max!=null)inp.max=i.max;if(i.maxLength)inp.maxLength=i.maxLength;inp.autocomplete="off";inp.setAttribute("aria-label",o.title||"Answer");box.appendChild(inp)}
+    const act=document.createElement("div"),no=document.createElement("button"),yes=document.createElement("button");act.className="dlg-a";
+    no.className="ghost";no.dataset.dlg="no";no.textContent=o.cancel||"Cancel";yes.dataset.dlg="yes";yes.textContent=o.ok||"OK";if(o.danger)yes.className="bad";
+    act.append(no,yes);box.appendChild(act);bg.appendChild(box);document.body.appendChild(bg);
+    let done=false,pushed=false;
+    try{history.pushState({...(history.state||{}),dlg:1},"");pushed=true}catch(_){}
+    const close=(ok,fromPop)=>{
+      if(done)return;done=true;S.dlg=null;document.removeEventListener("keydown",key,true);bg.remove();
+      try{prev&&prev.isConnected&&prev.focus&&prev.focus({preventScroll:true})}catch(_){}
+      const v=ok?(inp?inp.value:true):(inp?null:false);
+      if(pushed&&!fromPop){   /* remove the history step the dialog added, and only then continue, so the next screen change does not clash with it */
+        let fired=false;const go=()=>{if(!fired){fired=true;res(v)}};S.dlgSkip=go;
+        try{history.back()}catch(_){S.dlgSkip=null;go()}
+        setTimeout(()=>{if(S.dlgSkip===go){S.dlgSkip=null;go()}},500)}
+      else res(v)};
+    const key=e=>{
+      if(e.key==="Escape"){e.preventDefault();e.stopPropagation();close(false)}
+      else if(e.key==="Enter"&&e.target!==no){e.preventDefault();e.stopPropagation();close(true)}
+      else if(e.key==="Tab"){const f=[...box.querySelectorAll("input,button")].filter(x=>!x.disabled),i=f.indexOf(document.activeElement);
+        if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus()}}};
+    document.addEventListener("keydown",key,true);S.dlg=close;
+    bg.addEventListener("click",e=>{e.stopPropagation();const b=e.target.closest&&e.target.closest("[data-dlg]");if(b)close(b.dataset.dlg==="yes");else if(e.target===bg)close(false)});
+    (inp||(o.danger?no:yes)).focus();if(inp)inp.select();
+  })}
+/* yes("Question?\n\nMore words") shows "Question?" as the title when the first line is short, and the rest as the text */
+const yes=(text,o)=>{o=o||{};let title=o.title,body=text;
+  if(title&&text.split("\n")[0].trim()===title)body=text.split("\n").slice(1).join("\n").trim();   // do not say the same question twice
+  if(!title){const i=text.indexOf("\n"),first=(i<0?text:text.slice(0,i)).trim();if(first.length<=80&&/\?$/.test(first)){title=first;body=i<0?"":text.slice(i).trim()}}
+  return ask({title,text:body,danger:/cannot be undone/i.test(text),...o})};
+
 
 /* ---------- boot / auth ---------- */
 async function boot(){
@@ -112,26 +170,33 @@ async function boot(){
   try{history.replaceState({tab:S.tab,sheets:[],y:0},"")}catch(_){}
   view();
 }
-async function load(){
-  const[b,t,sc,st]=await Promise.all([db.from("bookings").select("*").order("created_at"),db.from("tickets").select("*").order("reg_seq"),db.from("screenshot_scans").select("*"),db.from("settings").select("*").eq("id",1).single()]);
-  const e=b.error||t.error||sc.error||st.error;if(e){S.msg="Could not load data: "+e.message;return}
-  S.bookings=b.data;S.tickets=t.data;S.scans=sc.data;S.settings=st.data;
-  try{const r=await db.rpc("admin_registration_status");S.reg=r.error?null:r.data}catch(_){S.reg=null}
-  try{const r=await db.rpc("admin_payment_alert");S.alert=r.error?null:r.data}catch(_){S.alert=null}
-  try{const r=await db.from("settings_log").select("*").order("id",{ascending:false}).limit(200);S.log=r.error?[]:r.data}catch(_){S.log=[]}
+/* Data is read in named parts, all at once. After an action only the parts it can have changed are read again, for example sync("core","log").
+   sync() with no names reads everything. Parts: core (bookings, tickets, scans, settings), reg, alert, log, emails, fb, tr (transfers), ip, msg, pz. */
+const G={
+  core:async()=>{try{const[b,t,sc,st]=await Promise.all([db.from("bookings").select("*").order("created_at"),db.from("tickets").select("*").order("reg_seq"),db.from("screenshot_scans").select("*"),db.from("settings").select("*").eq("id",1).single()]);
+    const e=b.error||t.error||sc.error||st.error;if(e){S.msg="Could not load data: "+e.message;return false}
+    if(/^Could not load data/.test(S.msg||""))S.msg="";
+    S.bookings=b.data;S.tickets=t.data;S.scans=sc.data;S.settings=st.data;return true}catch(e){S.msg="Could not load data: "+((e&&e.message)||"network problem");return false}},
+  reg:async()=>{try{const r=await db.rpc("admin_registration_status");S.reg=r.error?null:r.data}catch(_){S.reg=null}},
+  alert:async()=>{try{const r=await db.rpc("admin_payment_alert");S.alert=r.error?null:r.data}catch(_){S.alert=null}},
+  log:async()=>{try{const r=await db.from("settings_log").select("*").order("id",{ascending:false}).limit(200);S.log=r.error?[]:r.data}catch(_){S.log=[]}},
   /* emails live in their own admin-only table; transfers and IP flags exist only after the Release 2 database update */
-  try{const r=await db.from("ticket_emails").select("ticket_id,email");S.emailsOk=!r.error;S.emails=r.error?{}:Object.fromEntries(r.data.map(x=>[x.ticket_id,x.email]))}catch(_){S.emailsOk=false;S.emails={}}
-  try{const r=await db.from("booking_feedback").select("booking_id,rating,comment,created_at,updated_at").order("updated_at",{ascending:false});S.fbOk=!r.error;S.fb=r.error?[]:r.data}catch(_){S.fbOk=false;S.fb=[]}
-  try{const[x,y]=await Promise.all([db.from("transfers").select("*").order("created_at",{ascending:false}),db.from("transfer_buyers").select("*")]);
+  emails:async()=>{try{const r=await db.from("ticket_emails").select("ticket_id,email");S.emailsOk=!r.error;S.emails=r.error?{}:Object.fromEntries(r.data.map(x=>[x.ticket_id,x.email]))}catch(_){S.emailsOk=false;S.emails={}}},
+  fb:async()=>{try{const r=await db.from("booking_feedback").select("booking_id,rating,comment,created_at,updated_at").order("updated_at",{ascending:false});S.fbOk=!r.error;S.fb=r.error?[]:r.data}catch(_){S.fbOk=false;S.fb=[]}},
+  tr:async()=>{try{const[x,y]=await Promise.all([db.from("transfers").select("*").order("created_at",{ascending:false}),db.from("transfer_buyers").select("*")]);
     S.tReady=!x.error&&!y.error;S.transfers=x.error?[]:x.data;S.buyers=y.error?[]:y.data;S.money=null;
-    if(S.tReady){const m=await db.rpc("admin_transfer_money");S.money=m.error?null:m.data}}catch(_){S.tReady=false;S.transfers=[];S.buyers=[]}
-  try{const r=await db.rpc("admin_ip_flags");S.ipf=r.error?null:r.data}catch(_){S.ipf=null}
+    if(S.tReady){const m=await db.rpc("admin_transfer_money");S.money=m.error?null:m.data}}catch(_){S.tReady=false;S.transfers=[];S.buyers=[]}},
+  ip:async()=>{try{const r=await db.rpc("admin_ip_flags");S.ipf=r.error?null:r.data}catch(_){S.ipf=null}},
   /* messages exist only after sql/r2_13 has been run; before that the Messages tab and card stay hidden */
-  try{const[x,y]=await Promise.all([db.from("game_messages").select("*").order("created_at"),db.from("ticket_messages").select("ticket_id,message_id")]);
-    S.msgOk=!x.error&&!y.error;S.msgs=x.error?[]:x.data;S.tm=y.error?{}:Object.fromEntries(y.data.map(r=>[r.ticket_id,r.message_id]))}catch(_){S.msgOk=false;S.msgs=[];S.tm={}}
+  msg:async()=>{try{const[x,y]=await Promise.all([db.from("game_messages").select("*").order("created_at"),db.from("ticket_messages").select("ticket_id,message_id")]);
+    S.msgOk=!x.error&&!y.error;S.msgs=x.error?[]:x.data;S.tm=y.error?{}:Object.fromEntries(y.data.map(r=>[r.ticket_id,r.message_id]))}catch(_){S.msgOk=false;S.msgs=[];S.tm={}}},
   /* "pick random people" (r2_14) exists only after sql/r2_14 has been run; before that its card stays hidden */
-  try{const r=await db.from("ticket_prizes").select("ticket_id,body,heading");S.pzOk=!r.error;S.pz=r.error?{}:Object.fromEntries(r.data.map(x=>[x.ticket_id,x.body]));S.pzh=r.error?{}:Object.fromEntries(r.data.map(x=>[x.ticket_id,x.heading]))}catch(_){S.pzOk=false;S.pz={};S.pzh={}}
-}
+  pz:async()=>{try{const r=await db.from("ticket_prizes").select("ticket_id,body,heading");S.pzOk=!r.error;S.pz=r.error?{}:Object.fromEntries(r.data.map(x=>[x.ticket_id,x.body]));S.pzh=r.error?{}:Object.fromEntries(r.data.map(x=>[x.ticket_id,x.heading]))}catch(_){S.pzOk=false;S.pz={};S.pzh={}}}
+};
+async function sync(...names){
+  const list=names.length?names:Object.keys(G),r=await track(Promise.all(list.map(n=>G[n]())));
+  return r.every(x=>x!==false)}
+const load=()=>sync();
 /* ===== live registration status banner (daily pause + 10-minute grace) ===== */
 function fmtIST(iso){try{const d=new Date(iso),day=x=>x.toLocaleDateString("en-IN",{day:"numeric",month:"short",timeZone:"Asia/Kolkata"});
   return d.toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit",hour12:true,timeZone:"Asia/Kolkata"}).toUpperCase()+(day(d)===day(new Date())?"":" on "+day(d))}catch(_){return""}}
@@ -191,26 +256,51 @@ function flags(){
 function ham(a,b){let d=0;const n=Math.min(a.length,b.length);for(let i=0;i<n;i++){let x=parseInt(a[i],16)^parseInt(b[i],16);while(x){d+=x&1;x>>=1}}return d}
 
 /* ---------- views ---------- */
-function view(){
-  S.charts.forEach(c=>c.destroy());S.charts=[];if(!S.staff)S.sheets=[];
+function tabList(){
+  const todo=S.tReady?S.transfers.filter(x=>x.status==="pending_admin").length+S.transfers.filter(x=>x.return_due&&!x.returned_at).length+S.transfers.filter(x=>x.kind==="public"&&x.status==="done"&&!x.seller_paid_at).length:0;
+  return [["overview","Overview"],["gate","Gate"],["bookings","Bookings"],["people","People"],...(S.msgOk?[["messages","Messages"]]:[]),...(S.tReady?[["transfers","Transfers"+(todo?" ("+todo+")":"")]]:[]),["scan","Scan screenshots"],...(S.fbOk?[["feedback","Feedback"+(S.fb.length?" ("+S.fb.length+")":"")]]:[]),["settings","Settings"]]}
+/* things typed into the page but not saved yet (only fields that differ from what the page drew), so a redraw does not wipe them */
+function snapForm(){const o={};document.querySelectorAll("#v input[id],#v select[id],#v textarea[id]").forEach(el=>{
+  if(el.type==="button")return;
+  if(el.type==="checkbox"||el.type==="radio"){if(el.checked!==el.defaultChecked)o[el.id]=el.checked}
+  else if(el.tagName==="SELECT"){if([...el.options].some(op=>op.selected!==op.defaultSelected))o[el.id]=el.value}
+  else if(el.value!==el.defaultValue)o[el.id]=el.value});return o}
+function putForm(o){for(const id in o){const el=document.getElementById(id);if(!el)continue;
+  if(el.type==="checkbox"||el.type==="radio")el.checked=o[id];else if(el.value!==o[id])el.value=o[id]}
+  const so=$("#sopen"),pb=$("#pausebox");if(so&&pb)pb.style.display=so.checked?"block":"none"}
+/* view() draws the current tab. The header and tab bar are built once per login and then only updated; the tab's own content is swapped in place,
+   keeping the scroll position, open filter panels and the focused field. view({keepForm:true}) also keeps unsaved typing. */
+function view(o){
+  o=o||{};S.charts.forEach(c=>c.destroy());S.charts=[];if(!S.staff)S.sheets=[];
   const a=$("#app");
-  if(!S.staff){a.innerHTML=`<h1>Organiser login</h1><p class="mute">Meetup registrations</p><div class="card" style="max-width:380px">
+  if(!S.staff){delete a.dataset.shell;S.rt=null;
+    a.innerHTML=`<h1>Organiser login</h1><p class="mute">Meetup registrations</p><div class="card" style="max-width:380px">
     ${S.msg?`<p class="err" role="alert">${esc(S.msg)}</p>`:""}<label for="em">Email</label><input id="em" type="email" autocomplete="username" style="width:100%">
     <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" style="width:100%"><p><button id="login">Sign in</button></p></div>`;return}
-  if(S.staff.role!=="admin"){   // gate staff: just the scanner
-    S.tab="gate";
-    a.innerHTML=`<div class="hdr"><div class="who"><small>Signed in as</small><h1>${esc(S.staff.name)}</h1></div><div class="acts"><button class="ghost sm" id="refresh">Refresh</button><button class="ghost sm" id="logout">Sign out</button></div></div>${S.msg?`<p class="err" role="alert">${esc(S.msg)}</p>`:""}<div id="v"></div>`;
-    vGate();renderSheet();return}
-  const todo=S.tReady?S.transfers.filter(x=>x.status==="pending_admin").length+S.transfers.filter(x=>x.return_due&&!x.returned_at).length+S.transfers.filter(x=>x.kind==="public"&&x.status==="done"&&!x.seller_paid_at).length:0;
-  const T=[["overview","Overview"],["gate","Gate"],["bookings","Bookings"],["people","People"],...(S.msgOk?[["messages","Messages"]]:[]),...(S.tReady?[["transfers","Transfers"+(todo?" ("+todo+")":"")]]:[]),["scan","Scan screenshots"],...(S.fbOk?[["feedback","Feedback"+(S.fb.length?" ("+S.fb.length+")":"")]]:[]),["settings","Settings"]];
+  const adm=S.staff.role==="admin",key=S.staff.name+"|"+S.staff.role;
+  if(!adm)S.tab="gate";   // gate staff: just the scanner
   if(S.tab==="feedback"&&!S.fbOk)S.tab="overview";
   if(S.tab==="transfers"&&!S.tReady)S.tab="overview";
   if(S.tab==="messages"&&!S.msgOk)S.tab="overview";
-  a.innerHTML=`<div class="hdr"><div class="who"><small>Signed in as</small><h1>${esc(S.staff.name)}</h1></div><div class="acts"><button class="ghost sm" data-sheet="search:">🔍 Find</button><button class="ghost sm" id="refresh">Refresh</button><button class="ghost sm" id="logout">Sign out</button></div></div>
-  ${S.msg?`<p class="err" role="alert">${esc(S.msg)}</p>`:""}<div class="tabs">${T.map(t=>`<button data-tab="${t[0]}" class="${S.tab===t[0]?"on":""}">${t[1]}</button>`).join("")}</div>${S.tab==="overview"?alertBanner()+ipBanner():""}<div id="v"></div>`;
+  const same=a.dataset.shell===key&&!!$("#v")&&S.rt===S.tab,y=window.scrollY,form=o.keepForm?snapForm():null,
+    det=same?[...document.querySelectorAll("#v details")].map(d=>d.open):[],ae=document.activeElement;
+  let foc=null;try{if(same&&ae&&ae.id&&a.contains(ae))foc={id:ae.id,s:ae.selectionStart,e:ae.selectionEnd}}catch(_){}
+  if(a.dataset.shell!==key||!$("#v")){a.dataset.shell=key;
+    a.innerHTML=`<div class="hdr"><div class="who"><small>Signed in as</small><h1>${esc(S.staff.name)}</h1></div><div class="acts">${adm?'<button class="ghost sm" data-sheet="search:">🔍 Find</button>':""}<button class="ghost sm" id="refresh">Refresh</button><button class="ghost sm" id="logout">Sign out</button></div></div><div id="msg"></div>${adm?'<div class="tabs" id="tabs"></div><div id="banners"></div>':""}<div id="v"></div>`}
+  $("#msg").innerHTML=S.msg?`<p class="err" role="alert">${esc(S.msg)}</p>`:"";
+  if(adm){const tb=$("#tabs"),sl=tb.scrollLeft;
+    tb.innerHTML=tabList().map(t=>`<button data-tab="${t[0]}" class="${S.tab===t[0]?"on":""}">${t[1]}</button>`).join("");
+    tb.scrollLeft=sl;const on=tb.querySelector(".on");if(on){const l=on.offsetLeft,r=l+on.offsetWidth;if(l<tb.scrollLeft||r>tb.scrollLeft+tb.clientWidth)tb.scrollLeft=Math.max(0,l-16)}   // the open tab is always in view
+    $("#banners").innerHTML=S.tab==="overview"?alertBanner()+ipBanner():""}
   if(S.tab!=="gate"&&S.stream)gCamStop(true);   // leaving the Gate tab turns the camera off
+  const v=$("#v");if(same)v.style.minHeight=v.offsetHeight+"px";   // keeps the page tall while the content is swapped, so the scroll position survives
   ({overview:vOverview,gate:vGate,bookings:vBookings,people:vPeople,transfers:vTransfers,scan:vScan,feedback:vFeedback,messages:vMessages,settings:vSettings})[S.tab]();
   renderSheet();
+  window.scrollTo(0,same?y:0);requestAnimationFrame(()=>{v.style.minHeight=""});
+  if(det.length){const ds=document.querySelectorAll("#v details");if(ds.length===det.length)ds.forEach((d,i)=>{d.open=det[i]})}
+  if(form)putForm(form);
+  if(foc){const el=document.getElementById(foc.id);if(el&&!el.disabled){try{el.focus({preventScroll:true});if(foc.s!=null&&el.setSelectionRange)el.setSelectionRange(foc.s,foc.e)}catch(_){}}}
+  S.rt=S.tab;
 }
 function vOverview(){
   const P=live(),liveP=P.filter(p=>p.b.status!=="rejected"),paid=P.filter(p=>p.b.status==="paid"),pend=P.filter(p=>p.b.status==="pending");
@@ -347,7 +437,7 @@ async function runScan(list){
         const blob=await(await fetch(data.signedUrl)).blob(),rd=await readShot(w,blob),ids=rd.ids,amts=rd.amts,hash=await dhash(blob);
         const r=await db.rpc("save_scan",{p_booking:b.id,p_ids:ids,p_hash:hash,p_ok:ids.length>0,p_amounts:amts});if(r.error)throw r.error}
       catch(e){prog.textContent="Problem with "+b.booking_code+": "+e.message}}
-    await w.terminate();await load();prog.textContent="Done. Check the Bookings tab for flags."
+    await w.terminate();await sync("core");prog.textContent="Done. Check the Bookings tab for flags."
   }catch(e){prog.textContent=e.message}
   S.scanning=false;const p=prog.textContent;vScan();$("#prog").textContent=p;
 }
@@ -407,12 +497,12 @@ function vSettings(){const s=S.settings;
   ${S.msgOk?msgCard(s):""}
   <div class="card"><h2>Before you open registration</h2>
   <p class="mute">A reminder list. Nothing here is checked automatically.</p>
-  <label style="font-weight:400"><input type="checkbox"> Payment details above (UPI ID, payee name) are the final ones, and a test payment reached the right account</label>
-  <label style="font-weight:400"><input type="checkbox"> WhatsApp number above is the organisers' number</label>
-  <label style="font-weight:400"><input type="checkbox"> A ₹1 test payment was scanned in two UPI apps</label>
-  <label style="font-weight:400"><input type="checkbox"> All test bookings deleted and the payment-proofs storage emptied</label>
-  <label style="font-weight:400"><input type="checkbox"> "Allow new users to sign up" is off in Supabase</label>
-  <label style="font-weight:400"><input type="checkbox"> The other organiser logins are created</label></div>${logCard()}</div>`;
+  <label style="font-weight:400"><input type="checkbox" id="chk1"> Payment details above (UPI ID, payee name) are the final ones, and a test payment reached the right account</label>
+  <label style="font-weight:400"><input type="checkbox" id="chk2"> WhatsApp number above is the organisers' number</label>
+  <label style="font-weight:400"><input type="checkbox" id="chk3"> A ₹1 test payment was scanned in two UPI apps</label>
+  <label style="font-weight:400"><input type="checkbox" id="chk4"> All test bookings deleted and the payment-proofs storage emptied</label>
+  <label style="font-weight:400"><input type="checkbox" id="chk5"> "Allow new users to sign up" is off in Supabase</label>
+  <label style="font-weight:400"><input type="checkbox" id="chk6"> The other organiser logins are created</label></div>${logCard()}</div>`;
   const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Repeat-registration flag":"Repeat flag","About link":"About","Email box":"Email","Feedback questions":"Feedback","Game messages":"Messages","Before you open registration":"Checklist","Settings log":"Log"};
   $("#snav").innerHTML=[...document.querySelectorAll(".sgrid>.card")].map((c,i)=>{c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="s-${i}">${esc(SH[h]||h)}</button>`}).join("")}
 
@@ -434,8 +524,8 @@ function planShuffle(ppl,ids,base,together){
   let units;if(together){const g={};ppl.forEach(p=>(g[p.booking_id]=g[p.booking_id]||[]).push(p));units=shuf(Object.values(g)).sort((a,b)=>b.length-a.length)}else units=shuf(ppl).map(p=>[p]);
   units.forEach(u=>{const mn=Math.min(...ids.map(m=>cnt[m])),c=ids.filter(m=>cnt[m]===mn),pick=c[rnd(c.length)];u.forEach(p=>pairs.push([p.id,pick]));cnt[pick]+=u.length});
   return pairs}
-async function msgCall(fn,args,okMsg){const r=await db.rpc(fn,args);if(r.error){toast(terr(r.error),6000);await load();view();return null}
-  await load();view();if(okMsg)toast(okMsg);return r}
+async function msgCall(fn,args,okMsg,parts){parts=parts||["msg","pz","log"];const r=await db.rpc(fn,args);if(r.error){toast(terr(r.error),6000);await sync(...parts);view();return null}
+  await sync(...parts);view();if(okMsg)toast(okMsg);return r}
 async function msgPairs(pairs,okMsg){return msgCall("admin_assign_messages",{p_pairs:pairs.map(x=>({t:x[0],m:x[1]}))},okMsg)}
 function msgCard(s){
   if(s.show_messages===undefined)return"";
@@ -503,20 +593,20 @@ function vMessages(){
     ${noneL.length?`<details class="ros"><summary><b>No message</b> <span class="mute">${noneL.length}</span></summary><div class="rlist">${noneL.map(p=>`<div>${lk("person",p.id,p.name)} <span class="mute">${esc(tlabel(p))}${p.b.status!=="paid"?" · "+esc(p.b.status):""}</span></div>`).join("")}</div></details>`:""}</div>`}
 async function msgClick(t,id){
   const b=t.closest&&t.closest("button");const d=b?b.dataset:{};
-  if(id==="msgshowsave"){const r=await db.rpc("admin_set_show_messages",{p_show:$("#msgshow").checked});if(r.error)return toast(terr(r.error),6000),true;await load();view();toast("Game messages setting saved");return true}
+  if(id==="msgshowsave"){const r=await db.rpc("admin_set_show_messages",{p_show:$("#msgshow").checked});if(r.error)return toast(terr(r.error),6000),true;await sync("core","log");view({keepForm:true});toast("Game messages setting saved");return true}
   if(id==="mtoggle"){const on=!S.settings.show_messages;
-    if(on&&!confirm("Show messages on tickets now?\n\nEvery person who has a message will see it on their ticket straight away."))return true;
-    await msgCall("admin_set_show_messages",{p_show:on},on?"Messages are now shown":"Messages are now hidden");return true}
+    if(on&&!await yes("Show messages on tickets now?\n\nEvery person who has a message will see it on their ticket straight away."))return true;
+    await msgCall("admin_set_show_messages",{p_show:on},on?"Messages are now shown":"Messages are now hidden",["core","log"]);return true}
   if(id==="msave"){const m=S.mf;m.name=$("#mname").value;m.body=$("#mbody").value;
     if(!m.name.trim())return toast("Type a name for the message"),true;if(!m.body.trim())return toast("Type the text people will see"),true;
     const r=await msgCall("admin_save_message",{p_id:m.edit,p_name:m.name,p_body:m.body},m.edit?"Message saved":"Message added");if(r){m.edit=null;m.name="";m.body="";view()}return true}
   if(id==="mcancel"){S.mf.edit=null;S.mf.name="";S.mf.body="";vMessages();return true}
   if(d.medit){const x=S.msgs.find(y=>y.id===d.medit);if(x){S.mf.edit=x.id;S.mf.name=x.name;S.mf.body=x.body;vMessages();const f=$("#mname");if(f)f.scrollIntoView({block:"center"})}return true}
   if(d.mdel){const x=S.msgs.find(y=>y.id===d.mdel),n=msgCount(d.mdel);
-    if(!confirm(`Delete the message "${x?x.name:""}"?\n\n${n} ${n===1?"person has":"people have"} it and will lose it. This cannot be undone.`))return true;
+    if(!await yes(`Delete the message "${x?x.name:""}"?\n\n${n} ${n===1?"person has":"people have"} it and will lose it. This cannot be undone.`))return true;
     await msgCall("admin_delete_message",{p_id:d.mdel},"Message deleted");return true}
   if(d.mclear){const x=S.msgs.find(y=>y.id===d.mclear),n=msgCount(d.mclear);if(!n)return toast("Nobody has this message"),true;
-    if(!confirm(`Take "${x?x.name:""}" away from its ${n} ${n===1?"holder":"holders"}?\n\nThe message itself stays; you can give it out again.`))return true;
+    if(!await yes(`Take "${x?x.name:""}" away from its ${n} ${n===1?"holder":"holders"}?\n\nThe message itself stays; you can give it out again.`))return true;
     await msgCall("admin_clear_messages",{p_message:d.mclear,p_tickets:null},"Taken away");return true}
   if(id==="mshuf"||id==="mplanagain"){const m=S.mf,sc=msgScope(),ids=(m.use||S.msgs.map(x=>x.id)).filter(i=>S.msgs.some(x=>x.id===i));
     if(!ids.length)return toast("Tick at least one message to use"),true;if(!sc.length)return toast("Nobody is in this group"),true;
@@ -529,21 +619,21 @@ async function msgClick(t,id){
     l.plan=drawWinners(pool,n).map(p=>p.id);vMessages();const pv=document.querySelector(".plan");if(pv)pv.scrollIntoView({block:"nearest"});return true}
   if(id==="lcancel"){S.mf.lot.plan=null;vMessages();return true}
   if(id==="lsave"){const l=S.mf.lot;if(!l.plan||!l.plan.length)return true;const rep=l.plan.filter(i=>S.pz[i]).length;
-    if(!confirm(`Give "${l.body.trim()}" (heading: "${l.head.trim()||"You are a winner!"}") to ${l.plan.length} ${l.plan.length===1?"person":"people"}?${rep?`\n\n${rep} of them already ${rep===1?"has":"have"} a message line; it will be replaced.`:""}`))return true;
+    if(!await yes(`Give "${l.body.trim()}" (heading: "${l.head.trim()||"You are a winner!"}") to ${l.plan.length} ${l.plan.length===1?"person":"people"}?${rep?`\n\n${rep} of them already ${rep===1?"has":"have"} a message line; it will be replaced.`:""}`))return true;
     const r=await msgCall("admin_set_prizes",{p_tickets:l.plan,p_body:l.body,p_heading:l.head.trim()||null},l.plan.length+(l.plan.length===1?" person saved":" people saved"));if(r){S.mf.lot.plan=null;view()}return true}
-  if(d.pzdel){if(!confirm("Take this message line away?"))return true;await msgCall("admin_clear_prizes",{p_tickets:[d.pzdel]},"Message line taken away");return true}
-  if(id==="pzclr"){if(!confirm("Take every message line away from everyone?\n\nThe team messages are not affected."))return true;await msgCall("admin_clear_prizes",{p_tickets:null},"All message lines taken away");return true}
+  if(d.pzdel){if(!await yes("Take this message line away?"))return true;await msgCall("admin_clear_prizes",{p_tickets:[d.pzdel]},"Message line taken away");return true}
+  if(id==="pzclr"){if(!await yes("Take every message line away from everyone?\n\nThe team messages are not affected."))return true;await msgCall("admin_clear_prizes",{p_tickets:null},"All message lines taken away");return true}
   if(id==="mplansave"){const pl=S.mf.plan;if(!pl)return true;const rep=pl.pairs.filter(([tk,mi])=>S.tm[tk]&&S.tm[tk]!==mi).length;
-    if(!confirm(`Save these ${pl.pairs.length} messages?${rep?`\n\n${rep} ${rep===1?"person already has":"people already have"} a different message; it will be replaced.`:""}`))return true;
+    if(!await yes(`Save these ${pl.pairs.length} messages?${rep?`\n\n${rep} ${rep===1?"person already has":"people already have"} a different message; it will be replaced.`:""}`))return true;
     const r=await msgPairs(pl.pairs,pl.pairs.length+" messages saved");if(r){S.mf.plan=null;view()}return true}
   if(id==="mgivego"){const m=S.mf,sc=msgScope();if(!m.give)return toast("Choose a message first"),true;
     const rep=sc.filter(p=>S.tm[p.id]&&S.tm[p.id]!==m.give).length;
-    if(!confirm(`Give "${msgName(m.give)}" to ${sc.length} ${sc.length===1?"person":"people"}?${rep?`\n\n${rep} of them already have a different message; it will be replaced.`:""}`))return true;
+    if(!await yes(`Give "${msgName(m.give)}" to ${sc.length} ${sc.length===1?"person":"people"}?${rep?`\n\n${rep} of them already have a different message; it will be replaced.`:""}`))return true;
     await msgPairs(sc.map(p=>[p.id,m.give]),"Given to "+sc.length);return true}
   if(id==="mclrgrp"){const sc=msgScope().filter(p=>S.tm[p.id]);if(!sc.length)return true;
-    if(!confirm(`Take the message away from ${sc.length} ${sc.length===1?"person":"people"}?`))return true;
+    if(!await yes(`Take the message away from ${sc.length} ${sc.length===1?"person":"people"}?`))return true;
     await msgCall("admin_clear_messages",{p_message:null,p_tickets:sc.map(p=>p.id)},"Taken away");return true}
-  if(id==="mclrall"){if(!confirm("Take every message away from everyone?\n\nThe messages themselves stay; only who has what is cleared."))return true;
+  if(id==="mclrall"){if(!await yes("Take every message away from everyone?\n\nThe messages themselves stay; only who has what is cleared."))return true;
     await msgCall("admin_clear_messages",{p_message:null,p_tickets:null},"Cleared");return true}
   return false}
 /* changes on the Messages tab and the one-person select (called from the page's "change" and "input" listeners) */
@@ -570,9 +660,9 @@ const sellerLbl=x=>{const t=sellerTk(x);return t?tlabel(t):"?"};
 const buyerOf=x=>S.buyers.find(b=>b.transfer_id===x.id&&(b.status==="active"||b.status==="done"));
 const MODE=k=>k==="public"?"Public":"Private";
 async function tcall(fn,args,okMsg){
-  const r=await db.rpc(fn,args);
-  if(r.error){toast(terr(r.error),6000);await load();view();return null}
-  await load();view();toast(okMsg);return r.data||true}
+  const r=await db.rpc(fn,args),parts=["tr","core","log","reg"];
+  if(r.error){toast(terr(r.error),6000);await sync(...parts);view({keepForm:true});return null}
+  await sync(...parts);view({keepForm:true});toast(okMsg);return r.data||true}
 function moneyPanel(){const m=S.money;if(!m)return"";
   const c=(l,k,hint)=>`<div class="card stat" data-sheet="list:t_${k}" role="button" tabindex="0"><span class="mute">${l}</span><b>${inr(m[k].amount)}</b><span class="mute">${m[k].count} transfer${m[k].count===1?"":"s"}${hint?" · "+hint:""}</span><span class="more">Details ›</span></div>`;
   return `<h2>Transfer money</h2><p class="mute" style="margin-top:0">Only <b>public</b> transfers move money through you. This never mixes with the registration totals on the Overview.</p>
@@ -619,18 +709,18 @@ async function tAction(act,id){
   if(act==="verify"){const v=+($("#amt-"+id)||{}).value;if(!(v>=1))return toast("Type the amount that actually arrived in the bank",4000);
     if(!Number.isInteger(v))return toast("Type whole rupees only (no paise or decimals)",4000);
     const diff=x.amount_due!=null&&v!==x.amount_due;
-    if(!confirm((diff?"CHECK THE AMOUNT: you asked the buyer for ₹"+x.amount_due+" but you typed ₹"+v+".\n"+(v<x.amount_due?"That is LESS than asked, so the seller will be owed less.":"That is MORE than asked.")+"\nPress OK only if ₹"+v+" really arrived.\n\n":"")+"Confirm: ₹"+v+" has arrived in the bank account for this transfer?\n\nThe seller will be owed exactly ₹"+v+"."))return;
+    if(!await yes((diff?"CHECK THE AMOUNT: you asked the buyer for ₹"+x.amount_due+" but you typed ₹"+v+".\n"+(v<x.amount_due?"That is LESS than asked, so the seller will be owed less.":"That is MORE than asked.")+"\nPress OK only if ₹"+v+" really arrived.\n\n":"")+"Confirm: ₹"+v+" has arrived in the bank account for this transfer?\n\nThe seller will be owed exactly ₹"+v+".",{title:diff?"Check the amount":"Payment received?",ok:"Yes, it arrived",danger:diff}))return;
     return tcall("admin_transfer_verify_payment",{p_transfer:id,p_amount:v},"Payment verified")}
   if(act==="approve"){
-    if(!confirm("Transfer ticket "+sellerLbl(x)+" ("+x.seller_name+") to "+(b?b.name:"the buyer")+"?\n\n"+x.seller_name+"'s ticket is cancelled for good and "+(b?b.name:"the buyer")+" receives a new ticket number. This cannot be undone."))return;
+    if(!await yes("Transfer ticket "+sellerLbl(x)+" ("+x.seller_name+") to "+(b?b.name:"the buyer")+"?\n\n"+x.seller_name+"'s ticket is cancelled for good and "+(b?b.name:"the buyer")+" receives a new ticket number. This cannot be undone.",{ok:"Transfer"}))return;
     const r=await tcall("admin_transfer_approve",{p_transfer:id},"Done.");if(r&&r.new_label)toast("Transferred: "+r.old_label+" → "+r.new_label,5000);return}
   if(act==="reject"){
     const warn=x.kind==="public"&&x.payment_submitted_at?"\n\nThe buyer has already paid: the money will be marked as TO RETURN.":"";
-    const note=prompt((x.status==="code_active"?"Cancel this code?":"Reject this transfer?")+warn+"\n\nOptional note (why):","");if(note===null)return;
+    const note=await ask({title:x.status==="code_active"?"Cancel this code?":"Reject this transfer?",text:(warn?warn.trim()+"\n\n":"")+"Optional note (why):",input:{value:"",placeholder:"Why? (optional)",maxLength:300},ok:x.status==="code_active"?"Cancel code":"Reject",danger:true});if(note===null)return;
     return tcall("admin_transfer_reject",{p_transfer:id,p_note:note.trim()||null},x.status==="code_active"?"Code cancelled":"Transfer rejected")}
-  if(act==="extend"){const h=prompt("Keep this code valid for how many more hours from now? (1 to 168)","24");if(h===null)return;
+  if(act==="extend"){const h=await ask({title:"Extend this code",text:"Keep this code valid for how many more hours from now? (1 to 168)",input:{value:"24",type:"number",min:1,max:168},ok:"Extend"});if(h===null)return;
     return tcall("admin_transfer_extend_code",{p_transfer:id,p_hours:parseInt(h,10)},"Code extended")}
-  if(act==="paid"||act==="returned"){const ref=prompt(act==="paid"?"The seller was paid ₹"+x.amount_received+". Type the payment reference (for example the UPI transaction ID):":"The buyer's money was sent back. Type the payment reference (or a short note such as “no money received”):","");if(ref===null)return;
+  if(act==="paid"||act==="returned"){const ref=await ask({title:act==="paid"?"Mark the seller as paid":"Mark the money as returned",text:act==="paid"?"The seller was paid ₹"+x.amount_received+". Type the payment reference (for example the UPI transaction ID):":"The buyer's money was sent back. Type the payment reference (or a short note such as “no money received”):",input:{value:"",placeholder:"Reference",maxLength:80},ok:act==="paid"?"Mark paid":"Mark returned"});if(ref===null)return;
     return tcall(act==="paid"?"admin_transfer_mark_paid":"admin_transfer_mark_returned",{p_transfer:id,p_reference:ref.trim()},act==="paid"?"Seller marked as paid":"Return recorded")}
 }
 
@@ -843,7 +933,8 @@ function gotoTab(tab,type,id){const who=type==="person"?people().find(x=>x.id===
   nav({tab,sheets:[]});
   const el=type==="person"||type==="booking"?document.querySelector(`[data-${type==="person"?"pid":"bid"}="${id}"]`):null;
   if(el){el.scrollIntoView({block:"center"});el.classList.add("flash")}}
-window.addEventListener("popstate",e=>{const st=e.state;if(!S.staff||!st||!st.tab)return;
+window.addEventListener("popstate",e=>{if(S.dlgSkip){const f=S.dlgSkip;S.dlgSkip=null;f();return}if(S.dlg){const f=S.dlg;S.dlg=null;f(false,true);return}
+  const st=e.state;if(!S.staff||!st||!st.tab)return;
   const tabChanged=st.tab!==S.tab;S.sheets=(st.sheets||[]).slice();S.tab=st.tab;
   if(tabChanged){view();window.scrollTo(0,st.y||0)}else renderSheet()});
 try{history.replaceState({tab:S.tab,sheets:[],y:0},"")}catch(_){}
@@ -910,78 +1001,86 @@ function gSearch(){const q=(S.gq||"").trim().toLowerCase(),el=document.getElemen
   el.innerHTML=L.length?pRows(L,p=>p.transferred_out_at?'<span class="mute">transferred</span>':`<span class="pill p-${p.b.status}">${esc(p.b.status||"")}</span>`):'<p class="mute">Nobody found.</p>'}
 function renderSheet(){
   let m=document.getElementById("sheetbg");
-  if(!S.staff||!S.sheets.length){if(m)m.remove();document.body.classList.remove("shopen");return}
+  if(!S.staff||!S.sheets.length){if(m)m.remove();S.shk=null;document.body.classList.remove("shopen");return}
   const cur=S.sheets[S.sheets.length-1],c=cur.type==="person"?pSheet(cur.id):cur.type==="list"?lSheet(cur.id):cur.type==="search"?{title:"Find a person",html:`<input id="gq" type="search" placeholder="Name, phone, ticket or booking ID" value="${esc(S.gq||"")}" style="width:100%" autocomplete="off"><div id="sres" class="srs"></div>`}:bSheet(cur.id);
   if(!m){m=document.createElement("div");m.id="sheetbg";m.className="sheet-bg";document.body.appendChild(m)}
   document.body.classList.add("shopen");
-  m.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><div class="sh-h">${S.sheets.length>1?'<button class="ghost sm" data-sback="1">‹ Back</button>':""}<h2>${esc(c.title)}</h2><button class="ghost sm" data-sback="1" aria-label="Close">✕</button></div>${c.html}${c.tab?`<p class="sh-f"><button data-gotab="${c.tab[0]}:${c.tab[2]}:${esc(c.tab[3])}">${c.tab[1]}</button></p>`:""}</div>`;
-  const sh=m.firstChild;sh.scrollTop=0;if(cur.type==="search"){gSearch();const g=document.getElementById("gq");if(g&&!g.value)g.focus()}}
+  const sk=cur.type+":"+cur.id,again=S.shk===sk,keepY=again&&m.firstChild?m.firstChild.scrollTop:0;   // the same sheet drawn again keeps its scroll position and does not replay the slide-in
+  m.innerHTML=`<div class="sheet${again?" still":""}" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><div class="sh-h">${S.sheets.length>1?'<button class="ghost sm" data-sback="1">‹ Back</button>':""}<h2>${esc(c.title)}</h2><button class="ghost sm" data-sback="1" aria-label="Close">✕</button></div>${c.html}${c.tab?`<p class="sh-f"><button data-gotab="${c.tab[0]}:${c.tab[2]}:${esc(c.tab[3])}">${c.tab[1]}</button></p>`:""}</div>`;
+  const sh=m.firstChild;sh.scrollTop=keepY;S.shk=sk;if(cur.type==="search"){gSearch();const g=document.getElementById("gq");if(g&&!g.value)g.focus()}}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.sheets.length)history.back();if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches('[role=button][data-sheet]')){e.preventDefault();const[k,i]=sp(e.target.dataset.sheet,2);openSheet(k,i)}});
 
 /* ---------- events ---------- */
-document.addEventListener("click",async e=>{const t=e.target,id=t.id;
+async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))||e.target,id=t.id;
   if(id==="login"){const{error}=await db.auth.signInWithPassword({email:$("#em").value.trim(),password:$("#pw").value});S.msg=error?"Wrong email or password.":"";return error?view():boot()}
   if(id==="logout"){gCamStop(true);await db.auth.signOut();S.staff=null;S.msg="";S.sheets=[];return view()}
-  if(id==="refresh"){if(S.staff.role==="admin")await load();else await gLoad();view();return toast("Refreshed")}
+  if(id==="refresh"){if(S.staff.role==="admin")await sync();else await gLoad();view({keepForm:true});return toast("Refreshed")}
   if(S.staff&&S.staff.role==="admin"&&S.msgOk&&await msgClick(t,id))return;
   {const gb=t.closest&&t.closest("button");if(gb&&(gb.dataset.act||gb.dataset.pick))return gAct(gb)}
   if(id==="camtoggle")return S.cam?gCamStop():gCamStart();
   if(t.id==="sheetbg"||t.dataset.sback){history.back();return}
   const shT=t.closest&&t.closest("[data-sheet]");if(shT){const[k,i]=sp(shT.dataset.sheet,2);return openSheet(k,i)}
   if(t.dataset.gotab){const[tab,k,i]=sp(t.dataset.gotab,3);return gotoTab(tab,k,i)}
-  if(t.dataset.tab){if(t.dataset.tab===S.tab&&!S.sheets.length)return view();return nav({tab:t.dataset.tab,sheets:[]})}
+  if(t.dataset.tab){if(t.dataset.tab===S.tab&&!S.sheets.length){S.rt=null;return view()}return nav({tab:t.dataset.tab,sheets:[]})}
     if(t.dataset.undo){
-    if(!confirm("Undo this check-in?"))return;
+    if(!await yes("Undo this check-in?\n\nThis person will be marked as not present again.",{ok:"Undo check-in"}))return;
     const r=await db.rpc("undo_checkin",{p_id:t.dataset.undo});
     if(r.error)return toast("Failed: "+r.error.message);
-    await load();view();return toast("Check-in undone");
+    await sync("core");view();return toast("Check-in undone");
   }
   if(id==="csv")return csv();
   if(t.dataset.jump){document.getElementById(t.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(t.dataset.chip!==undefined){S.f.pay=t.dataset.chip;vBookings();return}
   if(t.dataset.shot){const b=bk(t.dataset.shot),F=flags()[b.id]||[],items=[{path:b.screenshot_path,label:b.booking_code}];
     S.scans.filter(s=>s.booking_id!==b.id).forEach(s=>{const o=bk(s.booking_id);if(F.some(x=>x.includes(o.booking_code)))items.push({path:o.screenshot_path,label:o.booking_code+" (flagged match)"})});return shots(items)}
-  if(t.dataset.st){const r=await db.rpc("set_booking_status",{p_booking:t.dataset.b,p_status:t.dataset.st});if(r.error)return toast("Failed: "+r.error.message);await load();view();return toast("Marked "+t.dataset.st+(t.dataset.st==="paid"?". Ticket numbers given.":""))}
+  if(t.dataset.st){const r=await db.rpc("set_booking_status",{p_booking:t.dataset.b,p_status:t.dataset.st});if(r.error)return toast("Failed: "+r.error.message);await sync("core","reg","ip");view();return toast("Marked "+t.dataset.st+(t.dataset.st==="paid"?". Ticket numbers given.":""))}
   if(t.dataset.co){const tk=S.tickets.find(x=>x.id===t.dataset.t),make=t.dataset.co==="make";if(!tk)return;
     const msg=make?"Make "+tk.name+" a coordinator?"+(tk.ticket_no!=null?"\n\nTheir guest number "+tlabel(tk)+" will be cancelled and they will get the next coordinator number. Other numbers do not change.":"\n\nThey will get the next coordinator number (E26-"+pad(S.settings.next_coord)+"C)."):"Remove "+tk.name+" as coordinator?\n\nThe coordinator number is retired and never reused. They go back to being a guest.";
-    if(!confirm(msg))return;
+    if(!await yes(msg,{title:make?"Make "+tk.name+" a coordinator?":"Remove "+tk.name+" as coordinator?",ok:make?"Make coordinator":"Remove"}))return;
     const r=await db.rpc("set_coordinator",{p_ticket_id:tk.id,p_make:make});if(r.error)return toast(/ALREADY_TRANSFERRED/.test(r.error.message||"")?"This ticket was already transferred to someone else, so its coordinator status cannot be changed.":"Failed: "+r.error.message);
-    await load();view();return toast(make?tk.name+" is now "+r.data.label:tk.name+" is a guest again")}
+    await sync("core");view();return toast(make?tk.name+" is now "+r.data.label:tk.name+" is a guest again")}
   if(id==="scan")return runScan(S.bookings.filter(b=>b.kind!=="transfer"&&b.status!=="rejected"&&!S.scans.some(s=>s.booking_id===b.id)));
   if(id==="rescanall")return runScan(S.scans.map(s=>bk(s.booking_id)).filter(b=>b.status!=="rejected"));
   if(id==="rescan")return runScan(S.scans.filter(s=>!s.read_ok||!s.amounts).map(s=>bk(s.booking_id)).filter(b=>b.status!=="rejected"));
   if(t.dataset.tact)return tAction(t.dataset.tact,t.dataset.id);
   if(id==="tsave"){const s0=S.settings,cv=$("#tcut").value,on=$("#topen").checked,h=+$("#thours").value;
     if(!(h>=1&&h<=168))return toast("Code validity must be 1 to 168 hours",4000);
-    if(on&&!s0.transfers_open&&!confirm("Switch ticket transfers ON?\n\nPeople will be able to start transfers straight away. Only do this once the transfer system has been tested."))return;
+    if(on&&!s0.transfers_open&&!await yes("Switch ticket transfers ON?\n\nPeople will be able to start transfers straight away. Only do this once the transfer system has been tested.",{ok:"Switch on"}))return;
     const r=await db.rpc("admin_set_transfer_settings",{p_open:on,p_food_locked:$("#tfood").checked,p_code_hours:h,p_clear_cutoff:!cv&&!!s0.transfer_cutoff_at,p_cutoff:cv?new Date(cv+":00+05:30").toISOString():null});
-    if(r.error)return toast(terr(r.error),6000);await load();view();return toast("Transfer settings saved")}
-  if(id==="askemailsave"){const r=await db.rpc("admin_set_ask_email",{p_ask:$("#askemail").checked});if(r.error)return toast(terr(r.error),6000);await load();view();return toast("Email setting saved")}
-  if(id==="askfbsave"){const r=await db.rpc("admin_set_ask_feedback",{p_ask:$("#askfb").checked});if(r.error)return toast(terr(r.error),6000);await load();view();return toast("Feedback setting saved")}
-  if(id==="aboutsave"){const r=await db.rpc("admin_set_show_about",{p_show:$("#aboutshow").checked});if(r.error)return toast(terr(r.error),6000);await load();view();return toast("About link saved")}
+    if(r.error)return toast(terr(r.error),6000);await sync("core","log");view({keepForm:true});return toast("Transfer settings saved")}
+  if(id==="askemailsave"){const r=await db.rpc("admin_set_ask_email",{p_ask:$("#askemail").checked});if(r.error)return toast(terr(r.error),6000);await sync("core","log");view({keepForm:true});return toast("Email setting saved")}
+  if(id==="askfbsave"){const r=await db.rpc("admin_set_ask_feedback",{p_ask:$("#askfb").checked});if(r.error)return toast(terr(r.error),6000);await sync("core","log");view({keepForm:true});return toast("Feedback setting saved")}
+  if(id==="aboutsave"){const r=await db.rpc("admin_set_show_about",{p_show:$("#aboutshow").checked});if(r.error)return toast(terr(r.error),6000);await sync("core","log");view({keepForm:true});return toast("About link saved")}
   if(id==="ipsave"){const n=+$("#ipth").value;if(!(n>=2&&n<=1000))return toast("Use a number from 2 to 1000",4000);
-    const r=await db.rpc("admin_set_transfer_settings",{p_ip_threshold:n});if(r.error)return toast(terr(r.error),6000);await load();view();return toast("Saved")}
-  if(id==="ipclear"){if(!confirm("Delete every stored network address?\n\nDo this only after the event. It cannot be undone, and the repeat-registration flags will disappear."))return;
-    const r=await db.rpc("admin_clear_client_ips");if(r.error)return toast(terr(r.error),6000);await load();view();return toast(r.data+" stored addresses deleted")}
+    const r=await db.rpc("admin_set_transfer_settings",{p_ip_threshold:n});if(r.error)return toast(terr(r.error),6000);await sync("core","log");view({keepForm:true});return toast("Saved")}
+  if(id==="ipclear"){if(!await yes("Delete every stored network address?\n\nDo this only after the event. It cannot be undone, and the repeat-registration flags will disappear."))return;
+    const r=await db.rpc("admin_clear_client_ips");if(r.error)return toast(terr(r.error),6000);await sync("ip","core","log");view({keepForm:true});return toast(r.data+" stored addresses deleted")}
   if(id==="evsave"){
     const v=$("#sev").value,vn=$("#svenue").value.trim();
     if(!v)return toast("Choose the event date and time");
     if(!vn)return toast("Type the venue");
     const r=await db.rpc("admin_set_event",{p_event_at:new Date(v+":00+05:30").toISOString(),p_venue:vn});
-    if(r.error)return toast("Failed: "+r.error.message);await load();view();toast("Event details saved")}
+    if(r.error)return toast("Failed: "+r.error.message);await sync("core","log");view({keepForm:true});toast("Event details saved")}
   if(id==="pchange"){S.payOpen=true;view();setTimeout(()=>$("#pupi")&&$("#pupi").focus(),0)}
   if(id==="pcancel"){S.payOpen=false;view()}
   if(id==="psave"){
     const u=$("#pupi").value.trim(),n=$("#ppayee").value.trim(),w=$("#pwa").value.trim(),o=S.settings;
-    if(!confirm("Change the payment details?\n\nUPI ID: "+(o.upi_id||"(none)")+"  →  "+u+"\nPayee: "+(o.payee_name||"(none)")+"  →  "+n+"\nWhatsApp: "+(o.whatsapp_number||"(none)")+"  →  "+w+"\n\nNew payments will go to this UPI ID straight away. The other admin will be shown a notice."))return;
+    if(!await yes("Change the payment details?\n\nUPI ID: "+(o.upi_id||"(none)")+"  →  "+u+"\nPayee: "+(o.payee_name||"(none)")+"  →  "+n+"\nWhatsApp: "+(o.whatsapp_number||"(none)")+"  →  "+w+"\n\nNew payments will go to this UPI ID straight away. The other admin will be shown a notice.",{ok:"Change payment details",danger:true}))return;
     const r=await db.rpc("admin_set_payment_info",{p_upi:u,p_payee:n,p_whatsapp:w});
     if(r.error){const m=(r.error.message||"").match(/[A-Z_]{6,}/);return toast(PAY_ERR[m&&m[0]]||("Failed: "+r.error.message))}
-    S.payOpen=false;await load();view();toast("Payment details saved")}
+    S.payOpen=false;await sync("core","log","alert");view({keepForm:true});toast("Payment details saved")}
   if(id==="ssave"){
     if($("#sclose").value&&$("#sclose").value===$("#sreopen").value)return toast("Close time and reopen time must be different");
     const r=await db.rpc("admin_update_settings",{p_cap:+$("#scap").value,p_price:+$("#sprice").value,p_deadline:$("#sdl").value?new Date($("#sdl").value+":59+05:30").toISOString():null,p_is_open:$("#sopen").checked,
       p_pause_enabled:$("#spause").checked,p_pause_close:$("#sclose").value||null,p_pause_open:$("#sreopen").value||null});
-    if(r.error)return toast("Failed: "+r.error.message);await load();view();toast("Settings saved")}
+    if(r.error)return toast("Failed: "+r.error.message);await sync("core","reg","log");view({keepForm:true});toast("Settings saved")}
+}
+document.addEventListener("click",async e=>{
+  const b=e.target.closest&&e.target.closest("button"),quick=!b||b.matches(".lk,.chip,.tg,.tabs button,[data-sheet],[data-sback],[data-jump],[data-gotab],[data-medit],[data-muse],[data-act],[data-pick],[data-dlg],#camtoggle");
+  if(!quick&&b.dataset.run)return;   // this button is still working on the last tap
+  if(!quick)b.dataset.run="1";
+  try{await onClick(e)}catch(err){toast("Something went wrong: "+String((err&&err.message)||err).slice(0,120),6000)}
+  finally{if(!quick)delete b.dataset.run}
 });
 document.addEventListener("change",e=>{const t=e.target;
   if(S.staff&&S.staff.role==="admin"&&S.msgOk&&msgChange(t))return;
@@ -992,5 +1091,23 @@ document.addEventListener("change",e=>{const t=e.target;
   if(["fpay","ffood","floc","frole","ftype","fhere","frev"].includes(t.id)){S.f.pay=$("#fpay")?.value??S.f.pay;if($("#ffood")){S.f.food=$("#ffood").value;S.f.loc=$("#floc").value;S.f.role=$("#frole").value;S.f.type=$("#ftype").value;S.f.here=$("#fhere").value}if($("#frev"))S.f.review=$("#frev").checked;S.tab==="people"?tPeople():tBookings()}});
 document.addEventListener("input",e=>{if(e.target.id==="lbody"){S.mf.lot.body=e.target.value;return}if(e.target.id==="lhead"){S.mf.lot.head=e.target.value;return}if(e.target.id==="ln"){S.mf.lot.n=e.target.value;return}if(e.target.id==="mname"){S.mf.name=e.target.value;return}if(e.target.id==="mbody"){S.mf.body=e.target.value;return}if(e.target.id==="gfq"){S.gfind=e.target.value;gResults();return}if(e.target.id==="gq"){S.gq=e.target.value;gSearch();return}if(e.target.id==="q"){S.f.q=e.target.value;S.tab==="people"?tPeople():tBookings()}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.target.id==="pw"||e.target.id==="em"))$("#login").click()});
+/* Keeps the data fresh without anyone pressing Refresh: every minute while the page is in front, and when you come back to it after a while.
+   It only redraws when something really changed, and never while you are typing or a dialog is open. */
+const dataSig=()=>JSON.stringify([S.bookings,S.tickets,S.scans,S.settings,S.transfers,S.buyers,S.fb,S.msgs,S.tm,S.pz,S.pzh,S.emails,S.log,S.alert,S.ipf,S.money]);
+let hiddenAt=0;
+async function autoRefresh(){
+  if(!S.staff||S.staff.role!=="admin"||S.tab==="gate"||S.scanning||S.busy||S.refreshing||S.dlg||document.visibilityState!=="visible")return;
+  S.refreshing=true;S.quiet=true;
+  try{const m0=S.msg,before=dataSig(),ok=await sync();
+    if(!ok){S.msg=m0;return}
+    if(dataSig()===before)return;
+    const el=document.activeElement,typing=el&&el.matches&&el.matches("#app input:not([type=checkbox]):not([type=radio]),#app textarea,#app select");
+    if(typing||document.querySelector(".dlg-bg,.modal"))return;
+    view({keepForm:true})}
+  catch(_){}
+  finally{S.quiet=false;S.refreshing=false}
+}
+setInterval(autoRefresh,60000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){hiddenAt=Date.now();return}if(hiddenAt&&Date.now()-hiddenAt>=45000){hiddenAt=0;autoRefresh()}});
 boot();
 </script></body></html>

@@ -21,9 +21,10 @@
       getSession: async()=>({data:{session:{user:{id:'u1'}}}}),
       signOut: async()=>({}), signInWithPassword: async()=>({error:null})
     },
-    from: builder,
+    from: t=>{(window.__READS=window.__READS||[]).push(t);return builder(t)},
     rpc: async(name,args)=>{
       calls.push({name,args});
+      if (D.delay) await new Promise(r=>setTimeout(r,D.delay));
       const h = D.rpc[name];
       if (h === undefined) return {data:null,error:{message:'function '+name+' does not exist'}};
       if (typeof h === 'string') return {data:null,error:{message:h}};

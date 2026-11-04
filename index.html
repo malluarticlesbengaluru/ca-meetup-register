@@ -920,7 +920,6 @@ body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc
 body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc .tm-a{width:72px;height:72px;font-size:1.4rem}
 body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc b{font:700 .92rem/1.25 var(--sans);color:var(--cream)}
 body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc small{font:500 .74rem/1 var(--sans);color:var(--blush);padding:4px 0}
-body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc small.tm-lead{background:var(--gold);color:var(--wine);border-radius:99px;padding:4px 11px;font-weight:800}
 body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-lg{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 20px}
 body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-lg span{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:99px;border:1px solid var(--glass-b);font:500 .7rem/1.2 var(--sans);color:var(--cream)}
 body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-lg u{width:9px;height:9px;border-radius:50%}
@@ -1202,7 +1201,7 @@ function vHome(){
 <img class="bh-logo" src="assets/burg-logo.png" alt="" width="104" height="70">
 <p class="bh-pres">${O} presents</p>
 <h1 aria-label="${E}">${nameHtml()}</h1>
-<p class="bh-tag">Creating bonds beyond the workplace!.</p>
+<p class="bh-tag">Where strangers feel like home.</p>
 <div class="bh-chips"><span class="bh-chip">${BH_IC.cal}<span data-ev="c">${esc(evChip())}</span></span><span class="bh-chip">${BH_IC.pin}<span data-ev="v">${esc(evVenue())}</span></span></div>
 <div class="bh-cta"><button class="bh-btn bh-gold" id="hero-register" type="button">${esc(P)}</button><button class="bh-btn bh-ghost" id="hero-tickets" type="button">${esc(Q)}</button></div>
 ${spots}
@@ -1323,8 +1322,8 @@ function homeMount(){
 }
 /* ===== Meet the team (Nov 2026) =====
    ONE place to edit: TEAMS. Each team: name, leg (short name for the colour key), ic (icon), c (the two colours of its initials circles and its ring),
-   obj (the one-line objective) and m (the members). The FIRST member of a team is its lead. A member is a plain name ("Anil K.") or an object:
-   {n:"Anil K.", p:"assets/team/anil.jpg", r:"Lead"}. p (photo) and r (role) are optional; without a photo the circle shows the person's initials.
+   obj (the one-line objective) and m (the members). Members are shown in the order listed; nobody is marked as lead. A member is a plain name ("Anil K.") or an object:
+   {n:"Anil K.", p:"assets/team/anil.jpg", r:"Coordinator"}. p (photo) and r (a label shown under the name) are optional; without a photo the circle shows the person's initials.
    The names below are PLACEHOLDERS: replace them. Photos go in assets/team/ (square, about 300x300, under 40 KB). */
 const TEAMS=[
  {name:"Program Anchors",leg:"Anchors",ic:"chat",c:["#7FD6C6","#5CC2B0"],obj:"The voices that guide the day and keep the programme flowing.",m:["Rohit P.","Nimisha K."]},
@@ -1343,7 +1342,7 @@ const tmSvg=(k,c)=>`<svg class="${c||"tm-ic"}" viewBox="0 0 24 24" aria-hidden="
 const tmPad=n=>String(n).padStart(2,"0");
 const tmM=x=>typeof x==="string"?{n:x}:x;
 const tmIni=n=>{const w=String(n).replace(/\./g,"").trim().split(/\s+/).filter(Boolean);return(((w[0]||"")[0]||"")+((w[1]||"")[0]||"")).toUpperCase()};
-const tmRole=(m,j)=>m.r||(j===0?"Lead":"Member");
+const tmRole=m=>m.r||"";
 const tmTotal=()=>TEAMS.reduce((a,t)=>a+t.m.length,0);
 const tmEv=()=>esc(CONFIG.eventName).replace(/&#39;|'/g,"’");
 /* the circle: the photo when there is one, otherwise (or if the photo fails to load) the person's initials on the team's colours. Never an empty-profile icon. */
@@ -1365,7 +1364,7 @@ function vTeam(){
   return `<div class="tm"><button class="ghost tm-back" id="tm-back" type="button">${tmSvg("back")}Teams</button>
   <span class="tm-n tm-big">${tmPad(i+1)}</span><h1>${esc(t.name).replace(/(\S+-\S+)/g,'<span style="white-space:nowrap">$1</span>')}</h1>
   <div class="card"><p class="tm-eb">Our objective</p><p class="tm-obj">${esc(t.obj)}</p></div>
-  <div class="tm-grid">`+ms.map((m,j)=>`<div class="tm-mc">${tmAv(m,t)}<b>${esc(m.n)}</b><small${j===0&&!m.r?' class="tm-lead"':""}>${esc(tmRole(m,j))}</small></div>`).join("")+`</div>
+  <div class="tm-grid">`+ms.map((m,j)=>`<div class="tm-mc">${tmAv(m,t)}<b>${esc(m.n)}</b>${tmRole(m)?`<small>${esc(tmRole(m))}</small>`:""}</div>`).join("")+`</div>
   <div class="row"><button class="ghost" id="tm-prev" type="button">‹ Previous</button><button id="tm-next" type="button">Next ›</button></div>
   <div class="row"><button class="ghost" id="tm-home" type="button">Home</button></div></div>`}
 function vMembers(){
@@ -1377,7 +1376,7 @@ function tmClose(){document.querySelectorAll(".tm-sheet").forEach(x=>x.remove())
 function tmOpen(ti,mi){
   tmClose();const t=TEAMS[ti],m=tmM(t.m[mi]),d=document.createElement("div");
   d.className="tm-sheet";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-label",m.n);
-  d.innerHTML=`<div class="tm-card" style="--rg:${t.c[1]}">${tmAv(m,t)}<h3>${esc(m.n)}</h3><p>${esc(tmRole(m,mi))} · ${esc(t.name)}</p><div class="row"><button id="tm-view" type="button" data-tm-team="${ti}">View team</button><button class="ghost" id="tm-x" type="button">Close</button></div></div>`;
+  d.innerHTML=`<div class="tm-card" style="--rg:${t.c[1]}">${tmAv(m,t)}<h3>${esc(m.n)}</h3><p>${tmRole(m)?esc(tmRole(m))+" · ":""}${esc(t.name)}</p><div class="row"><button id="tm-view" type="button" data-tm-team="${ti}">View team</button><button class="ghost" id="tm-x" type="button">Close</button></div></div>`;
   document.body.appendChild(d);const x=d.querySelector("#tm-x");if(x)x.focus()}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")tmClose()});
 /* ---------- About us: the community text comes from the Mallu Articles Bengaluru brochure; the two links are the community's WhatsApp group and Instagram page ---------- */

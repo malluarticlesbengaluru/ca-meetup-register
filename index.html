@@ -710,6 +710,11 @@ body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mn
 .tm-sheet{position:fixed;left:0;right:0;top:0;bottom:0;z-index:60;background:rgba(10,2,6,.78);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center}
 .tm-card{width:100%;max-width:560px;box-sizing:border-box;background:linear-gradient(180deg,#4A0A1F,#2A0612);border:1px solid rgba(255,179,192,.22);border-radius:28px 28px 0 0;padding:30px 24px calc(24px + env(safe-area-inset-bottom,0px));text-align:center;color:#F6D7C6;animation:tmUp .3s ease both}
 .tm-card .tm-a{width:104px;height:104px;font-size:2.2rem;margin:0 auto 14px;box-shadow:0 0 0 3px #2A0612,0 0 0 6px var(--rg,#E9B24C)}
+.tm-rw{display:grid;border-radius:50%}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-m .tm-rw{padding:4px}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-m .tm-rw .tm-a{box-shadow:0 0 0 2px #1A040C}
+.tm-card .tm-rw{width:max-content;padding:6px;margin:0 auto 14px}
+.tm-card .tm-rw .tm-a{margin:0;box-shadow:0 0 0 3px #2A0612}
 .tm-card h3{margin:0;font:800 1.4rem/1.2 "Poppins",system-ui,sans-serif;color:#F6D7C6}
 .tm-card p{margin:6px 0 18px;font:italic 500 1rem/1.4 "Lora",Georgia,serif;color:#FFB3C0}
 @keyframes tmUp{from{transform:translateY(30px);opacity:0}}
@@ -1177,7 +1182,12 @@ function tmPeople(){const o=[],ix={};TEAMS.forEach((t,ti)=>t.m.forEach(x=>{const
 const tmTotal=()=>tmPeople().length;
 const tmEv=()=>esc(CONFIG.eventName).replace(/&#39;|'/g,"’");
 /* the circle: the photo when there is one, otherwise (or if the photo fails to load) the person's initials on the team's colours. Never an empty-profile icon. */
-function tmAv(m,t){return `<span class="tm-a" style="--g1:${t.c[0]};--g2:${t.c[1]}">${esc(tmIni(m.n))}${m.p?`<img src="${esc(m.p)}" alt="" loading="lazy" onerror="this.remove()">`:""}</span>`}
+/* A person in 2 (or more) teams: the circle and its ring are split into equal parts, one per team, in the order the teams list them. */
+const tmSeg=(ts,f)=>ts.map((t,i)=>f(t,(i/ts.length*100).toFixed(2),((i+1)/ts.length*100).toFixed(2))).join(",");
+const tmBg=ts=>"linear-gradient(90deg,"+tmSeg(ts,(t,a,b)=>t.c[0]+" "+a+"%,"+t.c[1]+" "+b+"%")+")";
+const tmRing=ts=>"linear-gradient(90deg,"+tmSeg(ts,(t,a,b)=>t.c[1]+" "+a+"% "+b+"%")+")";
+function tmAvQ(q,m){const ts=q.t.map(i=>TEAMS[i]);if(ts.length<2)return tmAv(m,ts[0]);return `<span class="tm-rw" style="background:${tmRing(ts)}">${tmAv(m,ts[0],ts)}</span>`}
+function tmAv(m,t,ts){return `<span class="tm-a" style="--g1:${t.c[0]};--g2:${t.c[1]}${ts&&ts.length>1?";background:"+tmBg(ts):""}">${esc(tmIni(m.n))}${m.p?`<img src="${esc(m.p)}" alt="" loading="lazy" onerror="this.remove()">`:""}</span>`}
 S.tm={team:0};
 function tmHomeCard(){
   const n=tmTotal(),k=TEAMS.length,kt=tmNT();
@@ -1201,7 +1211,7 @@ function vTeam(){
 function vMembers(){
   return `<div class="tm"><button class="ghost tm-back" id="tm-back" type="button">${tmSvg("back")}Teams</button>`+head("All members",tmTotal()+" volunteers · "+tmNT()+" teams")+
   `<div class="tm-lg">`+TEAMS.map(t=>`<span><u style="background:${t.c[1]}"></u>${esc(t.leg)}</span>`).join("")+`</div>
-  <div class="tm-mg">`+tmPeople().map((q,pi)=>{const t=TEAMS[q.t[0]],m=q.m;return `<button class="tm-m" type="button" data-tm-mem="${pi}" aria-label="${esc(m.n)}, ${esc(q.t.map(i=>TEAMS[i].name).join(" and "))}" style="--rg:${t.c[1]}">${tmAv(m,t)}<span class="tm-mn">${esc(m.n)}</span></button>`}).join("")+`</div>
+  <div class="tm-mg">`+tmPeople().map((q,pi)=>{const t=TEAMS[q.t[0]],m=q.m;return `<button class="tm-m" type="button" data-tm-mem="${pi}" aria-label="${esc(m.n)}, ${esc(q.t.map(i=>TEAMS[i].name).join(" and "))}" style="--rg:${t.c[1]}">${tmAvQ(q,m)}<span class="tm-mn">${esc(m.n)}</span></button>`}).join("")+`</div>
   <div class="row"><button class="ghost" id="tm-home" type="button">Home</button></div></div>`}
 let tmT=0,tmPend=0;
 function tmStep(d){
@@ -1216,7 +1226,7 @@ function tmOpen(pi){
   const q=tmPeople()[pi];if(!q)return;
   tmClose();const t=TEAMS[q.t[0]],m=q.m,d=document.createElement("div");
   d.className="tm-sheet";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-label",m.n);
-  d.innerHTML=`<div class="tm-card" style="--rg:${t.c[1]}">${tmAv(m,t)}<h3>${esc(m.n)}</h3><p>${tmRole(m)?esc(tmRole(m))+" · ":""}${esc(q.t.map(i=>TEAMS[i].name).join(" · "))}</p><div class="row">${q.t.map(i=>`<button class="tm-view" type="button" data-tm-team="${i}">${q.t.length>1?"View "+esc(TEAMS[i].leg):"View team"}</button>`).join("")}<button class="ghost" id="tm-x" type="button">Close</button></div></div>`;
+  d.innerHTML=`<div class="tm-card" style="--rg:${t.c[1]}">${tmAvQ(q,m)}<h3>${esc(m.n)}</h3><p>${tmRole(m)?esc(tmRole(m))+" · ":""}${esc(q.t.map(i=>TEAMS[i].name).join(" · "))}</p><div class="row">${q.t.map(i=>`<button class="tm-view" type="button" data-tm-team="${i}">${q.t.length>1?"View "+esc(TEAMS[i].leg):"View team"}</button>`).join("")}<button class="ghost" id="tm-x" type="button">Close</button></div></div>`;
   document.body.appendChild(d);const x=d.querySelector("#tm-x");if(x)x.focus()}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")tmClose()});
 /* ---------- About us: the community text comes from the Mallu Articles Bengaluru brochure; the two links are the community's WhatsApp group and Instagram page ---------- */

@@ -967,7 +967,7 @@ function refreshHome(){
   /* the countdowns read these three attributes (see homeMount) */
   const a=homeAttrs();root.dataset.event=a.event;root.dataset.skew=a.skew;root.dataset.close=a.close;
   /* the main Register buttons carry the live price (a returning visitor's main button says View my ticket and is left alone) */
-  if(!homeRet()){const l=regLabel();["hero-register","go-register"].forEach(id=>{const b=document.getElementById(id);if(b&&b.textContent!==l)b.textContent=l})}
+  if(!homeRet()){const l=regLabel();["go-register"].forEach(id=>{const b=document.getElementById(id);if(b&&b.textContent!==l)b.textContent=l})}
   /* the spots lines are patched in place, only when the text changes */
   const v=spotsView();
   root.querySelectorAll(".bh-spots").forEach(p=>{const s=p.querySelector("span");if(!s)return;p.classList.toggle("bh-nosp",!v);if(p.dataset.v!==v){p.dataset.v=v;s.innerHTML=v}});
@@ -990,7 +990,7 @@ function vHome(){
 <p class="bh-pres">${O} presents</p>
 <h1 aria-label="${E}">${nameHtml()}</h1>
 <p class="bh-tag">Where strangers feels like home</p>
-<div class="bh-cta"><button class="bh-btn bh-gold" id="hero-register" type="button">${esc(P)}</button><button class="bh-btn bh-ghost" id="hero-tickets" type="button">${esc(Q)}</button></div>
+<div class="bh-cta"><button class="bh-btn bh-gold" id="hero-register" type="button">${ret?"View my ticket":"Register"}</button><button class="bh-btn bh-ghost" id="hero-tickets" type="button">${esc(Q)}</button></div>
 ${spots}
 </div></section>
 
@@ -1037,7 +1037,7 @@ ${ret?`<p class="bh-note">${n===1?"Your booking is saved on this device. Enter y
 <p class="bh-cdwhen"><span data-ev="d">${esc(evDate())}</span> · <span data-ev="t">${esc(evTime())}</span></p></div></div></section>
 
 <footer class="bh-foot"><div class="bh-w"><b>${O}</b> · ${E}${SPONSOR.name?`<br>Co-sponsored by ${esc(SPONSOR.name)}`:""}<div class="bh-flogos"><img class="bh-fm" src="assets/burg-logo.png" alt="${O} logo">${SPONSOR.logo?`<span class="bh-fsep" aria-hidden="true"></span><img class="bh-fe" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.previousElementSibling.remove();this.remove()">`:""}</div></div></footer>
-<button class="bh-btn bh-gold bh-fab" id="home-fab" type="button">${ret?"View my ticket":"Register now"}</button></div>`;
+</div>`;
 }
 
 /* Home behaviour: the clicks (poster zoom, the floating Register button, the optional sponsor card). The movement (reveal on scroll, countdowns,

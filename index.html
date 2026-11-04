@@ -257,7 +257,7 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 @media(min-width:820px){.bhome .bh-split{grid-template-columns:minmax(0,400px) 1fr;gap:64px}}
 .bhome .bh-poster{border-radius:22px;overflow:hidden;border:1px solid var(--glass-b);box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 0 8px rgba(233,178,76,.08);max-width:420px;margin:0 auto;transform:rotate(-1.4deg);transition:transform .4s}
 .bhome .bh-poster:hover{transform:rotate(0)}
-.bhome .bh-poster img{display:block;width:100%;height:auto;cursor:zoom-in}
+.bhome .bh-poster img{display:block;width:100%;height:auto}
 .bhome .bh-hint{text-align:center;font:600 .78rem var(--sans);color:var(--rose);margin-top:16px;letter-spacing:.06em}
 .bhome .bh-facts{display:grid;gap:12px;margin:26px 0}
 .bhome .bh-fact{display:flex;gap:16px;align-items:center;text-decoration:none;color:inherit;background:var(--glass);border:1px solid var(--glass-b);border-radius:18px;padding:18px 20px;transition:border-color .2s,transform .2s}
@@ -1080,7 +1080,7 @@ function homeMount(){
   function big(src){const d=document.createElement("div");d.className="bh-lb";d.innerHTML='<img alt="">';d.firstChild.src=src;d.onclick=()=>d.remove();document.body.appendChild(d)}
   on(document,"keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".bh-lb").forEach(x=>x.remove())});
   sig.addEventListener("abort",()=>document.querySelectorAll(".bh-lb").forEach(x=>x.remove()));
-  root.querySelectorAll(".bh-poster img,.bh-sl img,#home-sp-img").forEach(im=>on(im,"click",()=>big(im.currentSrc||im.src)));
+  root.querySelectorAll(".bh-sl img,#home-sp-img").forEach(im=>on(im,"click",()=>big(im.currentSrc||im.src)));
   /* the photo slider: dots, swipe, and a slow auto-advance that stops on hover and when the tab is hidden */
   const tr=root.querySelector("#bh-track"),dt=[].slice.call(root.querySelectorAll("#bh-dots button")),sl=root.querySelector("#bh-slider");let cur=0,timer=null,sw=false,x0=0;
   function go(n){cur=(n+dt.length)%dt.length;tr.style.transform="translateX(-"+cur*100+"%)";dt.forEach((d,i)=>d.setAttribute("aria-current",String(i===cur)))}

@@ -1,4 +1,4 @@
-/* Motion for every public screen except Home (Home has its own, in home-fx.js). Loaded by index.html as assets/page-fx.js?v=1:
+/* Motion for every public screen except Home (Home has its own motion, inside index.html). Loaded by index.html as assets/page-fx.js?v=1:
    BUMP THE NUMBER whenever this file changes.
      - PageFX.enter(step): called at the end of render(). A SHORT entrance (the heading, then each block, about 0.6 s in all) that plays only when the
        screen really changes, or when its content first arrives (e.g. the payment details finish loading). A redraw of the same screen (a typo

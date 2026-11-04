@@ -1005,9 +1005,9 @@ ${spots}
 
 <section style="padding-top:0"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">How it works</p><h2>Booked in <i>three taps.</i></h2></div>
 <div class="bh-steps">
-<div class="bh-step bh-rv"><h3>Add your group</h3><p data-fr>${esc(frText())}</p></div>
-<div class="bh-step bh-rv"><h3>Pay by UPI</h3><p>We calculate the total and open your UPI app. Upload the screenshot and you’re done.</p></div>
-<div class="bh-step bh-rv"><h3>Get your QR ticket</h3><p>Once verified, download your ticket and show it at the gate.</p></div></div></div></section>
+<div class="bh-step bh-rv"><h3>Click Register now and fill the form</h3><p data-fr>${esc(frText())}</p></div>
+<div class="bh-step bh-rv"><h3>Pay by UPI</h3><p>We calculate the total and open your UPI app. Make the payment, upload the screenshot and submit.</p></div>
+<div class="bh-step bh-rv"><h3>Get your QR ticket</h3><p>Once verified, download your ticket and show it at the gate on the day of the meet.</p></div></div></div></section>
 
 <section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-slider bh-spslider bh-rv" id="sp-slider" role="region" aria-roledescription="carousel" aria-label="Our co-sponsor"><div class="bh-track" id="sp-track"><div class="bh-spsl bh-sponsor" aria-roledescription="slide" aria-label="1 of 2">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you.</p></div></div>${SPONSOR.video?`<div class="bh-spsl bh-spvid" id="home-sp-vfig" aria-roledescription="slide" aria-label="2 of 2"><video id="home-sp-video" data-src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="none" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video></div>`:""}</div>${SPONSOR.video?`<div class="bh-dots" id="sp-dots"><button type="button" aria-label="Show the thank-you card" aria-current="true"></button><button type="button" aria-label="Show the video"></button></div>`:""}</div></div></section>
 

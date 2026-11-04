@@ -279,13 +279,18 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-slider{--ih:clamp(340px,60vw,540px);position:relative;border-radius:28px;overflow:hidden;border:1px solid var(--glass-b);background:linear-gradient(180deg,var(--wine),var(--deep));touch-action:pan-y}
 .bhome .bh-track{display:flex;transition:transform .7s cubic-bezier(.65,0,.25,1)}
 .bhome .bh-sl{position:relative;flex:0 0 100%;margin:0;display:flex;flex-direction:column}
-.bhome .bh-sl img{display:block;width:100%;height:var(--ih);object-fit:cover;object-position:50% 70%;cursor:zoom-in}
+.bhome .bh-sl>img{display:block;width:100%;height:var(--ih);object-fit:cover;object-position:50% 70%;cursor:zoom-in}
 .bhome .bh-sl:after{content:"";position:absolute;left:0;right:0;top:calc(var(--ih) - 150px);height:150px;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(26,4,12,.96))}
 .bhome .bh-sl .bh-txt{position:relative;z-index:2;margin-top:-34px;padding:0 24px 30px;pointer-events:none}
 .bhome .bh-sl h3{font:900 clamp(1.9rem,6vw,2.9rem)/1.08 var(--sans);letter-spacing:-.02em;color:var(--cream)}
 .bhome .bh-sl h3 i{font:italic 500 1em var(--serif);color:var(--blush);letter-spacing:0}
 .bhome .bh-sl p:not(.bh-eyebrow){font:italic 500 1.1rem/1.6 var(--serif);max-width:52ch;margin-top:14px}
 .bhome .bh-sl b{font-weight:500;color:var(--gold)}
+/* small thank-you to the previous year's partner, inside the "Chai, Chill and Chartered 2025" slide (much smaller than the current co-sponsor card) */
+.bhome .bh-sl .bh-txt p.bh-thx{display:flex;align-items:center;gap:12px;margin-top:18px;font:600 .82rem/1.35 var(--sans);letter-spacing:.02em;color:var(--cream);opacity:.9}
+.bhome .bh-sl .bh-txt p.bh-thx img{display:block;width:auto;height:58px;flex:none;border-radius:12px}
+.bhome .bh-sl .bh-txt p.bh-thx span{display:block}
+.bhome .bh-sl .bh-txt p.bh-thx b{display:block;font:700 .95rem/1.25 var(--sans);color:var(--cream)}
 .bhome .bh-dots{position:absolute;top:12px;right:12px;z-index:5;display:flex;background:rgba(26,4,12,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:99px;padding:0 4px}
 .bhome .bh-dots button{width:32px;height:32px;background:none;border:0;padding:0;cursor:pointer;display:grid;place-items:center}
 .bhome .bh-dots button:before{content:"";width:9px;height:9px;border-radius:99px;background:rgba(246,215,198,.55);transition:all .3s}
@@ -1015,7 +1020,7 @@ ${tmHomeCard()}
 
 <section id="moments"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">Our meetups</p><h2>Moments we’ve <i>shared.</i></h2></div>
 <div class="bh-slider bh-rv" id="bh-slider" role="region" aria-roledescription="carousel" aria-label="Photos from our past meetups"><div class="bh-track" id="bh-track">
-<figure class="bh-sl" aria-roledescription="slide" aria-label="1 of 2"><img src="assets/burg-moment-chai.jpg" alt="The crowd at Chai, Chill and Chartered 2025" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">Last year</p><h3>Chai, Chill <i>and</i> Chartered 2025</h3><p>It was full of warmth, and you made it that way. This year we’re back with <b>${E}</b>, planned even more carefully.</p></figcaption></figure>
+<figure class="bh-sl" aria-roledescription="slide" aria-label="1 of 2"><img src="assets/burg-moment-chai.jpg" alt="The crowd at Chai, Chill and Chartered 2025" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">Last year</p><h3>Chai, Chill <i>and</i> Chartered 2025</h3><p>It was full of warmth, and you made it that way. This year we’re back with <b>${E}</b>, planned even more carefully.</p><p class="bh-thx"><img src="assets/chai-2025-partner-logo.png" alt="IAM Business School logo" width="258" height="178" loading="lazy" onerror="this.remove()"><span>With thanks to<b>IAM Business School</b></span></p></figcaption></figure>
 <figure class="bh-sl" aria-roledescription="slide" aria-label="2 of 2"><img src="assets/burg-moment-mizaaniya.jpg" alt="The crowd at Mizaaniya 1.0, our Iftar meet" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">March 2026 · Iftar meet</p><h3>Mizaaniya <i>1.0</i></h3><p>An evening of Iftar, laughter and good company, with the whole community around one table.</p></figcaption></figure>
 </div><div class="bh-dots" id="bh-dots"><button type="button" aria-label="Show Chai, Chill and Chartered 2025" aria-current="true"></button><button type="button" aria-label="Show Mizaaniya 1.0"></button></div></div></div></section>
 
@@ -1080,7 +1085,7 @@ function homeMount(){
   function big(src){const d=document.createElement("div");d.className="bh-lb";d.innerHTML='<img alt="">';d.firstChild.src=src;d.onclick=()=>d.remove();document.body.appendChild(d)}
   on(document,"keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".bh-lb").forEach(x=>x.remove())});
   sig.addEventListener("abort",()=>document.querySelectorAll(".bh-lb").forEach(x=>x.remove()));
-  root.querySelectorAll(".bh-sl img,#home-sp-img").forEach(im=>on(im,"click",()=>big(im.currentSrc||im.src)));
+  root.querySelectorAll(".bh-sl>img,#home-sp-img").forEach(im=>on(im,"click",()=>big(im.currentSrc||im.src)));
   /* the photo slider: dots, swipe, and a slow auto-advance that stops on hover and when the tab is hidden */
   const tr=root.querySelector("#bh-track"),dt=[].slice.call(root.querySelectorAll("#bh-dots button")),sl=root.querySelector("#bh-slider");let cur=0,timer=null,sw=false,x0=0;
   function go(n){cur=(n+dt.length)%dt.length;tr.style.transform="translateX(-"+cur*100+"%)";dt.forEach((d,i)=>d.setAttribute("aria-current",String(i===cur)))}

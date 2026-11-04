@@ -17,6 +17,13 @@ DLG_BOT = r"""
   const n=Date.now.bind(Date);Date.now=()=>n()+(window.__off||0);   // tests can move the clock forward with window.__off
 })();
 """
+def go_tab(pg, t):
+    """open a section like a person would: tap its menu button if one is on screen (side menu or bottom bar), otherwise go there directly (Scan screenshots, and the sections under More on a phone)"""
+    el = pg.query_selector(f'button[data-tab="{t}"]:visible')
+    if el: el.click()
+    else: pg.evaluate("t=>nav({tab:t,sheets:[]})", t)
+    pg.wait_for_timeout(100)
+def on_tab(pg, t): return pg.query_selector(f'button[data-tab="{t}"][aria-current="page"]') is not None
 def auto(pg, accept=True, value=None): pg.evaluate('(q)=>window.__DLGQ.push(q)', dict(accept=accept, value=value))
 def dlg_msgs(pg): return pg.evaluate('(()=>{const m=window.__DLGMSG;window.__DLGMSG=[];return m})()')
 def check(name, cond, detail=''):
@@ -55,6 +62,6 @@ def open_page(p, database, tab=None):
         else r.fulfill(body='/*stub*/', content_type='text/javascript') if r.request.url.endswith('.js') or '/npm/' in r.request.url
         else r.fulfill(status=204, body='')))
     pg.add_init_script('window.__DB='+json.dumps(database)+';'); pg.add_init_script(MOCK); pg.add_init_script(CH); pg.add_init_script(DLG_BOT)
-    pg.goto('https://example.test/admin/test.html'); pg.wait_for_selector('.tabs')
-    if tab: pg.click(f'button[data-tab="{tab}"]'); pg.wait_for_timeout(100)
+    pg.goto('https://example.test/admin/test.html'); pg.wait_for_selector('#v')
+    if tab: go_tab(pg, tab)
     return b, pg, errs

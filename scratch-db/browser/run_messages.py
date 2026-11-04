@@ -76,8 +76,8 @@ def opn(p, d, tab=None, w=1300, h=900):
     pg.route('**/*', lambda r: (r.fulfill(body=HTML, content_type='text/html') if r.request.url.endswith('/admin/test.html')
         else r.fulfill(body='/*stub*/', content_type='text/javascript') if r.request.url.endswith('.js') or '/npm/' in r.request.url else r.fulfill(status=204, body='')))
     pg.add_init_script('window.__DB=' + json.dumps(d) + ';'); pg.add_init_script(MOCK); pg.add_init_script(CH); pg.add_init_script(STATEFUL); pg.add_init_script(DLG_BOT)
-    pg.goto('https://example.test/admin/test.html'); pg.wait_for_selector('.tabs')
-    if tab: pg.click(f'button[data-tab="{tab}"]'); pg.wait_for_timeout(100)
+    pg.goto('https://example.test/admin/test.html'); pg.wait_for_selector('#v')
+    if tab: go_tab(pg, tab)
     return b, pg, errs
 def calls(pg, name=None): return [x for x in pg.evaluate('window.__CALLS||[]') if name is None or x['name'] == name]
 def tm(pg): return pg.evaluate('window.__M.tm')
@@ -92,7 +92,7 @@ with sync_playwright() as p:
     # ---- 1. before the database file is run: nothing shows, nothing breaks
     b, pg, errs = open_page(p, db()); 
     check('1.1 before r2_13: no Messages tab', pg.query_selector('button[data-tab="messages"]') is None)
-    pg.click('button[data-tab="settings"]'); check('1.2 before r2_13: no Game messages card, no crash', pg.query_selector('#msgshow') is None and not errs, errs); b.close()
+    go_tab(pg, 'settings'); check('1.2 before r2_13: no Game messages card, no crash', pg.query_selector('#msgshow') is None and not errs, errs); b.close()
     # ---- 2. tab, banner and the Settings switch
     b, pg, errs = opn(p, mdb(T, B), 'messages'); t = pg.inner_text('#v')
     check('2.1 Messages tab appears, with the three messages and 0 people each', pg.query_selector('button[data-tab="messages"]') and 'Tiger' in t and 'Elephant' in t and 'Lion' in t and t.count('0 people') >= 3, t[:300])
@@ -104,10 +104,9 @@ with sync_playwright() as p:
     check('2.5 the banner now says SHOWN', 'SHOWN' in pg.inner_text('#v') and 'Hide messages' in pg.inner_text('#v'))
     pg.click('#mtoggle'); pg.wait_for_timeout(250)
     check('2.6 Hide: no question asked, sends false', calls(pg, 'admin_set_show_messages')[-1]['args'] == {'p_show': False} and 'HIDDEN' in pg.inner_text('#v'))
-    pg.click('button[data-tab="settings"]'); check('2.7 Settings has the Game messages card with the switch, unticked', pg.query_selector('#msgshow') and not pg.is_checked('#msgshow'))
-    check('2.8 the jump bar lists Messages', any('Messages' == x.inner_text().strip() for x in pg.query_selector_all('#snav .chip')))
-    pg.check('#msgshow'); pg.click('#msgshowsave'); pg.wait_for_timeout(250)
-    check('2.9 Settings Save sends p_show = true', calls(pg, 'admin_set_show_messages')[-1]['args'] == {'p_show': True})
+    go_tab(pg, 'settings'); check('2.7 Settings no longer repeats the Show/Hide switch (it lives only in the Messages tab)', pg.query_selector('#msgshow') is None and 'Game messages' not in pg.inner_text('#v'))
+    check('2.8 the jump bar has no Messages entry', not any('Messages' == x.inner_text().strip() for x in pg.query_selector_all('#snav .chip')))
+    check('2.9 the Messages tab itself still shows the state after the toggles', 'HIDDEN' in (go_tab(pg, 'messages') or pg.inner_text('#v')) or 'HIDDEN' in pg.inner_text('#v'))
     check('2.10 no page errors', not errs, errs); b.close()
     # ---- 3. writing messages
     b, pg, errs = opn(p, mdb(T, B), 'messages')

@@ -802,7 +802,6 @@ const db={
 
 function uuid(){if(crypto.randomUUID)return crypto.randomUUID();
   return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=crypto.getRandomValues(new Uint8Array(1))[0]&15;return(c==="x"?r:(r&3|8)).toString(16)})}
-const askEmail=()=>!(S.flags&&S.flags.ask_email===false);
 function blank(){return{name:"",phone:"",occ:"",occd:"",occFor:"",loc:"",food:""}}
 const S={step:"home",status:null,friends:false,n:1,people:[blank()],file:null,sid:uuid(),errs:[],ferr:null,payErr:"",busy:false,result:null,
   tk:{q:"",phone:"",msg:"",busy:false,res:null,nf:false,code:"",ph:""},ti:null,cur:null,cv:[],pay:null,payLoading:false,payFail:false,payChanged:false};
@@ -981,7 +980,7 @@ function refreshHome(){
   const cal=document.getElementById("home-cal"),map=document.getElementById("home-map");
   if(cal){const u=evCalUrl();if(u&&cal.getAttribute("href")!==u)cal.setAttribute("href",u)}
   if(map){const u=evMapUrl();if(map.getAttribute("href")!==u)map.setAttribute("href",u)}
-  const tk=document.getElementById("go-tickets"),ab=document.getElementById("go-about"),want=!!(S.flags&&S.flags.show_about);
+  const tk=document.getElementById("go-tickets"),ab=document.getElementById("go-about"),want=true;
   if(want&&!ab&&tk)tk.insertAdjacentHTML("afterend",hAbout());
   else if(!want&&ab)ab.remove();
   const root=document.querySelector("#app .bhome");if(!root)return;
@@ -1050,7 +1049,7 @@ ${tmHomeCard()}
 
 <section style="padding-top:0"><div class="bh-w"><div class="bh-final bh-rv" id="home-join"><p class="bh-eyebrow">See you there</p><h2>Ready to join <i>us?</i></h2><p class="bh-lede">Reserve your spot, or open a ticket you already booked.</p>
 ${spots}
-<div class="bh-cta"><button class="bh-btn bh-gold" id="go-register" type="button">${esc(P)}</button><button class="bh-btn bh-ghost" id="go-tickets" type="button">${esc(Q)}</button>${S.flags&&S.flags.show_about?hAbout():""}</div>
+<div class="bh-cta"><button class="bh-btn bh-gold" id="go-register" type="button">${esc(P)}</button><button class="bh-btn bh-ghost" id="go-tickets" type="button">${esc(Q)}</button>${hAbout()}</div>
 ${ret?`<p class="bh-note">${n===1?"Your booking is saved on this device. Enter your phone number to view it.":n+" bookings are saved on this device. Open Tickets and enter your phone number to view them."}</p>`:""}</div><p class="bh-reg" id="bh-reg" role="timer" aria-label="Time left to register"${a.close?"":" hidden"}>Registration closes in <b>00</b>d <b>00</b>h <b>00</b>m <b>00</b>s</p></div></section>
 
 <section class="bh-grand" id="bh-grand"><div class="bh-w"><div class="bh-rv"><p class="bh-eyebrow">The countdown</p><h2>Until we <i>meet.</i></h2>
@@ -1365,7 +1364,7 @@ function vPay(){
   ${S.file&&S.fileUrl?`<div class="note" style="font-size:.95rem">✓ <b>File uploaded</b> · <a href="${esc(S.fileUrl)}" target="_blank" rel="noopener">Tap to view</a> · <label for="shot" style="display:inline;font-weight:400;text-decoration:underline;cursor:pointer">Change</label></div>`:`<div class="note">Required. Please upload an image of your payment confirmation.</div>`}<div class="err" id="ferr"></div></div>
   <div class="row"><button class="ghost" id="back" ${S.busy?"disabled":""}>Back</button><button id="submit">Submit registration</button></div>`;
 }
-const fbOn=()=>!!(S.flags&&S.flags.ask_feedback===true);
+const fbOn=()=>true;
 function fbCard(r){
   if(!fbOn())return"";
   if(!S.fb||S.fb.code!==r.booking_code)S.fb={code:r.booking_code,rating:0,comment:"",busy:false,sent:false,err:""};
@@ -1405,7 +1404,6 @@ const phoneBox=(id,attr,val,ph)=>`<div class="pf"><span aria-hidden="true">+91</
 const optX=(k,v,cur)=>`<label><input type="radio" name="x_${k}" data-x="${k}" value="${v}" ${cur===v?"checked":""}><span>${v}</span></label>`;
 /* a pasted number such as "+91 98765-43210", "919876543210" or "09876543210" becomes the plain 10 digits */
 const cleanPhone=v=>{let d=String(v||"").replace(/\D/g,"");if(d.length===12&&d.startsWith("91"))d=d.slice(2);else if(d.length===11&&d[0]==="0")d=d.slice(1);return d.slice(0,10)};
-const okMail=e=>{e=String(e||"").trim();return e.length>=5&&e.length<=120&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)};
 const XERR={MISMATCH:"The details don't match. Please check the Booking ID, the ticket number and the phone number registered for that ticket.",TRANSFERS_CLOSED:"Ticket transfers aren't open right now.",CUTOFF_PASSED:"The deadline for ticket transfers has passed.",NOT_CONFIRMED:"This ticket isn't confirmed yet, so it can't be transferred.",
   COORDINATOR:"Coordinator tickets can't be transferred here. Please contact the organisers.",ALREADY_CHECKED_IN:"This ticket has already been used at the entry.",ALREADY_TRANSFERRED:"This ticket has already been transferred.",ALREADY_PENDING:"A buyer has already applied for this ticket and the organisers are handling it. Please wait, or contact them.",
   TRY_AGAIN:"That didn't go through. Please tap the button again.",INVALID_UPI:"That payout UPI ID or phone number doesn't look right. Use name@bank or a 10-digit number.",INVALID_CODE:"This code isn't valid. Please check it, or ask for a new one. Codes expire after a while.",NOT_AVAILABLE:"This ticket is no longer available for transfer.",
@@ -1532,12 +1530,10 @@ function vXForm(){
   (b.err?`<div class="card errbox" role="alert">${esc(b.err)}</div>`:"")+
   `<div class="card"><label for="xf_n">Full name</label><input type="text" id="xf_n" data-x="name" value="${esc(b.name||"")}" maxlength="80" autocomplete="name">
   <label for="xf_p">Phone number</label>${phoneBox("xf_p",'data-x="phone"',b.phone)}
-  ${askEmail()?`<label for="xf_e">Email address</label><input type="text" id="xf_e" data-x="email" value="${esc(b.email||"")}" maxlength="120" inputmode="email" autocapitalize="off" autocomplete="email" placeholder="you@example.com">`:""}
   <div class="lbl">Where are you currently based?</div><div class="opts">${optX("loc","In Bengaluru",b.loc)}${optX("loc","Outside Bengaluru",b.loc)}</div>
   <div class="lbl">Will you be attending?</div><div class="opts">${optX("att","Surely",b.att)}${optX("att","Most probably",b.att)}</div>
   ${b.food_locked?`<div class="lbl">Food preference</div><p class="note" style="margin-top:0">The food order has already been placed, so your meal will be the same as the seller's: <b>${esc(b.food)}</b>.</p>`:`<div class="lbl">Food preference</div><div class="opts">${optX("food","Veg",b.food)}${optX("food","Non-veg",b.food)}</div>`}
   <label style="display:flex;gap:10px;align-items:flex-start;font-weight:400;margin-top:18px"><input type="checkbox" id="xf_ok" ${b.consent?"checked":""} style="margin-top:5px;flex:none"><span>${pub?"I understand that the organisers will ask me to pay the standard ticket price once they have confirmed with the seller, and that the seat becomes mine only after they complete the transfer.":"I understand that any payment between me and the seller is our own arrangement, and the organisers are not responsible for it."}</span></label>
-  ${askEmail()?`<p class="note">Only the organisers can see this. We will use it to share event updates, or to reach you if there is an issue with your transfer.</p>`:""}
   <div class="row"><button class="ghost" id="go-xbuy">Back</button><button id="xsubmit" ${b.busy?"disabled":""}>${b.busy?"Submitting…":"Submit"}</button></div></div>`}
 function vXDone(){
   const r=S.xb.result,pub=S.xb.mode==="public";
@@ -1586,12 +1582,12 @@ async function xOpenCode(){
 }
 async function xSubmit(){
   const b=S.xb;if(b.busy)return;b.err="";
-  const e=[];if(!String(b.name||"").trim())e.push("enter your name");if(!/^\d{10}$/.test(b.phone||""))e.push("enter a 10-digit phone number");if(askEmail()&&!okMail(b.email))e.push("enter a valid email address");
+  const e=[];if(!String(b.name||"").trim())e.push("enter your name");if(!/^\d{10}$/.test(b.phone||""))e.push("enter a 10-digit phone number");
   if(!b.loc)e.push("select where you are currently based");if(!b.att)e.push("select Surely or Most probably");if(!b.food_locked&&!b.food)e.push("select Veg or Non-veg");if(!b.consent)e.push("tick the box to confirm you understand");
   if(e.length){b.err="Please complete the following: "+e.join("; ")+".";return render()}
   b.busy=true;render();
   try{
-    const{data,error}=await db.rpc("transfer_submit",{p_code:b.code,p_submission_id:b.sid,p_buyer:{name:b.name.trim(),phone:b.phone,email:askEmail()?String(b.email||"").trim():"",loc:b.loc,att:b.att,food:b.food_locked?"":b.food,consent:"true"}});if(error)throw error;
+    const{data,error}=await db.rpc("transfer_submit",{p_code:b.code,p_submission_id:b.sid,p_buyer:{name:b.name.trim(),phone:b.phone,email:"",loc:b.loc,att:b.att,food:b.food_locked?"":b.food,consent:"true"}});if(error)throw error;
     if(data&&data.ok){b.result=data;remember("mm_mine",data.booking_code,20);S.step="xdone";b.busy=false;return render()}
     b.err=xerr(data);
   }catch(_){b.err="We couldn't reach the server. Please check your internet and tap Submit again. Tapping again won't create a duplicate request."}

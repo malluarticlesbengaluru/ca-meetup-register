@@ -2,37 +2,33 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<link rel="icon" type="image/png" href="../assets/icon-192.png"><link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"><meta name="theme-color" content="#04140F">
+<link rel="icon" type="image/png" href="../assets/icon-192.png"><link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"><meta name="theme-color" content="#F2F4F9" id="tc">
 <title>Organiser · Meetup 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:#04140F;--card:#0A2219;--card2:#0F2D22;--ink:#EAF6F0;--mute:#9DBBAD;--brand:#2FD39B;--brand2:#18A878;--accent:#F0A000;--line:#1D4636;--err:#FF8A80;--ok:#5EE2A6;--warn:#FFC15A;--on:#03150E;--r:16px;box-sizing:border-box}
+:root{color-scheme:light;--bg:#F2F4F9;--card:#FFFFFF;--card2:#F4F6FB;--field:#FFFFFF;--ink:#0E1730;--mute:#5A6584;--brand:#2447F0;--brand2:#1B38C0;--accent:#B47C00;--line:#DCE1EE;--err:#B8312A;--ok:#0F7B57;--warn:#A85F00;--on:#FFFFFF;--on-err:#FFFFFF;--soft:#E6EBFF;--gold-soft:#FFF2CC;--ok-soft:#DDF4EA;--warn-soft:#FFEBCF;--bad-soft:#FDE4E1;--shadow:0 1px 2px rgba(14,23,48,.06),0 8px 24px -12px rgba(14,23,48,.18);--r:14px;--display:"Bricolage Grotesque",Manrope,system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0A0F1F;--card:#121A31;--card2:#0E1527;--field:#0B1226;--ink:#E9EDFA;--mute:#96A2C4;--brand:#7D95FF;--brand2:#5F79F0;--accent:#F0B73A;--line:#232D4D;--err:#FF8A80;--ok:#4FD6A0;--warn:#FFB454;--on:#0A0F1F;--on-err:#2B0705;--soft:#1B2650;--gold-soft:#3A2D0A;--ok-soft:#0F3328;--warn-soft:#3B2808;--bad-soft:#3F1714;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6)}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0A0F1F;--card:#121A31;--card2:#0E1527;--field:#0B1226;--ink:#E9EDFA;--mute:#96A2C4;--brand:#7D95FF;--brand2:#5F79F0;--accent:#F0B73A;--line:#232D4D;--err:#FF8A80;--ok:#4FD6A0;--warn:#FFB454;--on:#0A0F1F;--on-err:#2B0705;--soft:#1B2650;--gold-soft:#3A2D0A;--ok-soft:#0F3328;--warn-soft:#3B2808;--bad-soft:#3F1714;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6)}
 *,*:before,*:after{box-sizing:inherit}html{scroll-padding-top:70px;-webkit-text-size-adjust:100%}
-body{margin:0;background:radial-gradient(900px 500px at 85% -10%,#0B3A2B 0,transparent 60%),var(--bg);background-attachment:fixed;color:var(--ink);font:500 15px/1.5 Manrope,system-ui,sans-serif;padding-bottom:env(safe-area-inset-bottom,0px)}
-.top{background:rgba(4,20,15,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--ink);padding:9px 14px;padding-top:calc(9px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line)}
-.top div{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:11px}.top img{height:28px;width:auto;display:block}.top span{font-weight:800;font-size:.98rem;letter-spacing:.01em}.top small{margin-left:auto;color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:.72rem}
-.kasavu{height:4px;background:linear-gradient(90deg,var(--accent),var(--brand),#2D6BFF,#C0307E,var(--accent))}
-main{max-width:1100px;margin:0 auto;padding:16px 14px 60px}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.5 "Instrument Sans",Manrope,system-ui,sans-serif;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+main{min-width:0;display:flex;flex-direction:column}
 h1{font-size:1.45rem;margin:6px 0 4px;font-weight:800;letter-spacing:-.01em}h2{font-size:1.1rem;margin:0 0 10px;font-weight:800}
 a{color:var(--brand)}
-.card{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--brand);border-radius:var(--r);padding:14px;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:0 0 12px;box-shadow:var(--shadow)}
 .mute{color:var(--mute)}.err{color:var(--err)}
-input,select{font:inherit;padding:10px 11px;min-height:42px;border:1px solid var(--line);border-radius:12px;background:#06180F;color:var(--ink);max-width:100%}
+input,select{font:inherit;padding:10px 11px;min-height:42px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);max-width:100%}
 label{display:block;font-weight:700;margin:10px 0 4px}
 button{font:inherit;font-weight:700;border-radius:12px;padding:10px 14px;min-height:42px;border:1px solid var(--brand);background:var(--brand);color:var(--on);cursor:pointer;transition:transform .12s,filter .12s}
 button:active{transform:scale(.97)}button:hover{filter:brightness(1.08)}
-button.ghost{background:transparent;color:var(--brand)}button.bad{background:var(--err);border-color:var(--err);color:#2b0705}button.sm{padding:6px 11px;min-height:36px;font-size:.88rem}
-button:disabled{opacity:.5}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.ghost{background:transparent;color:var(--brand)}button.bad{background:var(--err);border-color:var(--err);color:var(--on-err)}button.sm{padding:6px 11px;min-height:36px;font-size:.88rem}
+button:disabled{opacity:.5}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
 label>input[type=checkbox]{width:22px;height:22px;min-height:0;accent-color:var(--brand)}
 .hdr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 6px}.hdr .who{flex:1 1 180px;min-width:0}.hdr .who small{display:block;color:var(--mute);font-weight:600}.hdr .who h1{margin:0}.hdr .acts{display:flex;gap:6px;flex-wrap:wrap}
 a.lnk{display:inline-flex;align-items:center;text-decoration:none;border:1px solid var(--brand);border-radius:12px;padding:6px 11px;min-height:36px;font-weight:700;font-size:.88rem;color:var(--brand)}
-.tabs{display:flex;gap:6px;margin:10px -14px 14px;padding:8px 14px;overflow-x:auto;white-space:nowrap;position:sticky;top:0;z-index:5;background:rgba(4,20,15,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);scrollbar-width:none;-webkit-overflow-scrolling:touch}.tabs::-webkit-scrollbar{display:none}
-.tabs button{flex:0 0 auto;background:transparent;color:var(--ink);border-color:var(--line);border-radius:999px;min-height:40px;padding:8px 15px}.tabs button.on{background:var(--brand);color:var(--on);border-color:var(--brand)}
 .grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:12px}.grid .card{margin:0}
 .stat{position:relative;overflow:hidden}.stat>span:first-child{font-size:.78rem;font-weight:700;letter-spacing:.06em;color:var(--mute)}.stat b{display:block;font-size:2rem;line-height:1.15;font-weight:800;margin:2px 0 2px}.stat>span:last-child{font-size:.85rem}
-.stat.c-pink{border-top-color:#D82890}.stat.c-amber{border-top-color:var(--accent)}.stat.c-blue{border-top-color:#4D78FF}.stat.c-violet{border-top-color:#9A55F0}.stat.c-teal{border-top-color:#20C8A0}
-.meter{height:10px;border-radius:999px;background:#06180F;border:1px solid var(--line);overflow:hidden;margin:8px 0 6px;display:flex}.meter i{display:block;height:100%}.meter .m1{background:var(--brand)}.meter .m2{background:var(--accent)}
+.meter{height:10px;border-radius:999px;background:var(--field);border:1px solid var(--line);overflow:hidden;margin:8px 0 6px;display:flex}.meter i{display:block;height:100%}.meter .m1{background:var(--brand)}.meter .m2{background:var(--accent)}
 .charts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.charts .card{margin:0}.charts h3{margin:0 0 6px;font-size:1rem;font-weight:800}
 .pie{position:relative;height:210px}.pie canvas{max-height:100%}
 .leg{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}.leg li{display:flex;align-items:center;gap:8px}.leg i{width:12px;height:12px;border-radius:4px;flex:0 0 auto}.leg b{margin-left:auto}.leg em{font-style:normal;color:var(--mute);min-width:3.2em;text-align:right}
@@ -41,10 +37,10 @@ a.lnk{display:inline-flex;align-items:center;text-decoration:none;border:1px sol
 .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:700;border:1px solid var(--line)}
 .p-paid{color:var(--ok);border-color:var(--ok)}.p-pending{color:var(--warn);border-color:var(--warn)}.p-rejected{color:var(--err);border-color:var(--err)}
 .flag{display:block;font-size:.82rem;color:var(--warn);white-space:normal;max-width:300px}
-.modal{position:fixed;inset:0;background:rgba(0,8,5,.82);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto;z-index:9}
+.modal{position:fixed;inset:0;background:rgba(0,8,5,.82);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto;z-index:24}
 .modal .box{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:var(--r);padding:14px;max-width:960px;width:100%}.modal img{max-width:100%;max-height:78vh;border-radius:12px;display:block;margin:6px auto}.two{display:flex;gap:10px;flex-wrap:wrap}.two>div{flex:1 1 300px}
 #toasts{position:fixed;left:0;right:0;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 14px;z-index:40;pointer-events:none}.toast{background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;max-width:100%;text-align:center;animation:up .15s ease-out}
-@media(max-width:560px){main{padding:12px 12px 60px}.tabs{margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px}.stat b{font-size:1.7rem}.grid{grid-template-columns:1fr 1fr}.pie{height:200px}}
+@media(max-width:560px){.stat b{font-size:1.7rem}.grid{grid-template-columns:1fr 1fr}.pie{height:200px}}
 .chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 12px}.chip{background:transparent;color:var(--ink);border-color:var(--line);border-radius:999px;min-height:40px;padding:8px 14px}.chip span{display:inline-block;min-width:1.5em;margin-left:4px;padding:0 6px;border-radius:999px;background:var(--card2);color:var(--mute);font-size:.82rem;text-align:center}.chip.on{background:var(--brand);color:var(--on);border-color:var(--brand)}.chip.on span{background:rgba(3,21,14,.18);color:var(--on)}.chips .rev{margin:0 0 0 auto;display:flex;align-items:center;gap:8px;font-weight:600}
 .bks{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}.bk{margin:0;display:flex;flex-direction:column;gap:10px}.bk.st-pending{border-top-color:var(--warn)}.bk.st-paid{border-top-color:var(--ok)}.bk.st-rejected{border-top-color:var(--err)}
 .bk-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.bk-h b{font-size:1.1rem}.bk-r{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}.bk-amt{font-size:1.35rem;font-weight:800}
@@ -80,9 +76,9 @@ body.shopen{overflow:hidden}.sheet-bg{position:fixed;inset:0;background:rgba(0,8
 .cam{position:relative;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:1/1;max-width:520px;margin:0 auto}.cam video{width:100%;height:100%;object-fit:cover;display:block}.cam .frame{position:absolute;inset:18%;border:3px solid rgba(255,255,255,.85);border-radius:16px;pointer-events:none}.cam .off{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#cfd8d3;text-align:center;padding:20px}
 .row{display:flex;gap:8px;margin-top:10px}.row>button{flex:1}
 .res{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}.res:last-child{border-bottom:0}
-.p-moved{color:var(--mute);border-color:var(--mute)}.p-here{color:#03150E;background:var(--ok);border-color:var(--ok)}
+.p-moved{color:var(--mute);border-color:var(--mute)}.p-here{color:var(--on);background:var(--ok);border-color:var(--ok)}
 .vm{display:inline-block;width:13px;height:13px;border:2px solid;border-radius:3px;position:relative;vertical-align:-2px;margin:0 4px 0 0}.vm:after{content:"";position:absolute;inset:2px;border-radius:50%;background:currentColor}.vm.v{color:#2FD39B}.vm.n{color:#ff6b5e}
-.ov{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:#fff;overflow:auto}.ov.g{background:#0f7a3d}.ov.r{background:#b3261e}.ov.a{background:#b36b00}.ov.n{background:#26413a}
+.ov{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:#fff;overflow:auto}.ov.g{background:#0f7a3d}.ov.r{background:#b3261e}.ov.a{background:#b36b00}.ov.n{background:#2A3350}
 .ov .big{font-size:2.2rem;font-weight:800;letter-spacing:.04em;margin:0 0 6px}.ov .name{font-size:2rem;font-weight:800;line-height:1.15;margin:10px 0 4px}.ov .sub{font-size:1.15rem;opacity:.95;margin:2px 0}.ov .lab{font-size:1.6rem;font-weight:800;letter-spacing:.06em;background:rgba(255,255,255,.18);border-radius:10px;padding:2px 14px;margin:8px 0}.ov .vm{border-color:#fff;color:#fff}
 .ov button{background:#fff;color:#111;border-color:#fff;min-width:220px;margin-top:12px;font-size:1.05rem;padding:14px 18px}.ov button.line{background:transparent;color:#fff;border-color:#fff}.ov img{max-width:100%;max-height:50vh;border-radius:10px;margin-top:10px}
 @media(prefers-reduced-motion:reduce){.sheet{animation:none}.flash{animation:none;box-shadow:0 0 0 3px var(--accent)}}
@@ -97,18 +93,75 @@ body.working button[data-run]{opacity:.55;pointer-events:none}
 .dlg-a{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}.dlg-a button{flex:1 1 130px}
 @media(max-width:560px){.dlg-bg{align-items:flex-end;padding:0}.dlg{max-width:none;border-radius:20px 20px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
 @media(prefers-reduced-motion:reduce){.dlg,.toast{animation:none}body.working #wbar{animation:none}}
+/* ===== new frame (Step 2): side rail on laptops, bottom bar on phones, one top bar ===== */
+h1,h2,h3{font-family:var(--display);letter-spacing:-.01em;text-wrap:balance}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.mono{font-family:var(--mono);font-weight:600}
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+body:not(.adm) .app{grid-template-columns:minmax(0,1fr)}body:not(.adm) .rail,body:not(.adm) .bnav{display:none}
+.rail{position:sticky;top:0;height:100vh;border-right:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;gap:4px;padding:calc(18px + env(safe-area-inset-top,0px)) 12px 14px;overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 10px 12px}.brand b{font:800 1.05rem/1.1 var(--display);display:block}.brand small{display:block;color:var(--mute);font:600 .72rem "Instrument Sans",sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.mark{width:34px;height:34px;border-radius:10px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:800 .95rem var(--display);flex:0 0 auto}
+.grp{font:700 .7rem "Instrument Sans",sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--mute);padding:14px 10px 4px}
+.nav{display:flex;align-items:center;gap:11px;width:100%;border:0;background:transparent;text-align:left;padding:10px;border-radius:10px;font-weight:600;color:var(--ink);min-height:44px}
+.nav:hover{background:var(--card2);filter:none}.nav[aria-current="page"]{background:var(--soft);color:var(--brand)}
+.badge{margin-left:auto;min-width:22px;height:22px;padding:0 7px;border-radius:999px;background:var(--brand);color:var(--on);font:700 .75rem/22px "Instrument Sans",sans-serif;text-align:center}.badge.warn{background:var(--warn);color:var(--card)}.badge.quiet{background:var(--card2);color:var(--mute);border:1px solid var(--line);line-height:20px}
+.who{margin-top:auto;border-top:1px solid var(--line);padding:12px 6px 0;display:flex;align-items:center;gap:10px}.who .av{width:32px;height:32px;border-radius:50%;background:var(--gold-soft);color:var(--accent);display:grid;place-items:center;font-weight:800;flex:0 0 auto}.who b{display:block}.who small{color:var(--mute)}.who .sm{margin-left:auto}
+.tbar{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) 24px 12px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.tbar .grow{flex:1}.tbar .mark+b{font:800 1rem var(--display)}.tbar .tl{display:flex;align-items:center;gap:10px}
+.sbox{position:relative;flex:1 1 auto;max-width:560px;min-width:0}
+.search{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 12px;min-height:44px;color:var(--mute)}
+.search input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;outline:none;min-height:42px;padding:0}.search input:focus-visible{outline:none}.search:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px var(--soft)}
+.search kbd{font:600 .72rem var(--mono);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.sdrop{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);max-height:60vh;overflow:auto;padding:4px 12px;z-index:12}.sdrop[hidden]{display:none}.sdrop .srs{margin:0}
+.rp{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 12px;font-weight:700;font-size:.82rem;white-space:nowrap}.rp:before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.rp.ok{background:var(--ok-soft);color:var(--ok)}.rp.warn{background:var(--warn-soft);color:var(--warn)}.rp.bad{background:var(--bad-soft);color:var(--err)}
+.icon-btn{width:44px;height:44px;min-height:44px;padding:0;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;flex:0 0 auto}.icon-btn:hover{filter:none;background:var(--card2)}
+.page{padding:22px 24px 40px;max-width:1280px;width:100%;margin:0 auto;min-width:0}
+.phead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;margin:0 0 16px}.phead h1{font-size:clamp(1.5rem,3vw,2rem);line-height:1.1;margin:0}.phead p{margin:4px 0 0;color:var(--mute)}
+.today{display:inline-flex;align-items:center;background:var(--gold-soft);color:var(--accent);border-radius:999px;padding:5px 12px;font-weight:700;font-size:.85rem}
+.todo{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}.todo li{display:flex;align-items:center;gap:14px;padding:12px 8px;border-radius:12px}.todo li:hover{background:var(--card2)}
+.todo .n{font:800 1.7rem/1 var(--display);min-width:2ch;text-align:right;font-variant-numeric:tabular-nums}.todo li.zero .n{color:var(--mute)}
+.todo .t{flex:1;min-width:0}.todo .t b{display:block}.todo .t span{color:var(--mute);font-size:.88rem}
+.sev{width:4px;align-self:stretch;border-radius:4px;background:var(--brand)}.sev.warn{background:var(--warn)}.sev.bad{background:var(--err)}.todo li.zero .sev{background:var(--line)}
+.checks{display:flex;flex-direction:column;gap:8px;margin:0 0 10px;padding:0;list-style:none}.checks li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--card2);border:1px solid var(--line)}
+.bk,.pc.co{border-top-width:3px}
+.bnav{display:none}
+#more{position:fixed;inset:0;background:rgba(5,10,25,.55);z-index:22;display:flex;align-items:flex-end;justify-content:center}#more[hidden]{display:none}
+#more .sheetm{width:100%;max-width:520px;background:var(--card);border-radius:22px 22px 0 0;padding:14px 12px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:2px}#more .grip{width:42px;height:4px;border-radius:4px;background:var(--line);margin:0 auto 10px}
+.hide-sm{display:grid}
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr)}.rail{display:none}
+  .tbar{padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));gap:8px}
+  .search kbd,.rp .long{display:none}.hide-sm{display:none}
+  .page{padding:16px 14px 24px}body.adm .page{padding-bottom:104px}
+  body.adm .bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+  body.shopen .bnav{display:none}
+  .bnav button{position:relative;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:56px;border-radius:12px;font-size:.72rem;font-weight:700;color:var(--mute);padding:4px}
+  .bnav button:hover{filter:none}.bnav button[aria-current="page"]{color:var(--brand);background:var(--soft)}
+  .bnav .badge{position:absolute;top:2px;left:calc(50% + 6px);margin:0;min-width:18px;height:18px;line-height:18px;font-size:.68rem;padding:0 5px}
+  body.adm #toasts{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
+#desk{position:fixed;inset:0;z-index:21;background:var(--bg);display:flex;flex-direction:column}body.deskopen{overflow:hidden}
+.dk-h{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--card)}.dk-h b{flex:1}
+.dk-b{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr)}
+.dk-img{overflow:auto;background:var(--soft);display:flex;align-items:flex-start;justify-content:center;padding:12px}.dk-img img{max-width:100%;border-radius:12px;cursor:zoom-in}.dk-img img.z{max-width:none;width:170%;cursor:zoom-out}
+.dk-i{overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}.dk-amt{font:700 2rem var(--display)}.dk-i .flag{display:block;margin:2px 0}
+.dk-f{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--card)}.dk-f button{flex:1}.dk-f kbd{font:600 .72rem var(--mono);opacity:.7;margin-left:6px}
+@media(max-width:820px){.dk-b{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}.dk-i{max-height:38vh}.dk-f kbd{display:none}.dk-amt{font-size:1.5rem}}
 </style></head>
-<body><header class="top"><div><img src="../assets/logo-mark.png" alt="" width="41" height="28"><span>Mallu Articles Bengaluru</span><small>Organiser</small></div></header><div class="kasavu"></div><div id="wbar"></div><main id="app"></main>
+<body><div class="app"><nav class="rail" id="rail" aria-label="Main"></nav><main><header class="tbar" id="top"></header><div class="page" id="app"></div></main></div><nav class="bnav" id="bnav" aria-label="Main"></nav><div class="more" id="more" hidden></div><div id="wbar"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.js"></script>
 <script>
+try{const th=localStorage.getItem("adm_theme");if(th==="dark"||th==="light")document.documentElement.dataset.theme=th}catch(_){}
 const CFG={url:"https://jddrwajazpsdrqpwlncu.supabase.co",key:"sb_publishable_W3tJTLdbCOuwkUwkjLW1Iw_9m1zGHFT"};
 const SIMILAR_BITS=8;                // images differing by <= this many of 1024 bits count as "possibly the same screenshot" (real tests: identical file = 0 bits; different PhonePe payments = 8 bits; different Google Pay payments = ~27)
 const db=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true}});
 const $=s=>document.querySelector(s),esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const pad=n=>String(n).padStart(3,"0"),inr=n=>"₹"+Number(n||0).toLocaleString("en-IN");
 const S={staff:null,tab:"overview",bookings:[],tickets:[],scans:[],settings:null,mode:"both",f:{q:"",food:"",loc:"",role:"",pay:"",type:"",review:false,here:""},msg:"",charts:[],scanning:false,alert:null,log:[],payOpen:false,
-  emails:{},emailsOk:false,fb:[],fbOk:false,transfers:[],buyers:[],tReady:false,money:null,ipf:null,showMoved:false};
+  fb:[],fbOk:false,transfers:[],buyers:[],tReady:false,money:null,ipf:null,showMoved:false};
 function toast(t,ms){let c=document.getElementById("toasts");if(!c){c=document.createElement("div");c.id="toasts";c.setAttribute("role","status");c.setAttribute("aria-live","polite");document.body.appendChild(c)}
   const d=document.createElement("div");d.className="toast";d.textContent=t;c.appendChild(d);setTimeout(()=>d.remove(),ms||2400)}
 Object.assign(S,{dlg:null,dlgSkip:null,rt:null,shk:null,refreshing:false,quiet:false});
@@ -116,7 +169,7 @@ Object.assign(S,{dlg:null,dlgSkip:null,rt:null,shk:null,refreshing:false,quiet:f
 /* ---------- progress: a thin bar at the top and a guard against double taps while the database is working ---------- */
 let inflight=0;
 const track=async p=>{if(S.quiet)return p;inflight++;document.body.classList.add("working");try{return await p}finally{inflight--;if(!inflight)document.body.classList.remove("working")}};
-{const rawRpc=db.rpc.bind(db);db.rpc=(...a)=>track(rawRpc(...a))}
+const rawRpc=db.rpc.bind(db);db.rpc=(...a)=>track(rawRpc(...a));
 
 /* ---------- in-app dialogs (replace the browser's own confirm and prompt boxes) ----------
    ask({title,text,ok,cancel,danger,input}) resolves true/false, or with the typed text / null when it has an input.
@@ -177,11 +230,10 @@ const G={
     const e=b.error||t.error||sc.error||st.error;if(e){S.msg="Could not load data: "+e.message;return false}
     if(/^Could not load data/.test(S.msg||""))S.msg="";
     S.bookings=b.data;S.tickets=t.data;S.scans=sc.data;S.settings=st.data;return true}catch(e){S.msg="Could not load data: "+((e&&e.message)||"network problem");return false}},
-  reg:async()=>{try{const r=await db.rpc("admin_registration_status");S.reg=r.error?null:r.data}catch(_){S.reg=null}},
+  reg:async()=>{try{const r=await db.rpc("admin_registration_status");S.reg=r.error?null:r.data;const rp=$("#regpill");if(rp)rp.outerHTML=regPill()}catch(_){S.reg=null}},
   alert:async()=>{try{const r=await db.rpc("admin_payment_alert");S.alert=r.error?null:r.data}catch(_){S.alert=null}},
   log:async()=>{try{const r=await db.from("settings_log").select("*").order("id",{ascending:false}).limit(200);S.log=r.error?[]:r.data}catch(_){S.log=[]}},
-  /* emails live in their own admin-only table; transfers and IP flags exist only after the Release 2 database update */
-  emails:async()=>{try{const r=await db.from("ticket_emails").select("ticket_id,email");S.emailsOk=!r.error;S.emails=r.error?{}:Object.fromEntries(r.data.map(x=>[x.ticket_id,x.email]))}catch(_){S.emailsOk=false;S.emails={}}},
+  /* transfers and IP flags exist only after the Release 2 database update */
   fb:async()=>{try{const r=await db.from("booking_feedback").select("booking_id,rating,comment,created_at,updated_at").order("updated_at",{ascending:false});S.fbOk=!r.error;S.fb=r.error?[]:r.data}catch(_){S.fbOk=false;S.fb=[]}},
   tr:async()=>{try{const[x,y]=await Promise.all([db.from("transfers").select("*").order("created_at",{ascending:false}),db.from("transfer_buyers").select("*")]);
     S.tReady=!x.error&&!y.error;S.transfers=x.error?[]:x.data;S.buyers=y.error?[]:y.data;S.money=null;
@@ -209,8 +261,8 @@ function regBar(){const r=S.reg;if(!r)return `<div id="regbar"></div>`;
     deadline:`<b>Registration is closed: deadline passed.</b>`,full:`<b>Registration is closed: all spots are taken.</b>`}[r.closed_reason]||`<b>Registration is closed.</b>`;
   return box("var(--err)",why)}
 async function refreshReg(){
-  if(!S.staff||S.staff.role!=="admin"||!$("#regbar"))return;
-  try{const r=await db.rpc("admin_registration_status");if(!r.error){S.reg=r.data;$("#regbar").outerHTML=regBar()}}catch(_){}
+  if(!S.staff||S.staff.role!=="admin")return;
+  try{const r=await rawRpc("admin_registration_status");if(!r.error){S.reg=r.data;const rb=$("#regbar");if(rb)rb.outerHTML=regBar();const rp=$("#regpill");if(rp)rp.outerHTML=regPill()}}catch(_){}
 }
 setInterval(refreshReg,15000);
 const bk=id=>S.bookings.find(b=>b.id===id)||{};
@@ -256,29 +308,76 @@ function flags(){
 function ham(a,b){let d=0;const n=Math.min(a.length,b.length);for(let i=0;i<n;i++){let x=parseInt(a[i],16)^parseInt(b[i],16);while(x){d+=x&1;x>>=1}}return d}
 
 /* ---------- views ---------- */
-function tabList(){
-  const todo=S.tReady?S.transfers.filter(x=>x.status==="pending_admin").length+S.transfers.filter(x=>x.return_due&&!x.returned_at).length+S.transfers.filter(x=>x.kind==="public"&&x.status==="done"&&!x.seller_paid_at).length:0;
-  return [["overview","Overview"],["gate","Gate"],["bookings","Bookings"],["people","People"],...(S.msgOk?[["messages","Messages"]]:[]),...(S.tReady?[["transfers","Transfers"+(todo?" ("+todo+")":"")]]:[]),["scan","Scan screenshots"],...(S.fbOk?[["feedback","Feedback"+(S.fb.length?" ("+S.fb.length+")":"")]]:[]),["settings","Settings"]]}
-/* things typed into the page but not saved yet (only fields that differ from what the page drew), so a redraw does not wipe them */
-function snapForm(){const o={};document.querySelectorAll("#v input[id],#v select[id],#v textarea[id]").forEach(el=>{
-  if(el.type==="button")return;
-  if(el.type==="checkbox"||el.type==="radio"){if(el.checked!==el.defaultChecked)o[el.id]=el.checked}
-  else if(el.tagName==="SELECT"){if([...el.options].some(op=>op.selected!==op.defaultSelected))o[el.id]=el.value}
-  else if(el.value!==el.defaultValue)o[el.id]=el.value});return o}
-function putForm(o){for(const id in o){const el=document.getElementById(id);if(!el)continue;
-  if(el.type==="checkbox"||el.type==="radio")el.checked=o[id];else if(el.value!==o[id])el.value=o[id]}
-  const so=$("#sopen"),pb=$("#pausebox");if(so&&pb)pb.style.display=so.checked?"block":"none"}
-/* view() draws the current tab. The header and tab bar are built once per login and then only updated; the tab's own content is swapped in place,
-   keeping the scroll position, open filter panels and the focused field. view({keepForm:true}) also keeps unsaved typing. */
+const IC={overview:'<path d="M4 12l8-8 8 8M6 10v10h12V10"/>',bookings:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h3"/>',people:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 5.2a3 3 0 010 5.6M18 14.8c1.8.7 3 2.4 3 5.2"/>',gate:'<path d="M4 8V5h3M17 5h3v3M20 16v3h-3M7 19H4v-3M8 12h8"/>',transfers:'<path d="M7 7h12l-3-3M17 17H5l3 3"/>',messages:'<path d="M4 5h16v11H9l-5 4z"/>',feedback:'<path d="M12 4l2.4 5 5.6.7-4.1 3.8 1.1 5.5L12 16.3 7 19l1.1-5.5L4 9.7 9.6 9z"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',more:'<circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/>',search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>',refresh:'<path d="M20 11a8 8 0 10-2.3 5.7M20 5v6h-6"/>',moon:'<path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/>'};
+const ico=k=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
+const todoCount=()=>S.tReady?S.transfers.filter(x=>x.status==="pending_admin").length+S.transfers.filter(x=>x.return_due&&!x.returned_at).length+S.transfers.filter(x=>x.kind==="public"&&x.status==="done"&&!x.seller_paid_at).length:0;
+const payCount=()=>S.bookings.filter(b=>b.kind!=="transfer"&&b.status==="pending").length;
+/* the navigation: [group, [[tab, label, count, kind]]]. "Scan screenshots" is reached from Payments, so Payments stays lit there. */
+function navGroups(){const pc=payCount(),tc=todoCount();return[
+  ["Daily",[["overview","Today",0],["bookings","Payments",pc],["people","People",0]]],
+  ["Event day",[["gate","Gate",0],...(S.tReady?[["transfers","Transfers",tc,"warn"]]:[])]],
+  ["Setup",[...(S.msgOk?[["messages","Game messages",0]]:[]),...(S.fbOk?[["feedback","Feedback",S.fb.length,"quiet"]]:[]),["settings","Settings",0]]]]}
+const curNav=()=>S.tab==="scan"?"bookings":S.tab;
+function navBars(){
+  const cur=curNav(),b=(t,l,n,k)=>`<button class="nav" data-tab="${t}" ${cur===t?'aria-current="page"':""}>${ico(t)}${l}${n?`<span class="badge ${k||""}">${n}</span>`:""}</button>`;
+  $("#rail").innerHTML=`<div class="brand"><div class="mark">E</div><div><b>${esc(GEV)}</b><small>Organiser desk</small></div></div>`+navGroups().map(g=>`<div class="grp">${g[0]}</div>`+g[1].map(x=>b(...x)).join("")).join("")+
+    `<div class="who"><div class="av">${esc((S.staff.name||"?").trim().charAt(0).toUpperCase())}</div><div style="min-width:0"><b>${esc(S.staff.name)}</b><small>Admin</small></div><button class="ghost sm" data-logout="1">Sign out</button></div>`;
+  const pc=payCount(),tc=todoCount(),bb=(t,l,n)=>`<button data-tab="${t}" ${cur===t?'aria-current="page"':""}>${ico(t)}${l}${n?`<span class="badge">${n}</span>`:""}</button>`,moreOn=["transfers","messages","feedback","settings"].includes(cur);
+  $("#bnav").innerHTML=bb("overview","Today",0)+bb("bookings","Payments",pc)+bb("people","People",0)+bb("gate","Gate",0)+`<button id="morebtn" ${moreOn?'aria-current="page"':""}>${ico("more")}More${tc?`<span class="badge warn">${tc}</span>`:""}</button>`;
+  const mi=(t,l,n)=>`<button class="nav" data-tab="${t}" ${cur===t?'aria-current="page"':""}>${ico(t)}${l}${n?`<span class="badge warn">${n}</span>`:""}</button>`;
+  $("#more").innerHTML=`<div class="sheetm" role="dialog" aria-label="More"><div class="grip"></div>${S.tReady?mi("transfers","Transfers",tc):""}${S.msgOk?mi("messages","Game messages",0):""}${S.fbOk?mi("feedback","Feedback",0):""}${mi("settings","Settings",0)}<button class="nav" data-refresh="1">${ico("refresh")}Refresh</button><button class="nav" data-logout="1">Sign out (${esc(S.staff.name)})</button></div>`;
+}
+function regPill(){const r=S.reg;if(!r)return `<span id="regpill"></span>`;
+  const p=(c,t,l)=>`<span id="regpill" class="rp ${c}"><span class="long">${l||"Registration "}</span>${t}</span>`;
+  if(r.grace_count>0)return p("warn","in grace time","Registration ");
+  if(r.accepting)return p("ok","open");
+  return p("bad",{paused:"paused",not_open:"closed",deadline:"closed (deadline)",full:"full"}[r.closed_reason]||"closed")}
+function topBar(){
+  const t=$("#top"),k=!S.staff?"out":S.staff.role==="admin"?"adm":"gate";
+  if(t.dataset.k!==k){t.dataset.k=k;
+    t.innerHTML=k==="adm"?`<div class="sbox"><div class="search">${ico("search")}<input id="gtop" type="search" placeholder="Find anyone: name, phone, ticket, booking ID" autocomplete="off" aria-label="Find anyone"><kbd>/</kbd></div><div class="sdrop" id="sdrop" hidden></div></div><span id="regpill"></span><span class="grow"></span><button class="icon-btn hide-sm" data-refresh="1" aria-label="Refresh">${ico("refresh")}</button><button class="icon-btn" id="theme" aria-label="Switch light or dark">${ico("moon")}</button>`
+      :`<div class="tl"><div class="mark">E</div><b>Organiser</b></div><span class="grow"></span><button class="icon-btn" id="theme" aria-label="Switch light or dark">${ico("moon")}</button>`}
+  const rp=$("#regpill");if(rp)rp.outerHTML=regPill()}
+const curDark=()=>{const r=document.documentElement;return r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches};
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem("adm_theme",t)}catch(_){}
+  const m=$("#tc");if(m)m.content=t==="dark"?"#0A0F1F":"#F2F4F9";if(S.staff&&S.tab==="overview")view({keepForm:true})}
+const hideS=()=>{const d=$("#sdrop");if(d){d.hidden=true;d.innerHTML=""}};
+const tod=()=>{const h=+new Date().toLocaleString("en-GB",{hour:"numeric",hour12:false,timeZone:"Asia/Kolkata"});return h<12?"morning":h<17?"afternoon":"evening"};
+function todayChip(){try{const e=S.settings&&S.settings.event_at,d=new Date().toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short",timeZone:"Asia/Kolkata"});
+  if(!e)return d;const days=Math.ceil((new Date(e)-new Date())/864e5);return d+(days>1?" · "+days+" days to "+GEV:days===1?" · tomorrow is "+GEV:days===0?" · "+GEV+" is today":"")}catch(_){return""}}
+const HEAD={overview:()=>["Good "+tod()+", "+String(S.staff.name||"").split(" ")[0],"Here is what needs a person right now.",`<span class="today">${esc(todayChip())}</span>`],
+  gate:()=>["Gate","Camera scan, find a person and the admitted list."],
+  bookings:()=>["Payments","Check each screenshot, then mark it Paid or Rejected.",`<button class="ghost" data-tab="scan">Scan screenshots</button>`],
+  scan:()=>["Scan screenshots","Reads the payment screenshots on this computer.",`<button class="ghost" data-tab="bookings">‹ Payments</button>`],
+  people:()=>["People","Everyone with a ticket."],transfers:()=>["Transfers","Calls, payments, payouts and returns."],
+  messages:()=>["Game messages","Team messages, shuffle and random winners."],feedback:()=>["Feedback","Ratings and comments from participants."],
+  settings:()=>["Settings","Registration, payment, event details and the settings log."]};
+function headHtml(){const h=(HEAD[S.tab]||HEAD.overview)();return `<div class="phead"><div><h1>${esc(h[0])}</h1><p>${esc(h[1])}</p></div>${h[2]||""}</div>`}
+/* the first thing on Today: what needs a person, worked out from the data */
+function needsCard(){
+  const B=S.bookings.filter(b=>b.kind!=="transfer"),pend=B.filter(b=>b.status==="pending"),F=flags(),warn=pend.filter(b=>(F[b.id]||[]).length),
+    sum=pend.reduce((a,b)=>a+(b.amount_expected||0),0),old=pend.length?tAge(pend.reduce((m,b)=>b.created_at<m?b.created_at:m,pend[0].created_at)):"",
+    tw=S.tReady?S.transfers.filter(x=>x.status==="pending_admin").length:0,
+    pr=S.tReady?S.transfers.filter(x=>x.kind==="public"&&x.status==="done"&&!x.seller_paid_at).length+S.transfers.filter(x=>x.return_due&&!x.returned_at).length:0,
+    row=(n,sev,title,sub,btn)=>`<li class="${n?"":"zero"}"><span class="sev ${sev}"></span><span class="n">${n}</span><span class="t"><b>${title}</b><span>${sub}</span></span>${btn}</li>`;
+  return `<div class="card"><h2>Needs you</h2><ul class="todo">`+
+    row(pend.length,"","Payments to check",pend.length?`${inr(sum)} waiting · oldest ${old} ago`:"Nothing waiting",`<button data-need="pay" ${pend.length?"":"disabled"}>Review</button>`)+
+    row(warn.length,"bad","Bookings with a warning","Same transaction ID, unreadable ID or amount not found",`<button class="ghost" data-need="warn" ${warn.length?"":"disabled"}>Open</button>`)+
+    (S.tReady?row(tw,"warn","Transfers waiting for a call","Phone the seller, then press Transfer",`<button class="ghost" data-tab="transfers">Open</button>`)+row(pr,"","Payouts and returns due","Pay a seller or send money back to a buyer",`<button class="ghost" data-tab="transfers">Open</button>`):"")+
+    `</ul></div>`}
+const cv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* gate staff and admins share this page; admins also get the rail, bottom bar and search */
 function view(o){
   o=o||{};S.charts.forEach(c=>c.destroy());S.charts=[];if(!S.staff)S.sheets=[];
-  const a=$("#app");
-  if(!S.staff){delete a.dataset.shell;S.rt=null;
+  const a=$("#app"),adm=!!S.staff&&S.staff.role==="admin";
+  document.body.classList.toggle("adm",adm);topBar();
+  if(!S.staff){delete a.dataset.shell;S.rt=null;$("#rail").innerHTML="";$("#bnav").innerHTML="";$("#more").innerHTML="";
     a.innerHTML=`<h1>Organiser login</h1><p class="mute">Meetup registrations</p><div class="card" style="max-width:380px">
     ${S.msg?`<p class="err" role="alert">${esc(S.msg)}</p>`:""}<label for="em">Email</label><input id="em" type="email" autocomplete="username" style="width:100%">
     <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" style="width:100%"><p><button id="login">Sign in</button></p></div>`;return}
-  const adm=S.staff.role==="admin",key=S.staff.name+"|"+S.staff.role;
-  if(!adm)S.tab="gate";   // gate staff: just the scanner
+  const key=S.staff.name+"|"+S.staff.role;
+  if(!adm){S.tab="gate";$("#rail").innerHTML="";$("#bnav").innerHTML="";$("#more").innerHTML=""}
   if(S.tab==="feedback"&&!S.fbOk)S.tab="overview";
   if(S.tab==="transfers"&&!S.tReady)S.tab="overview";
   if(S.tab==="messages"&&!S.msgOk)S.tab="overview";
@@ -286,12 +385,10 @@ function view(o){
     det=same?[...document.querySelectorAll("#v details")].map(d=>d.open):[],ae=document.activeElement;
   let foc=null;try{if(same&&ae&&ae.id&&a.contains(ae))foc={id:ae.id,s:ae.selectionStart,e:ae.selectionEnd}}catch(_){}
   if(a.dataset.shell!==key||!$("#v")){a.dataset.shell=key;
-    a.innerHTML=`<div class="hdr"><div class="who"><small>Signed in as</small><h1>${esc(S.staff.name)}</h1></div><div class="acts">${adm?'<button class="ghost sm" data-sheet="search:">🔍 Find</button>':""}<button class="ghost sm" id="refresh">Refresh</button><button class="ghost sm" id="logout">Sign out</button></div></div><div id="msg"></div>${adm?'<div class="tabs" id="tabs"></div><div id="banners"></div>':""}<div id="v"></div>`}
+    a.innerHTML=adm?`<div id="msg"></div><div id="head"></div><div id="banners"></div><div id="v"></div>`
+      :`<div class="hdr"><div class="who2"><small class="mute">Signed in as</small><h1 style="margin:0">${esc(S.staff.name)}</h1></div><div class="acts"><button class="ghost sm" data-refresh="1">Refresh</button><button class="ghost sm" data-logout="1">Sign out</button></div></div><div id="msg"></div><div id="v"></div>`}
   $("#msg").innerHTML=S.msg?`<p class="err" role="alert">${esc(S.msg)}</p>`:"";
-  if(adm){const tb=$("#tabs"),sl=tb.scrollLeft;
-    tb.innerHTML=tabList().map(t=>`<button data-tab="${t[0]}" class="${S.tab===t[0]?"on":""}">${t[1]}</button>`).join("");
-    tb.scrollLeft=sl;const on=tb.querySelector(".on");if(on){const l=on.offsetLeft,r=l+on.offsetWidth;if(l<tb.scrollLeft||r>tb.scrollLeft+tb.clientWidth)tb.scrollLeft=Math.max(0,l-16)}   // the open tab is always in view
-    $("#banners").innerHTML=S.tab==="overview"?alertBanner()+ipBanner():""}
+  if(adm){navBars();$("#head").innerHTML=headHtml();$("#banners").innerHTML=S.tab==="overview"?alertBanner()+ipBanner():""}
   if(S.tab!=="gate"&&S.stream)gCamStop(true);   // leaving the Gate tab turns the camera off
   const v=$("#v");if(same)v.style.minHeight=v.offsetHeight+"px";   // keeps the page tall while the content is swapped, so the scroll position survives
   ({overview:vOverview,gate:vGate,bookings:vBookings,people:vPeople,transfers:vTransfers,scan:vScan,feedback:vFeedback,messages:vMessages,settings:vSettings})[S.tab]();
@@ -302,11 +399,20 @@ function view(o){
   if(foc){const el=document.getElementById(foc.id);if(el&&!el.disabled){try{el.focus({preventScroll:true});if(foc.s!=null&&el.setSelectionRange)el.setSelectionRange(foc.s,foc.e)}catch(_){}}}
   S.rt=S.tab;
 }
+/* things typed into the page but not saved yet (only fields that differ from what the page drew), so a redraw does not wipe them */
+function snapForm(){const o={};document.querySelectorAll("#v input[id],#v select[id],#v textarea[id]").forEach(el=>{
+  if(el.type==="button")return;
+  if(el.type==="checkbox"||el.type==="radio"){if(el.checked!==el.defaultChecked)o[el.id]=el.checked}
+  else if(el.tagName==="SELECT"){if([...el.options].some(op=>op.selected!==op.defaultSelected))o[el.id]=el.value}
+  else if(el.value!==el.defaultValue)o[el.id]=el.value});return o}
+function putForm(o){for(const id in o){const el=document.getElementById(id);if(!el)continue;
+  if(el.type==="checkbox"||el.type==="radio")el.checked=o[id];else if(el.value!==o[id])el.value=o[id]}
+  const so=$("#sopen"),pb=$("#pausebox");if(so&&pb)pb.style.display=so.checked?"block":"none"}
 function vOverview(){
   const P=live(),liveP=P.filter(p=>p.b.status!=="rejected"),paid=P.filter(p=>p.b.status==="paid"),pend=P.filter(p=>p.b.status==="pending");
   const money=st=>S.bookings.filter(b=>b.status===st).reduce((s,b)=>s+b.amount_expected,0),here=P.filter(p=>p.checked_in_at&&p.b.status==="paid").length;
   const used=liveP.length,left=Math.max(S.settings.cap-used,0),coords=liveP.filter(p=>p.kind==="coordinator"),pcoords=paid.filter(p=>p.kind==="coordinator");
-  $("#v").innerHTML=regBar()+`<div class="grid">
+  $("#v").innerHTML=needsCard()+regBar()+`<div class="grid">
       <div class="card stat c-teal" data-sheet="list:active" role="button" tabindex="0"><span>Active tickets</span><b>${paid.length}</b><span class="mute">${paid.length-pcoords.length} guests · ${pcoords.length} coordinators · ${inr(money("paid"))}</span><span class="more">Details ›</span></div>
    <div class="card stat c-amber" data-sheet="list:spots" role="button" tabindex="0"><span>Spots used</span><b>${used}</b><div class="meter" role="img" aria-label="${paid.length} active, ${pend.length} pending, ${left} left"><i class="m1" style="width:${Math.min(100,paid.length/Math.max(S.settings.cap,1)*100)}%"></i><i class="m2" style="width:${Math.min(100,pend.length/Math.max(S.settings.cap,1)*100)}%"></i></div><span class="mute">${paid.length} active + ${pend.length} pending · cap ${S.settings.cap}, ${left} left</span><span class="more">Details ›</span></div>
    <div class="card stat c-pink" data-sheet="list:pending" role="button" tabindex="0"><span>Pending</span><b>${pend.length}</b><span class="mute">${inr(money("pending"))}</span><span class="more">Details ›</span></div>
@@ -316,18 +422,18 @@ function vOverview(){
    <div class="bar"><b>Count:</b><select id="mode"><option value="both" ${S.mode==="both"?"selected":""}>Confirmed + Pending</option><option value="paid" ${S.mode==="paid"?"selected":""}>Confirmed only</option></select>
    <span class="mute">Use "Confirmed only" for final food and hall numbers.</span></div>
    <div class="charts">${["c1","c2","c3"].map(i=>`<div class="card"><h3 id="${i}t"></h3><div class="pie"><canvas id="${i}" role="img"></canvas></div><ul class="leg" id="${i}l"></ul></div>`).join("")}</div>`;
-  if(Chart.defaults){Chart.defaults.color="#EAF6F0";if(Chart.defaults.font)Chart.defaults.font.family="Manrope, system-ui, sans-serif"}
+  if(Chart.defaults){Chart.defaults.color=cv("--ink")||"#0E1730";if(Chart.defaults.font)Chart.defaults.font.family="Instrument Sans, system-ui, sans-serif"}
   const set=S.mode==="paid"?paid:paid.concat(pend),cnt=(k,vals)=>vals.map(v=>set.filter(p=>p[k]===v).length);
-  const pctLabels={id:"pctLabels",afterDatasetsDraw(ch){const d=ch.data.datasets[0].data,tot=d.reduce((x,y)=>x+y,0),ctx=ch.ctx;if(!tot)return;ch.getDatasetMeta(0).data.forEach((arc,k)=>{if(!d[k]||d[k]/tot<.06)return;const pt=arc.tooltipPosition();ctx.save();ctx.fillStyle="#04140F";ctx.font="800 14px Manrope, system-ui, sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(Math.round(d[k]/tot*100)+"%",pt.x,pt.y);ctx.restore()})}};
+  const pctLabels={id:"pctLabels",afterDatasetsDraw(ch){const d=ch.data.datasets[0].data,tot=d.reduce((x,y)=>x+y,0),ctx=ch.ctx;if(!tot)return;ch.getDatasetMeta(0).data.forEach((arc,k)=>{if(!d[k]||d[k]/tot<.06)return;const pt=arc.tooltipPosition();ctx.save();ctx.fillStyle="#FFFFFF";ctx.font="800 14px Instrument Sans, system-ui, sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(Math.round(d[k]/tot*100)+"%",pt.x,pt.y);ctx.restore()})}};
   const mk=(id,title,labels,data,colors)=>{
     const tot=data.reduce((x,y)=>x+y,0);
     $(id+"t").textContent=title+" · "+set.length+" people";
     $(id).setAttribute("aria-label",title+": "+labels.map((l,i)=>l+" "+data[i]).join(", "));
     $(id+"l").innerHTML=labels.map((l,i)=>`<li><i style="background:${colors[i]}"></i>${esc(l)}<b>${data[i]}</b><em>${tot?Math.round(data[i]/tot*100):0}%</em></li>`).join("");
-    S.charts.push(new Chart($(id),{type:"pie",data:{labels,datasets:[{data,backgroundColor:colors,borderColor:"#0A2219",borderWidth:3,hoverOffset:6}]},plugins:[pctLabels],options:{maintainAspectRatio:false,devicePixelRatio:Math.max(window.devicePixelRatio||1,2),plugins:{legend:{display:false}}}}))};
-  mk("#c1","Food",["Veg","Non-veg"],cnt("food",["Veg","Non-veg"]),["#2FD39B","#E86818"]);
-  mk("#c2","Location",["In Bengaluru","Outside Bengaluru"],cnt("location",["In Bengaluru","Outside Bengaluru"]),["#4D78FF","#C0307E"]);
-  mk("#c3","Role",["Article Assistant","Industrial Trainee","Employee","Student","Others"],cnt("occupation",["Article Assistant","Industrial Trainee","Employee","Student","Others"]),["#F0A000","#4D78FF","#9A55F0","#2FD39B","#E86818"]);
+    S.charts.push(new Chart($(id),{type:"pie",data:{labels,datasets:[{data,backgroundColor:colors,borderColor:cv("--card")||"#FFFFFF",borderWidth:3,hoverOffset:6}]},plugins:[pctLabels],options:{maintainAspectRatio:false,devicePixelRatio:Math.max(window.devicePixelRatio||1,2),plugins:{legend:{display:false}}}}))};
+  mk("#c1","Food",["Veg","Non-veg"],cnt("food",["Veg","Non-veg"]),["#0F7B57","#C9561B"]);
+  mk("#c2","Location",["In Bengaluru","Outside Bengaluru"],cnt("location",["In Bengaluru","Outside Bengaluru"]),["#2447F0","#B02A78"]);
+  mk("#c3","Role",["Article Assistant","Industrial Trainee","Employee","Student","Others"],cnt("occupation",["Article Assistant","Industrial Trainee","Employee","Student","Others"]),["#B47C00","#2447F0","#7B3FD0","#0F7B57","#C9561B"]);
 }
 function filtBar(withPeople){
   const f=S.f,o=(v,l)=>`<option value="${v}" ${f.pay===v?"selected":""}>${l}</option>`,n=[f.pay,f.food,f.loc,f.role,f.type,f.here].filter(Boolean).length;
@@ -345,7 +451,7 @@ function filtBar(withPeople){
 }
 function vBookings(){const nT=S.bookings.filter(b=>b.kind==="transfer").length,B=S.bookings.filter(b=>b.kind!=="transfer"),
   c=st=>B.filter(b=>b.status===st).length,chip=(v,l,n)=>`<button class="chip ${S.f.pay===v?"on":""}" data-chip="${v}">${l} <span>${n}</span></button>`;
-  $("#v").innerHTML=`<div class="bar"><input id="q" type="search" placeholder="Search name, phone or booking ID" value="${esc(S.f.q)}" style="flex:1 1 240px"></div>
+  $("#v").innerHTML=`<div class="bar"><input id="q" type="search" placeholder="Search name, phone or booking ID" value="${esc(S.f.q)}" style="flex:1 1 240px">${c("pending")?`<button data-dk="open">Review payments (${c("pending")})</button>`:""}</div>
   <div class="chips">${chip("pending","Pending",c("pending"))}${chip("paid","Paid",c("paid"))}${chip("rejected","Rejected",c("rejected"))}${chip("","All",B.length)}
   <label class="rev"><input type="checkbox" id="frev" ${S.f.review?"checked":""}> Needs review only</label></div>`+(nT?`<p class="mute">${nT} transfer booking${nT===1?"":"s"} not shown here: they have no payment screenshot and are handled in the Transfers tab.</p>`:"")+`<div id="tbl"></div>`;tBookings()}
 function amtRemark(b,s){if(!s)return"";if(!s.amounts)return'<div class="mute">Amount: re-scan to check</div>';
@@ -373,18 +479,54 @@ function vPeople(){$("#v").innerHTML=filtBar(true)+`<div id="tbl"></div>`;tPeopl
 function tPeople(){const r=filteredPeople(),here=r.filter(p=>p.checked_in_at).length;
   const tag=t=>`<span class="tg">${esc(t)}</span>`;
   $("#tbl").innerHTML=`<p class="mute" style="margin:0 0 8px">${r.length} people shown${here?" · "+here+" present":""}</p><div class="pcs">`+r.map(p=>{
-    const em=S.emailsOk&&S.emails[p.id]?`<a href="mailto:${esc(S.emails[p.id])}">${esc(S.emails[p.id])}</a>`:(S.emailsOk?'<span class="mute">no email</span>':"");
+    const em="";
     if(p.transferred_out_at)return `<div class="card pc moved" data-pid="${p.id}"><div class="pc-h"><div><b>${esc(p.name)}</b><div class="mute">${esc(tlabel(p))} · Guest</div></div><span class="pill">Transferred</span></div><div class="mute">Transferred to another person</div><div class="pc-c"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>${em}</div>${p.occupation_detail?`<div class="mute">${esc(p.occupation_detail)}</div>`:""}<div class="pc-t">${tag(p.location)}${p.occupation?tag(p.occupation):""}${tag(p.food)}<button class="tg lk2" data-sheet="booking:${p.booking_id}">${esc(p.b.booking_code)} ›</button></div></div>`;
     const co=p.kind==="coordinator",old=co?(p.ticket_no!=null?`guest ${"E26-"+pad(p.ticket_no)} cancelled`:""):(p.prev_coord_no!=null?`coordinator ${"E26-"+pad(p.prev_coord_no)+"C"} cancelled`:"");
     return `<div class="card pc ${co?"co":""}" data-pid="${p.id}"><div class="pc-h"><div><b>${esc(p.name)}</b><div class="mute">${esc(tlabel(p))} · ${co?"Coordinator":"Guest"}${old?` · ${esc(old)}`:""}</div></div><span class="pill p-${p.b.status}">${p.b.status}</span></div>
     <div class="pc-c"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>${em}</div>${p.occupation_detail?`<div class="mute">${esc(p.occupation_detail)}</div>`:""}
     <div class="pc-t">${tag(p.location)}${p.occupation?tag(p.occupation):""}${tag(p.food)}${S.msgOk&&S.tm[p.id]?tag("✉ "+msgName(S.tm[p.id])):""}${S.pzOk&&S.pz[p.id]?tag("🎲 picked"):""}<button class="tg lk2" data-sheet="booking:${p.booking_id}">${esc(p.b.booking_code)} ›</button></div>
     <div class="pc-a">${p.checked_in_at?`<span class="here">✔ Present</span><button class="sm ghost" data-undo="${p.id}">Undo</button>`:""}${p.b.status==="rejected"?"":co?`<button class="sm ghost" data-co="remove" data-t="${p.id}">Remove coordinator</button>`:`<button class="sm ghost" data-co="make" data-t="${p.id}">Make coordinator</button>`}</div></div>`}).join("")+`</div>${r.length?"":'<p class="mute">Nobody matches.</p>'}`}
-function csv(){const r=filteredPeople(),h=["Ticket No.","Type","Name","Phone",...(S.emailsOk?["Email"]:[]),"Location","Role","Role details","Food","Booking ID","Payment","Expected amount","Present","Checked in at",...(S.showMoved?["Transferred to another person"]:[])];
+function csv(){const r=filteredPeople(),h=["Ticket No.","Type","Name","Phone","Location","Role","Role details","Food","Booking ID","Payment","Expected amount","Present","Checked in at",...(S.showMoved?["Transferred to another person"]:[])];
   const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-  const rows=r.map(p=>[tlabel(p),p.kind==="coordinator"?"Coordinator":"Guest",p.name,p.phone,...(S.emailsOk?[S.emails[p.id]||""]:[]),p.location,p.occupation,p.occupation_detail,p.food,p.b.booking_code,p.b.status,p.b.amount_expected,p.checked_in_at?"Yes":"No",p.checked_in_at||"",...(S.showMoved?[p.transferred_out_at?"Yes":"No"]:[])]);
+  const rows=r.map(p=>[tlabel(p),p.kind==="coordinator"?"Coordinator":"Guest",p.name,p.phone,p.location,p.occupation,p.occupation_detail,p.food,p.b.booking_code,p.b.status,p.b.amount_expected,p.checked_in_at?"Yes":"No",p.checked_in_at||"",...(S.showMoved?[p.transferred_out_at?"Yes":"No"]:[])]);
   const txt="\ufeff"+[h].concat(rows).map(x=>x.map(q).join(",")).join("\r\n"),a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([txt],{type:"text/csv;charset=utf-8"}));a.download="meetup-registrations.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+/* ---------- payment review desk: one booking at a time, screenshot beside the details, Paid / Reject moves straight to the next ---------- */
+const DK={urls:{}};
+const deskQueue=()=>S.bookings.filter(b=>b.kind!=="transfer"&&b.status==="pending").sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).map(b=>b.id);
+async function deskUrl(b){if(!b||!b.screenshot_path)return null;const c=DK.urls[b.screenshot_path];if(c&&c.t>Date.now()-240000)return c.u;
+  const{data,error}=await db.storage.from("payment-proofs").createSignedUrl(b.screenshot_path,300);if(error)return null;DK.urls[b.screenshot_path]={u:data.signedUrl,t:Date.now()};return data.signedUrl}
+function openDesk(startId){const q=deskQueue();if(!q.length)return toast("Nothing is waiting for review");
+  S.desk={ids:q,i:Math.max(0,q.indexOf(startId)),done:0,busy:false,pushed:false};document.body.classList.add("deskopen");
+  try{history.pushState({...(history.state||{}),desk:1},"");S.desk.pushed=true}catch(_){}renderDesk()}
+function closeDesk(fromPop){const D=S.desk;S.desk=null;document.body.classList.remove("deskopen");const d=document.getElementById("desk");if(d)d.remove();
+  if(D&&D.pushed&&!fromPop){try{history.back()}catch(_){}}}
+function renderDesk(){const D=S.desk;if(!D)return;
+  D.ids=D.ids.filter(id=>bk(id).status==="pending");if(D.i>=D.ids.length)D.i=0;
+  if(!D.ids.length){const n=D.done;closeDesk();return toast(n?"All caught up. "+n+" reviewed.":"Nothing is waiting for review",4000)}
+  let el=document.getElementById("desk");if(!el){el=document.createElement("div");el.id="desk";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","Review payments");document.body.appendChild(el)}
+  const id=D.ids[D.i],b=bk(id),ts=S.tickets.filter(t=>t.booking_id===id),fl=flags()[id]||[];
+  el.innerHTML=`<div class="dk-h"><b>Review payments</b><span class="mute">${D.i+1} of ${D.ids.length} waiting${D.done?" · "+D.done+" done":""}</span><button class="ghost sm" data-dk="close">Close</button></div>
+  <div class="dk-b"><div class="dk-img" id="dkimg"><div class="mute">Loading screenshot…</div></div>
+  <div class="dk-i"><div class="dk-amt">${inr(b.amount_expected)}</div><div><b>${esc(b.booking_code)}</b> <span class="mute">${new Date(b.created_at).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</span></div>
+  <div>${ts.map(t=>`<div><span class="mute">${esc(tlabel(t))}</span> ${esc(t.name)} · <a href="tel:${esc(t.phone)}">${esc(t.phone)}</a></div>`).join("")}</div>
+  <div><span class="mute">Payment ID read</span><br>${idRead(id)}</div>
+  ${fl.length?`<div>${fl.map(x=>`<span class="flag">⚑ ${esc(x)}</span>`).join("")}<button class="ghost sm" data-shot="${esc(id)}">Compare with matching screenshots</button></div>`:""}</div></div>
+  <div class="dk-f"><button class="ghost" data-dk="prev" ${D.ids.length>1?"":"disabled"}>‹ Back <kbd>←</kbd></button><button class="ghost" data-dk="skip" ${D.ids.length>1?"":"disabled"}>Skip <kbd>→</kbd></button><button class="bad" data-dk="reject">Reject <kbd>R</kbd></button><button data-dk="paid">Paid <kbd>P</kbd></button></div>`;
+  deskUrl(b).then(u=>{if(S.desk!==D||D.ids[D.i]!==id)return;const box=document.getElementById("dkimg");if(!box)return;
+    box.innerHTML=u?`<img src="${u}" alt="Payment screenshot ${esc(b.booking_code)}">`:'<p class="err">Could not open the screenshot.</p>'});
+  if(D.ids.length>1)deskUrl(bk(D.ids[(D.i+1)%D.ids.length]))}   // the next one is fetched while this one is being checked
+async function deskAct(kind){const D=S.desk;if(!D||D.busy)return;
+  if(kind==="close")return closeDesk();
+  if(kind==="skip"||kind==="prev"){const n=D.ids.length;if(n>1){D.i=(D.i+(kind==="skip"?1:n-1))%n;renderDesk()}return}
+  D.busy=true;
+  try{const id=D.ids[D.i];
+    if(kind==="reject"&&!await ask({title:"Reject this payment?",text:bk(id).booking_code+" will be marked rejected.",ok:"Reject",danger:true}))return;
+    if(S.desk!==D)return;
+    const r=await db.rpc("set_booking_status",{p_booking:id,p_status:kind==="paid"?"paid":"rejected"});if(r.error)return toast("Failed: "+r.error.message);
+    await sync("core","reg","ip");if(S.desk!==D)return;D.done++;D.ids.splice(D.i,1);if(D.i>=D.ids.length)D.i=0;
+    toast(kind==="paid"?"Marked paid. Ticket numbers given.":"Marked rejected");view({keepForm:true});renderDesk()}
+  finally{D.busy=false}}
 async function shots(items){
   const m=document.createElement("div");m.className="modal";m.innerHTML=`<div class="box"><div class="bar"><b style="flex:1">Payment screenshot</b><button class="sm" id="mx">Close</button></div><div class="two" id="mi">Loading…</div></div>`;document.body.appendChild(m);
   m.onclick=e=>{if(e.target===m||e.target.id==="mx")m.remove()};
@@ -443,7 +585,7 @@ async function runScan(list){
 }
 function istInput(iso){return new Date(new Date(iso).getTime()+5.5*3600e3).toISOString().slice(0,16)}
 function evCard(s){
-  if(s.event_at===undefined)return `<div class="card"><h2>Event details</h2><p class="err" style="margin:0"><b>One setup step is missing.</b> Run <code>event-details.sql</code> in the Supabase SQL editor, then reload this page.</p></div>`;
+  if(s.event_at===undefined)return"";
   return `<div class="card"><h2>Event details</h2>
   <p class="mute" style="margin-top:0">Shown to participants on the home page, the registration form and on every ticket.</p>
   <label for="sev">Event date and time (India time)</label><input id="sev" type="datetime-local" value="${istInput(s.event_at)}">
@@ -490,20 +632,11 @@ function vSettings(){const s=S.settings;
   ${payCard(s)}
   ${evCard(s)}
   ${trCard(s)}
-  ${ipCard(s)}
-  ${aboutCard(s)}
-  ${emailCard(s)}
-  ${feedbackCard(s)}
-  ${S.msgOk?msgCard(s):""}
-  <div class="card"><h2>Before you open registration</h2>
-  <p class="mute">A reminder list. Nothing here is checked automatically.</p>
-  <label style="font-weight:400"><input type="checkbox" id="chk1"> Payment details above (UPI ID, payee name) are the final ones, and a test payment reached the right account</label>
-  <label style="font-weight:400"><input type="checkbox" id="chk2"> WhatsApp number above is the organisers' number</label>
-  <label style="font-weight:400"><input type="checkbox" id="chk3"> A ₹1 test payment was scanned in two UPI apps</label>
-  <label style="font-weight:400"><input type="checkbox" id="chk4"> All test bookings deleted and the payment-proofs storage emptied</label>
-  <label style="font-weight:400"><input type="checkbox" id="chk5"> "Allow new users to sign up" is off in Supabase</label>
-  <label style="font-weight:400"><input type="checkbox" id="chk6"> The other organiser logins are created</label></div>${logCard()}</div>`;
-  const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Repeat-registration flag":"Repeat flag","About link":"About","Email box":"Email","Feedback questions":"Feedback","Game messages":"Messages","Before you open registration":"Checklist","Settings log":"Log"};
+  ${readyCard(s)}
+  ${advCard(s)}
+  ${afterCard(s)}
+  ${logCard()}</div>`;
+  const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Launch readiness":"Readiness","Advanced":"Advanced","After the event":"After event","Settings log":"Log"};
   $("#snav").innerHTML=[...document.querySelectorAll(".sgrid>.card")].map((c,i)=>{c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="s-${i}">${esc(SH[h]||h)}</button>`}).join("")}
 
 /* ---------- Messages (game activity): the Messages tab, the Settings switch, one message per person ---------- */
@@ -527,12 +660,6 @@ function planShuffle(ppl,ids,base,together){
 async function msgCall(fn,args,okMsg,parts){parts=parts||["msg","pz","log"];const r=await db.rpc(fn,args);if(r.error){toast(terr(r.error),6000);await sync(...parts);view();return null}
   await sync(...parts);view();if(okMsg)toast(okMsg);return r}
 async function msgPairs(pairs,okMsg){return msgCall("admin_assign_messages",{p_pairs:pairs.map(x=>({t:x[0],m:x[1]}))},okMsg)}
-function msgCard(s){
-  if(s.show_messages===undefined)return"";
-  return `<div class="card"><h2>Game messages</h2>
-  <p class="mute" style="margin-top:0">When on, every ticket holder who has a message sees it on their ticket (after entering their Booking ID and phone). When off, no message is shown to anyone and none leaves the database. You write and give the messages in the Messages tab.</p>
-  <label><input type="checkbox" id="msgshow" ${s.show_messages?"checked":""}> Show each person's message on their ticket</label>
-  <p><button id="msgshowsave">Save</button></p></div>`}
 /* ---- pick random people: choose N people at random (browser secure random, every eligible person has exactly the same chance), shown as a preview first ---- */
 function lotPool(){const l=S.mf.lot;return live().filter(p=>p.b.status!=="rejected"&&(l.scope==="present"?!!p.checked_in_at:p.b.status==="paid")&&(!l.ex||!S.pz[p.id]))}
 function drawWinners(pool,n){return shuf(pool).slice(0,Math.max(0,Math.min(n,pool.length)))}
@@ -593,7 +720,6 @@ function vMessages(){
     ${noneL.length?`<details class="ros"><summary><b>No message</b> <span class="mute">${noneL.length}</span></summary><div class="rlist">${noneL.map(p=>`<div>${lk("person",p.id,p.name)} <span class="mute">${esc(tlabel(p))}${p.b.status!=="paid"?" · "+esc(p.b.status):""}</span></div>`).join("")}</div></details>`:""}</div>`}
 async function msgClick(t,id){
   const b=t.closest&&t.closest("button");const d=b?b.dataset:{};
-  if(id==="msgshowsave"){const r=await db.rpc("admin_set_show_messages",{p_show:$("#msgshow").checked});if(r.error)return toast(terr(r.error),6000),true;await sync("core","log");view({keepForm:true});toast("Game messages setting saved");return true}
   if(id==="mtoggle"){const on=!S.settings.show_messages;
     if(on&&!await yes("Show messages on tickets now?\n\nEvery person who has a message will see it on their ticket straight away."))return true;
     await msgCall("admin_set_show_messages",{p_show:on},on?"Messages are now shown":"Messages are now hidden",["core","log"]);return true}
@@ -675,7 +801,7 @@ function tCard(x){
   return `<div class="card" style="border-color:${here?"var(--err)":"var(--line)"}"><div class="bar"><b style="flex:1">${MODE(x.kind)} transfer · ${esc(sellerLbl(x))} ${sellerLk(x)} → ${b?buyerLk(x):"(no buyer)"}</b><span class="mute">waiting ${tAge(x.updated_at||x.created_at)}</span></div>
   ${here?`<p class="err"><b>The seller has already entered the hall.</b> Transfer will be refused. Reject this transfer.</p>`:""}
   <div class="two"><div><b>Seller (original ticket)</b><div>${sellerLk(x)} · ${esc(sellerLbl(x))}</div><div>Registered phone: <b>${esc(x.seller_phone)}</b></div>${pub?`<div>Payout UPI / phone to read back: <b>${esc(x.seller_upi||"")}</b></div>`:""}</div>
-  <div><b>Buyer (new person)</b>${b?`<div>${buyerLk(x)} · ${esc(b.phone)}</div><div>${esc(b.email)}</div><div>${esc(b.location)} · ${esc(b.attendance)} · ${esc(b.food)}</div><div class="mute">Applied ${esc(fdt(b.created_at))}</div>`:`<div class="mute">No buyer</div>`}</div></div>
+  <div><b>Buyer (new person)</b>${b?`<div>${buyerLk(x)} · ${esc(b.phone)}</div><div>${esc(b.location)} · ${esc(b.attendance)} · ${esc(b.food)}</div><div class="mute">Applied ${esc(fdt(b.created_at))}</div>`:`<div class="mute">No buyer</div>`}</div></div>
   <div style="margin:10px 0"><label style="font-weight:600;display:block"><input type="checkbox" data-tcall="${x.id}" ${call?"checked":""}> I phoned the seller's <u>registered</u> number (${esc(x.seller_phone)}), not a number typed in any form</label>
   <p class="mute" style="margin:2px 0 8px">${pub?"Ask: “Is this ticket still yours? Shall we pass it to another person? Your payout goes to the UPI ID I will read back.” Read back the payout UPI ID shown above.":`Ask: “Shall I transfer this ticket to ${esc(b?b.name:"the buyer")}? We assume the payment is settled between you two, as you chose a private transfer.”`}</p></div>
   ${pub?`<div style="margin:6px 0">${tick(call,"Seller called")}${tick(asked,"Buyer asked to pay ₹"+esc(x.amount_due??"…"))}${tick(sub,"Buyer uploaded a screenshot")}${tick(ver,"Payment verified"+(ver?": ₹"+x.amount_received+" received":""))}</div>
@@ -726,7 +852,7 @@ async function tAction(act,id){
 
 /* ---------- settings cards for transfers and the repeat-registration flag ---------- */
 function trCard(s){
-  if(s.private_code_hours===undefined)return `<div class="card"><h2>Ticket transfers</h2><p class="err" style="margin:0"><b>One setup step is missing.</b> The transfer database update has not been applied yet.</p></div>`;
+  if(s.private_code_hours===undefined)return"";
   return `<div class="card"><h2>Ticket transfers</h2>
   <p class="mute" style="margin-top:0">Lets a ticket holder who cannot come hand the seat to someone else. Keep this OFF until it has been tested.</p>
   <label><input type="checkbox" id="topen" ${s.transfers_open?"checked":""}> Transfers open</label>
@@ -737,12 +863,6 @@ function trCard(s){
   <label for="thours">How long a transfer code stays valid (hours, 1 to 168)</label><input id="thours" type="number" min="1" max="168" value="${s.private_code_hours}">
   <p class="mute" style="margin:4px 0">You can extend any code later from the Transfers tab. The price a public buyer is asked is the “Price per person” above.</p>
   <p><button id="tsave">Save transfer settings</button></p></div>`}
-function aboutCard(s){
-  if(s.show_about===undefined)return"";
-  return `<div class="card"><h2>About link</h2>
-  <p class="mute" style="margin-top:0">Shows an "About" button on the home page of the registration site. For now it opens an "Under construction" page. Switch it off to hide the button completely.</p>
-  <label><input type="checkbox" id="aboutshow" ${s.show_about?"checked":""}> Show the About link on the home page</label>
-  <p><button id="aboutsave">Save</button></p></div>`}
 function vFeedback(){
   const rated=S.fb.filter(x=>x.rating),avg=rated.length?rated.reduce((a,x)=>a+x.rating,0)/rated.length:0,dist=[5,4,3,2,1].map(n=>[n,rated.filter(x=>x.rating===n).length]);
   const bk=Object.fromEntries(S.bookings.map(b=>[b.id,b])),who=id=>{const l=S.tickets.filter(x=>x.booking_id===id).sort((a,b)=>(a.reg_seq||0)-(b.reg_seq||0));return l.length?lk("person",l[0].id,l[0].name)+(l.length>1?` <button class="lk" data-sheet="booking:${id}">and ${l.length-1}${l.length===2?" other":" others"}</button>`:""):"–"};
@@ -750,25 +870,30 @@ function vFeedback(){
   <div class="card stat"><span class="mute">Average excitement</span><b>${rated.length?avg.toFixed(1)+" / 5":"–"}</b><span class="mute">${rated.length} ratings · ${dist.map(d=>d[1]?`<button class="lk" data-sheet="list:fb:${d[0]}">${d[0]}★ ${d[1]}</button>`:d[0]+"★ 0").join(" · ")}</span></div></div>
   <div class="card wrap"><table><tr><th>When</th><th>Booking</th><th>Name</th><th>Excitement</th><th>Suggestions / ideas / expectations</th></tr>`+
   (S.fb.length?S.fb.map(x=>`<tr><td>${esc(new Date(x.updated_at).toLocaleString())}</td><td>${bk[x.booking_id]?lk("booking",x.booking_id,bk[x.booking_id].booking_code):"–"}</td><td>${who(x.booking_id)}</td><td>${x.rating?x.rating+" / 5":"–"}</td><td style="white-space:pre-wrap;max-width:420px">${esc(x.comment||"")}</td></tr>`).join(""):`<tr><td colspan="5" class="mute">Nothing yet.</td></tr>`)+`</table></div>`}
-function feedbackCard(s){
-  if(s.ask_feedback===undefined)return"";
-  return `<div class="card"><h2>Feedback questions</h2>
-  <p class="mute" style="margin-top:0">When on, the "This is your Booking ID" page asks two optional questions: how excited they are (1 to 5) and any suggestions, ideas or expectations. When off, the questions are hidden and no new answers are accepted. Answers already received are kept and shown in the Feedback tab.</p>
-  <label><input type="checkbox" id="askfb" ${s.ask_feedback?"checked":""}> Ask the two feedback questions after booking</label>
-  <p><button id="askfbsave">Save</button></p></div>`}
-function emailCard(s){
-  if(s.ask_email===undefined)return"";
-  return `<div class="card"><h2>Email box</h2>
-  <p class="mute" style="margin-top:0">When on, the booking and transfer forms ask for an email address (required). When off, the Email box is hidden and no email is asked for or saved. Emails already saved are kept.</p>
-  <label><input type="checkbox" id="askemail" ${s.ask_email?"checked":""}> Ask for an email address on the forms</label>
-  <p><button id="askemailsave">Save</button></p></div>`}
-function ipCard(s){
+function advCard(s){
   if(s.ip_flag_threshold===undefined)return"";
-  return `<div class="card"><h2>Repeat-registration flag</h2>
+  return `<details class="card"><summary style="cursor:pointer;min-height:36px;display:flex;align-items:center"><h2 style="margin:0">Advanced</h2></summary>
+  <h3 class="sh3">Repeat-registration flag</h3>
   <p class="mute" style="margin-top:0">Marks bookings when one network address makes this many registrations or more. It only flags: nobody is ever blocked.</p>
   <label for="ipth">Flag at this many registrations (2 to 1000)</label><input id="ipth" type="number" min="2" max="1000" value="${s.ip_flag_threshold}">
-  <p><button id="ipsave">Save</button> <button class="ghost bad" id="ipclear">Delete all stored network addresses</button></p>
-  <p class="mute" style="margin-bottom:0">Do the deletion after the event. It cannot be undone.</p></div>`}
+  <p><button id="ipsave">Save</button></p></details>`}
+function afterCard(s){
+  if(s.ip_flag_threshold===undefined)return"";
+  return `<div class="card"><h2>After the event</h2>
+  <p class="mute" style="margin-top:0">Do this once the event is over. It cannot be undone, and the repeat-registration flags disappear.</p>
+  <p style="margin-bottom:0"><button class="ghost bad" id="ipclear">Delete all stored network addresses</button></p></div>`}
+/* the readiness list is worked out from the real settings, so nothing has to be ticked by hand */
+function readyCard(s){
+  const row=(good,t,h)=>`<li><span style="color:var(${good?"--ok":"--err"});font-weight:800">${good?"✓":"✗"}</span><div><b>${t}</b>${good?"":`<div class="mute">${h}</div>`}</div></li>`,
+    pay=!!(s.upi_id&&s.payee_name&&s.whatsapp_number),dl=s.deadline&&new Date(s.deadline)>new Date(),ev=!!(s.event_at&&s.venue&&new Date(s.event_at)>new Date());
+  return `<div class="card"><h2>Launch readiness</h2><p class="mute" style="margin-top:0">Worked out from your settings.</p><ul class="checks">
+  ${row(pay,"Payment details are filled in","Add the UPI ID, payee name and WhatsApp number under Payment details.")}
+  ${row(s.price_per_head>0,"Price per person is set","Set the final price under Registration settings.")}
+  ${row(s.cap>0,"Cap is set","Set how many people can register.")}
+  ${row(!!dl,"Deadline is in the future","Set the deadline under Registration settings.")}
+  ${row(ev,"Event date and venue are set","Fill in Event details.")}
+  ${row(!!s.is_open,"Registration is switched on","Switch on Registration open when you are ready to start.")}</ul>
+  <p class="mute" style="margin-bottom:0">Check by hand: a small real test payment scanned in two UPI apps, all test bookings deleted and the payment-proofs storage emptied, sign-ups switched off in Supabase, and the other organiser logins created.</p></div>`}
 
 /* ===================== GATE SCANNER (a tab; gate staff see only this tab) ===================== */
 const GEV="Ehsaas'26",UNDO_MS=2*60*1000,QR_RE=/^E26-(\d{1,6})(C?)\|([0-9a-f]{12})$/i;
@@ -933,7 +1058,7 @@ function gotoTab(tab,type,id){const who=type==="person"?people().find(x=>x.id===
   nav({tab,sheets:[]});
   const el=type==="person"||type==="booking"?document.querySelector(`[data-${type==="person"?"pid":"bid"}="${id}"]`):null;
   if(el){el.scrollIntoView({block:"center"});el.classList.add("flash")}}
-window.addEventListener("popstate",e=>{if(S.dlgSkip){const f=S.dlgSkip;S.dlgSkip=null;f();return}if(S.dlg){const f=S.dlg;S.dlg=null;f(false,true);return}
+window.addEventListener("popstate",e=>{if(S.dlgSkip){const f=S.dlgSkip;S.dlgSkip=null;f();return}if(S.dlg){const f=S.dlg;S.dlg=null;f(false,true);return}if(S.desk){closeDesk(true);return}
   const st=e.state;if(!S.staff||!st||!st.tab)return;
   const tabChanged=st.tab!==S.tab;S.sheets=(st.sheets||[]).slice();S.tab=st.tab;
   if(tabChanged){view();window.scrollTo(0,st.y||0)}else renderSheet()});
@@ -941,11 +1066,11 @@ try{history.replaceState({tab:S.tab,sheets:[],y:0},"")}catch(_){}
 const lk=(type,id,txt)=>`<button class="lk" data-sheet="${type}:${esc(id)}">${esc(txt)}</button>`;
 function pSheet(id){
   const p=people().find(x=>x.id===id);if(!p)return {title:"Person",html:`<p class="err">This person is no longer in the list.</p>`};
-  const adm=S.staff.role==="admin",co=p.kind==="coordinator",em=S.emailsOk?(S.emails[p.id]||""):"",tr=(S.tReady?S.transfers:[]).filter(x=>x.ticket_id===p.id);
+  const adm=S.staff.role==="admin",co=p.kind==="coordinator",tr=(S.tReady?S.transfers:[]).filter(x=>x.ticket_id===p.id);
   const row=(k,v)=>`<div class="sr"><span class="mute">${k}</span><span>${v}</span></div>`;
   return {title:p.name,html:`<div class="mute">${esc(tlabel(p))} · ${co?"Coordinator":"Guest"}</div>
   <div class="srs">${row("Payment",`<span class="pill p-${p.b.status}">${esc(p.b.status||"")}</span>`)}
-  ${row("Phone",`<a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>`)}${S.emailsOk?row("Email",em?`<a href="mailto:${esc(em)}">${esc(em)}</a>`:'<span class="mute">none</span>'):""}
+  ${row("Phone",`<a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>`)}
   ${p.location!==undefined?row("Location",esc(p.location)):""}${p.occupation?row("Role",esc(p.occupation)):""}${p.occupation_detail?row("Role details",esc(p.occupation_detail)):""}${row("Food",esc(p.food))}
   ${row("At the event",p.transferred_out_at?'<span class="mute">ticket transferred away</span>':p.checked_in_at?`<b style="color:var(--ok)">✔ Present</b> <span class="mute">${esc(fdt(p.checked_in_at))}</span>`:'<span class="mute">not yet</span>')}
   ${row("Booking",lk("booking",p.booking_id,p.b.booking_code||"–"))}
@@ -995,33 +1120,43 @@ function lSheet(key){
     const L=key==="scan_un"?un:key==="scan_bad"?bad:all;return{title:{scan_un:"Not scanned yet",scan_bad:"Unreadable or older scans",scan_all:"Scanned in total"}[key],html:bBlocks(L.filter(b=>b.id))}}
   if(key.startsWith("ip:")){const ip=key.slice(3),m=(S.ipf&&S.ipf.by_booking)||{},L=S.bookings.filter(b=>m[b.booking_code]&&m[b.booking_code].ip===ip);return{title:"Network address",html:intro(`${esc(ip)} · ${L.length} bookings`)+bBlocks(L)}}
   return{title:"Details",html:'<p class="mute">Nothing to show.</p>'}}
-function gSearch(){const q=(S.gq||"").trim().toLowerCase(),el=document.getElementById("sres");if(!el)return;
-  if(q.length<2){el.innerHTML='<p class="mute">Type at least 2 letters or digits: a name, phone number, ticket number or booking ID.</p>';return}
-  const L=people().filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q)||tlabel(p).toLowerCase().includes(q)||(p.b.booking_code||"").toLowerCase().includes(q)).slice(0,30);
-  el.innerHTML=L.length?pRows(L,p=>p.transferred_out_at?'<span class="mute">transferred</span>':`<span class="pill p-${p.b.status}">${esc(p.b.status||"")}</span>`):'<p class="mute">Nobody found.</p>'}
+function gSearch(){const q=(S.gq||"").trim().toLowerCase(),el=$("#sdrop");if(!el)return;
+  if(q.length<2){hideS();return}
+  const L=people().filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q)||tlabel(p).toLowerCase().includes(q)||(p.b.booking_code||"").toLowerCase().includes(q)).slice(0,8);
+  el.innerHTML=`<div class="srs">${L.length?pRows(L,p=>p.transferred_out_at?'<span class="mute">transferred</span>':`<span class="pill p-${p.b.status}">${esc(p.b.status||"")}</span>`):'<p class="mute" style="margin:10px 0">Nobody found.</p>'}</div>`;el.hidden=false}
 function renderSheet(){
   let m=document.getElementById("sheetbg");
   if(!S.staff||!S.sheets.length){if(m)m.remove();S.shk=null;document.body.classList.remove("shopen");return}
-  const cur=S.sheets[S.sheets.length-1],c=cur.type==="person"?pSheet(cur.id):cur.type==="list"?lSheet(cur.id):cur.type==="search"?{title:"Find a person",html:`<input id="gq" type="search" placeholder="Name, phone, ticket or booking ID" value="${esc(S.gq||"")}" style="width:100%" autocomplete="off"><div id="sres" class="srs"></div>`}:bSheet(cur.id);
+  const cur=S.sheets[S.sheets.length-1],c=cur.type==="person"?pSheet(cur.id):cur.type==="list"?lSheet(cur.id):bSheet(cur.id);
   if(!m){m=document.createElement("div");m.id="sheetbg";m.className="sheet-bg";document.body.appendChild(m)}
   document.body.classList.add("shopen");
   const sk=cur.type+":"+cur.id,again=S.shk===sk,keepY=again&&m.firstChild?m.firstChild.scrollTop:0;   // the same sheet drawn again keeps its scroll position and does not replay the slide-in
   m.innerHTML=`<div class="sheet${again?" still":""}" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><div class="sh-h">${S.sheets.length>1?'<button class="ghost sm" data-sback="1">‹ Back</button>':""}<h2>${esc(c.title)}</h2><button class="ghost sm" data-sback="1" aria-label="Close">✕</button></div>${c.html}${c.tab?`<p class="sh-f"><button data-gotab="${c.tab[0]}:${c.tab[2]}:${esc(c.tab[3])}">${c.tab[1]}</button></p>`:""}</div>`;
-  const sh=m.firstChild;sh.scrollTop=keepY;S.shk=sk;if(cur.type==="search"){gSearch();const g=document.getElementById("gq");if(g&&!g.value)g.focus()}}
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.sheets.length)history.back();if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches('[role=button][data-sheet]')){e.preventDefault();const[k,i]=sp(e.target.dataset.sheet,2);openSheet(k,i)}});
+  const sh=m.firstChild;sh.scrollTop=keepY;S.shk=sk}
+document.addEventListener("keydown",e=>{
+  if(S.desk&&!S.dlg&&!document.querySelector(".modal")&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target&&e.target.tagName)||"")&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
+    const k=e.key.toLowerCase(),m={p:"paid",r:"reject",arrowright:"skip",s:"skip",arrowleft:"prev",escape:"close"}[k];if(m){e.preventDefault();deskAct(m);return}}
+  if(e.key==="/"&&S.staff&&S.staff.role==="admin"&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target&&e.target.tagName)||"")&&!S.dlg){e.preventDefault();const g=$("#gtop");if(g)g.focus();return}
+  if(e.key==="Escape"&&e.target&&e.target.id==="gtop"){e.target.value="";S.gq="";hideS();e.target.blur();return}
+  if(e.key==="Escape"&&S.sheets.length)history.back();if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches('[role=button][data-sheet]')){e.preventDefault();const[k,i]=sp(e.target.dataset.sheet,2);openSheet(k,i)}});
 
 /* ---------- events ---------- */
 async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))||e.target,id=t.id;
   if(id==="login"){const{error}=await db.auth.signInWithPassword({email:$("#em").value.trim(),password:$("#pw").value});S.msg=error?"Wrong email or password.":"";return error?view():boot()}
-  if(id==="logout"){gCamStop(true);await db.auth.signOut();S.staff=null;S.msg="";S.sheets=[];return view()}
-  if(id==="refresh"){if(S.staff.role==="admin")await sync();else await gLoad();view({keepForm:true});return toast("Refreshed")}
+  if(id==="theme"){setTheme(curDark()?"light":"dark");return}
+  if(id==="morebtn"){const mo=$("#more");mo.hidden=!mo.hidden;return}
+  if(t.id==="more"){t.hidden=true;return}
+  if(!(t.closest&&t.closest(".sbox")))hideS();
+  if(id==="logout"||t.dataset.logout){gCamStop(true);await db.auth.signOut();S.staff=null;S.msg="";S.sheets=[];return view()}
+  if(id==="refresh"||t.dataset.refresh){const mo=$("#more");if(mo)mo.hidden=true;if(S.staff.role==="admin")await sync();else await gLoad();view({keepForm:true});return toast("Refreshed")}
   if(S.staff&&S.staff.role==="admin"&&S.msgOk&&await msgClick(t,id))return;
   {const gb=t.closest&&t.closest("button");if(gb&&(gb.dataset.act||gb.dataset.pick))return gAct(gb)}
   if(id==="camtoggle")return S.cam?gCamStop():gCamStart();
   if(t.id==="sheetbg"||t.dataset.sback){history.back();return}
-  const shT=t.closest&&t.closest("[data-sheet]");if(shT){const[k,i]=sp(shT.dataset.sheet,2);return openSheet(k,i)}
+  const shT=t.closest&&t.closest("[data-sheet]");if(shT){if(shT.closest(".sbox")){hideS();const g=$("#gtop");if(g)g.value="";S.gq=""}const[k,i]=sp(shT.dataset.sheet,2);return openSheet(k,i)}
   if(t.dataset.gotab){const[tab,k,i]=sp(t.dataset.gotab,3);return gotoTab(tab,k,i)}
-  if(t.dataset.tab){if(t.dataset.tab===S.tab&&!S.sheets.length){S.rt=null;return view()}return nav({tab:t.dataset.tab,sheets:[]})}
+  if(t.dataset.need){S.f={...S.f,q:"",pay:"pending",review:t.dataset.need==="warn"};return nav({tab:"bookings",sheets:[]})}
+  if(t.dataset.tab){const mo=$("#more");if(mo)mo.hidden=true;if(t.dataset.tab===S.tab&&!S.sheets.length){S.rt=null;return view()}return nav({tab:t.dataset.tab,sheets:[]})}
     if(t.dataset.undo){
     if(!await yes("Undo this check-in?\n\nThis person will be marked as not present again.",{ok:"Undo check-in"}))return;
     const r=await db.rpc("undo_checkin",{p_id:t.dataset.undo});
@@ -1031,6 +1166,8 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
   if(id==="csv")return csv();
   if(t.dataset.jump){document.getElementById(t.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(t.dataset.chip!==undefined){S.f.pay=t.dataset.chip;vBookings();return}
+  if(t.matches&&t.matches('#dkimg img')){t.classList.toggle('z');return}
+  if(t.dataset.dk){return t.dataset.dk==='open'?openDesk():deskAct(t.dataset.dk)}
   if(t.dataset.shot){const b=bk(t.dataset.shot),F=flags()[b.id]||[],items=[{path:b.screenshot_path,label:b.booking_code}];
     S.scans.filter(s=>s.booking_id!==b.id).forEach(s=>{const o=bk(s.booking_id);if(F.some(x=>x.includes(o.booking_code)))items.push({path:o.screenshot_path,label:o.booking_code+" (flagged match)"})});return shots(items)}
   if(t.dataset.st){const r=await db.rpc("set_booking_status",{p_booking:t.dataset.b,p_status:t.dataset.st});if(r.error)return toast("Failed: "+r.error.message);await sync("core","reg","ip");view();return toast("Marked "+t.dataset.st+(t.dataset.st==="paid"?". Ticket numbers given.":""))}
@@ -1048,9 +1185,6 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
     if(on&&!s0.transfers_open&&!await yes("Switch ticket transfers ON?\n\nPeople will be able to start transfers straight away. Only do this once the transfer system has been tested.",{ok:"Switch on"}))return;
     const r=await db.rpc("admin_set_transfer_settings",{p_open:on,p_food_locked:$("#tfood").checked,p_code_hours:h,p_clear_cutoff:!cv&&!!s0.transfer_cutoff_at,p_cutoff:cv?new Date(cv+":00+05:30").toISOString():null});
     if(r.error)return toast(terr(r.error),6000);await sync("core","log");view({keepForm:true});return toast("Transfer settings saved")}
-  if(id==="askemailsave"){const r=await db.rpc("admin_set_ask_email",{p_ask:$("#askemail").checked});if(r.error)return toast(terr(r.error),6000);await sync("core","log");view({keepForm:true});return toast("Email setting saved")}
-  if(id==="askfbsave"){const r=await db.rpc("admin_set_ask_feedback",{p_ask:$("#askfb").checked});if(r.error)return toast(terr(r.error),6000);await sync("core","log");view({keepForm:true});return toast("Feedback setting saved")}
-  if(id==="aboutsave"){const r=await db.rpc("admin_set_show_about",{p_show:$("#aboutshow").checked});if(r.error)return toast(terr(r.error),6000);await sync("core","log");view({keepForm:true});return toast("About link saved")}
   if(id==="ipsave"){const n=+$("#ipth").value;if(!(n>=2&&n<=1000))return toast("Use a number from 2 to 1000",4000);
     const r=await db.rpc("admin_set_transfer_settings",{p_ip_threshold:n});if(r.error)return toast(terr(r.error),6000);await sync("core","log");view({keepForm:true});return toast("Saved")}
   if(id==="ipclear"){if(!await yes("Delete every stored network address?\n\nDo this only after the event. It cannot be undone, and the repeat-registration flags will disappear."))return;
@@ -1076,7 +1210,7 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
     if(r.error)return toast("Failed: "+r.error.message);await sync("core","reg","log");view({keepForm:true});toast("Settings saved")}
 }
 document.addEventListener("click",async e=>{
-  const b=e.target.closest&&e.target.closest("button"),quick=!b||b.matches(".lk,.chip,.tg,.tabs button,[data-sheet],[data-sback],[data-jump],[data-gotab],[data-medit],[data-muse],[data-act],[data-pick],[data-dlg],#camtoggle");
+  const b=e.target.closest&&e.target.closest("button"),quick=!b||b.matches(".lk,.chip,.tg,[data-tab],.nav,#theme,#morebtn,[data-sheet],[data-sback],[data-jump],[data-gotab],[data-medit],[data-muse],[data-act],[data-pick],[data-dlg],[data-dk],#camtoggle");
   if(!quick&&b.dataset.run)return;   // this button is still working on the last tap
   if(!quick)b.dataset.run="1";
   try{await onClick(e)}catch(err){toast("Something went wrong: "+String((err&&err.message)||err).slice(0,120),6000)}
@@ -1089,19 +1223,19 @@ document.addEventListener("change",e=>{const t=e.target;
   if(t.id==="fmoved"){S.showMoved=t.checked;tPeople()}
   if(t.dataset.tcall){tcall("admin_transfer_confirm_call",{p_transfer:t.dataset.tcall,p_confirmed:t.checked},t.checked?"Call confirmed":"Call tick removed")}
   if(["fpay","ffood","floc","frole","ftype","fhere","frev"].includes(t.id)){S.f.pay=$("#fpay")?.value??S.f.pay;if($("#ffood")){S.f.food=$("#ffood").value;S.f.loc=$("#floc").value;S.f.role=$("#frole").value;S.f.type=$("#ftype").value;S.f.here=$("#fhere").value}if($("#frev"))S.f.review=$("#frev").checked;S.tab==="people"?tPeople():tBookings()}});
-document.addEventListener("input",e=>{if(e.target.id==="lbody"){S.mf.lot.body=e.target.value;return}if(e.target.id==="lhead"){S.mf.lot.head=e.target.value;return}if(e.target.id==="ln"){S.mf.lot.n=e.target.value;return}if(e.target.id==="mname"){S.mf.name=e.target.value;return}if(e.target.id==="mbody"){S.mf.body=e.target.value;return}if(e.target.id==="gfq"){S.gfind=e.target.value;gResults();return}if(e.target.id==="gq"){S.gq=e.target.value;gSearch();return}if(e.target.id==="q"){S.f.q=e.target.value;S.tab==="people"?tPeople():tBookings()}});
+document.addEventListener("input",e=>{if(e.target.id==="lbody"){S.mf.lot.body=e.target.value;return}if(e.target.id==="lhead"){S.mf.lot.head=e.target.value;return}if(e.target.id==="ln"){S.mf.lot.n=e.target.value;return}if(e.target.id==="mname"){S.mf.name=e.target.value;return}if(e.target.id==="mbody"){S.mf.body=e.target.value;return}if(e.target.id==="gfq"){S.gfind=e.target.value;gResults();return}if(e.target.id==="gtop"){S.gq=e.target.value;gSearch();return}if(e.target.id==="q"){S.f.q=e.target.value;S.tab==="people"?tPeople():tBookings()}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.target.id==="pw"||e.target.id==="em"))$("#login").click()});
 /* Keeps the data fresh without anyone pressing Refresh: every minute while the page is in front, and when you come back to it after a while.
    It only redraws when something really changed, and never while you are typing or a dialog is open. */
-const dataSig=()=>JSON.stringify([S.bookings,S.tickets,S.scans,S.settings,S.transfers,S.buyers,S.fb,S.msgs,S.tm,S.pz,S.pzh,S.emails,S.log,S.alert,S.ipf,S.money]);
+const dataSig=()=>JSON.stringify([S.bookings,S.tickets,S.scans,S.settings,S.transfers,S.buyers,S.fb,S.msgs,S.tm,S.pz,S.pzh,S.log,S.alert,S.ipf,S.money]);
 let hiddenAt=0;
 async function autoRefresh(){
-  if(!S.staff||S.staff.role!=="admin"||S.tab==="gate"||S.scanning||S.busy||S.refreshing||S.dlg||document.visibilityState!=="visible")return;
+  if(!S.staff||S.staff.role!=="admin"||S.tab==="gate"||S.scanning||S.busy||S.refreshing||S.dlg||S.desk||document.visibilityState!=="visible")return;
   S.refreshing=true;S.quiet=true;
   try{const m0=S.msg,before=dataSig(),ok=await sync();
     if(!ok){S.msg=m0;return}
     if(dataSig()===before)return;
-    const el=document.activeElement,typing=el&&el.matches&&el.matches("#app input:not([type=checkbox]):not([type=radio]),#app textarea,#app select");
+    const el=document.activeElement,typing=el&&el.matches&&el.matches("#app input:not([type=checkbox]):not([type=radio]),#app textarea,#app select,#gtop");
     if(typing||document.querySelector(".dlg-bg,.modal"))return;
     view({keepForm:true})}
   catch(_){}

@@ -1138,7 +1138,7 @@ function homeMount(){
   const sv=root.querySelector("#home-sp-video");
   const lz=()=>{if(sv&&sv.dataset.src){sv.preload="metadata";sv.src=sv.dataset.src;sv.removeAttribute("data-src")}};   /* the video file is only fetched when the visitor scrolls near it */
   if(sv){try{const lo=new IntersectionObserver(es=>{if(es[0].isIntersecting){lz();lo.disconnect()}},{rootMargin:"600px 0px"});lo.observe(sv);sig.addEventListener("abort",()=>lo.disconnect())}catch(_){lz()}}
-  /* the sponsor slider: slide 1 the thank-you card, slide 2 the video. The two cross-fade (1.5s). When the visitor first reaches the card it rests 1.5s, fades to the video and plays it; when the video ends it fades back to the card. Dots (below the card) and swipe still work, and take over from the automatic move. */
+  /* the sponsor slider: slide 1 the thank-you card, slide 2 the video. The two cross-fade (1.5s). When the visitor first reaches the card it rests 3.5s, fades to the video and plays it; when the video ends it fades back to the card. Dots (below the card) and swipe still work, and take over from the automatic move. */
   const ssl=root.querySelector("#sp-slider"),str=root.querySelector("#sp-track"),sdt=[].slice.call(root.querySelectorAll("#sp-dots button")),sls=[].slice.call(root.querySelectorAll("#sp-track>.bh-spsl"));
   let sc=0,sx=0,sy=0,ssw=false,sblk=false,sauto=null,sdone=false,hct=null;
   /* play with sound; if the browser refuses (no tap on the page yet), play muted instead; the tap-to-show controls then offer the sound */
@@ -1159,8 +1159,8 @@ function homeMount(){
       const hideC=()=>{if(!sv.paused&&!sv.ended)sv.controls=false},keepC=()=>{clearTimeout(hct);if(sv.controls&&!sv.paused&&!sv.ended)hct=setTimeout(hideC,3000)};
       on(sv,"playing",()=>{sv.controls=false});on(sv,"pause",()=>{clearTimeout(hct);sv.controls=true});
       on(sv,"click",()=>{if(!sv.paused&&!sv.controls)sv.controls=true;keepC()});["pointerdown","pointermove","touchstart"].forEach(k=>on(sv,k,keepC,{passive:true}));
-      /* first time the card is properly in view: rest on the thank-you card for 1.5s, then fade to the video and play it */
-      try{const so=new IntersectionObserver(es=>{if(es[0].isIntersecting&&!sdone){so.disconnect();sdone=true;sauto=setTimeout(()=>{sauto=null;if(sc===0)sgo(1,true)},1500)}},{threshold:.6});so.observe(ssl);sig.addEventListener("abort",()=>{so.disconnect();clearTimeout(sauto);clearTimeout(hct)})}catch(_){}}
+      /* first time the card is properly in view: rest on the thank-you card for 3.5s, then fade to the video and play it */
+      try{const so=new IntersectionObserver(es=>{if(es[0].isIntersecting&&!sdone){so.disconnect();sdone=true;sauto=setTimeout(()=>{sauto=null;if(sc===0)sgo(1,true)},3500)}},{threshold:.6});so.observe(ssl);sig.addEventListener("abort",()=>{so.disconnect();clearTimeout(sauto);clearTimeout(hct)})}catch(_){}}
     on(ssl,"touchstart",e=>{const t=e.touches[0],v=e.target.closest&&e.target.closest("video");sblk=false;if(v&&v.controls){const r=v.getBoundingClientRect();if(t.clientY>r.bottom-64)sblk=true}sx=t.clientX;sy=t.clientY},{passive:true});   /* a swipe that starts on the video's control bar is the seek bar, not the slider */
     on(ssl,"touchend",e=>{if(sblk)return;const t=e.changedTouches[0],d=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(d)>40&&Math.abs(d)>Math.abs(dy)*1.5){ssw=true;stake();sgo(sc+(d<0?1:-1),true)}},{passive:true});   /* only a clearly sideways swipe moves it: a diagonal flick while scrolling the page past the card must not */
     on(ssl,"scroll",()=>{if(ssl.scrollLeft)ssl.scrollLeft=0},{passive:true});   /* the card is only ever moved by its dots or a sideways swipe: if the browser nudges the hidden overflow (focus, find, anchors), put it straight back */

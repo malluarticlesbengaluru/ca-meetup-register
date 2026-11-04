@@ -26,7 +26,7 @@ with sync_playwright() as p:
     check('gate: search finds the retired ticket and says Transferred', 'Transferred' in t and 'current ticket' in t, t)
     check('gate: retired ticket has NO Open/Admit button', pg.query_selector('#gres button') is None)
     pg.fill('#gfq','Dan'); check('gate: the buyer Dan can be opened', pg.query_selector('#gres button[data-pick]') is not None)
-    check('look: staff page has the slim header with the logo and the Organiser label', pg.is_visible('.top') and pg.query_selector('.top img') is not None and 'Organiser' in pg.inner_text('.top'))
+    check('look: staff page has the top bar with the Organiser label and no admin menu for gate staff', pg.is_visible('#top') and 'Organiser' in pg.inner_text('#top') and not pg.is_visible('#rail') and pg.query_selector('#gtop') is None)
     check('look: gate screen has no sideways scrolling at phone width', pg.evaluate('document.documentElement.scrollWidth<=window.innerWidth+1'))
     check('no page errors', not errs, errs); b.close()
     # ---- result screens stay until the gate person decides; Home page / Next scan / Undo; admitted list; camera retry
@@ -66,14 +66,14 @@ with sync_playwright() as p:
     check('non-admin undo refused: "Only an admin can undo this"', 'Only an admin' in pg.inner_text('.ov'), pg.inner_text('.ov')); b.close()
     # ---- merged page: what each role sees
     b,pg,errs=run(p,T,B)
-    tabs = pg.query_selector_all('.tabs button')
+    tabs = pg.query_selector_all('#rail button, #bnav button')
     check('gate staff see only the scanner: no admin tabs, no Bookings/People/Settings', not tabs and pg.query_selector('#counts') is not None and 'Settings' not in pg.inner_text('#app'), pg.inner_text('#app')[:200])
     pg.evaluate("document.querySelector('#admlist')"); 
-    check('gate staff have no Find/Dashboard shortcut to admin things', pg.query_selector('[data-sheet="search:"]') is None and pg.query_selector('a[href*="admin"]') is None)
+    check('gate staff have no Find/Dashboard shortcut to admin things', pg.query_selector('#gtop') is None and pg.query_selector('a[href*="admin"]') is None)
     b.close()
     b,pg,errs=A.open_page(p, A.db())
     check('admin: Gate is a tab, and the old "Gate scanner" link is gone', pg.query_selector('button[data-tab="gate"]') is not None and pg.query_selector('a[href*="gate"]') is None)
-    pg.click('button[data-tab="gate"]'); check('admin: Gate tab shows the counts, camera card, find and admitted list', all(pg.query_selector(x) is not None for x in ['#counts','#camtoggle','#gfq','#admlist']))
+    A.go_tab(pg,'gate'); check('admin: Gate tab shows the counts, camera card, find and admitted list', all(pg.query_selector(x) is not None for x in ['#counts','#camtoggle','#gfq','#admlist']))
     pg.fill('#gfq','Ben'); check('admin: find works inside the Gate tab', 'Ben' in pg.inner_text('#gres'))
     pg.click('button[data-tab="people"]'); check('admin: other tabs still work after visiting Gate', pg.query_selector('#tbl .pc') is not None)
     check('no page errors for admin on the merged page', not errs, errs); b.close()

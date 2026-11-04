@@ -404,6 +404,20 @@ The owner will say when. When all work is done the owner fixes all settings. In 
 
 ---
 
+## ADMIN REDESIGN (Nov 2026): progress, branch `admin-step2-frame` (NOT pushed yet, owner asked to wait)
+
+Plan in 7 steps: (1) smoothness engine, merged as PR #48; (2) new frame: side menu / bottom bar, top bar with search, light and dark, Today screen (**built, on the branch**); (3) payment review desk; (4) People and Gate; (5) Transfers and Messages; (6) Settings grouped, Scan, Feedback; (7) final pass and docs.
+
+**Decisions of the owner (Step 2):** the About link is always on; Feedback is always on; the Email box is never asked and email is not shown anywhere (the only place it was asked was the transfer buyer form; the registration form already had none). So the switches were removed from Settings, and the Game messages card was removed (the Messages tab already has Show/Hide). The hand-ticked checklist is now an automatic "Launch readiness" card; the repeat-registration threshold is under a collapsed "Advanced"; "Delete all stored network addresses" is under "After the event".
+
+**Order to roll out (important):** (1) run `sql/r2_15_fixed_switches.sql` in Supabase (sets show_about=true, ask_email=false, ask_feedback=true); (2) merge the pages. If the pages go first, the transfer form no longer sends an email while the database still demands one, and transfers would fail. After running it, paste it into `sql/changes.sql` and refresh `schema_snapshot.txt`.
+
+**Tests on the branch:** `run_admin.py` 69, `run_gate.py` 35, `run_messages.py` 111, `run_smooth.py` 71, new `run_frame.py` 19 (menu, badges, Needs-you buttons, theme, search, phone bar and More sheet, no email), new `run_public_fixed.py` 7 (About always shown, no email box, feedback always on; fails on the old page). **`run_public.py` is out of date** with the live registration form (it still expects an attendance question and an email box) and was already failing before this work; it needs a rewrite, not used here. Note `run_public_fixed.py` needs `qrcode-generator` in `/home/claude/qrtest` only for the older suite.
+
+**Not verified:** a real phone, a real database, the SQL on the live database, light/dark on real devices.
+
+---
+
 ## 14. Never share
 
 Supabase **service role key**, database password, the `snapshot_reader` password or connection string, staff passwords, or anything from the Supabase dashboard's secret key section. The publishable key in the pages is safe by design.

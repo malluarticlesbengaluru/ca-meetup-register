@@ -10,11 +10,11 @@ def small(p, database, w=390, h=800):
     pg.route('**/*', lambda r: (r.fulfill(body=HTML, content_type='text/html') if r.request.url.endswith('/admin/test.html')
         else r.fulfill(body='/*stub*/', content_type='text/javascript') if r.request.url.endswith('.js') or '/npm/' in r.request.url else r.fulfill(status=204, body='')))
     pg.add_init_script('window.__DB=' + json.dumps(database) + ';'); pg.add_init_script(MOCK); pg.add_init_script(CH); pg.add_init_script(DLG_BOT)
-    pg.goto('https://example.test/admin/test.html'); pg.wait_for_selector('.tabs'); return b, pg, errs
+    pg.goto('https://example.test/admin/test.html'); pg.wait_for_selector('#v'); return b, pg, errs
 
 def calls(pg, name=None): return [x for x in pg.evaluate('window.__CALLS||[]') if name is None or x['name'] == name]
 def dlg(pg): return pg.query_selector('.dlg') is not None
-def tab_on(pg, t): return pg.query_selector(f'button[data-tab="{t}"].on') is not None
+def tab_on(pg, t): return pg.query_selector(f'button[data-tab="{t}"][aria-current="page"]') is not None
 
 def pending_world(n=1):
     """n pending bookings with one person each (plus the standard sample data)"""
@@ -106,9 +106,9 @@ with sync_playwright() as p:
     check('2.1 marking Paid re-reads bookings, tickets, scans and settings', {'bookings', 'tickets', 'screenshot_scans', 'settings'} <= reads, reads)
     check('2.2 ...and does NOT re-read transfers, emails, feedback, messages or the log', not (reads & {'transfers', 'transfer_buyers', 'ticket_emails', 'booking_feedback', 'game_messages', 'ticket_messages', 'settings_log', 'ticket_prizes'}), reads)
     check('2.3 ...it refreshes the registration banner and the repeat-address flags, but not the transfer money', {'set_booking_status', 'admin_registration_status', 'admin_ip_flags'} <= cn and 'admin_transfer_money' not in cn, cn)
-    pg.evaluate('window.__READS.length=0;window.__CALLS.length=0'); pg.click('#refresh'); pg.wait_for_timeout(400)
+    pg.evaluate('window.__READS.length=0;window.__CALLS.length=0'); pg.click('[data-refresh]:visible'); pg.wait_for_timeout(400)
     reads = set(pg.evaluate('window.__READS'))
-    check('2.4 the Refresh button still reads everything', {'bookings', 'tickets', 'screenshot_scans', 'settings', 'settings_log', 'ticket_emails', 'booking_feedback', 'transfers', 'transfer_buyers', 'game_messages', 'ticket_messages'} <= reads, reads)
+    check('2.4 the Refresh button still reads everything', {'bookings', 'tickets', 'screenshot_scans', 'settings', 'settings_log', 'booking_feedback', 'transfers', 'transfer_buyers', 'game_messages', 'ticket_messages'} <= reads and 'ticket_emails' not in reads, reads)
     check('2.5 no page errors', not errs, errs); b.close()
 
     # reading in parallel: with a slow database the whole reload takes about one wait, not twelve
@@ -120,13 +120,13 @@ with sync_playwright() as p:
     # ================= 3. the screen is updated in place
     d = db(tables=pending_world(40)); d['rpc']['set_booking_status'] = None
     b, pg, errs = open_page(p, d, 'bookings')
-    pg.evaluate("document.querySelector('.hdr').dataset.keep='1';document.querySelector('#tabs').dataset.keep='1'")
+    pg.evaluate("document.querySelector('#top').dataset.keep='1';document.querySelector('#rail').dataset.keep='1'")
     pg.evaluate('window.scrollTo(0,900)'); pg.wait_for_timeout(100); y0 = pg.evaluate('scrollY')
     pg.evaluate("document.querySelectorAll('.bk')[8].querySelector('[data-st=paid]').click()"); pg.wait_for_timeout(500)
     y1 = pg.evaluate('scrollY')
     check('3.1 the page is long enough for the test (scrolled down)', y0 >= 800, y0)
     check('3.2 marking Paid keeps the scroll position', abs(y1 - y0) <= 2, (y0, y1))
-    check('3.3 the header and the tab bar are updated in place, not rebuilt', pg.evaluate("document.querySelector('.hdr').dataset.keep") == '1' and pg.evaluate("document.querySelector('#tabs').dataset.keep") == '1')
+    check('3.3 the top bar and the side menu are updated in place, not rebuilt', pg.evaluate("document.querySelector('#top').dataset.keep") == '1' and pg.evaluate("document.querySelector('#rail').dataset.keep") == '1')
     check('3.4 a booking card is still there after the redraw', pg.evaluate("document.querySelectorAll('.bk').length") >= 40, pg.evaluate("document.querySelectorAll('.bk').length"))
     b.close()
 
@@ -138,14 +138,14 @@ with sync_playwright() as p:
     check('3.6 the filter panel is still open after an action redraws the list', pg.evaluate("document.querySelector('.flt').open"))
     b.close()
 
-    d = db(); d['tables']['settings'] = dict(d['tables']['settings'], show_about=True); d['rpc']['admin_set_show_about'] = None; d['rpc']['admin_update_settings'] = None
+    d = db(); d['tables']['settings'] = dict(d['tables']['settings'], show_about=True); d['rpc']['admin_set_event'] = None; d['rpc']['admin_update_settings'] = None
     b, pg, errs = open_page(p, d, 'settings')
-    pg.fill('#sprice', '999'); pg.check('#chk1'); pg.fill('#thours', '99')
-    pg.click('#aboutsave'); pg.wait_for_timeout(400)
+    pg.fill('#sprice', '999'); pg.fill('#thours', '99'); pg.fill('#svenue', 'Typed Hall')
+    pg.click('#evsave'); pg.wait_for_timeout(400)
     check('3.7 saving one card does not wipe what was typed in another (price)', pg.input_value('#sprice') == '999', pg.input_value('#sprice'))
     check('3.8 ...nor another card (transfer hours) ...', pg.input_value('#thours') == '99')
-    check('3.9 ...nor a tick in the checklist', pg.is_checked('#chk1'))
-    check('3.10 and the save itself worked', calls(pg, 'admin_set_show_about') and 'About link saved' in pg.inner_text('#toasts'))
+    check('3.9 ...and the venue just saved is still shown', pg.input_value('#svenue') == 'Typed Hall')
+    check('3.10 and the save itself worked', calls(pg, 'admin_set_event') and 'Event details saved' in pg.inner_text('#toasts'), pg.inner_text('#toasts'))
     pg.click('#ssave'); pg.wait_for_timeout(400)
     check('3.11 saving Registration settings sends the typed price', calls(pg, 'admin_update_settings')[-1]['args']['p_price'] == 999, calls(pg, 'admin_update_settings'))
     check('3.12 ...and keeps what was typed in other cards', pg.input_value('#thours') == '99')
@@ -190,23 +190,20 @@ with sync_playwright() as p:
     b.close()
 
     b, pg, errs = small(p, db())
-    pg.click('button[data-tab="settings"]'); pg.wait_for_timeout(150)
-    r = pg.evaluate("(()=>{const o=document.querySelector('.tabs .on').getBoundingClientRect(),t=document.querySelector('.tabs').getBoundingClientRect();return [o.left>=t.left-1,o.right<=t.right+1,document.querySelector('.tabs').scrollLeft]})()")
-    check('5.3 on a phone the open tab is scrolled into view in the tab bar', r[0] and r[1] and r[2] > 0, r)
-    pg.click('button[data-tab="people"]'); pg.wait_for_timeout(150)
-    r = pg.evaluate("(()=>{const o=document.querySelector('.tabs .on').getBoundingClientRect(),t=document.querySelector('.tabs').getBoundingClientRect();return [o.left>=t.left-1,o.right<=t.right+1]})()")
-    check('5.4 ...and after switching tabs the new open tab is also in view', r[0] and r[1], r)
+    check('5.3 on a phone the menu is a bottom bar and the side menu is hidden', pg.is_visible('#bnav') and not pg.is_visible('#rail'))
+    pg.click('#bnav button[data-tab="people"]'); pg.wait_for_timeout(150)
+    check('5.4 tapping a bottom-bar item opens it and marks it as the open one', tab_on(pg, 'people') and pg.query_selector('#bnav [aria-current="page"][data-tab="people"]') is not None)
     check('5.5 no sideways scrolling at 390 px', pg.evaluate('document.documentElement.scrollWidth<=window.innerWidth+1'))
-    pg.click('button[data-tab="overview"]'); pg.evaluate('window.scrollTo(0,300)'); pg.click('button[data-tab="overview"].on'); pg.wait_for_timeout(100)
-    check('5.6 tapping the open tab again scrolls to the top', pg.evaluate('scrollY') == 0)
+    pg.click('#bnav button[data-tab="overview"]'); pg.evaluate('window.scrollTo(0,300)'); pg.click('#bnav button[data-tab="overview"][aria-current="page"]'); pg.wait_for_timeout(100)
+    check('5.6 tapping the open item again scrolls to the top', pg.evaluate('scrollY') == 0)
     b.close()
 
     # ================= 6. sign out and in builds the screen again; gate staff unaffected
     b, pg, errs = open_page(p, db())
-    pg.click('#logout'); pg.wait_for_timeout(150)
-    check('6.1 signing out shows the login', pg.query_selector('#login') is not None and pg.query_selector('.tabs') is None)
+    pg.click('[data-logout]:visible'); pg.wait_for_timeout(150)
+    check('6.1 signing out shows the login', pg.query_selector('#login') is not None and pg.query_selector('#rail button') is None)
     pg.fill('#em', 'a@b.c'); pg.fill('#pw', 'x'); pg.click('#login'); pg.wait_for_timeout(400)
-    check('6.2 signing in again builds the header and tabs again', pg.query_selector('.hdr') is not None and pg.query_selector('.tabs button') is not None and 'Admin One' in pg.inner_text('.hdr'), pg.inner_text('#app')[:100])
+    check('6.2 signing in again builds the header and tabs again', pg.query_selector('#top') is not None and pg.query_selector('#rail button') is not None and 'Admin One' in pg.inner_text('#rail'), pg.inner_text('#app')[:100])
     check('6.3 no page errors on sign out / in', not errs, errs); b.close()
 
     # ================= 7. data stays fresh without pressing Refresh
@@ -225,7 +222,7 @@ with sync_playwright() as p:
     pg.evaluate(f"window.__DB.tables.bookings=window.__DB.tables.bookings.concat([{NEW.replace('b9','b8').replace('CODE0009','CODE0008')}])")
     leave_and_return(pg, 2)
     check('7.3 while you are typing in a box the data is refreshed but the screen is not redrawn under your fingers', pg.input_value('#q') == 'CODE' and pg.evaluate("S.bookings.some(b=>b.booking_code==='CODE0008')") and 'CODE0008' not in pg.inner_text('#tbl'), pg.inner_text('#tbl')[:80])
-    pg.evaluate("document.activeElement.blur()"); pg.click('#refresh'); pg.wait_for_timeout(300)
+    pg.evaluate("document.activeElement.blur()"); pg.click('[data-refresh]:visible'); pg.wait_for_timeout(300)
     check('7.4 pressing Refresh then shows it', 'CODE0008' in pg.inner_text('#tbl'))
     check('7.5 no page errors', not errs, errs); b.close()
 
@@ -240,7 +237,7 @@ with sync_playwright() as p:
     b, pg, errs = open_page(p, db(), 'bookings'); pg.evaluate(VIS)
     pg.evaluate("window.__DB.tables.bookings={error:'network problem'}"); leave_and_return(pg, 2)
     check('7.7 a failed automatic refresh stays silent and keeps the screen', 'Could not load' not in pg.inner_text('#app') and 'CODE0001' in pg.inner_text('#tbl'), pg.inner_text('#app')[:120])
-    pg.click('#refresh'); pg.wait_for_timeout(300)
+    pg.click('[data-refresh]:visible'); pg.wait_for_timeout(300)
     check('7.8 a failed manual Refresh does say so', 'Could not load data' in pg.inner_text('#app'))
     pg.evaluate("window.__DB.tables.bookings=[]"); b.close()
 

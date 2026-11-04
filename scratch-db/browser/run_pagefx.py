@@ -1,13 +1,11 @@
 """Tests for the motion on every public screen except Home (assets/page-fx.js + the CSS in index.html), and for the payment-screen change:
 the scroll-reveal ("a card appears only when you swipe to it") is OFF on the two payment screens, so the next card is never hidden.
-Run:  cd scratch-db/browser && python3 run_pagefx.py | tail -1      (PAGE=/path/index.html, FX=/path/page-fx.js, HFX=/path/home-fx.js test other copies)"""
+Run:  cd scratch-db/browser && python3 run_pagefx.py | tail -1      (PAGE=/path/index.html, FX=/path/page-fx.js test other copies)"""
 import os, sys, subprocess
 from playwright.sync_api import sync_playwright
 ROOT = '/home/claude/ca-meetup-register/'
 HTML = open(os.environ.get('PAGE', ROOT + 'index.html'), encoding='utf-8').read()
 FX = open(os.environ.get('FX', ROOT + 'assets/page-fx.js'), encoding='utf-8').read()
-HFX = open(os.environ.get('HFX', ROOT + 'assets/home-fx.js'), encoding='utf-8').read()
-LOGO = open(ROOT + 'assets/logo-fluid.js', encoding='utf-8').read()
 res = []
 def check(n, c, d=''): res.append(bool(c)); print(('  PASS  ' if c else '  FAIL  ') + n + ('' if c else '  ' + str(d)[:300]))
 FAKE_SB = "window.supabase={createClient:()=>({auth:{},rpc:async()=>({data:null,error:{message:'x'}}),storage:{from:()=>({upload:async()=>({data:{},error:null})})}})};"
@@ -18,14 +16,12 @@ PAYSTATE = ("S.status={price_per_head:250,max_group:5,accepting:true,deadline:'2
 def new_page(p, html=None, fx=None, hfx=None, reduced=False, w=390, h=844):
     b = p.chromium.launch(); ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, is_mobile=True, has_touch=True, reduced_motion='reduce' if reduced else 'no-preference')
     pg = ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
-    H = HTML if html is None else html; F = FX if fx is None else fx; HF = HFX if hfx is None else hfx
+    H = HTML if html is None else html; F = FX if fx is None else fx
     def hd(r):
         u = r.request.url
         if u.endswith('/test.html'): r.fulfill(body=H, content_type='text/html')
         elif '@supabase' in u: r.fulfill(body=FAKE_SB, content_type='text/javascript')
         elif 'qrcode' in u and u.split('?')[0].endswith('.js'): r.fulfill(body=QR, content_type='text/javascript')
-        elif 'logo-fluid.js' in u: r.fulfill(body=LOGO, content_type='text/javascript')
-        elif 'home-fx.js' in u: r.fulfill(body=HF, content_type='text/javascript')
         elif 'page-fx.js' in u: r.fulfill(body=F, content_type='text/javascript')
         elif '/assets/' in u and u.split('?')[0].endswith('.png'): r.fulfill(path=ROOT + 'assets/' + u.split('/assets/')[1].split('?')[0])
         else: r.fulfill(status=204, body='')
@@ -38,7 +34,7 @@ CARDS = "(()=>{const c=[...document.querySelectorAll('#app .card')];return {n:c.
 with sync_playwright() as p:
     # ---------- the payment screens ----------
     b, pg, errs = new_page(p)
-    check('Z0 the new scripts really are loaded (so these checks mean something)', pg.evaluate("typeof PageFX+typeof HomeFX") == 'objectobject')
+    check('Z0 the new scripts really are loaded (so these checks mean something)', pg.evaluate("typeof PageFX") == 'object')
     show(pg, 'pay'); c0 = pg.evaluate(CARDS)
     check('PAY1 payment screen: no card is held back by the scroll-reveal (none has the hidden class), right away', c0['n'] >= 2 and c0['rv'] == 0, c0)
     pg.wait_for_timeout(1000); c1 = pg.evaluate(CARDS)

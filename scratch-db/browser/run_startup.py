@@ -7,8 +7,6 @@ import os, sys, time
 from playwright.sync_api import sync_playwright
 ROOT = '/home/claude/ca-meetup-register/'
 HTML = open(os.environ.get('PAGE', ROOT + 'index.html'), encoding='utf-8').read()
-LOGO_JS = open(ROOT + 'assets/logo-fluid.js', encoding='utf-8').read()
-HOMEFX_JS = open(ROOT + 'assets/home-fx.js', encoding='utf-8').read()
 res = []
 def check(n, c, d=''): res.append(bool(c)); print(('  PASS  ' if c else '  FAIL  ') + n + ('' if c else '  ' + str(d)[:300]))
 
@@ -53,8 +51,6 @@ def make(p, html=None, preloaded=True, cfg=None, sb='ok', qr='ok', w=420, h=900)
             if qr == 'hold': held.append(('qr', r))
             elif qr == 'fail': r.abort()
             else: r.fulfill(body=QR_JS, content_type='text/javascript')
-        elif 'logo-fluid.js' in u: r.fulfill(body=LOGO_JS, content_type='text/javascript')
-        elif 'home-fx.js' in u: r.fulfill(body=HOMEFX_JS, content_type='text/javascript')
         else: r.fulfill(status=204, body='')
     pg.route('**/*', handler)
     import json

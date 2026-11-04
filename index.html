@@ -553,6 +553,9 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-rv{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
 .bhome .bh-rv.bh-in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){.bhome .bh-rv{opacity:1;transform:none;transition:none}.bhome .bh-spots i{animation:none}}
+/* scroll-linked pop (homeMount): while a section is part-way, --p (0 to 1) is set from the scroll position and drives it directly, with no timed transition */
+.bhome .bh-rv.bh-in{transition:transform .25s var(--ease,ease),border-color .25s}   /* fully popped: no timed fade any more (the pop itself is driven in homeMount), only the hover lift */
+.bhome .bh-rv.bh-pr{opacity:var(--p,0);transform:translateY(calc((1 - var(--p,0)) * 26px));transition:none;will-change:opacity,transform}
 .bhome .bh-sm{font-size:.84rem}
 .bhome button.bh-btn{width:auto;letter-spacing:0;overflow:visible}
 .bhome button.bh-gold:hover{background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember));border-color:transparent}
@@ -1280,10 +1283,33 @@ function homeMount(){
   homeUnmount();const root=document.querySelector("#app .bhome");if(!root)return;
   homeAC=new AbortController();const sig=homeAC.signal,on=(t,e,f,o)=>t&&t.addEventListener(e,f,Object.assign({signal:sig},o||{}));
   const RM=matchMedia("(prefers-reduced-motion:reduce)").matches;
-  /* sections fade in as they come into view (everything just shows if the browser can't do that) */
+  /* sections pop in as they are scrolled to. Two things drive each section and the FURTHER ALONG one wins:
+     (1) time: when the section's top edge comes into view (POP_TRIG, a share of the screen height) a normal timed pop of POP_MS starts (perfect for slow scrolling);
+     (2) position: the section is 0% popped with its top edge at the bottom of the screen and 100% once it has risen to POP_END (covers fast scrolling and the Register
+         button's jump, which would otherwise land on empty space).
+     A section never un-pops. Reduced motion: everything is simply shown. */
   const rv=[].slice.call(root.querySelectorAll(".bh-rv"));
-  if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("bh-in");io.unobserve(e.target)}}),{threshold:.12});rv.forEach(el=>io.observe(el));sig.addEventListener("abort",()=>io.disconnect())}
-  else rv.forEach(el=>el.classList.add("bh-in"));
+  if(RM)rv.forEach(el=>el.classList.add("bh-in"));
+  else{
+    const POP_TRIG=.92,POP_START=1,POP_END=.82,POP_MS=800;   /* tune here (the first three are shares of the screen height, from the top) */
+    const ease=x=>1-Math.pow(1-x,3);
+    let pq=false;
+    function pop(now){
+      pq=false;let busy=false;
+      const vh=innerHeight||document.documentElement.clientHeight,atEnd=scrollY+vh>=document.documentElement.scrollHeight-2;   /* at the very bottom nothing can scroll further, so show everything */
+      rv.forEach(el=>{
+        if(el._done)return;
+        const t=el.getBoundingClientRect().top;
+        if(el._t0==null&&t<vh*POP_TRIG)el._t0=now;
+        const tp=el._t0==null?0:ease(Math.min(1,(now-el._t0)/POP_MS)),sp=Math.min(1,Math.max(0,(vh*POP_START-t)/(vh*(POP_START-POP_END))));
+        const p=el._p=atEnd?1:Math.max(tp,sp,el._p||0);
+        if(p>=1){el._done=true;el.classList.add("bh-in");el.classList.remove("bh-pr");el.style.removeProperty("--p")}
+        else{el.classList.add("bh-pr");el.style.setProperty("--p",p.toFixed(3));if(el._t0!=null)busy=true}
+      });
+      if(busy&&!pq){pq=true;requestAnimationFrame(pop)}}
+    const popSoon=()=>{if(!pq){pq=true;requestAnimationFrame(pop)}};
+    on(window,"scroll",popSoon,{passive:true});on(window,"resize",popSoon);on(window,"load",popSoon);pop(performance.now());
+  }
   /* the two countdowns: to the meetup, and (only while registration has a deadline) to the end of registration */
   const cd=[].slice.call(root.querySelectorAll("#bh-cd b")),rg=root.querySelector("#bh-reg"),rb=rg?[].slice.call(rg.querySelectorAll("b")):[],pad=n=>String(n).padStart(2,"0");
   const put=(els,s)=>[Math.floor(s/86400),Math.floor(s%86400/3600),Math.floor(s%3600/60),s%60].forEach((n,i)=>{const x=pad(n);if(els[i]&&els[i].textContent!==x)els[i].textContent=x});

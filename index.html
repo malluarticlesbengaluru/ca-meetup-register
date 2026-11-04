@@ -889,6 +889,56 @@ body[data-step="about"] .ab-join a.btn svg{width:22px;height:22px;flex:none;fill
 body[data-step="about"] .ab-join .row.col{gap:12px;margin-top:18px}
 body[data-step="about"] .ab-join .row.col>a.btn{flex:none;width:100%}
 </style>
+<style id="burg-team">
+/* ===== Meet the team (Nov 2026): the Home card (.bh-team), three screens (data-step teams, team, members) and the member pop-up (.tm-sheet).
+   Everything here starts with .tm, .tm-, .bh-team or .bh-tstack, so no other screen is touched. ===== */
+.tm-a{position:relative;display:grid;place-items:center;flex:none;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--g1,#F3C766),var(--g2,#E9B24C));color:#2A0612;font:800 1em/1 "Poppins",system-ui,sans-serif;letter-spacing:.02em}
+.tm-a img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover}
+.bhome .bh-team{text-align:center;background:linear-gradient(135deg,var(--deep),rgba(140,24,56,.55));border:1px solid var(--glass-b);border-radius:28px;padding:42px 24px 38px}
+.bhome .bh-team h2{margin-bottom:12px}
+.bhome .bh-team .bh-lede{margin:0 auto 24px}
+.bhome .bh-tstack{display:flex;justify-content:center;align-items:center;margin:0 auto 26px;padding-left:10px}
+.bhome .bh-tstack .tm-a{width:44px;height:44px;font-size:.85rem;margin-left:-5px;box-shadow:0 0 0 3px #3A0B1D}
+.bhome .bh-tstack b{position:relative;margin-left:-5px;min-width:44px;height:44px;padding:0 10px;box-sizing:border-box;border-radius:99px;display:grid;place-items:center;background:var(--glass);border:1px solid var(--glass-b);font:800 .8rem/1 var(--sans);color:var(--cream)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm h1{text-align:center;font:900 clamp(1.9rem,8.4vw,2.7rem)/1.1 var(--sans);letter-spacing:-.025em;margin:18px 0 18px;text-wrap:balance}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .sub{text-align:center;margin:0 auto 22px;max-width:34ch;font:italic 500 .98rem/1.6 var(--serif);color:var(--blush)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-list{display:grid;gap:12px;margin:0 0 20px}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm button.tm-row{display:flex;align-items:center;gap:14px;min-height:64px;width:100%;padding:0 16px;border-radius:22px;border:1px solid var(--glass-b);background:var(--glass);color:var(--cream);font:600 1rem/1.25 var(--sans);text-align:left;box-shadow:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm button.tm-row:hover{background:rgba(140,24,56,.5);border-color:var(--gold);box-shadow:none;transform:translateX(3px)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-n{flex:none;width:36px;height:36px;border-radius:50%;background:var(--ember);color:var(--wine);display:grid;place-items:center;font:800 .8rem/1 var(--sans)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-big{width:54px;height:54px;font-size:1rem;margin:22px auto 0}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-ic{width:24px;height:24px;flex:none;fill:none;stroke:var(--cream);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-ch{margin-left:auto;opacity:.7}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-t{flex:1;min-width:0}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm button.tm-back{display:inline-flex;align-items:center;gap:4px;min-height:40px;padding:8px 16px;font-size:.88rem;margin-top:14px}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-back .tm-ic{width:18px;height:18px}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-eb{font:800 .7rem/1 var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:0 0 10px}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .card p.tm-obj{font:italic 500 1.08rem/1.6 var(--serif);color:var(--cream)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 18px}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px 14px;border-radius:20px;background:linear-gradient(160deg,rgba(140,24,56,.42),rgba(74,10,31,.6));border:1px solid var(--glass-b);text-align:center}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc:last-child:nth-child(odd){grid-column:1/-1;justify-self:center;width:calc(50% - 5px)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc .tm-a{width:72px;height:72px;font-size:1.4rem}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc b{font:700 .92rem/1.25 var(--sans);color:var(--cream)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc small{font:500 .74rem/1 var(--sans);color:var(--blush);padding:4px 0}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mc small.tm-lead{background:var(--gold);color:var(--wine);border-radius:99px;padding:4px 11px;font-weight:800}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-lg{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 20px}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-lg span{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:99px;border:1px solid var(--glass-b);font:500 .7rem/1.2 var(--sans);color:var(--cream)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-lg u{width:9px;height:9px;border-radius:50%}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 6px;margin:0 0 20px}
+@media(min-width:520px){body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mg{grid-template-columns:repeat(6,1fr)}}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm button.tm-m{display:flex;flex-direction:column;align-items:center;gap:7px;padding:6px 0;background:none;border:0;border-radius:12px;box-shadow:none;color:var(--cream);font:500 .68rem/1.25 var(--sans);overflow:visible}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm button.tm-m:hover{background:none;box-shadow:none;transform:translateY(-2px)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-m .tm-a{width:58px;height:58px;font-size:1.05rem;box-shadow:0 0 0 2px #1A040C,0 0 0 4px var(--rg)}
+body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mn{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:80px;text-align:center}
+.tm-sheet{position:fixed;left:0;right:0;top:0;bottom:0;z-index:60;background:rgba(10,2,6,.78);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center}
+.tm-card{width:100%;max-width:560px;box-sizing:border-box;background:linear-gradient(180deg,#4A0A1F,#2A0612);border:1px solid rgba(255,179,192,.22);border-radius:28px 28px 0 0;padding:30px 24px calc(24px + env(safe-area-inset-bottom,0px));text-align:center;color:#F6D7C6;animation:tmUp .3s ease both}
+.tm-card .tm-a{width:104px;height:104px;font-size:2.2rem;margin:0 auto 14px;box-shadow:0 0 0 3px #2A0612,0 0 0 6px var(--rg,#E9B24C)}
+.tm-card h3{margin:0;font:800 1.4rem/1.2 "Poppins",system-ui,sans-serif;color:#F6D7C6}
+.tm-card p{margin:6px 0 18px;font:italic 500 1rem/1.4 "Lora",Georgia,serif;color:#FFB3C0}
+@keyframes tmUp{from{transform:translateY(30px);opacity:0}}
+@media(min-width:700px){.tm-sheet{align-items:center}.tm-card{border-radius:28px}}
+@media(prefers-reduced-motion:reduce){.tm-card{animation:none}}
+</style>
 </head>
 <body>
 <header class="top"><div><img src="assets/burg-logo.png" alt="" width="44" height="30"><span>Mallu Articles Bengaluru</span></div></header>
@@ -1070,9 +1120,9 @@ function stepBar(){const i=({summary:2,pay:3})[S.step];if(!i)return"";
   return `<ol class="steps" aria-label="Progress">`+["Details","Review","Payment"].map((n,j)=>`<li class="${j+1<i?"done":j+1===i?"cur":""}"${j+1===i?' aria-current="step"':""}><i>${j+1<i?"✓":j+1}</i><span>${n}</span></li>`).join("")+`</ol>`}
 function foot(){return S.step==="home"||S.step==="form"?"":`<p class="foot">${esc(CONFIG.organiserName)}</p>`}
 function render(){
-  const a=$("#app");document.body.dataset.step=S.step;
+  const a=$("#app");document.body.dataset.step=S.step;tmClose();
   const fb=$("#fbar");if(fb)fb.innerHTML=S.step==="form"?fBar():"";   /* the Register form's sticky bar sits outside #app */
-  a.innerHTML=stepBar()+({home:vHome,loading:()=>head("Loading…","One moment."),error:vError,closed:vClosed,form:vForm,summary:vSummary,pay:vPay,done:vDone,tickets:vTickets,ticket:vTicket,about:vAbout,xmenu:vXMenu,xsell:vXSell,xcode:vXCode,xbuy:vXBuy,xform:vXForm,xdone:vXDone,tpay:vTPay})[S.step]()+foot();
+  a.innerHTML=stepBar()+({home:vHome,loading:()=>head("Loading…","One moment."),error:vError,closed:vClosed,form:vForm,summary:vSummary,pay:vPay,done:vDone,tickets:vTickets,ticket:vTicket,about:vAbout,teams:vTeams,team:vTeam,members:vMembers,xmenu:vXMenu,xsell:vXSell,xcode:vXCode,xbuy:vXBuy,xform:vXForm,xdone:vXDone,tpay:vTPay})[S.step]()+foot();
   if(S.step==="pay"&&$("#qr"))whenQR(()=>{const c=$("#qr");if(c&&S.step==="pay")drawQR(c,upiLink())});
   if(S.step==="tpay"&&$("#qr"))whenQR(()=>{const c=$("#qr");if(c&&S.step==="tpay")drawQR(c,upiLink(S.xp.amount,"Meetup ticket transfer"))});
   if(S.step==="ticket")drawTickets().catch(()=>{});
@@ -1183,6 +1233,8 @@ ${spots}
 
 <section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-slider bh-spslider bh-rv" id="sp-slider" role="region" aria-roledescription="carousel" aria-label="Our co-sponsor"><div class="bh-track" id="sp-track"><div class="bh-spsl bh-sponsor" aria-roledescription="slide" aria-label="1 of 2">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you.</p></div></div>${SPONSOR.video?`<div class="bh-spsl bh-spvid" id="home-sp-vfig" aria-roledescription="slide" aria-label="2 of 2"><video id="home-sp-video" data-src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="none" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video></div>`:""}</div>${SPONSOR.video?`<div class="bh-dots" id="sp-dots"><button type="button" aria-label="Show the thank-you card" aria-current="true"></button><button type="button" aria-label="Show the video"></button></div>`:""}</div></div></section>
 
+${tmHomeCard()}
+
 <section id="moments"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">Our meetups</p><h2>Moments we’ve <i>shared.</i></h2></div>
 <div class="bh-slider bh-rv" id="bh-slider" role="region" aria-roledescription="carousel" aria-label="Photos from our past meetups"><div class="bh-track" id="bh-track">
 <figure class="bh-sl" aria-roledescription="slide" aria-label="1 of 2"><img src="assets/burg-moment-chai.jpg" alt="The crowd at Chai, Chill and Chartered" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">Last year</p><h3>Chai, Chill <i>and</i> Chartered</h3><p>It was full of warmth, and you made it that way. This year we’re back with <b>${E}</b>, planned even more carefully.</p></figcaption></figure>
@@ -1269,6 +1321,65 @@ function homeMount(){
   if(sp){const gone=()=>{const x=root.querySelector("#home-sp-fig"),c=root.querySelector("#home-sp-cap");if(x)x.remove();if(c)c.remove()};
     on(sp,"error",gone);if(sp.complete&&sp.naturalWidth===0&&sp.getAttribute("src"))setTimeout(()=>{if(sp.naturalWidth===0&&sp.complete)gone()},0)}
 }
+/* ===== Meet the team (Nov 2026) =====
+   ONE place to edit: TEAMS. Each team: name, leg (short name for the colour key), ic (icon), c (the two colours of its initials circles and its ring),
+   obj (the one-line objective) and m (the members). The FIRST member of a team is its lead. A member is a plain name ("Anil K.") or an object:
+   {n:"Anil K.", p:"assets/team/anil.jpg", r:"Lead"}. p (photo) and r (role) are optional; without a photo the circle shows the person's initials.
+   The names below are PLACEHOLDERS: replace them. Photos go in assets/team/ (square, about 300x300, under 40 KB). */
+const TEAMS=[
+ {name:"Program Anchors",leg:"Anchors",ic:"chat",c:["#7FD6C6","#5CC2B0"],obj:"The voices that guide the day and keep the programme flowing.",m:["Rohit P.","Nimisha K."]},
+ {name:"Members Co-ordination",leg:"Co-ord",ic:"people",c:["#F3C766","#E9B24C"],obj:"Keeping our community informed and connected, from first registration to the final goodbye.",m:["Rameez M.","Anjali R.","Faisal H.","Lakshmi D.","Adil J."]},
+ {name:"Food & Venue",leg:"Food & Venue",ic:"pin",c:["#F7A45E","#F08A3C"],obj:"Making sure everyone is welcomed, seated and well fed, from the hall at Bloom Creative Zone to the last plate.",m:["Anil K.","Meera S.","Rahul P.","Sneha M.","Joseph T."]},
+ {name:"Activities & Games Planning",leg:"Activities",ic:"game",c:["#F68A7C","#F26B5B"],obj:"Planning the games and icebreakers that turn a room full of strangers into friends.",m:["Neha G.","Vishnu S.","Ameena Z.","Sarath K.","Remya P."]},
+ {name:"Stage Programme Planning",leg:"Stage",ic:"mic",c:["#D79BC8","#C77DB3"],obj:"Shaping the programme on stage, with its flow, performances and the moments people will remember.",m:["Midhun L.","Aswathy N.","Shahid O.","Gayathri V.","Basil E.","Tessa M."]},
+ {name:"Marketing & Media",leg:"Marketing",ic:"horn",c:["#F07A9A","#E2557A"],obj:"Spreading the word, and designing the posters and visuals that bring Ehsaas’26 to life.",m:["Fathima N.","Arjun V.","Nikhil R.","Divya C.","Sana A.","Gokul B."]},
+ {name:"Social Media",leg:"Social",ic:"share",c:["#9CC4F0","#7FB3E6"],obj:"Sharing Ehsaas’26 with the world, before, during and after the day.",m:["Hari S.","Aleena J."]},
+ {name:"Photo & Video",leg:"Photo & Video",ic:"cam",c:["#C3DB9C","#A8C77A"],obj:"Capturing the moments and memories, so everyone can relive them.",m:["Jithin V.","Sreya M."]}];
+const TM_IC={chat:'<path d="M4 5h16v11H9l-5 4z"/>',people:'<circle cx="12" cy="8" r="3.2"/><path d="M5.5 20v-1a4.5 4.5 0 0 1 4.5-4.5h4a4.5 4.5 0 0 1 4.5 4.5v1"/>',pin:'<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>',
+ game:'<rect x="2.5" y="7" width="19" height="10" rx="5"/><path d="M8 10v4M6 12h4"/><circle cx="16" cy="12" r=".6"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6"/>',
+ horn:'<path d="M3 10v4h4l7 4V6L7 10H3z"/><path d="M17 9a4 4 0 0 1 0 6"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 11l7.6-4M8.2 13l7.6 4"/>',cam:'<path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13.5" r="3.5"/>',
+ next:'<path d="M9 6l6 6-6 6"/>',back:'<path d="M15 6l-6 6 6 6"/>'};
+const tmSvg=(k,c)=>`<svg class="${c||"tm-ic"}" viewBox="0 0 24 24" aria-hidden="true">${TM_IC[k]||""}</svg>`;
+const tmPad=n=>String(n).padStart(2,"0");
+const tmM=x=>typeof x==="string"?{n:x}:x;
+const tmIni=n=>{const w=String(n).replace(/\./g,"").trim().split(/\s+/).filter(Boolean);return(((w[0]||"")[0]||"")+((w[1]||"")[0]||"")).toUpperCase()};
+const tmRole=(m,j)=>m.r||(j===0?"Lead":"Member");
+const tmTotal=()=>TEAMS.reduce((a,t)=>a+t.m.length,0);
+const tmEv=()=>esc(CONFIG.eventName).replace(/&#39;|'/g,"’");
+/* the circle: the photo when there is one, otherwise (or if the photo fails to load) the person's initials on the team's colours. Never an empty-profile icon. */
+function tmAv(m,t){return `<span class="tm-a" style="--g1:${t.c[0]};--g2:${t.c[1]}">${esc(tmIni(m.n))}${m.p?`<img src="${esc(m.p)}" alt="" loading="lazy" onerror="this.remove()">`:""}</span>`}
+S.tm={team:0};
+function tmHomeCard(){
+  const n=tmTotal(),k=TEAMS.length;
+  return `<section style="padding-top:0" id="home-team"><div class="bh-w"><div class="bh-team bh-rv"><p class="bh-eyebrow">The people behind it</p><h2>Meet the team who’s <i>making this happen.</i></h2>
+<p class="bh-lede">Behind ${tmEv()} are ${n} volunteers across ${k} teams, planning the stage, the food, the games and every small detail of your day.</p>
+<div class="bh-tstack" aria-hidden="true">${TEAMS.map(t=>tmAv(tmM(t.m[0]),t)).join("")}<b>+${n-k}</b></div>
+<button class="bh-btn bh-gold" id="go-team" type="button">Tap to meet the team</button></div></div></section>`}
+function vTeams(){
+  const n=tmTotal();
+  return `<div class="tm">`+head(TEAMS.length+" teams behind "+tmEv(),"Meet the teams making it happen")+
+  `<div class="tm-list">`+TEAMS.map((t,i)=>`<button class="tm-row" type="button" data-tm-team="${i}"><span class="tm-n">${tmPad(i+1)}</span>${tmSvg(t.ic)}<span class="tm-t">${esc(t.name)}</span>${tmSvg("next","tm-ic tm-ch")}</button>`).join("")+`</div>
+  <div class="row col"><button class="ghost" id="tm-all" type="button">See all ${n} members</button><button id="tm-home" type="button">Home</button></div></div>`}
+function vTeam(){
+  const i=S.tm.team,t=TEAMS[i],ms=t.m.map(tmM);
+  return `<div class="tm"><button class="ghost tm-back" id="tm-back" type="button">${tmSvg("back")}Teams</button>
+  <span class="tm-n tm-big">${tmPad(i+1)}</span><h1>${esc(t.name).replace(/(\S+-\S+)/g,'<span style="white-space:nowrap">$1</span>')}</h1>
+  <div class="card"><p class="tm-eb">Our objective</p><p class="tm-obj">${esc(t.obj)}</p></div>
+  <div class="tm-grid">`+ms.map((m,j)=>`<div class="tm-mc">${tmAv(m,t)}<b>${esc(m.n)}</b><small${j===0&&!m.r?' class="tm-lead"':""}>${esc(tmRole(m,j))}</small></div>`).join("")+`</div>
+  <div class="row"><button class="ghost" id="tm-prev" type="button">‹ Previous</button><button id="tm-next" type="button">Next ›</button></div>
+  <div class="row"><button class="ghost" id="tm-home" type="button">Home</button></div></div>`}
+function vMembers(){
+  return `<div class="tm"><button class="ghost tm-back" id="tm-back" type="button">${tmSvg("back")}Teams</button>`+head("All members",tmTotal()+" volunteers · "+TEAMS.length+" teams")+
+  `<div class="tm-lg">`+TEAMS.map(t=>`<span><u style="background:${t.c[1]}"></u>${esc(t.leg)}</span>`).join("")+`</div>
+  <div class="tm-mg">`+TEAMS.map((t,ti)=>t.m.map((x,mi)=>{const m=tmM(x);return `<button class="tm-m" type="button" data-tm-mem="${ti}-${mi}" aria-label="${esc(m.n)}, ${esc(t.name)}" style="--rg:${t.c[1]}">${tmAv(m,t)}<span class="tm-mn">${esc(m.n)}</span></button>`}).join("")).join("")+`</div>
+  <div class="row"><button class="ghost" id="tm-home" type="button">Home</button></div></div>`}
+function tmClose(){document.querySelectorAll(".tm-sheet").forEach(x=>x.remove())}
+function tmOpen(ti,mi){
+  tmClose();const t=TEAMS[ti],m=tmM(t.m[mi]),d=document.createElement("div");
+  d.className="tm-sheet";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-label",m.n);
+  d.innerHTML=`<div class="tm-card" style="--rg:${t.c[1]}">${tmAv(m,t)}<h3>${esc(m.n)}</h3><p>${esc(tmRole(m,mi))} · ${esc(t.name)}</p><div class="row"><button id="tm-view" type="button" data-tm-team="${ti}">View team</button><button class="ghost" id="tm-x" type="button">Close</button></div></div>`;
+  document.body.appendChild(d);const x=d.querySelector("#tm-x");if(x)x.focus()}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")tmClose()});
 /* ---------- About us: the community text comes from the Mallu Articles Bengaluru brochure; the two links are the community's WhatsApp group and Instagram page ---------- */
 const COMMUNITY_LINKS={whatsapp:"https://chat.whatsapp.com/Jt4eGv1yz40C26667HYplh",instagram:"https://www.instagram.com/mallu.articles.bengaluru/",instagramName:"@mallu.articles.bengaluru"};
 function vAbout(){
@@ -1919,6 +2030,15 @@ document.addEventListener("click",async e=>{const el=e.target.closest("button,a"
   if(S.step==="home"&&HOME_GO[id]){if((HOME_GO[id]==="main")!==homeRet()){S.step="loading";render();load()}else openTickets("");return}
   if(id==="go-home"){S.step="home";render();loadHomeStatus().then(()=>{if(S.step==="home")refreshHome()})}
   if(id==="go-about"){S.step="about";render()}
+  if(e.target.classList&&e.target.classList.contains("tm-sheet"))tmClose();
+  if(id==="go-team"){S.step="teams";render()}
+  if(ds.tmTeam!==undefined&&ds.tmTeam!==""){S.tm.team=Math.max(0,Math.min(TEAMS.length-1,+ds.tmTeam||0));S.step="team";render()}
+  if(id==="tm-back"){S.step="teams";render()}
+  if(id==="tm-all"){S.step="members";render()}
+  if(id==="tm-prev"||id==="tm-next"){const k=TEAMS.length;S.tm.team=(S.tm.team+(id==="tm-next"?1:k-1))%k;render()}
+  if(ds.tmMem){const p=ds.tmMem.split("-");tmOpen(+p[0],+p[1])}
+  if(id==="tm-x")tmClose();
+  if(id==="tm-home"){S.step="home";render();try{const t=document.getElementById("home-team");if(t)t.scrollIntoView({block:"center",behavior:"instant"})}catch(_){}loadHomeStatus().then(()=>{if(S.step==="home")refreshHome()})}
   if(id==="go-register"){S.step="loading";render();load()}
   if(id==="go-tickets")openTickets(S.step==="done"&&S.result?S.result.booking_code:S.step==="xdone"&&S.xb.result?S.xb.result.booking_code:"");
   if(id==="back-tickets"){S.step="tickets";render()}

@@ -1343,7 +1343,13 @@ const tmPad=n=>String(n).padStart(2,"0");
 const tmM=x=>typeof x==="string"?{n:x}:x;
 const tmIni=n=>{const w=String(n).replace(/\./g,"").trim().split(/\s+/).filter(Boolean);return(((w[0]||"")[0]||"")+((w[1]||"")[0]||"")).toUpperCase()};
 const tmRole=m=>m.r||"";
-const tmTotal=()=>TEAMS.reduce((a,t)=>a+t.m.length,0);
+/* One entry per PERSON, however many teams they are in (matched on the name, ignoring case and extra spaces). Order = first appearance.
+   Each: {m: member object (first photo / role found), t: [team indices]}. Used for the head-count and the All members screen. */
+const tmKey=n=>String(n).trim().toLowerCase().replace(/\s+/g," ");
+function tmPeople(){const o=[],ix={};TEAMS.forEach((t,ti)=>t.m.forEach(x=>{const m=tmM(x),k=tmKey(m.n);
+  if(ix[k]===undefined){ix[k]=o.length;o.push({m:{...m},t:[ti]})}
+  else{const q=o[ix[k]];if(!q.t.includes(ti))q.t.push(ti);if(!q.m.p&&m.p)q.m.p=m.p;if(!q.m.r&&m.r)q.m.r=m.r}}));return o}
+const tmTotal=()=>tmPeople().length;
 const tmEv=()=>esc(CONFIG.eventName).replace(/&#39;|'/g,"’");
 /* the circle: the photo when there is one, otherwise (or if the photo fails to load) the person's initials on the team's colours. Never an empty-profile icon. */
 function tmAv(m,t){return `<span class="tm-a" style="--g1:${t.c[0]};--g2:${t.c[1]}">${esc(tmIni(m.n))}${m.p?`<img src="${esc(m.p)}" alt="" loading="lazy" onerror="this.remove()">`:""}</span>`}
@@ -1370,13 +1376,14 @@ function vTeam(){
 function vMembers(){
   return `<div class="tm"><button class="ghost tm-back" id="tm-back" type="button">${tmSvg("back")}Teams</button>`+head("All members",tmTotal()+" volunteers · "+TEAMS.length+" teams")+
   `<div class="tm-lg">`+TEAMS.map(t=>`<span><u style="background:${t.c[1]}"></u>${esc(t.leg)}</span>`).join("")+`</div>
-  <div class="tm-mg">`+TEAMS.map((t,ti)=>t.m.map((x,mi)=>{const m=tmM(x);return `<button class="tm-m" type="button" data-tm-mem="${ti}-${mi}" aria-label="${esc(m.n)}, ${esc(t.name)}" style="--rg:${t.c[1]}">${tmAv(m,t)}<span class="tm-mn">${esc(m.n)}</span></button>`}).join("")).join("")+`</div>
+  <div class="tm-mg">`+tmPeople().map((q,pi)=>{const t=TEAMS[q.t[0]],m=q.m;return `<button class="tm-m" type="button" data-tm-mem="${pi}" aria-label="${esc(m.n)}, ${esc(q.t.map(i=>TEAMS[i].name).join(" and "))}" style="--rg:${t.c[1]}">${tmAv(m,t)}<span class="tm-mn">${esc(m.n)}</span></button>`}).join("")+`</div>
   <div class="row"><button class="ghost" id="tm-home" type="button">Home</button></div></div>`}
 function tmClose(){document.querySelectorAll(".tm-sheet").forEach(x=>x.remove())}
-function tmOpen(ti,mi){
-  tmClose();const t=TEAMS[ti],m=tmM(t.m[mi]),d=document.createElement("div");
+function tmOpen(pi){
+  const q=tmPeople()[pi];if(!q)return;
+  tmClose();const t=TEAMS[q.t[0]],m=q.m,d=document.createElement("div");
   d.className="tm-sheet";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-label",m.n);
-  d.innerHTML=`<div class="tm-card" style="--rg:${t.c[1]}">${tmAv(m,t)}<h3>${esc(m.n)}</h3><p>${tmRole(m)?esc(tmRole(m))+" · ":""}${esc(t.name)}</p><div class="row"><button id="tm-view" type="button" data-tm-team="${ti}">View team</button><button class="ghost" id="tm-x" type="button">Close</button></div></div>`;
+  d.innerHTML=`<div class="tm-card" style="--rg:${t.c[1]}">${tmAv(m,t)}<h3>${esc(m.n)}</h3><p>${tmRole(m)?esc(tmRole(m))+" · ":""}${esc(q.t.map(i=>TEAMS[i].name).join(" · "))}</p><div class="row">${q.t.map(i=>`<button class="tm-view" type="button" data-tm-team="${i}">${q.t.length>1?"View "+esc(TEAMS[i].leg):"View team"}</button>`).join("")}<button class="ghost" id="tm-x" type="button">Close</button></div></div>`;
   document.body.appendChild(d);const x=d.querySelector("#tm-x");if(x)x.focus()}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")tmClose()});
 /* ---------- About us: the community text comes from the Mallu Articles Bengaluru brochure; the two links are the community's WhatsApp group and Instagram page ---------- */
@@ -2035,7 +2042,7 @@ document.addEventListener("click",async e=>{const el=e.target.closest("button,a"
   if(id==="tm-back"){S.step="teams";render()}
   if(id==="tm-all"){S.step="members";render()}
   if(id==="tm-prev"||id==="tm-next"){const k=TEAMS.length;S.tm.team=(S.tm.team+(id==="tm-next"?1:k-1))%k;render()}
-  if(ds.tmMem){const p=ds.tmMem.split("-");tmOpen(+p[0],+p[1])}
+  if(ds.tmMem!==undefined&&ds.tmMem!==""){tmOpen(+ds.tmMem)}
   if(id==="tm-x")tmClose();
   if(id==="tm-home"){S.step="home";render();try{const t=document.getElementById("home-team");if(t)t.scrollIntoView({block:"center",behavior:"instant"})}catch(_){}loadHomeStatus().then(()=>{if(S.step==="home")refreshHome()})}
   if(id==="go-register"){S.step="loading";render();load()}

@@ -40,13 +40,13 @@ with sync_playwright() as p:
     pg.click('[data-tcall="x1"]'); pg.wait_for_timeout(200)
     c = pg.evaluate('window.__CALLS'); cc=[x for x in c if x['name']=='admin_transfer_confirm_call']
     check('ticking the call box calls the database with the right transfer', cc and cc[-1]['args']=={'p_transfer':'x1','p_confirmed':True}, c[-3:])
-    pg.once('dialog', lambda dlg: dlg.accept())
-    pg.eval_on_selector('[data-tact="approve"]', 'e=>e.disabled=false'); pg.click('[data-tact="approve"]'); pg.wait_for_timeout(300)
+    auto(pg)
+    pg.eval_on_selector('[data-tact="approve"]', 'e=>e.disabled=false'); pg.click('[data-tact="approve"]'); pg.wait_for_timeout(400)
     check('Transfer button calls admin_transfer_approve', any(x['name']=='admin_transfer_approve' and x['args']=={'p_transfer':'x1'} for x in pg.evaluate('window.__CALLS')))
     b.close()
     d = db(); d['rpc']['admin_transfer_approve']='SELLER_CHECKED_IN'
-    b, pg, errs = open_page(p, d, 'transfers'); pg.once('dialog', lambda dlg: dlg.accept())
-    pg.eval_on_selector('[data-tact="approve"]', 'e=>e.disabled=false'); pg.click('[data-tact="approve"]'); pg.wait_for_timeout(300)
+    b, pg, errs = open_page(p, d, 'transfers'); auto(pg)
+    pg.eval_on_selector('[data-tact="approve"]', 'e=>e.disabled=false'); pg.click('[data-tact="approve"]'); pg.wait_for_timeout(400)
     check('database error is shown in plain words, never as a raw code', 'already entered the hall' in pg.inner_text('.toast') and 'SELLER_CHECKED_IN' not in pg.inner_text('.toast'), pg.inner_text('.toast') if pg.query_selector('.toast') else 'no toast')
     b.close()
     # ---- 7. public flow buttons appear in the right order
@@ -56,8 +56,7 @@ with sync_playwright() as p:
     check('public: shows screenshot and amount box once buyer uploaded', pg.query_selector('[data-tact="shot"]') and pg.query_selector('#amt-x4'))
     check('public: Transfer still disabled (payment not verified)', pg.query_selector('[data-tact="approve"]').is_disabled())
     check('public: payout UPI shown to read back', 's@upi' in t)
-    msgs=[]
-    pg.fill('#amt-x4','230'); pg.once('dialog', lambda dlg: (msgs.append(dlg.message), dlg.accept())); pg.click('[data-tact="verify"]'); pg.wait_for_timeout(200)
+    pg.fill('#amt-x4','230'); auto(pg); pg.click('[data-tact="verify"]'); pg.wait_for_timeout(400); msgs=dlg_msgs(pg)
     check('a typed amount different from the asked amount shows a strong warning with both figures', msgs and 'CHECK THE AMOUNT' in msgs[0] and '₹250' in msgs[0] and '₹230' in msgs[0] and 'LESS' in msgs[0], msgs)
     check('verify sends the typed amount', any(x['name']=='admin_transfer_verify_payment' and x['args'].get('p_amount')==230 for x in pg.evaluate('window.__CALLS')), pg.evaluate('window.__CALLS')[-2:])
     b.close()

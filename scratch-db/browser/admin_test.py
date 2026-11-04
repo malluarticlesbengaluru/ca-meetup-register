@@ -4,6 +4,21 @@ import os
 HTML = open(os.environ.get('ADMIN_HTML', '/home/claude/ca-meetup-register/admin/index.html'), encoding='utf-8').read()
 MOCK = open('mock_supabase.js').read(); CH = open('chart_stub.js').read()
 results = []
+# The page now shows its own dialogs (not the browser's confirm/prompt). This small bot answers the NEXT dialog the page shows:
+#   auto(pg)              -> press OK          auto(pg, False) -> press Cancel        auto(pg, True, value='x') -> type x, press OK
+#   dlg_msgs(pg)          -> the texts of the dialogs answered since the last call
+DLG_BOT = r"""
+(function(){
+  window.__DLGQ=[];window.__DLGMSG=[];
+  const go=()=>{const d=document.querySelector('.dlg');if(!d||d.dataset.bot)return;const q=window.__DLGQ.shift();if(!q)return;d.dataset.bot='1';
+    window.__DLGMSG.push(d.innerText);const i=d.querySelector('input');if(i&&q.value!=null)i.value=q.value;
+    setTimeout(()=>d.querySelector('[data-dlg="'+(q.accept?'yes':'no')+'"]').click(),0)};
+  new MutationObserver(go).observe(document,{childList:true,subtree:true});
+  const n=Date.now.bind(Date);Date.now=()=>n()+(window.__off||0);   // tests can move the clock forward with window.__off
+})();
+"""
+def auto(pg, accept=True, value=None): pg.evaluate('(q)=>window.__DLGQ.push(q)', dict(accept=accept, value=value))
+def dlg_msgs(pg): return pg.evaluate('(()=>{const m=window.__DLGMSG;window.__DLGMSG=[];return m})()')
 def check(name, cond, detail=''):
     results.append(bool(cond)); print(('  PASS  ' if cond else '  FAIL  ')+name+('' if cond else '  '+str(detail)[:200]))
 
@@ -39,7 +54,7 @@ def open_page(p, database, tab=None):
     pg.route('**/*', lambda r: (r.fulfill(body=HTML, content_type='text/html') if r.request.url.endswith('/admin/test.html')
         else r.fulfill(body='/*stub*/', content_type='text/javascript') if r.request.url.endswith('.js') or '/npm/' in r.request.url
         else r.fulfill(status=204, body='')))
-    pg.add_init_script('window.__DB='+json.dumps(database)+';'); pg.add_init_script(MOCK); pg.add_init_script(CH)
+    pg.add_init_script('window.__DB='+json.dumps(database)+';'); pg.add_init_script(MOCK); pg.add_init_script(CH); pg.add_init_script(DLG_BOT)
     pg.goto('https://example.test/admin/test.html'); pg.wait_for_selector('.tabs')
     if tab: pg.click(f'button[data-tab="{tab}"]'); pg.wait_for_timeout(100)
     return b, pg, errs

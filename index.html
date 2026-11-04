@@ -293,6 +293,9 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-sl .bh-txt p.bh-thx{display:flex;align-items:center;gap:12px;margin-top:18px;font:600 .82rem/1.35 var(--sans);letter-spacing:.02em;color:var(--cream);opacity:.9}
 .bhome .bh-sl .bh-txt p.bh-thx img{display:block;width:auto;height:58px;flex:none;border-radius:12px}
 .bhome .bh-sl .bh-txt p.bh-thx span{display:block}
+.bhome .bh-sl .bh-txt p.bh-thx2{flex-wrap:wrap}
+.bhome .bh-sl .bh-txt p.bh-thx span.bh-lg{display:flex;align-items:center;gap:10px;flex:none}
+.bhome .bh-sl .bh-txt p.bh-thx2 b+b{margin-top:2px}
 .bhome .bh-sl .bh-txt p.bh-thx b{display:block;font:700 .95rem/1.25 var(--sans);color:var(--cream)}
 .bhome .bh-dots{position:absolute;top:12px;right:12px;z-index:5;display:flex;background:rgba(26,4,12,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:99px;padding:0 4px}
 .bhome .bh-dots button{width:32px;height:32px;background:none;border:0;padding:0;cursor:pointer;display:grid;place-items:center}
@@ -1024,7 +1027,7 @@ ${tmHomeCard()}
 <section id="moments"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">Our meetups</p><h2>Moments we’ve <i>shared.</i></h2></div>
 <div class="bh-slider bh-rv" id="bh-slider" role="region" aria-roledescription="carousel" aria-label="Photos from our past meetups"><div class="bh-track" id="bh-track">
 <figure class="bh-sl" aria-roledescription="slide" aria-label="1 of 2"><img src="assets/burg-moment-chai.jpg" alt="The crowd at Chai, Chill and Chartered 2025" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">Last year</p><h3>Chai, Chill <i>and</i> Chartered 2025</h3><p>It was full of warmth, and you made it that way. This year we’re back with <b>${E}</b>, planned even more carefully.</p><p class="bh-thx"><img src="assets/chai-2025-partner-logo.png" alt="IAM Business School logo" width="258" height="178" loading="lazy" onerror="this.remove()"><span>With thanks to<b>IAM Business School</b></span></p></figcaption></figure>
-<figure class="bh-sl" aria-roledescription="slide" aria-label="2 of 2"><img src="assets/burg-moment-mizaaniya.jpg" alt="The crowd at Mizaaniya 1.0, our Iftar meet" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">March 2026 · Iftar meet</p><h3>Mizaaniya <i>1.0</i></h3><p>An evening of Iftar, laughter and good company, with the whole community around one table.</p></figcaption></figure>
+<figure class="bh-sl" aria-roledescription="slide" aria-label="2 of 2"><img src="assets/burg-moment-mizaaniya.jpg" alt="The crowd at Mizaaniya 1.0, our Iftar meet" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">March 2026 · Iftar meet</p><h3>Mizaaniya <i>1.0</i></h3><p>An evening of Iftar, laughter and good company, with the whole community around one table.</p><p class="bh-thx bh-thx2"><span class="bh-lg"><img src="assets/audire-logo.png" alt="Audire School of Commerce logo" width="600" height="247" loading="lazy" onerror="this.remove()"><img src="assets/placementship-logo.png" alt="Placementship logo" loading="lazy" onerror="this.remove()"></span><span>With thanks to<b>Audire School of Commerce</b><b>Placementship</b></span></p></figcaption></figure>
 </div><div class="bh-dots" id="bh-dots"><button type="button" aria-label="Show Chai, Chill and Chartered 2025" aria-current="true"></button><button type="button" aria-label="Show Mizaaniya 1.0"></button></div></div></div></section>
 
 <section style="padding-top:0"><div class="bh-w"><div class="bh-final bh-rv" id="home-join"><p class="bh-eyebrow">See you there</p><h2>Ready to join <i>us?</i></h2><p class="bh-lede">Reserve your spot, or open a ticket you already booked.</p>

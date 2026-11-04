@@ -981,13 +981,13 @@ function vHome(){
 <img class="bh-logo" src="assets/burg-logo.png" alt="" width="104" height="70">
 <p class="bh-pres">${O} presents</p>
 <h1 aria-label="${E}">${nameHtml()}</h1>
-<p class="bh-tag">Where strangers feel like home.</p>
+<p class="bh-tag">Creating bonds beyond the workplace!</p>
 <div class="bh-cta"><button class="bh-btn bh-gold" id="hero-register" type="button">${esc(P)}</button><button class="bh-btn bh-ghost" id="hero-tickets" type="button">${esc(Q)}</button></div>
 ${spots}
 </div></section>
 
 <section><div class="bh-w bh-split">
-<div class="bh-rv"><figure class="bh-poster" style="margin:0 auto"><img id="home-poster" src="assets/burg-poster.jpg" alt="${E} event poster" width="900" height="1126" loading="lazy"></figure><p class="bh-hint">TAP THE POSTER TO ENLARGE</p></div>
+<div class="bh-rv"><figure class="bh-poster" style="margin:0 auto"><img id="home-poster" src="assets/burg-poster.jpg" alt="${E} event poster" width="900" height="1126" loading="lazy"></figure></div>
 <div class="bh-rv"><p class="bh-eyebrow">Save the date</p><h2>Mark your <i>Sunday.</i></h2>
 <p class="bh-lede" style="margin-top:14px">One afternoon with your people: food, games, stage moments and a long-overdue exhale.</p>
 <div class="bh-facts">
@@ -1102,7 +1102,7 @@ function homeMount(){
   if(sv){try{const lo=new IntersectionObserver(es=>{if(es[0].isIntersecting){lz();lo.disconnect()}},{rootMargin:"600px 0px"});lo.observe(sv);sig.addEventListener("abort",()=>lo.disconnect())}catch(_){lz()}}
   /* the sponsor slider: slide 1 the thank-you card, slide 2 the video. Dots and swipe only (no auto-advance, so it never moves away from a playing video). */
   const ssl=root.querySelector("#sp-slider"),str=root.querySelector("#sp-track"),sdt=[].slice.call(root.querySelectorAll("#sp-dots button")),sls=[].slice.call(root.querySelectorAll("#sp-track>.bh-spsl"));
-  let sc=0,sx=0,ssw=false,sblk=false;
+  let sc=0,sx=0,sy=0,ssw=false,sblk=false;
   function sgo(n){if(!str||!sdt.length)return;sc=Math.max(0,Math.min(sdt.length-1,n));str.style.transform="translateX(-"+sc*100+"%)";
     sdt.forEach((d,i)=>d.setAttribute("aria-current",String(i===sc)));sls.forEach((s,i)=>{try{s.inert=i!==sc}catch(_){}});
     if(sc===1)lz();if(sc!==1&&sv&&!sv.paused)sv.pause();sfit()}
@@ -1112,8 +1112,9 @@ function homeMount(){
     try{const ro=new ResizeObserver(sfit);sls.forEach(s=>ro.observe(s));sig.addEventListener("abort",()=>ro.disconnect())}catch(_){}
     on(window,"resize",sfit);if(sv)on(sv,"loadedmetadata",sfit);
     sdt.forEach((d,i)=>on(d,"click",()=>sgo(i)));
-    on(ssl,"touchstart",e=>{const t=e.touches[0],v=e.target.closest&&e.target.closest("video");sblk=false;if(v){const r=v.getBoundingClientRect();if(t.clientY>r.bottom-64)sblk=true}sx=t.clientX},{passive:true});   /* a swipe that starts on the video's control bar is the seek bar, not the slider */
-    on(ssl,"touchend",e=>{if(sblk)return;const d=e.changedTouches[0].clientX-sx;if(Math.abs(d)>40){ssw=true;sgo(sc+(d<0?1:-1))}},{passive:true});
+    on(ssl,"touchstart",e=>{const t=e.touches[0],v=e.target.closest&&e.target.closest("video");sblk=false;if(v){const r=v.getBoundingClientRect();if(t.clientY>r.bottom-64)sblk=true}sx=t.clientX;sy=t.clientY},{passive:true});   /* a swipe that starts on the video's control bar is the seek bar, not the slider */
+    on(ssl,"touchend",e=>{if(sblk)return;const t=e.changedTouches[0],d=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(d)>40&&Math.abs(d)>Math.abs(dy)*1.5){ssw=true;sgo(sc+(d<0?1:-1))}},{passive:true});   /* only a clearly sideways swipe moves it: a diagonal flick while scrolling the page past the card must not */
+    on(ssl,"scroll",()=>{if(ssl.scrollLeft)ssl.scrollLeft=0},{passive:true});   /* the card is only ever moved by its dots or a sideways swipe: if the browser nudges the hidden overflow (focus, find, anchors), put it straight back */
     on(ssl,"click",e=>{if(ssw){e.stopPropagation();e.preventDefault();ssw=false}},{capture:true})}
   if(sv){const gone=()=>{const x=root.querySelector("#home-sp-vfig"),d=root.querySelector("#sp-dots");if(x)x.remove();if(d)d.remove();if(str)str.style.transform="";if(ssl)ssl.style.height="";sdt.length=0};   /* file missing: the slider quietly becomes the plain thank-you card */
     on(sv,"error",gone);if(sv.error)gone();
@@ -1129,7 +1130,7 @@ function homeMount(){
    Only real members are listed. Teams with no members yet are parked in comments (an empty team would break the Home card). Photos go in assets/personals/ (passport-style 7:9, 420x540 JPG, under 80 KB). */
 const TEAMS=[
  /* ORGANIZERS: a separate group shown above the six teams (org:1). It is not numbered and not counted as a team in the "6 teams" wording, but its people are counted as volunteers. */
- {name:"Organizers",leg:"Organizers",ic:"star",org:1,c:["#7FD6C6","#5CC2B0"],obj:"Leading Ehsaas’26 from the first idea to the last goodbye, and keeping every team moving together.",m:[{n:"Irshal",p:"assets/personals/irshal.jpg"},{n:"Zeen Shabeer",p:"assets/personals/zeen-shabeer.jpg"}]},
+ {name:"Organizers",leg:"Organizers",ic:"star",org:1,c:["#7FD6C6","#5CC2B0"],obj:"Leading Ehsaas’26 from the first idea to the last goodbye, and keeping every team moving together.",m:[{n:"Muhammed Irshal",p:"assets/personals/irshal.jpg"},{n:"Zeen Shabeer",p:"assets/personals/zeen-shabeer.jpg"}]},
  {name:"Program Anchors",leg:"Anchors",ic:"chat",c:["#A9B4F2","#8C99E8"],obj:"The voices that guide the day and keep the programme flowing.",m:[{n:"Thamanna Rose",p:"assets/personals/thamanna-rose.jpg"},{n:"Shalini Prasad",p:"assets/personals/shalini-prasad.jpg"}]},
  {name:"Members Co-ordination",leg:"Co-ord",ic:"people",c:["#F3C766","#E9B24C"],obj:"Keeping our community informed and connected, from first registration to the final goodbye.",m:[{n:"Ramiz Muneer",p:"assets/personals/ramiz-muneer.jpg"},{n:"Fathima Minna",p:"assets/personals/fathima-minna.jpg"},{n:"Amjad",p:"assets/personals/amjad.jpg"},{n:"Abdul Basith",p:"assets/personals/abdul-basith.jpg"},{n:"Eshal",p:"assets/personals/eshal.jpg"},{n:"Fouzana K",p:"assets/personals/fouzana-k.jpg"}]},
  {name:"Food & Venue",leg:"Food & Venue",ic:"pin",c:["#F7A45E","#F08A3C"],obj:"Making sure everyone is welcomed, seated and well fed, from the hall at Bloom Creative Zone to the last plate.",m:[{n:"Sahad bin Khalid",p:"assets/personals/sahad-bin-khalid.jpg"},{n:"Abdussalam",p:"assets/personals/abdussalam.jpg"}]},

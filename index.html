@@ -1128,13 +1128,15 @@ function homeMount(){
    {n:"Anil K.", p:"assets/team/anil.jpg", r:"Coordinator"}. p (photo) and r (a label shown under the name) are optional; without a photo the circle shows the person's initials.
    Only real members are listed. Teams with no members yet are parked in comments (an empty team would break the Home card). Photos go in assets/personals/ (passport-style 7:9, 420x540 JPG, under 80 KB). */
 const TEAMS=[
+ /* ORGANIZERS: a separate group shown above the five teams (org:1). It is not numbered and not counted as a team in the "5 teams" wording, but its people are counted as volunteers. */
+ {name:"Organizers",leg:"Organizers",ic:"star",org:1,c:["#7FD6C6","#5CC2B0"],obj:"Leading Ehsaas’26 from the first idea to the last goodbye, and keeping every team moving together.",m:[{n:"Zeen Shabeer",p:"assets/personals/zeen-shabeer.jpg"},"Irshal","Abdul Fathah"]},
  /* NO MEMBERS YET (restore by moving out of the comment and adding members):
  {name:"Program Anchors",leg:"Anchors",ic:"chat",c:["#7FD6C6","#5CC2B0"],obj:"The voices that guide the day and keep the programme flowing.",m:["Rohit P.","Nimisha K."]}
  */
- {name:"Members Co-ordination",leg:"Co-ord",ic:"people",c:["#F3C766","#E9B24C"],obj:"Keeping our community informed and connected, from first registration to the final goodbye.",m:[{n:"Ramiz Muneer",p:"assets/personals/ramiz-muneer.jpg"},{n:"Fathima Minna",p:"assets/personals/fathima-minna.jpg"},{n:"Amjad",p:"assets/personals/amjad.jpg"}]},
+ {name:"Members Co-ordination",leg:"Co-ord",ic:"people",c:["#F3C766","#E9B24C"],obj:"Keeping our community informed and connected, from first registration to the final goodbye.",m:[{n:"Ramiz Muneer",p:"assets/personals/ramiz-muneer.jpg"},{n:"Fathima Minna",p:"assets/personals/fathima-minna.jpg"},{n:"Amjad",p:"assets/personals/amjad.jpg"},{n:"Abdul Basith",p:"assets/personals/abdul-basith.jpg"},{n:"Sooryajith",p:"assets/personals/sooryajith.jpg"},{n:"Eshal",p:"assets/personals/eshal.jpg"},{n:"Fouzana K",p:"assets/personals/fouzana-k.jpg"}]},
  {name:"Food & Venue",leg:"Food & Venue",ic:"pin",c:["#F7A45E","#F08A3C"],obj:"Making sure everyone is welcomed, seated and well fed, from the hall at Bloom Creative Zone to the last plate.",m:[{n:"Sahad bin Khalid",p:"assets/personals/sahad-bin-khalid.jpg"},{n:"Abdussalam",p:"assets/personals/abdussalam.jpg"}]},
- {name:"Activities & Games Planning",leg:"Activities",ic:"game",c:["#F68A7C","#F26B5B"],obj:"Planning the games and icebreakers that turn a room full of strangers into friends.",m:[{n:"Muhammad Rabil C",p:"assets/personals/muhammad-rabil-c.jpg"},{n:"Safwan Ibraheem",p:"assets/personals/safwan-ibraheem.jpg"}]},
- {name:"Stage Programme Planning",leg:"Stage",ic:"mic",c:["#D79BC8","#C77DB3"],obj:"Shaping the programme on stage, with its flow, performances and the moments people will remember.",m:[{n:"Akhina A R",p:"assets/personals/akhina-a-r.jpg"},{n:"Syed Sabith",p:"assets/personals/syed-sabith.jpg"},"Muhsina"]},
+ {name:"Activities & Games Planning",leg:"Activities",ic:"game",c:["#F68A7C","#F26B5B"],obj:"Planning the games and icebreakers that turn a room full of strangers into friends.",m:[{n:"Muhammad Rabil C",p:"assets/personals/muhammad-rabil-c.jpg"},{n:"Safwan Ibraheem",p:"assets/personals/safwan-ibraheem.jpg"},{n:"Akhina A R",p:"assets/personals/akhina-a-r.jpg"},{n:"Aiswarya Dinesh",p:"assets/personals/aiswarya-dinesh.jpg"}]},
+ {name:"Stage Programme Planning",leg:"Stage",ic:"mic",c:["#D79BC8","#C77DB3"],obj:"Shaping the programme on stage, with its flow, performances and the moments people will remember.",m:[{n:"Syed Sabith",p:"assets/personals/syed-sabith.jpg"},"Muhsina",{n:"Abdul Basith",p:"assets/personals/abdul-basith.jpg"}]},
  {name:"Marketing & Media",leg:"Marketing",ic:"horn",c:["#F07A9A","#E2557A"],obj:"Spreading the word, and designing the posters and visuals that bring Ehsaas’26 to life.",m:[{n:"Safwan Ibraheem",p:"assets/personals/safwan-ibraheem.jpg"},{n:"Fathima Minna",p:"assets/personals/fathima-minna.jpg"},{n:"Syed Sabith",p:"assets/personals/syed-sabith.jpg"}]},
  /* NO MEMBERS YET (restore by moving out of the comment and adding members):
  {name:"Social Media",leg:"Social",ic:"share",c:["#9CC4F0","#7FB3E6"],obj:"Sharing Ehsaas’26 with the world, before, during and after the day.",m:["Hari S.","Aleena J."]}
@@ -1146,9 +1148,13 @@ const TEAMS=[
 const TM_IC={chat:'<path d="M4 5h16v11H9l-5 4z"/>',people:'<circle cx="12" cy="8" r="3.2"/><path d="M5.5 20v-1a4.5 4.5 0 0 1 4.5-4.5h4a4.5 4.5 0 0 1 4.5 4.5v1"/>',pin:'<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>',
  game:'<rect x="2.5" y="7" width="19" height="10" rx="5"/><path d="M8 10v4M6 12h4"/><circle cx="16" cy="12" r=".6"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6"/>',
  horn:'<path d="M3 10v4h4l7 4V6L7 10H3z"/><path d="M17 9a4 4 0 0 1 0 6"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 11l7.6-4M8.2 13l7.6 4"/>',cam:'<path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13.5" r="3.5"/>',
+ star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
  next:'<path d="M9 6l6 6-6 6"/>',back:'<path d="M15 6l-6 6 6 6"/>'};
 const tmSvg=(k,c)=>`<svg class="${c||"tm-ic"}" viewBox="0 0 24 24" aria-hidden="true">${TM_IC[k]||""}</svg>`;
 const tmPad=n=>String(n).padStart(2,"0");
+/* Organizers (org:1) are a group, not a team: they get a star instead of a number, the numbers 01, 02… go to the real teams, and the "N teams" wording leaves them out. */
+const tmNT=()=>TEAMS.filter(t=>!t.org).length;
+const tmNo=i=>TEAMS[i].org?"★":tmPad(TEAMS.slice(0,i+1).filter(t=>!t.org).length);
 const tmM=x=>typeof x==="string"?{n:x}:x;
 const tmIni=n=>{const w=String(n).replace(/\./g,"").trim().split(/\s+/).filter(Boolean);return(((w[0]||"")[0]||"")+((w[1]||"")[0]||"")).toUpperCase()};
 const tmRole=m=>m.r||"";
@@ -1164,26 +1170,26 @@ const tmEv=()=>esc(CONFIG.eventName).replace(/&#39;|'/g,"’");
 function tmAv(m,t){return `<span class="tm-a" style="--g1:${t.c[0]};--g2:${t.c[1]}">${esc(tmIni(m.n))}${m.p?`<img src="${esc(m.p)}" alt="" loading="lazy" onerror="this.remove()">`:""}</span>`}
 S.tm={team:0};
 function tmHomeCard(){
-  const n=tmTotal(),k=TEAMS.length;
+  const n=tmTotal(),k=TEAMS.length,kt=tmNT();
   return `<section style="padding-top:0" id="home-team"><div class="bh-w"><div class="bh-team bh-rv"><p class="bh-eyebrow">The people behind it</p><h2>Meet the team who’s <i>making this happen.</i></h2>
-<p class="bh-lede">Behind ${tmEv()} are ${n} volunteers across ${k} teams, planning the stage, the food, the games and every small detail of your day.</p>
+<p class="bh-lede">Behind ${tmEv()} are ${n} volunteers across ${kt} teams, planning the stage, the food, the games and every small detail of your day.</p>
 <div class="bh-tstack" aria-hidden="true">${TEAMS.map(t=>tmAv(tmM(t.m[0]),t)).join("")}<b>+${n-k}</b></div>
 <button class="bh-btn bh-gold" id="go-team" type="button">Tap to meet the team</button></div></div></section>`}
 function vTeams(){
   const n=tmTotal();
-  return `<div class="tm">`+head(TEAMS.length+" teams behind "+tmEv(),"Meet the teams making it happen")+
-  `<div class="tm-list">`+TEAMS.map((t,i)=>`<button class="tm-row" type="button" data-tm-team="${i}"><span class="tm-n">${tmPad(i+1)}</span>${tmSvg(t.ic)}<span class="tm-t">${esc(t.name)}</span>${tmSvg("next","tm-ic tm-ch")}</button>`).join("")+`</div>
+  return `<div class="tm">`+head(tmNT()+" teams behind "+tmEv(),"Meet the teams making it happen")+
+  `<div class="tm-list">`+TEAMS.map((t,i)=>`<button class="tm-row" type="button" data-tm-team="${i}"><span class="tm-n">${tmNo(i)}</span>${tmSvg(t.ic)}<span class="tm-t">${esc(t.name)}</span>${tmSvg("next","tm-ic tm-ch")}</button>`).join("")+`</div>
   <div class="row col"><button class="ghost" id="tm-all" type="button">See all ${n} members</button><button id="tm-home" type="button">Home</button></div></div>`}
 function vTeam(){
   const i=S.tm.team,t=TEAMS[i],ms=t.m.map(tmM),dc=S.tm.dir>0?" tm-from-r":S.tm.dir<0?" tm-from-l":"";S.tm.dir=0;
   return `<div class="tm"><button class="ghost tm-back" id="tm-back" type="button">${tmSvg("back")}Teams</button>
-  <div class="tm-pg${dc}"><span class="tm-n tm-big">${tmPad(i+1)}</span><h1>${esc(t.name).replace(/(\S+-\S+)/g,'<span style="white-space:nowrap">$1</span>')}</h1>
+  <div class="tm-pg${dc}"><span class="tm-n tm-big">${tmNo(i)}</span><h1>${esc(t.name).replace(/(\S+-\S+)/g,'<span style="white-space:nowrap">$1</span>')}</h1>
   <div class="card"><p class="tm-eb">Our objective</p><p class="tm-obj">${esc(t.obj)}</p></div>
   <div class="tm-grid">`+ms.map((m,j)=>`<div class="tm-mc">${tmAv(m,t)}<b>${esc(m.n)}</b>${tmRole(m)?`<small>${esc(tmRole(m))}</small>`:""}</div>`).join("")+`</div></div>
   <div class="row"><button class="ghost" id="tm-prev" type="button">‹ Previous</button><button id="tm-next" type="button">Next ›</button></div>
   <div class="row"><button class="ghost" id="tm-home" type="button">Home</button></div></div>`}
 function vMembers(){
-  return `<div class="tm"><button class="ghost tm-back" id="tm-back" type="button">${tmSvg("back")}Teams</button>`+head("All members",tmTotal()+" volunteers · "+TEAMS.length+" teams")+
+  return `<div class="tm"><button class="ghost tm-back" id="tm-back" type="button">${tmSvg("back")}Teams</button>`+head("All members",tmTotal()+" volunteers · "+tmNT()+" teams")+
   `<div class="tm-lg">`+TEAMS.map(t=>`<span><u style="background:${t.c[1]}"></u>${esc(t.leg)}</span>`).join("")+`</div>
   <div class="tm-mg">`+tmPeople().map((q,pi)=>{const t=TEAMS[q.t[0]],m=q.m;return `<button class="tm-m" type="button" data-tm-mem="${pi}" aria-label="${esc(m.n)}, ${esc(q.t.map(i=>TEAMS[i].name).join(" and "))}" style="--rg:${t.c[1]}">${tmAv(m,t)}<span class="tm-mn">${esc(m.n)}</span></button>`}).join("")+`</div>
   <div class="row"><button class="ghost" id="tm-home" type="button">Home</button></div></div>`}

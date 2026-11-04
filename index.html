@@ -226,6 +226,14 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(26,4,12,.78);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--glass-b)}
 .bhome .bh-bar .bh-w{display:flex;align-items:center;justify-content:space-between;height:58px}
 .bhome .bh-bar img{height:34px;width:auto;display:block}
+.bhome .bh-barr{display:flex;align-items:center;gap:8px;position:relative}
+.bhome button.bh-menu,.bhome button.bh-menu:hover{width:40px;height:40px;min-width:0;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--glass);border:1px solid var(--glass-b);color:var(--cream);box-shadow:none;transform:none;overflow:visible}
+.bhome button.bh-menu svg{width:18px;height:18px;fill:currentColor;display:block}
+.bhome button.bh-menu[aria-expanded="true"],.bhome button.bh-menu:hover{border-color:var(--gold);color:var(--gold)}
+.bhome .bh-nav{position:absolute;right:0;top:calc(100% + 12px);width:min(272px,calc(100vw - 36px));box-sizing:border-box;padding:8px;border-radius:20px;background:rgba(42,6,18,.97);border:1px solid var(--glass-b);box-shadow:0 18px 50px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:2px;z-index:30}
+.bhome .bh-nav[hidden]{display:none}
+.bhome .bh-nav button.bh-ni,.bhome .bh-nav button.bh-ni:hover{display:block;width:100%;margin:0;padding:13px 14px;border:0;border-radius:12px;background:none;color:var(--cream);font:600 .92rem/1.25 var(--sans);letter-spacing:0;text-align:left;box-shadow:none;transform:none;overflow:visible}
+.bhome .bh-nav button.bh-ni:hover,.bhome .bh-nav button.bh-ni:focus-visible{background:var(--glass);color:var(--gold)}
 .bhome .bh-brand{display:flex;align-items:center;gap:10px;font:800 .78rem/1.15 var(--sans);letter-spacing:.14em;text-transform:uppercase}
 .bhome .bh-brand small{display:block;color:var(--gold);font-weight:600;letter-spacing:.2em;font-size:.6rem}
 .bhome .bh-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;font:800 1rem/1 var(--sans);padding:17px 30px;border-radius:99px;text-decoration:none;transition:transform .2s,box-shadow .2s}
@@ -992,7 +1000,7 @@ function vHome(){
     brand=O.replace(/\s+Bengaluru$/i,""),
     spLogo=SPONSOR.logo?`<img class="bh-splogo" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.remove()">`:"";
   return `<div class="bhome${ret?" ret":""}" data-event="${esc(a.event)}" data-skew="${esc(a.skew)}" data-close="${esc(a.close)}">
-<header class="bh-bar"><div class="bh-w"><div class="bh-brand"><img src="assets/burg-logo.png" alt="${O} logo" width="50" height="34"><span>${esc(brand)}<small>BENGALURU</small></span></div><button class="bh-btn bh-gold bh-sm" id="bar-register" type="button">${ret?"View my ticket":"Register"}</button></div></header>
+<header class="bh-bar"><div class="bh-w"><div class="bh-brand"><img src="assets/burg-logo.png" alt="${O} logo" width="50" height="34"><span>${esc(brand)}<small>BENGALURU</small></span></div><div class="bh-barr"><button class="bh-btn bh-gold bh-sm" id="bar-register" type="button">${ret?"View my ticket":"Register"}</button><button class="bh-menu" id="bar-menu" type="button" aria-label="Jump to a section" aria-haspopup="true" aria-expanded="false" aria-controls="bar-nav"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button><nav class="bh-nav" id="bar-nav" aria-label="Sections" hidden><button class="bh-ni" type="button" data-go="sec-date">Date, time &amp; venue</button><button class="bh-ni" type="button" data-go="sec-how">How to book</button><button class="bh-ni" type="button" data-go="home-sponsor">Our co-sponsor</button><button class="bh-ni" type="button" data-go="home-team">Meet the team</button><button class="bh-ni" type="button" data-go="moments">Past meetups</button></nav></div></div></header>
 
 <section class="bh-hero" style="padding-bottom:70px"><div class="bh-w">
 <img class="bh-logo" src="assets/burg-logo.png" alt="" width="104" height="70">
@@ -1003,7 +1011,7 @@ function vHome(){
 ${spots}
 </div></section>
 
-<section><div class="bh-w bh-split">
+<section id="sec-date"><div class="bh-w bh-split">
 <div class="bh-rv"><figure class="bh-poster" style="margin:0 auto"><img id="home-poster" src="assets/burg-poster.jpg" alt="${E} event poster" width="900" height="1126" loading="lazy"></figure></div>
 <div class="bh-rv"><p class="bh-eyebrow">Save the date</p><h2>Mark your <i>Sunday.</i></h2>
 <p class="bh-lede" style="margin-top:14px">One afternoon with your people: food, games, stage moments and a long-overdue exhale.</p>
@@ -1012,7 +1020,7 @@ ${spots}
 <a class="bh-fact" id="home-map" href="${esc(evMapUrl())}" target="_blank" rel="noopener"><span class="bh-ic">${BH_IC.pin}</span><span><small>Venue</small><b data-ev="v">${esc(evVenue())}</b><em>Open in Maps →</em></span></a></div>
 </div></div></section>
 
-<section style="padding-top:0"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">On the day</p><h2>Four reasons to <i>show up.</i></h2></div>
+<section style="padding-top:0" id="sec-why"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">On the day</p><h2>Four reasons to <i>show up.</i></h2></div>
 <div class="bh-cards">
 <div class="bh-card bh-rv" data-n="1"><div class="bh-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M17.2 14c2.4.1 4.3 2 4.3 4.5"/></svg></div><h3>Meet your people</h3><p>Fellow CA, CMA and ACCA folks from across Bengaluru. Real conversations, real connections.</p></div>
 <div class="bh-card bh-rv" data-n="2"><div class="bh-ic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></div><h3>Stage programs</h3><p>A lineup of performances and moments to enjoy, and to cheer on together.</p></div>
@@ -1020,7 +1028,7 @@ ${spots}
 <div class="bh-card bh-rv" data-n="4"><div class="bh-ic"><svg viewBox="0 0 24 24"><path d="M6 3v6a2.5 2.5 0 0 0 5 0V3M8.5 3v18"/><path d="M17 21V3c-2.3 1.2-3.5 3.7-3.5 7v3.5H17"/></svg></div><h3>Food &amp; refreshments</h3><p>Good food and good company, shared at one long table.</p></div>
 </div></div></section>
 
-<section style="padding-top:0"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">How it works</p><h2>Booked in <i>three taps.</i></h2></div>
+<section style="padding-top:0" id="sec-how"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">How it works</p><h2>Booked in <i>three taps.</i></h2></div>
 <div class="bh-steps">
 <div class="bh-step bh-rv"><h3>Click Register now and fill the form</h3><p data-fr>${esc(frText())}</p></div>
 <div class="bh-step bh-rv"><h3>Pay by UPI</h3><p>We calculate the total and open your UPI app. Make the payment, upload the screenshot and submit.</p></div>
@@ -1059,6 +1067,16 @@ function homeMount(){
   homeUnmount();const root=document.querySelector("#app .bhome");if(!root)return;
   homeAC=new AbortController();const sig=homeAC.signal,on=(t,e,f,o)=>t&&t.addEventListener(e,f,Object.assign({signal:sig},o||{}));
   const RM=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  /* the section navigator: the three dots in the top bar open a short list of the section headings; tapping one scrolls there */
+  const mb=root.querySelector("#bar-menu"),mn=root.querySelector("#bar-nav");
+  if(mb&&mn){
+    mn.querySelectorAll("[data-go]").forEach(b=>{if(!root.querySelector("#"+b.dataset.go))b.remove()});
+    const shut=()=>{mn.hidden=true;mb.setAttribute("aria-expanded","false")};
+    on(mb,"click",e=>{e.stopPropagation();const o=mn.hidden;mn.hidden=!o;mb.setAttribute("aria-expanded",String(o))});
+    on(mn,"click",e=>{const b=e.target.closest("[data-go]");if(!b)return;const t=root.querySelector("#"+b.dataset.go);shut();if(t)t.scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})});
+    on(document,"click",e=>{if(!mn.hidden&&!mn.contains(e.target)&&e.target!==mb&&!mb.contains(e.target))shut()});
+    on(document,"keydown",e=>{if(e.key==="Escape"&&!mn.hidden){shut();mb.focus()}});
+  }
   /* sections pop in as they are scrolled to. Two things drive each section and the FURTHER ALONG one wins:
      (1) time: when the section's top edge comes into view (POP_TRIG, a share of the screen height) a normal timed pop of POP_MS starts (perfect for slow scrolling);
      (2) position: the section is 0% popped with its top edge at the bottom of the screen and 100% once it has risen to POP_END (covers fast scrolling and the Register

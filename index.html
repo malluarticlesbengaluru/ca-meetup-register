@@ -937,6 +937,23 @@ body:is([data-step="teams"],[data-step="team"],[data-step="members"]) .tm .tm-mn
 @keyframes tmUp{from{transform:translateY(30px);opacity:0}}
 @media(min-width:700px){.tm-sheet{align-items:center}.tm-card{border-radius:28px}}
 @media(prefers-reduced-motion:reduce){.tm-card{animation:none}}
+/* Team pages: quick slide between teams (Next / Previous). Only with html.fx. The old page slides out in 0.1 s, the new one slides in from the side you are heading to (0.26 s), and the member cards rise in one after another. */
+@keyframes tmInR{from{opacity:0;transform:translate3d(38px,0,0)}to{opacity:1;transform:none}}
+@keyframes tmInL{from{opacity:0;transform:translate3d(-38px,0,0)}to{opacity:1;transform:none}}
+@keyframes tmRise{from{opacity:0;transform:translate3d(0,12px,0)}to{opacity:1;transform:none}}
+@keyframes tmOutL{to{opacity:0;transform:translate3d(-30px,0,0)}}
+@keyframes tmOutR{to{opacity:0;transform:translate3d(30px,0,0)}}
+html.fx .tm-pg{animation:tmRise .26s var(--ease) both;will-change:transform,opacity}
+html.fx .tm-pg.tm-from-r{animation-name:tmInR}
+html.fx .tm-pg.tm-from-l{animation-name:tmInL}
+html.fx .tm-pg.tm-out-n{animation:tmOutL .1s ease-in both}
+html.fx .tm-pg.tm-out-p{animation:tmOutR .1s ease-in both}
+html.fx .tm-pg .tm-mc{animation:tmRise .3s var(--ease) both}
+html.fx .tm-pg .tm-mc:nth-child(2){animation-delay:.04s}
+html.fx .tm-pg .tm-mc:nth-child(3){animation-delay:.08s}
+html.fx .tm-pg .tm-mc:nth-child(4){animation-delay:.12s}
+html.fx .tm-pg .tm-mc:nth-child(n+5){animation-delay:.16s}
+html.fx .tm-pg.tm-out-n .tm-mc,html.fx .tm-pg.tm-out-p .tm-mc{animation:none}
 </style>
 </head>
 <body>
@@ -1373,11 +1390,11 @@ function vTeams(){
   `<div class="tm-list">`+TEAMS.map((t,i)=>`<button class="tm-row" type="button" data-tm-team="${i}"><span class="tm-n">${tmPad(i+1)}</span>${tmSvg(t.ic)}<span class="tm-t">${esc(t.name)}</span>${tmSvg("next","tm-ic tm-ch")}</button>`).join("")+`</div>
   <div class="row col"><button class="ghost" id="tm-all" type="button">See all ${n} members</button><button id="tm-home" type="button">Home</button></div></div>`}
 function vTeam(){
-  const i=S.tm.team,t=TEAMS[i],ms=t.m.map(tmM);
+  const i=S.tm.team,t=TEAMS[i],ms=t.m.map(tmM),dc=S.tm.dir>0?" tm-from-r":S.tm.dir<0?" tm-from-l":"";S.tm.dir=0;
   return `<div class="tm"><button class="ghost tm-back" id="tm-back" type="button">${tmSvg("back")}Teams</button>
-  <span class="tm-n tm-big">${tmPad(i+1)}</span><h1>${esc(t.name).replace(/(\S+-\S+)/g,'<span style="white-space:nowrap">$1</span>')}</h1>
+  <div class="tm-pg${dc}"><span class="tm-n tm-big">${tmPad(i+1)}</span><h1>${esc(t.name).replace(/(\S+-\S+)/g,'<span style="white-space:nowrap">$1</span>')}</h1>
   <div class="card"><p class="tm-eb">Our objective</p><p class="tm-obj">${esc(t.obj)}</p></div>
-  <div class="tm-grid">`+ms.map((m,j)=>`<div class="tm-mc">${tmAv(m,t)}<b>${esc(m.n)}</b>${tmRole(m)?`<small>${esc(tmRole(m))}</small>`:""}</div>`).join("")+`</div>
+  <div class="tm-grid">`+ms.map((m,j)=>`<div class="tm-mc">${tmAv(m,t)}<b>${esc(m.n)}</b>${tmRole(m)?`<small>${esc(tmRole(m))}</small>`:""}</div>`).join("")+`</div></div>
   <div class="row"><button class="ghost" id="tm-prev" type="button">‹ Previous</button><button id="tm-next" type="button">Next ›</button></div>
   <div class="row"><button class="ghost" id="tm-home" type="button">Home</button></div></div>`}
 function vMembers(){
@@ -1385,6 +1402,14 @@ function vMembers(){
   `<div class="tm-lg">`+TEAMS.map(t=>`<span><u style="background:${t.c[1]}"></u>${esc(t.leg)}</span>`).join("")+`</div>
   <div class="tm-mg">`+tmPeople().map((q,pi)=>{const t=TEAMS[q.t[0]],m=q.m;return `<button class="tm-m" type="button" data-tm-mem="${pi}" aria-label="${esc(m.n)}, ${esc(q.t.map(i=>TEAMS[i].name).join(" and "))}" style="--rg:${t.c[1]}">${tmAv(m,t)}<span class="tm-mn">${esc(m.n)}</span></button>`}).join("")+`</div>
   <div class="row"><button class="ghost" id="tm-home" type="button">Home</button></div></div>`}
+let tmT=0,tmPend=0;
+function tmStep(d){
+  const k=TEAMS.length,fx=document.documentElement.classList.contains("fx"),pg=document.querySelector(".tm-pg");
+  const go=()=>{const n=tmPend;tmPend=0;tmT=0;if(!n){const g=document.querySelector(".tm-pg");if(g)g.classList.remove("tm-out-n","tm-out-p");return}
+    S.tm.team=(((S.tm.team+n)%k)+k)%k;S.tm.dir=n>0?1:-1;render()};
+  tmPend+=d;
+  if(!fx||!pg){go();return}
+  if(!tmT){pg.classList.add(d>0?"tm-out-n":"tm-out-p");tmT=setTimeout(go,100)}}
 function tmClose(){document.querySelectorAll(".tm-sheet").forEach(x=>x.remove())}
 function tmOpen(pi){
   const q=tmPeople()[pi];if(!q)return;
@@ -2048,7 +2073,7 @@ document.addEventListener("click",async e=>{const el=e.target.closest("button,a"
   if(ds.tmTeam!==undefined&&ds.tmTeam!==""){S.tm.team=Math.max(0,Math.min(TEAMS.length-1,+ds.tmTeam||0));S.step="team";render()}
   if(id==="tm-back"){S.step="teams";render()}
   if(id==="tm-all"){S.step="members";render()}
-  if(id==="tm-prev"||id==="tm-next"){const k=TEAMS.length;S.tm.team=(S.tm.team+(id==="tm-next"?1:k-1))%k;render()}
+  if(id==="tm-prev"||id==="tm-next"){tmStep(id==="tm-next"?1:-1)}
   if(ds.tmMem!==undefined&&ds.tmMem!==""){tmOpen(+ds.tmMem)}
   if(id==="tm-x")tmClose();
   if(id==="tm-home"){S.step="home";render();try{const t=document.getElementById("home-team");if(t)t.scrollIntoView({block:"center",behavior:"instant"})}catch(_){}loadHomeStatus().then(()=>{if(S.step==="home")refreshHome()})}

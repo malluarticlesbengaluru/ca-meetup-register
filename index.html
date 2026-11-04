@@ -656,10 +656,8 @@ body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="t
 .bhome .bh-spslider .bh-spvid{display:block;background:#0C0206}
 .bhome .bh-spslider .bh-spvid video{display:block;width:100%;height:auto;max-height:560px;background:#0C0206;object-fit:contain}
 @media(min-width:760px){.bhome .bh-spslider .bh-sponsor{padding:46px 44px 40px}}
-/* "Swipe to view trailer>>>": small glowing hint at the bottom of the thank-you card (only rendered when a sponsor video exists) */
-.bhome .bh-spslider .bh-swipehint{grid-column:1/-1;justify-self:center;margin:6px 0 0;padding:6px 14px;border-radius:99px;font:700 .7rem/1.2 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:rgba(243,199,102,.12);border:1px solid rgba(243,199,102,.45);text-shadow:0 0 8px rgba(243,199,102,.85);animation:bh-swipeglow 1.8s ease-in-out infinite}
-@keyframes bh-swipeglow{0%,100%{box-shadow:0 0 6px rgba(243,199,102,.25),0 0 14px rgba(243,199,102,.15);text-shadow:0 0 4px rgba(243,199,102,.5);opacity:.8}50%{box-shadow:0 0 14px rgba(243,199,102,.75),0 0 30px rgba(243,199,102,.45);text-shadow:0 0 10px rgba(243,199,102,1);opacity:1}}
-@media(prefers-reduced-motion:reduce){.bhome .bh-spslider .bh-swipehint{animation:none}}
+/* the page dots sit below the card (not on top of it) */
+.bhome .bh-dots.bh-spdots{position:static;justify-content:center;width:max-content;margin:14px auto 0;padding:0;background:none;-webkit-backdrop-filter:none;backdrop-filter:none}
 </style>
 <style id="burg-about">
 /* ===== About us screen (Nov 2026): brochure text in the same card style as the other inner screens. Scoped to data-step="about". ===== */
@@ -1037,7 +1035,7 @@ ${spots}
 <div class="bh-step bh-rv"><h3>Pay by UPI</h3><p>We calculate the total and open your UPI app. Make the payment, upload the screenshot and submit.</p></div>
 <div class="bh-step bh-rv"><h3>Get your QR ticket</h3><p>Once verified, download your ticket and show it at the gate on the day of the meet.</p></div></div></div></section>
 
-<section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-slider bh-spslider bh-rv" id="sp-slider" role="region" aria-roledescription="carousel" aria-label="Our co-sponsor"><div class="bh-track" id="sp-track"><div class="bh-spsl bh-sponsor" aria-roledescription="slide" aria-label="1 of 2">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you.</p></div>${SPONSOR.video?`<p class="bh-swipehint" aria-hidden="true">Swipe to view trailer&gt;&gt;&gt;</p>`:""}</div>${SPONSOR.video?`<div class="bh-spsl bh-spvid" id="home-sp-vfig" aria-roledescription="slide" aria-label="2 of 2"><video id="home-sp-video" data-src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="none" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video></div>`:""}</div>${SPONSOR.video?`<div class="bh-dots" id="sp-dots"><button type="button" aria-label="Show the thank-you card" aria-current="true"></button><button type="button" aria-label="Show the video"></button></div>`:""}</div></div></section>
+<section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-slider bh-spslider bh-rv" id="sp-slider" role="region" aria-roledescription="carousel" aria-label="Our co-sponsor"><div class="bh-track" id="sp-track">${SPONSOR.video?`<div class="bh-spsl bh-spvid" id="home-sp-vfig" aria-roledescription="slide" aria-label="1 of 2"><video id="home-sp-video" data-src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="none" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video></div>`:""}<div class="bh-spsl bh-sponsor" aria-roledescription="slide" aria-label="2 of 2">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you.</p></div></div></div></div>${SPONSOR.video?`<div class="bh-dots bh-spdots" id="sp-dots"><button type="button" aria-label="Show the video" aria-current="true"></button><button type="button" aria-label="Show the thank-you card"></button></div>`:""}</div></section>
 
 ${tmHomeCard()}
 
@@ -1138,24 +1136,25 @@ function homeMount(){
   const sv=root.querySelector("#home-sp-video");
   const lz=()=>{if(sv&&sv.dataset.src){sv.preload="metadata";sv.src=sv.dataset.src;sv.removeAttribute("data-src")}};   /* the video file is only fetched when the visitor scrolls near it */
   if(sv){try{const lo=new IntersectionObserver(es=>{if(es[0].isIntersecting){lz();lo.disconnect()}},{rootMargin:"600px 0px"});lo.observe(sv);sig.addEventListener("abort",()=>lo.disconnect())}catch(_){lz()}}
-  /* the sponsor slider: slide 1 the thank-you card, slide 2 the video. Dots and swipe only (no auto-advance, so it never moves away from a playing video). */
+  /* the sponsor slider: slide 1 the video, slide 2 the thank-you card. Dots (below the card) and swipe; the only automatic move is to the thank-you card when the video ends. */
   const ssl=root.querySelector("#sp-slider"),str=root.querySelector("#sp-track"),sdt=[].slice.call(root.querySelectorAll("#sp-dots button")),sls=[].slice.call(root.querySelectorAll("#sp-track>.bh-spsl"));
   let sc=0,sx=0,sy=0,ssw=false,sblk=false;
-  function sgo(n){if(!str||!sdt.length)return;sc=Math.max(0,Math.min(sdt.length-1,n));str.style.transform="translateX(-"+sc*100+"%)";
+  function sgo(n,play){if(!str||!sdt.length)return;sc=Math.max(0,Math.min(sdt.length-1,n));str.style.transform="translateX(-"+sc*100+"%)";
     sdt.forEach((d,i)=>d.setAttribute("aria-current",String(i===sc)));sls.forEach((s,i)=>{try{s.inert=i!==sc}catch(_){}});
-    if(sc===1){lz();try{const pl=sv&&sv.play();if(pl&&pl.catch)pl.catch(()=>{})}catch(_){}}   /* swiping (or tapping the dot) to the video starts it; the swipe is the visitor's gesture, so the browser allows it */
-    if(sc!==1&&sv&&!sv.paused)sv.pause();sfit()}
+    if(sc===0){lz();if(play){try{const pl=sv&&sv.play();if(pl&&pl.catch)pl.catch(()=>{})}catch(_){}}}   /* swiping (or tapping the dot) back to the video starts it; that is the visitor's own gesture, so the browser allows it */
+    if(sc!==0&&sv&&!sv.paused)sv.pause();sfit()}
   /* the slider is exactly as tall as the slide being shown, so the video never sits in empty bars; it follows any later size change (fonts, rotation, the video's own size) */
   function sfit(){if(!ssl||!sls[sc])return;const cs=getComputedStyle(ssl),b=cs.boxSizing==="border-box"?parseFloat(cs.borderTopWidth)+parseFloat(cs.borderBottomWidth):0;ssl.style.height=(sls[sc].offsetHeight+b)+"px"}
-  if(ssl&&str&&sdt.length){sgo(0);
+  if(ssl&&str&&sdt.length){sgo(0,false);
     try{const ro=new ResizeObserver(sfit);sls.forEach(s=>ro.observe(s));sig.addEventListener("abort",()=>ro.disconnect())}catch(_){}
     on(window,"resize",sfit);if(sv)on(sv,"loadedmetadata",sfit);
-    sdt.forEach((d,i)=>on(d,"click",()=>sgo(i)));
+    sdt.forEach((d,i)=>on(d,"click",()=>sgo(i,true)));
+    if(sv)on(sv,"ended",()=>sgo(1,false));   /* when the video finishes, the slider moves on to the thank-you card by itself */
     on(ssl,"touchstart",e=>{const t=e.touches[0],v=e.target.closest&&e.target.closest("video");sblk=false;if(v){const r=v.getBoundingClientRect();if(t.clientY>r.bottom-64)sblk=true}sx=t.clientX;sy=t.clientY},{passive:true});   /* a swipe that starts on the video's control bar is the seek bar, not the slider */
-    on(ssl,"touchend",e=>{if(sblk)return;const t=e.changedTouches[0],d=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(d)>40&&Math.abs(d)>Math.abs(dy)*1.5){ssw=true;sgo(sc+(d<0?1:-1))}},{passive:true});   /* only a clearly sideways swipe moves it: a diagonal flick while scrolling the page past the card must not */
+    on(ssl,"touchend",e=>{if(sblk)return;const t=e.changedTouches[0],d=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(d)>40&&Math.abs(d)>Math.abs(dy)*1.5){ssw=true;sgo(sc+(d<0?1:-1),true)}},{passive:true});   /* only a clearly sideways swipe moves it: a diagonal flick while scrolling the page past the card must not */
     on(ssl,"scroll",()=>{if(ssl.scrollLeft)ssl.scrollLeft=0},{passive:true});   /* the card is only ever moved by its dots or a sideways swipe: if the browser nudges the hidden overflow (focus, find, anchors), put it straight back */
     on(ssl,"click",e=>{if(ssw){e.stopPropagation();e.preventDefault();ssw=false}},{capture:true})}
-  if(sv){const gone=()=>{const x=root.querySelector("#home-sp-vfig"),d=root.querySelector("#sp-dots");if(x)x.remove();if(d)d.remove();if(str)str.style.transform="";if(ssl)ssl.style.height="";sdt.length=0};   /* file missing: the slider quietly becomes the plain thank-you card */
+  if(sv){const gone=()=>{const x=root.querySelector("#home-sp-vfig"),d=root.querySelector("#sp-dots");if(x){const k=sls.indexOf(x);if(k>-1)sls.splice(k,1);x.remove()}if(d)d.remove();sc=0;sls.forEach(z=>{try{z.inert=false}catch(_){}});if(str)str.style.transform="";if(ssl)ssl.style.height="";sdt.length=0};   /* file missing: the slider quietly becomes the plain thank-you card */
     on(sv,"error",gone);if(sv.error)gone();
     try{const io=new IntersectionObserver(es=>{if(!es[0].isIntersecting&&!sv.paused)sv.pause()},{threshold:.25});io.observe(sv);sig.addEventListener("abort",()=>io.disconnect())}catch(_){}}
   const sp=root.querySelector("#home-sp-img");

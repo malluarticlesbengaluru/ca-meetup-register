@@ -1144,7 +1144,8 @@ function homeMount(){
   let sc=0,sx=0,sy=0,ssw=false,sblk=false;
   function sgo(n){if(!str||!sdt.length)return;sc=Math.max(0,Math.min(sdt.length-1,n));str.style.transform="translateX(-"+sc*100+"%)";
     sdt.forEach((d,i)=>d.setAttribute("aria-current",String(i===sc)));sls.forEach((s,i)=>{try{s.inert=i!==sc}catch(_){}});
-    if(sc===1)lz();if(sc!==1&&sv&&!sv.paused)sv.pause();sfit()}
+    if(sc===1){lz();try{const pl=sv&&sv.play();if(pl&&pl.catch)pl.catch(()=>{})}catch(_){}}   /* swiping (or tapping the dot) to the video starts it; the swipe is the visitor's gesture, so the browser allows it */
+    if(sc!==1&&sv&&!sv.paused)sv.pause();sfit()}
   /* the slider is exactly as tall as the slide being shown, so the video never sits in empty bars; it follows any later size change (fonts, rotation, the video's own size) */
   function sfit(){if(!ssl||!sls[sc])return;const cs=getComputedStyle(ssl),b=cs.boxSizing==="border-box"?parseFloat(cs.borderTopWidth)+parseFloat(cs.borderBottomWidth):0;ssl.style.height=(sls[sc].offsetHeight+b)+"px"}
   if(ssl&&str&&sdt.length){sgo(0);

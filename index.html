@@ -954,7 +954,7 @@ function evShort(){const p=evParts({day:"numeric",month:"long",year:"numeric"});
 function evCalUrl(){
   const s=new Date((S.ev&&S.ev.event_at)||CONFIG.eventStartISO);if(isNaN(s))return"";
   const f=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d+/,""),e=new Date(s.getTime()+3*3600*1000);
-  return"https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(CONFIG.eventName)+"&dates="+f(s)+"/"+f(e)+"&details="+encodeURIComponent(CONFIG.organiserName+" meetup for professionals")+"&location="+encodeURIComponent(evVenue()+", Bengaluru")}
+  return"https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(CONFIG.eventName)+"&dates="+f(s)+"/"+f(e)+"&details="+encodeURIComponent("നമ്മുടെ പിള്ളേരോപ്പം ഒരു കൂട്ടായ്മ😌 ~ MAB")+"&location="+encodeURIComponent(evVenue()+", Bengaluru")}
 function evMapUrl(){return"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(evVenue()+", Bengaluru")}
 /* ===== Home: what the page shows and when ===== */
 const evIso=()=>(S.ev&&S.ev.event_at)||CONFIG.eventStartISO;

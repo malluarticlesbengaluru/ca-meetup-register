@@ -770,7 +770,7 @@ const CONFIG={
   ticketTime:"2:00 PM",                            // shown on the ticket
   ticketVenue:"Bloom Creative Zone, Haralur",  // shown on the ticket
   organiserName:"Mallu Articles Bengaluru",        // shown on the ticket
-  ticketTagline:"MALAYALEE CA MEETUP · BENGALURU", // small line at the top of the ticket
+  ticketTagline:"Where strangers feels like home", // slogan under the title on the ticket
   // The UPI ID, the payee name and the organisers' WhatsApp number are NOT here any more:
   // they are set in Admin > Settings > Payment details and read from the database.
   supabaseUrl:"https://jddrwajazpsdrqpwlncu.supabase.co",
@@ -1626,7 +1626,7 @@ function vTicket(){
   const r=S.cur,n=r.tickets.length;
   let h=head("Your ticket"+(n>1?"s":""),"Show this QR code at the entry.");
   r.tickets.forEach((t,i)=>{
-    h+=`<div class="card"><canvas id="tc${i}" class="tk" width="900" height="1480" role="img" aria-label="Ticket ${esc(t.label||"")} for ${esc(t.name)}${t.game_message?". Secret message: "+esc(t.game_message):""}${t.game_prize?". "+esc(String(t.game_prize_heading||"").trim()||"You are a winner!")+": "+esc(t.game_prize):""}"></canvas>
+    h+=`<div class="card"><canvas id="tc${i}" class="tk" width="2000" height="668" role="img" aria-label="Ticket ${esc(t.label||"")} for ${esc(t.name)}${t.game_message?". Secret message: "+esc(t.game_message):""}${t.game_prize?". "+esc(String(t.game_prize_heading||"").trim()||"You are a winner!")+": "+esc(t.game_prize):""}"></canvas>
     <div class="row"><button data-dl="jpg" data-i="${i}">Download JPG</button><button class="ghost" data-dl="pdf" data-i="${i}">Download PDF</button></div></div>`;
   });
   if(n>1)h+=`<div class="card"><b>Everyone in this booking</b><div class="row"><button id="dl-all-pdf">All tickets as one PDF</button><button class="ghost" id="dl-all-jpg">All tickets as JPG</button></div><p class="note">The JPG option downloads one image per person. Your browser may ask permission to download several files.</p></div>`;
@@ -1634,113 +1634,169 @@ function vTicket(){
 }
 
 /* ---------- ticket drawing (canvas) ---------- */
-const TW=900,TH=1480;
+const TW=2000,TH=668;   /* landscape ticket, same proportions as the design */
 function rr(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);x.arcTo(X+W,Y+H,X,Y+H,r);x.arcTo(X,Y+H,X,Y,r);x.arcTo(X,Y,X+W,Y,r);x.closePath()}
 const FF='"Jost",Arial,sans-serif',FD='"Fraunces",Georgia,serif';
 function txt(x,s,X,Y,size,wt,col,al,sp,fam){x.font=wt+" "+size+"px "+(fam||FF);x.fillStyle=col;x.textAlign=al||"left";x.textBaseline="alphabetic";try{x.letterSpacing=(sp||0)+"px"}catch(_){}x.fillText(s,X,Y);try{x.letterSpacing="0px"}catch(_){}}
 function fit(x,s,maxW,size,min,wt,fam){let z=size;for(;z>min;z-=2){x.font=wt+" "+z+"px "+(fam||FF);if(x.measureText(s).width<=maxW)break}return z}
 let LOGO=null;
 function loadLogo(){return new Promise(r=>{if(LOGO)return r(LOGO);const i=new Image();i.onload=()=>{LOGO=i;r(i)};i.onerror=()=>r(null);i.src="assets/logo-mark.png"})}
+const FT='"Anton","Bebas Neue",Impact,"Arial Narrow",sans-serif';
+/* a rounded rectangle with a different radius on each corner: R = [top-left, top-right, bottom-right, bottom-left] */
+function rrr(x,X,Y,W,H,R){const a=R[0],b=R[1],c=R[2],d=R[3];x.beginPath();x.moveTo(X+a,Y);x.lineTo(X+W-b,Y);x.arcTo(X+W,Y,X+W,Y+b,b);x.lineTo(X+W,Y+H-c);x.arcTo(X+W,Y+H,X+W-c,Y+H,c);x.lineTo(X+d,Y+H);x.arcTo(X,Y+H,X,Y+H-d,d);x.lineTo(X,Y+a);x.arcTo(X,Y,X+a,Y,a);x.closePath()}
+/* a box with scooped (concave) ticket corners */
+function notchBox(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.lineTo(X+W-r,Y);x.arc(X+W,Y,r,Math.PI,Math.PI/2,true);x.lineTo(X+W,Y+H-r);x.arc(X+W,Y+H,r,-Math.PI/2,Math.PI,true);x.lineTo(X+r,Y+H);x.arc(X,Y+H,r,0,-Math.PI/2,true);x.lineTo(X,Y+r);x.arc(X,Y,r,Math.PI/2,0,true);x.closePath()}
+function sparkle(x,cx,cy,r,col){x.fillStyle=col;x.beginPath();x.moveTo(cx,cy-r);x.quadraticCurveTo(cx+r*.12,cy-r*.12,cx+r,cy);x.quadraticCurveTo(cx+r*.12,cy+r*.12,cx,cy+r);x.quadraticCurveTo(cx-r*.12,cy+r*.12,cx-r,cy);x.quadraticCurveTo(cx-r*.12,cy-r*.12,cx,cy-r);x.fill()}
+/* a small repeatable random source, so the crowd and the textures look the same every time the ticket is drawn */
+function prng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+/* the font size that makes capital letters exactly `cap` px tall */
+function capFs(x,wt,fam,cap){x.font=wt+" 100px "+fam;const a=x.measureText("H").actualBoundingBoxAscent;return a>0?cap/a*100:cap*1.4}
+/* one letter-spaced line stretched to exactly w px wide (centred on X, or starting at X) */
+function spread(x,s,font,col,X,Y,w,al){x.font=font;try{x.letterSpacing="0px"}catch(_){}const n=Array.from(s).length,w0=x.measureText(s).width,sp=n>1?Math.max(0,(w-w0)/(n-1)):0;
+  x.fillStyle=col;x.textBaseline="alphabetic";x.textAlign="left";try{x.letterSpacing=sp+"px"}catch(_){}x.fillText(s,al==="center"?X-w/2:X,Y);try{x.letterSpacing="0px"}catch(_){}}
+/* wrap capital-letter text into one line, or two lines of similar length (smaller type if it still does not fit) */
+function wrap2(x,s,maxW,cap){let fs=capFs(x,"400",FT,cap),L=[];const words=String(s).split(/\s+/).filter(Boolean);
+  for(let k=0;k<12;k++){x.font="400 "+fs+"px "+FT;const w=t=>x.measureText(t).width;
+    if(words.length<2||w(words.join(" "))<=maxW)L=[words.join(" ")];
+    else{let best=null;for(let i=1;i<words.length;i++){const a=words.slice(0,i).join(" "),b=words.slice(i).join(" "),m=Math.max(w(a),w(b));if(!best||m<best.m)best={m,L:[a,b]}}L=best.L}
+    if(L.every(l=>w(l)<=maxW))break;fs*=.92}
+  return{L,fs}}
+function tkDate(){const p=evParts({day:"numeric",month:"long",year:"numeric"});if(p)return p.month.slice(0,3).toUpperCase()+" "+p.day+", "+p.year;
+  const m=/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/.exec(CONFIG.ticketDate);return m?m[2].slice(0,3).toUpperCase()+" "+m[1]+", "+m[3]:String(CONFIG.ticketDate).toUpperCase()}
+/* the venue setting is one line, "Place name, Area": the place goes on the left of the date, the area (and the city) on the right */
+function tkVenue(){const v=String(evVenue()||"").split(",").map(s=>s.trim()).filter(Boolean);let b=v.slice(1).join(" ");if(!/bengaluru|bangalore/i.test(b))b=(b?b+" ":"")+"Bengaluru";return{a:(v[0]||"").toUpperCase(),b:b.toUpperCase()}}
+/* the co-sponsor logo (cropped above its small tagline line, which is drawn as text instead) and the Mallu Articles mark recoloured for the pink stub */
+let TKI=null;
+function loadTicketImgs(){return new Promise(r=>{if(TKI)return r(TKI);let n=0;const o={mark:null,sp:null};const done=()=>{if(++n===2){if(o.mark&&o.sp)TKI=o;r(o)}};
+  [["mark","assets/ticket-mark.png"],["sp","assets/burg-sponsor-logo.png"]].forEach(a=>{const i=new Image();i.onload=()=>{o[a[0]]=i;done()};i.onerror=()=>done();i.src=a[1]})})}
+const TK_SP={cropFrac:372/403,tag:"SPREADING EDUCATION"};   /* burg-sponsor-logo.png is 479 x 403; the top 372 rows are the bird and the name */
+/* the big title: pale pink "EHSAAS'" and orange "26", condensed capitals with a mottled, slightly worn texture and a soft glow */
+function drawTitle(x,name,cx,top,cap,wT){
+  const m=/^(.*?)(\d{2,4})$/.exec(name),A=(m?m[1]:name).replace(/'/g,"’"),B=m?m[2]:"",fs=capFs(x,"400",FT,cap),pad=40;
+  x.font="400 "+fs+"px "+FT;const wa=x.measureText(A).width,wb=B?x.measureText(B).width:0,gap=B?fs*.03:0,tw=wa+gap+wb,sx=Math.max(.7,Math.min(1.3,wT/tw));
+  const L=document.createElement("canvas");L.width=Math.ceil(tw*sx)+pad*2;L.height=cap+pad*2;const y=L.getContext("2d"),rnd=prng(26);
+  y.setTransform(sx,0,0,1,pad,pad+cap);y.font="400 "+fs+"px "+FT;y.textBaseline="alphabetic";
+  let g=y.createLinearGradient(0,-cap,0,0);g.addColorStop(0,"#F9E2E3");g.addColorStop(.55,"#EDC3C6");g.addColorStop(1,"#E2A3A9");y.fillStyle=g;y.fillText(A,0,0);
+  if(B){g=y.createLinearGradient(0,-cap,0,0);g.addColorStop(0,"#FFC64F");g.addColorStop(1,"#F2791B");y.fillStyle=g;y.fillText(B,wa+gap,0)}
+  y.setTransform(1,0,0,1,0,0);y.globalCompositeOperation="source-atop";
+  for(let i=0;i<150;i++){const r=14+rnd()*52,X=rnd()*L.width,Y=rnd()*L.height,gg=y.createRadialGradient(X,Y,0,X,Y,r),lt=rnd()<.5;gg.addColorStop(0,lt?"rgba(255,255,255,.09)":"rgba(120,30,50,.08)");gg.addColorStop(1,"rgba(0,0,0,0)");y.fillStyle=gg;y.fillRect(X-r,Y-r,r*2,r*2)}
+  y.globalCompositeOperation="destination-out";
+  for(let i=0;i<170;i++){y.fillStyle="rgba(0,0,0,"+(.12+rnd()*.2)+")";y.beginPath();y.arc(rnd()*L.width,rnd()*L.height,.6+rnd()*1.2,0,7);y.fill()}
+  x.save();x.shadowColor="rgba(255,110,140,.2)";x.shadowBlur=22;x.drawImage(L,Math.round(cx-L.width/2),top-pad);x.restore()}
+/* pink glow, sparks and a silhouette crowd along the bottom of the main panel (clip to the panel first) */
+function drawCrowd(x,X0,X1,Y0,Y1){
+  const r=prng(7);x.save();x.translate((X0+X1)/2,Y1+40);x.scale((X1-X0)*.62,230);
+  let g=x.createRadialGradient(0,0,0,0,0,1);g.addColorStop(0,"rgba(240,100,140,.9)");g.addColorStop(.4,"rgba(185,52,92,.5)");g.addColorStop(1,"rgba(120,20,50,0)");x.fillStyle=g;x.fillRect(-1,-1,2,1.3);x.restore();
+  for(let i=0;i<420;i++){const px=X0+r()*(X1-X0),py=Y0+Math.pow(r(),1.2)*(Y1-Y0-30),big=r()<.1,sz=big?3+r()*5:.8+r()*2.2;x.fillStyle="rgba(255,"+(130+Math.round(r()*60))+","+(170+Math.round(r()*40))+","+(.25+r()*.65)+")";
+    if(big){x.save();x.shadowColor="rgba(255,120,170,.9)";x.shadowBlur=14}x.beginPath();x.arc(px,py,sz,0,7);x.fill();if(big)x.restore()}
+  const row=(col,rim,hmin,hmax,rmin,rmax,step)=>{for(let px=X0-30;px<X1+30;px+=step*(.7+r()*.7)){const rad=rmin+r()*(rmax-rmin),cy=Y1-hmin-r()*(hmax-hmin);
+    x.fillStyle=rim;x.beginPath();x.arc(px,cy-2,rad+1.6,0,7);x.fill();x.fillStyle=col;x.beginPath();x.arc(px,cy,rad,0,7);x.fill();x.beginPath();x.ellipse(px,cy+rad*2,rad*1.9,rad*1.6,0,0,7);x.fill()}};
+  row("#35101C","rgba(255,125,165,.18)",72,96,9,14,24);
+  row("#240A12","rgba(255,130,170,.28)",56,82,12,19,31);
+  row("#18060C","rgba(255,135,175,.36)",38,64,15,23,40);
+  x.fillStyle="#150409";x.fillRect(X0,Y1-28,X1-X0,34)}
+/* soft paper-like mottling, used on the pink stub */
+function drawPaper(x,X,Y,W,H,seed){const r=prng(seed);for(let i=0;i<110;i++){const R=20+r()*80,cx=X+r()*W,cy=Y+r()*H,g=x.createRadialGradient(cx,cy,0,cx,cy,R),lt=r()<.55;g.addColorStop(0,lt?"rgba(255,235,240,.16)":"rgba(214,110,140,.10)");g.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=g;x.fillRect(cx-R,cy-R,R*2,R*2)}
+  for(let i=0;i<500;i++){x.fillStyle="rgba("+(r()<.5?"255,255,255":"190,80,110")+","+(.05+r()*.08)+")";x.beginPath();x.arc(X+r()*W,Y+r()*H,.6+r()*1.4,0,7);x.fill()}}
 function drawTicket(c,t,code){
-  /* DRAMATIC ticket (Nov 2026): burgundy stage, spotlight rays, sparks, gold foil (platinum for coordinators), glass panels, punched stub.
-     Same data as before (date, time, venue, attendee, food, ticket number, QR of "label|secret"); the Booking ID is still NOT on it. */
-  const coord=t.kind==="coordinator",W=TW;
-  const G=coord?["#FFFFFF","#D3DBE8","#8793AA"]:["#FFEBB0","#E9B24C","#B2701C"],GOLD=G[1],CREAM="#F6D7C6",BLUSH="#FFB3C0";
-  const BG=coord?{hi:"#A3153A",mid:"#4A0A1F",lo:"#14030A"}:{hi:"#7A1436",mid:"#3A0B1D",lo:"#12030A"};
-  const TINT=coord?"rgba(211,219,232,":"rgba(233,178,76,",RAY=coord?"rgba(230,236,248,":"rgba(255,214,130,";
-  /* two optional panels under the stub, each present only when that ticket has it: the team message and the prize line (the prize is drawn by the organisers).
-     With neither, the ticket is exactly the base size. */
-  const PANELS=[["Your secret message",t.game_message],[String(t.game_prize_heading||"").trim()||"You are a winner!",t.game_prize]].map(a=>[a[0],String(a[1]||"").trim()]).filter(a=>a[1]).map(a=>{const m=msgLines(a[1]);return {label:a[0],ML:m,PH:138+m.lines.length*m.lh}});
-  let PY=TH-4;PANELS.forEach((pn,i)=>{pn.y=PY;PY+=pn.PH+(i<PANELS.length-1?18:0)});
-  const H=PANELS.length?PY+54:TH;
+  /* LANDSCAPE ticket (Nov 2026 redesign, 2000 x 668): a maroon main panel (title, venue and date, co-sponsor, crowd) and a pink stub (logo, ENTRY TICKET, QR),
+     divided by a dotted tear line. Same data as before: date, time, venue, attendee, food, ticket number and the QR of "label|secret". The Booking ID is still NOT on it.
+     Under the ticket come the two optional panels (secret message, prize line), each present only when that ticket has it. */
+  const coord=t.kind==="coordinator",W=TW,GOLD="#E9B24C",CREAM="#F6D7C6",BLUSH="#FFB3C0",PINK="#F05E7B",INK="#1A0A10",EDGE="#F6EEEA";
+  const PANELS=[["Your secret message",t.game_message],[String(t.game_prize_heading||"").trim()||"You are a winner!",t.game_prize]].map(a=>[a[0],String(a[1]||"").trim()]).filter(a=>a[1]).map(a=>{const m=msgLines(a[1]);return {label:a[0],ML:m,PH:250+m.lines.length*m.lh}});
+  let PY=TH+16;PANELS.forEach((pn,i)=>{pn.y=PY;PY+=pn.PH+(i<PANELS.length-1?18:0)});
+  const H=PANELS.length?PY+26:TH;
   c.width=W;c.height=H;const x=c.getContext("2d");x.clearRect(0,0,W,H);
-  const foil=(x0,y0,x1,y1)=>{const g=x.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,G[0]);g.addColorStop(.5,G[1]);g.addColorStop(1,G[2]);return g};
-  const sheen=(y,sz)=>{const g=x.createLinearGradient(0,y-sz*.85,0,y+sz*.1);g.addColorStop(0,G[0]);g.addColorStop(.55,G[1]);g.addColorStop(1,G[2]);return g};
-  const dia=(X,Y,r,f)=>{x.fillStyle=f;x.beginPath();x.moveTo(X,Y-r);x.lineTo(X+r,Y);x.lineTo(X,Y+r);x.lineTo(X-r,Y);x.closePath();x.fill()};
-  x.save();rr(x,0,0,W,H,52);x.clip();
-  // stage: dark base, crimson glow behind the title, spotlight rays from the top
-  let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,BG.mid);g.addColorStop(.5,BG.lo);g.addColorStop(1,"#0B0206");x.fillStyle=g;x.fillRect(0,0,W,H);
-  g=x.createRadialGradient(W/2,300,20,W/2,300,800);g.addColorStop(0,BG.hi);g.addColorStop(1,"rgba(0,0,0,0)");x.globalAlpha=.7;x.fillStyle=g;x.fillRect(0,0,W,1100);x.globalAlpha=1;
-  // stub shade
-  x.fillStyle="rgba(0,0,0,.30)";x.fillRect(0,1100,W,H-1100);
-  // foil bars and frame
-  g=x.createLinearGradient(0,0,W,0);[G[0],G[1],G[2],G[1],G[0]].forEach((cl,i)=>g.addColorStop(i/4,cl));
-  x.lineWidth=4;x.strokeStyle=foil(0,0,W,H);rr(x,24,24,W-48,H-48,40);x.stroke();
-  
-  // logo with a halo
-  g=x.createRadialGradient(W/2,128,10,W/2,128,230);g.addColorStop(0,RAY+".14)");g.addColorStop(1,RAY+"0)");x.fillStyle=g;x.fillRect(0,0,W,360);
-  if(LOGO){const lw=160,lh=lw*LOGO.height/LOGO.width;x.drawImage(LOGO,(W-lw)/2,62,lw,lh)}
-  // badge with flanking lines
-  const kind=coord?"COORDINATOR":"MEMBER";x.font="600 26px "+FF;try{x.letterSpacing="8px"}catch(_){}const pw=x.measureText(kind).width+72;try{x.letterSpacing="0px"}catch(_){}
-  const bx=(W-pw)/2;x.fillStyle=foil(bx,206,bx+pw,260);rr(x,bx,206,pw,54,27);x.fill();txt(x,kind,W/2+4,243,26,"600","#2A0A14","center",8);
-  x.lineWidth=2;x.strokeStyle=foil(0,0,W,0);x.globalAlpha=.85;x.beginPath();x.moveTo(70,233);x.lineTo(bx-22,233);x.moveTo(bx+pw+22,233);x.lineTo(W-70,233);x.stroke();x.globalAlpha=1;
-  dia(bx-34,233,7,GOLD);dia(bx+pw+34,233,7,GOLD);
-  txt(x,CONFIG.ticketTagline,W/2+2,322,22,"500",BLUSH,"center",5);
-  // the title, in glowing foil
-  const ts=fit(x,CONFIG.eventName,780,170,64,"700",FD);
-    txt(x,CONFIG.eventName,W/2,472,ts,"700",sheen(472,ts),"center",0,FD);
-  txt(x,"presented by "+CONFIG.organiserName,W/2,528,30,"italic 500",BLUSH,"center",0,FD);
-  // details in a glass panel
-  x.fillStyle="rgba(255,255,255,.05)";rr(x,64,560,W-128,310,30);x.fill();x.lineWidth=2;x.strokeStyle=foil(64,560,W-64,870);x.globalAlpha=.6;x.stroke();x.globalAlpha=1;
-  [["DATE",evDate()],["TIME",evTime()],["VENUE",evVenue()]].forEach((r,i)=>{
-    const y=614+i*92;txt(x,r[0],114,y,21,"600",GOLD,"left",6);
-    const sz=fit(x,r[1],690,40,24,"500");txt(x,r[1],114,y+46,sz,"500",CREAM,"left",0);
-    if(i<2){x.strokeStyle=TINT+".22)";x.lineWidth=1.5;x.beginPath();x.moveTo(90,y+66);x.lineTo(W-90,y+66);x.stroke()}});
-  // attendee
-  txt(x,"ATTENDEE",114,922,21,"600",GOLD,"left",6);
-  const ns=fit(x,t.name,730,86,36,"700",FD);
-  txt(x,t.name,96,1002,ns,"700",CREAM,"left",0,FD);
-  const veg=t.food==="Veg",fc=veg?"#4BE38A":"#FF6B6B",ft=veg?"Veg":"Non-veg";x.font="600 32px "+FF;const fw=64+x.measureText(ft).width+30;
-  x.fillStyle=veg?"rgba(75,227,138,.14)":"rgba(255,107,107,.14)";rr(x,96,1024,fw,50,25);x.fill();x.lineWidth=2.5;x.strokeStyle=fc;rr(x,96,1024,fw,50,25);x.stroke();
-  x.lineWidth=4;rr(x,114,1035,28,28,6);x.stroke();x.fillStyle=fc;x.beginPath();x.arc(128,1049,6.5,0,7);x.fill();txt(x,ft,160,1058,32,"600",CREAM,"left",0);
-  // perforation with punched notches
-  x.setLineDash([14,12]);x.strokeStyle=foil(0,0,W,0);x.globalAlpha=.95;x.lineWidth=3;x.beginPath();x.moveTo(60,1100);x.lineTo(W-60,1100);x.stroke();x.setLineDash([]);x.globalAlpha=1;
-  x.globalCompositeOperation="destination-out";x.beginPath();x.arc(0,1100,40,0,7);x.fill();x.beginPath();x.arc(W,1100,40,0,7);x.fill();x.globalCompositeOperation="source-over";
-  x.lineWidth=3;x.strokeStyle=GOLD;x.globalAlpha=.9;x.beginPath();x.arc(0,1100,40,-Math.PI/2,Math.PI/2);x.stroke();x.beginPath();x.arc(W,1100,40,Math.PI/2,Math.PI*1.5);x.stroke();x.globalAlpha=1;
-  // stub
-  x.fillStyle="rgba(255,255,255,.04)";rr(x,64,1124,W-128,312,30);x.fill();x.lineWidth=2;x.strokeStyle=foil(64,1124,W-64,1436);x.globalAlpha=.6;x.stroke();x.globalAlpha=1;
-  txt(x,"TICKET NUMBER",114,1188,21,"600",GOLD,"left",6);
-  const tl=t.label||"—",ls=fit(x,tl,400,100,40,"600");
-  txt(x,tl,100,1296,ls,"600",sheen(1296,ls),"left",2);
-  txt(x,"Admits one person, one entry",100,1356,28,"italic 500",BLUSH,"left",0,FD);
-  txt(x,"Show this QR at the entry",100,1396,24,"400","rgba(246,215,198,.72)","left",0);
-  // QR (unchanged content and level; black on a white plate with a wide quiet zone)
-  x.fillStyle="#fff";rr(x,536,1140,280,280,24);x.fill();
-  x.lineWidth=3;x.strokeStyle=foil(536,1140,816,1420);rr(x,536,1140,280,280,24);x.stroke();
-  if(t.secret&&t.label){
-    const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k=Math.floor(240/m),o=536+(280-m*k)/2,p=1140+(280-m*k)/2;
-    x.fillStyle="#000";for(let r=0;r<m;r++)for(let cc=0;cc<m;cc++)if(q.isDark(r,cc))x.fillRect(o+cc*k,p+r*k,k,k);
-  }else txt(x,"Not ready",676,1288,30,"600","#444","center",0);
-  PANELS.forEach(pn=>{const y0=pn.y,ML=pn.ML;
-    x.fillStyle=TINT+".10)";rr(x,64,y0,W-128,pn.PH,30);x.fill();x.lineWidth=2;x.strokeStyle=foil(64,y0,W-64,y0+pn.PH);x.globalAlpha=.7;x.stroke();x.globalAlpha=1;
-    txt(x,pn.label,W/2,y0+62,fit(x,pn.label,700,30,12,"italic 500",FD),"italic 500",GOLD,"center",0,FD);
-    ML.lines.forEach((l,i)=>txt(x,l,W/2,y0+116+ML.size+i*ML.lh-ML.size*.2,ML.size,"700",CREAM,"center",0,FD));
-  });
+  x.fillStyle="#28080F";x.fillRect(0,0,W,H);
+  const IM=TKI||{mark:null,sp:null};
+  /* ---- main panel ---- */
+  x.save();rrr(x,22,22,1508,624,[56,10,10,56]);x.clip();
+  let g=x.createLinearGradient(22,0,1530,0);g.addColorStop(0,"#3A0C16");g.addColorStop(.5,"#340E15");g.addColorStop(1,"#3F131E");x.fillStyle=g;x.fillRect(22,22,1508,624);
+  g=x.createRadialGradient(640,250,40,640,250,760);g.addColorStop(0,"rgba(120,30,50,.30)");g.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=g;x.fillRect(22,22,1508,624);
+  drawCrowd(x,22,1530,520,646);
   x.restore();
+  x.lineWidth=4;x.strokeStyle=EDGE;rrr(x,22,22,1508,624,[56,10,10,56]);x.stroke();
+  /* header */
+  spread(x,String(CONFIG.organiserName).toUpperCase(),"500 24px "+FF,"#F6EEEA",610,66,617,"center");
+  spread(x,"PRESENTS","500 22px "+FF,"#F6EEEA",610,108,206,"center");
+  /* title and tagline */
+  drawTitle(x,String(CONFIG.eventName).toUpperCase(),610,143,222,790);
+  spread(x,String(CONFIG.ticketTagline),"italic 400 28px "+FF,"#F3E3DE",610,405,565,"center");
+  /* venue | date | area */
+  const V=tkVenue(),vcap=23,lw=wrap2(x,V.a,165,vcap),rw=wrap2(x,V.b,125,vcap);
+  lw.L.forEach((l,i)=>{x.font="400 "+lw.fs+"px "+FT;x.fillStyle="#FFFFFF";x.textAlign="left";x.fillText(l,211,460+i*30)});
+  rw.L.forEach((l,i)=>{x.font="400 "+rw.fs+"px "+FT;x.fillStyle="#FFFFFF";x.textAlign="center";x.fillText(l,939,460+i*30)});
+  x.fillStyle=PINK;x.fillRect(211,506,66,5);x.fillRect(942,506,66,5);x.fillRect(419,437,3,74);x.fillRect(814,437,3,74);
+  const ds=capFs(x,"400",FT,40);x.font="400 "+ds+"px "+FT;x.fillStyle="#FFFFFF";x.textAlign="center";x.fillText(tkDate(),617,486);
+  const wd=String(evDate()).split(",")[0].trim().toUpperCase(),tm=String(evTime()).toUpperCase();
+  txt(x,(wd?wd+"  ·  ":"")+tm,618,510,17,"500",BLUSH,"center",4);
+  /* divider, co-sponsor */
+  x.fillStyle=PINK;x.fillRect(1071,143,3,292);
+  x.fillStyle="#F6EEEA";x.fillRect(1113,214,44,1.5);x.fillRect(1424,214,44,1.5);
+  txt(x,"CO-SPONSORED BY",1288,223,23,"600","#FFFFFF","center",1);
+  if(IM.sp){const iw=184,ih=iw*(IM.sp.height*TK_SP.cropFrac)/IM.sp.width;x.drawImage(IM.sp,0,0,IM.sp.width,Math.round(IM.sp.height*TK_SP.cropFrac),1288-iw/2,262,iw,ih);
+    spread(x,TK_SP.tag,"400 11px "+FF,"#F6EEEA",1288,414,176,"center")}
+  g=x.createLinearGradient(1128,0,1467,0);g.addColorStop(0,"rgba(246,215,198,0)");g.addColorStop(.5,"rgba(246,215,198,.55)");g.addColorStop(1,"rgba(246,215,198,0)");x.fillStyle=g;x.fillRect(1128,472,339,1.6);
+  /* attendee, ticket number, food */
+  x.save();x.shadowColor="rgba(16,3,8,.95)";x.shadowBlur=8;
+  txt(x,t.name,1288,513,fit(x,t.name,370,32,18,"600"),"600",CREAM,"center",0);
+  const veg=t.food==="Veg",fc=veg?"#4BE38A":"#FF7B7B",bits=[[(coord?"":"TICKET ")+(t.label||"—"),CREAM],[veg?"VEG":"NON-VEG",fc]];if(coord)bits.push(["COORDINATOR",GOLD]);
+  const SEP="   ·   ";let af=19,sw,ws,tot;
+  for(;af>=11;af--){x.font="600 "+af+"px "+FF;try{x.letterSpacing=(af*.13)+"px"}catch(_){}sw=x.measureText(SEP).width;ws=bits.map(b=>x.measureText(b[0]).width);tot=ws.reduce((a,b)=>a+b,0)+sw*(bits.length-1);if(tot<=400)break}
+  let px=1288-tot/2;x.textAlign="left";bits.forEach((b,i)=>{x.fillStyle=b[1];x.fillText(b[0],px,541);px+=ws[i];if(i<bits.length-1){x.fillStyle="rgba(255,179,192,.7)";x.fillText(SEP,px,541);px+=sw}});try{x.letterSpacing="0px"}catch(_){}
+  x.restore();
+  /* ---- stub ---- */
+  x.save();rrr(x,1546,22,432,624,[10,56,56,10]);x.clip();
+  g=x.createLinearGradient(0,22,0,646);g.addColorStop(0,"#E7B1C1");g.addColorStop(.5,"#F0B9C3");g.addColorStop(1,"#F3A3B1");x.fillStyle=g;x.fillRect(1546,22,432,624);
+  drawPaper(x,1546,22,432,624,91);x.restore();
+  x.lineWidth=4;x.strokeStyle=EDGE;rrr(x,1546,22,432,624,[10,56,56,10]);x.stroke();
+  /* tear line */
+  x.fillStyle=EDGE;for(let yy=52;yy<=618;yy+=13){x.beginPath();x.arc(1538,yy,3.2,0,7);x.fill()}
+  /* logo */
+  if(IM.mark){const mw=100,mh=mw*IM.mark.height/IM.mark.width;x.drawImage(IM.mark,1767-mw/2,58,mw,mh)}
+  x.font="700 50px "+FF;const mt="Mallu Articles",k=Math.min(1.2,290/x.measureText(mt).width);txt(x,mt,1767,172,50*k,"700",INK,"center",0);
+  spread(x,"BENGALURU","500 15px "+FF,INK,1767,196,101,"center");
+  x.fillStyle=INK;x.fillRect(1641,211,254,2);
+  /* ENTRY TICKET */
+  x.lineWidth=3.5;x.strokeStyle=INK;notchBox(x,1605,243,332,162,15);x.stroke();x.lineWidth=2;rrr(x,1618,256,306,136,[4,4,4,4]);x.stroke();
+  sparkle(x,1641,326,13,INK);sparkle(x,1893,326,13,INK);
+  const es=capFs(x,"400",FT,50);x.font="400 "+es+"px "+FT;x.fillStyle=INK;x.textAlign="center";try{x.letterSpacing="2px"}catch(_){}x.fillText("ENTRY",1768,318);x.fillText("TICKET",1768,379);try{x.letterSpacing="0px"}catch(_){}
+  /* QR (content and error level unchanged; black on a light plate so it scans reliably) */
+  x.fillStyle="#FFF4F6";rr(x,1662,420,210,210,16);x.fill();
+  if(t.secret&&t.label){
+    const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k2=Math.floor(190/m),o=1662+(210-m*k2)/2,p=420+(210-m*k2)/2;
+    x.fillStyle="#000";for(let r=0;r<m;r++)for(let cc=0;cc<m;cc++)if(q.isDark(r,cc))x.fillRect(o+cc*k2,p+r*k2,k2,k2);
+  }else txt(x,"Not ready",1767,532,26,"600","#444","center",0);
+  /* the optional panels under the ticket */
+  PANELS.forEach(pn=>{const y0=pn.y,ML=pn.ML;
+    x.fillStyle="rgba(233,178,76,.10)";rr(x,22,y0,W-44,pn.PH,40);x.fill();x.lineWidth=3;x.strokeStyle=GOLD;x.globalAlpha=.7;rr(x,22,y0,W-44,pn.PH,40);x.stroke();x.globalAlpha=1;
+    txt(x,pn.label,W/2,y0+86,fit(x,pn.label,1500,56,24,"italic 500",FD),"italic 500",GOLD,"center",0,FD);
+    ML.lines.forEach((l,i)=>txt(x,l,W/2,y0+176+ML.size*.8+i*ML.lh,ML.size,"700",CREAM,"center",0,FD));
+  });
 }
-/* wrap the message to the panel width: 44 px text, smaller if it is long (200 characters at most). Splits on spaces, and inside a word only if one word alone is too wide. Never splits an emoji. */
+/* wrap the message to the panel width: 92 px text, smaller if it is long (200 characters at most). Splits on spaces, and inside a word only if one word alone is too wide. Never splits an emoji. */
 function msgLines(s){
-  const x=document.createElement("canvas").getContext("2d"),maxW=W_MSG;let size=46;
+  const x=document.createElement("canvas").getContext("2d"),maxW=W_MSG;let size=92;
   const wrap=z=>{x.font="700 "+z+"px "+FD;const L=[];let cur="";
     const add=w=>{const ch=Array.from(w);while(ch.length&&x.measureText(ch.join("")).width>maxW){let k=ch.length;while(k>1&&x.measureText(ch.slice(0,k).join("")).width>maxW)k--;if(cur){L.push(cur);cur=""}L.push(ch.slice(0,k).join(""));ch.splice(0,k)}
       const w2=ch.join("");if(!w2)return;const t=cur?cur+" "+w2:w2;if(x.measureText(t).width<=maxW)cur=t;else{L.push(cur);cur=w2}};
     s.split(/\s+/).filter(Boolean).forEach(add);if(cur)L.push(cur);return L};
-  let L=wrap(size);while(L.length>4&&size>30){size-=4;L=wrap(size)}
+  let L=wrap(size);while(L.length>4&&size>60){size-=8;L=wrap(size)}
   return {lines:L,size,lh:Math.round(size*1.3)}}
-const W_MSG=700;
+const W_MSG=1700;
 /* The ticket fonts (Fraunces, Jost) are not in the page's first stylesheet any more; they are fetched here, once, as soon as the Tickets screen opens,
    so they are usually there before the person has typed their Booking ID. */
 let tfP=null;
 function ensureTicketFonts(){
   if(tfP)return tfP;
   tfP=new Promise(res=>{const l=document.createElement("link");l.rel="stylesheet";
-    l.href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,500&family=Jost:wght@400;500;600&display=swap";
+    l.href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,500&family=Jost:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Anton&display=swap";
     l.onload=()=>res(true);l.onerror=()=>{tfP=null;res(false)};document.head.appendChild(l);setTimeout(()=>res(false),8000)})
-  .then(async ok=>{try{if(document.fonts&&document.fonts.load)await Promise.all(['700 60px "Fraunces"','600 40px "Fraunces"','italic 500 30px "Fraunces"','400 30px "Jost"','500 30px "Jost"','600 30px "Jost"'].map(f=>document.fonts.load(f)))}catch(_){}return ok});
+  .then(async ok=>{try{if(document.fonts&&document.fonts.load)await Promise.all(['700 60px "Fraunces"','600 40px "Fraunces"','italic 500 30px "Fraunces"','400 30px "Jost"','500 30px "Jost"','600 30px "Jost"','700 30px "Jost"','italic 400 30px "Jost"','400 60px "Anton"'].map(f=>document.fonts.load(f)))}catch(_){}return ok});
   return tfP}
 async function drawTickets(){
   if(!S.ev)await loadEvent();   /* already asked for at start; only waits here if it never arrived */
-  await Promise.all([loadLogo(),qrReady,ensureTicketFonts()]);
+  await Promise.all([loadLogo(),loadTicketImgs(),qrReady,ensureTicketFonts()]);
   const r=S.cur;S.cv=[];if(!r||S.step!=="ticket")return;
   const key=()=>evDate()+"|"+evTime()+"|"+evVenue(),k0=key();
   r.tickets.forEach((t,i)=>{const c=document.getElementById("tc"+i);if(c){drawTicket(c,t,r.booking_code);S.cv[i]=c}});

@@ -649,13 +649,14 @@ body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="t
 </style>
 <style id="burg-sponsor-slide">
 /* ===== Sponsor slider (test style B): the Moments slider look, with the thank-you card as slide 1 and the video as slide 2 ===== */
-.bhome .bh-spslider{--ih:auto;border-radius:28px;background:linear-gradient(135deg,var(--deep),rgba(140,24,56,.55));transition:height 1.1s cubic-bezier(.65,0,.25,1)}
-.bhome .bh-spslider .bh-track{display:grid;transition:none;transform:none}   /* both slides share one cell and cross-fade (no sliding) */
-.bhome .bh-spslider .bh-spsl{grid-area:1/1;align-self:start;min-width:0;margin:0;opacity:0;visibility:hidden;transition:opacity 1.5s ease,visibility 0s 1.5s}
-.bhome .bh-spslider .bh-spsl.on{opacity:1;visibility:visible;transition:opacity 1.5s ease,visibility 0s}
-@media(prefers-reduced-motion:reduce){.bhome .bh-spslider,.bhome .bh-spslider .bh-spsl,.bhome .bh-spslider .bh-spsl.on{transition-duration:.01s}}
+.bhome .bh-spslider{--ih:auto;border-radius:28px;background:linear-gradient(135deg,var(--deep),rgba(140,24,56,.55));transition:height .7s cubic-bezier(.65,0,.25,1)}
+.bhome .bh-spslider .bh-track{align-items:flex-start}
+.bhome .bh-spslider .bh-spsl{flex:0 0 100%;min-width:0;margin:0}
 .bhome .bh-spslider .bh-sponsor{border:0;border-radius:0;background:none;padding:46px 26px 38px}
-.bhome .bh-spslider .bh-spvid{display:block;background:#0C0206}
+.bhome .bh-spslider .bh-spvid{display:block;position:relative;background:#0C0206}
+/* shown only when the video had to start muted (browsers block sound until the visitor taps) */
+.bhome .bh-spslider .bh-unmute{position:absolute;top:12px;left:12px;z-index:3;min-height:36px;padding:0 14px;border-radius:99px;border:1px solid rgba(243,199,102,.6);background:rgba(26,4,12,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:var(--gold);font:700 .78rem/1 var(--sans);letter-spacing:.04em;cursor:pointer;box-shadow:none;transform:none}
+.bhome .bh-spslider .bh-unmute[hidden]{display:none}
 .bhome .bh-spslider .bh-spvid video{display:block;width:100%;height:auto;max-height:560px;background:#0C0206;object-fit:contain}
 @media(min-width:760px){.bhome .bh-spslider .bh-sponsor{padding:46px 44px 40px}}
 /* the page dots sit below the card (not on top of it) */
@@ -1037,7 +1038,7 @@ ${spots}
 <div class="bh-step bh-rv"><h3>Pay by UPI</h3><p>We calculate the total and open your UPI app. Make the payment, upload the screenshot and submit.</p></div>
 <div class="bh-step bh-rv"><h3>Get your QR ticket</h3><p>Once verified, download your ticket and show it at the gate on the day of the meet.</p></div></div></div></section>
 
-<section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-slider bh-spslider bh-rv" id="sp-slider" role="region" aria-roledescription="carousel" aria-label="Our co-sponsor"><div class="bh-track" id="sp-track"><div class="bh-spsl bh-sponsor on" aria-roledescription="slide" aria-label="1 of 2">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you.</p></div></div>${SPONSOR.video?`<div class="bh-spsl bh-spvid" id="home-sp-vfig" aria-roledescription="slide" aria-label="2 of 2"><video id="home-sp-video" data-src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="none" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video></div>`:""}</div></div>${SPONSOR.video?`<div class="bh-dots bh-spdots" id="sp-dots"><button type="button" aria-label="Show the thank-you card" aria-current="true"></button><button type="button" aria-label="Show the video"></button></div>`:""}</div></section>
+<section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-slider bh-spslider bh-rv" id="sp-slider" role="region" aria-roledescription="carousel" aria-label="Our co-sponsor"><div class="bh-track" id="sp-track"><div class="bh-spsl bh-sponsor on" aria-roledescription="slide" aria-label="1 of 2">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you.</p></div></div>${SPONSOR.video?`<div class="bh-spsl bh-spvid" id="home-sp-vfig" aria-roledescription="slide" aria-label="2 of 2"><video id="home-sp-video" data-src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="none" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video><button class="bh-unmute" id="home-sp-unmute" type="button" hidden>🔊 Tap for sound</button></div>`:""}</div></div>${SPONSOR.video?`<div class="bh-dots bh-spdots" id="sp-dots"><button type="button" aria-label="Show the thank-you card" aria-current="true"></button><button type="button" aria-label="Show the video"></button></div>`:""}</div></section>
 
 ${tmHomeCard()}
 
@@ -1138,31 +1139,31 @@ function homeMount(){
   const sv=root.querySelector("#home-sp-video");
   const lz=()=>{if(sv&&sv.dataset.src){sv.preload="metadata";sv.src=sv.dataset.src;sv.removeAttribute("data-src")}};   /* the video file is only fetched when the visitor scrolls near it */
   if(sv){try{const lo=new IntersectionObserver(es=>{if(es[0].isIntersecting){lz();lo.disconnect()}},{rootMargin:"600px 0px"});lo.observe(sv);sig.addEventListener("abort",()=>lo.disconnect())}catch(_){lz()}}
-  /* the sponsor slider: slide 1 the thank-you card, slide 2 the video. The two cross-fade (1.5s). When the visitor first reaches the card it rests 3.5s, fades to the video and plays it; when the video ends it fades back to the card. Dots (below the card) and swipe still work, and take over from the automatic move. */
+  /* the sponsor slider: slide 1 the thank-you card, slide 2 the video. When the visitor first reaches the card it rests 3.5s, slides to the video and plays it; when the video ends it slides back to the card. Dots (below the card) and swipe still work, and take over from the automatic move. */
   const ssl=root.querySelector("#sp-slider"),str=root.querySelector("#sp-track"),sdt=[].slice.call(root.querySelectorAll("#sp-dots button")),sls=[].slice.call(root.querySelectorAll("#sp-track>.bh-spsl"));
-  let sc=0,sx=0,sy=0,ssw=false,sblk=false,sauto=null,sdone=false,hct=null;
-  /* play with sound; if the browser refuses (no tap on the page yet), play muted instead; the tap-to-show controls then offer the sound */
-  function vplay(){if(!sv)return;lz();try{sv.muted=false;const p=sv.play();if(p&&p.catch)p.catch(()=>{sv.muted=true;try{const q=sv.play();if(q&&q.catch)q.catch(()=>{sv.controls=true})}catch(_){sv.controls=true}})}catch(_){}}
+  let sc=0,sx=0,sy=0,ssw=false,sblk=false,sauto=null,sdone=false,amu=false;
+  /* play with sound; if the browser refuses (no tap on the page yet) play muted instead and offer a "Tap for sound" chip */
+  const um=root.querySelector("#home-sp-unmute");
+  function vplay(){if(!sv)return;lz();amu=false;try{sv.muted=false;const p=sv.play();if(p&&p.catch)p.catch(()=>{amu=true;sv.muted=true;try{const q=sv.play();if(q&&q.catch)q.catch(()=>{})}catch(_){}})}catch(_){}}
   function stake(){sdone=true;if(sauto){clearTimeout(sauto);sauto=null}}   /* the visitor took over: no automatic move any more */
-  function sgo(n,play){if(!str||!sdt.length)return;sc=Math.max(0,Math.min(sdt.length-1,n));
-    sdt.forEach((d,i)=>d.setAttribute("aria-current",String(i===sc)));sls.forEach((s,i)=>{s.classList.toggle("on",i===sc);try{s.inert=i!==sc}catch(_){}});
+  function sgo(n,play){if(!str||!sdt.length)return;sc=Math.max(0,Math.min(sdt.length-1,n));str.style.transform="translateX(-"+sc*100+"%)";
+    sdt.forEach((d,i)=>d.setAttribute("aria-current",String(i===sc)));sls.forEach((s,i)=>{try{s.inert=i!==sc}catch(_){}});
     if(sc===1){lz();if(play)vplay()}
-    if(sc!==1&&sv&&!sv.paused)sv.pause();sfit()}
+    if(sc!==1&&sv&&!sv.paused)sv.pause();if(um&&sc!==1)um.hidden=true;sfit()}
   /* the slider is exactly as tall as the slide being shown, so the video never sits in empty bars; it follows any later size change (fonts, rotation, the video's own size) */
   function sfit(){if(!ssl||!sls[sc])return;const cs=getComputedStyle(ssl),b=cs.boxSizing==="border-box"?parseFloat(cs.borderTopWidth)+parseFloat(cs.borderBottomWidth):0;ssl.style.height=(sls[sc].offsetHeight+b)+"px"}
   if(ssl&&str&&sdt.length){sgo(0,false);
     try{const ro=new ResizeObserver(sfit);sls.forEach(s=>ro.observe(s));sig.addEventListener("abort",()=>ro.disconnect())}catch(_){}
     on(window,"resize",sfit);if(sv)on(sv,"loadedmetadata",sfit);
     sdt.forEach((d,i)=>on(d,"click",()=>{stake();sgo(i,true)}));
-    if(sv){on(sv,"ended",()=>{sv.controls=true;sgo(0,false)});   /* when the video finishes it fades back to the thank-you card */
-      /* the play controls stay out of sight while it plays; a tap shows them for 3s (they stay when paused or ended) */
-      const hideC=()=>{if(!sv.paused&&!sv.ended)sv.controls=false},keepC=()=>{clearTimeout(hct);if(sv.controls&&!sv.paused&&!sv.ended)hct=setTimeout(hideC,3000)};
-      on(sv,"playing",()=>{sv.controls=false});on(sv,"pause",()=>{clearTimeout(hct);sv.controls=true});
-      on(sv,"click",()=>{if(!sv.paused&&!sv.controls)sv.controls=true;keepC()});["pointerdown","pointermove","touchstart"].forEach(k=>on(sv,k,keepC,{passive:true}));
+    if(sv){on(sv,"ended",()=>sgo(0,false));   /* when the video finishes it slides back to the thank-you card */
+      /* the video keeps its native controls: the browser itself hides them while it plays and brings them back on one tap */
+      if(um){on(sv,"playing",()=>{um.hidden=!(sv.muted&&amu)});on(sv,"volumechange",()=>{if(!sv.muted){amu=false;um.hidden=true}});
+        on(um,"click",e=>{e.stopPropagation();amu=false;um.hidden=true;sv.muted=false})}
       /* first time the card is properly in view: rest on the thank-you card for 3.5s, then fade to the video and play it */
-      try{const so=new IntersectionObserver(es=>{if(es[0].isIntersecting&&!sdone){so.disconnect();sdone=true;sauto=setTimeout(()=>{sauto=null;if(sc===0)sgo(1,true)},3500)}},{threshold:.6});so.observe(ssl);sig.addEventListener("abort",()=>{so.disconnect();clearTimeout(sauto);clearTimeout(hct)})}catch(_){}}
+      try{const so=new IntersectionObserver(es=>{if(es[0].isIntersecting&&!sdone){so.disconnect();sdone=true;sauto=setTimeout(()=>{sauto=null;if(sc===0)sgo(1,true)},3500)}},{threshold:.6});so.observe(ssl);sig.addEventListener("abort",()=>{so.disconnect();clearTimeout(sauto)})}catch(_){}}
     on(ssl,"touchstart",e=>{const t=e.touches[0],v=e.target.closest&&e.target.closest("video");sblk=false;if(v&&v.controls){const r=v.getBoundingClientRect();if(t.clientY>r.bottom-64)sblk=true}sx=t.clientX;sy=t.clientY},{passive:true});   /* a swipe that starts on the video's control bar is the seek bar, not the slider */
-    on(ssl,"touchend",e=>{if(sblk)return;const t=e.changedTouches[0],d=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(d)>40&&Math.abs(d)>Math.abs(dy)*1.5){ssw=true;stake();sgo(sc+(d<0?1:-1),true)}},{passive:true});   /* only a clearly sideways swipe moves it: a diagonal flick while scrolling the page past the card must not */
+    on(ssl,"touchend",e=>{if(sblk)return;const t=e.changedTouches[0],d=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(d)>40&&Math.abs(d)>Math.abs(dy)*1.5){ssw=true;setTimeout(()=>{ssw=false},500);stake();sgo(sc+(d<0?1:-1),true)}},{passive:true});   /* only a clearly sideways swipe moves it: a diagonal flick while scrolling the page past the card must not */
     on(ssl,"scroll",()=>{if(ssl.scrollLeft)ssl.scrollLeft=0},{passive:true});   /* the card is only ever moved by its dots or a sideways swipe: if the browser nudges the hidden overflow (focus, find, anchors), put it straight back */
     on(ssl,"click",e=>{if(ssw){e.stopPropagation();e.preventDefault();ssw=false}},{capture:true})}
   if(sv){const gone=()=>{const x=root.querySelector("#home-sp-vfig"),d=root.querySelector("#sp-dots");if(x){const k=sls.indexOf(x);if(k>-1)sls.splice(k,1);x.remove()}if(d)d.remove();stake();sc=0;sls.forEach(z=>{try{z.inert=false}catch(_){}});if(str)str.style.transform="";if(ssl)ssl.style.height="";sdt.length=0};   /* file missing: the slider quietly becomes the plain thank-you card */

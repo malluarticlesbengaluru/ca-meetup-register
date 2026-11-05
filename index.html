@@ -646,6 +646,10 @@ body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="t
 body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"],[data-step="about"]):not([data-step="home"]):not([data-step="form"]) .chips{gap:8px}
 body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"],[data-step="about"]):not([data-step="home"]):not([data-step="form"]) button.chip{font:700 .8rem/1 var(--sans);padding:10px 14px;min-height:40px}
 body:is([data-step="summary"],[data-step="pay"],[data-step="done"],[data-step="tickets"],[data-step="ticket"],[data-step="about"]):not([data-step="home"]):not([data-step="form"]) canvas.tk{border:1px solid var(--glass-b)}
+/* Ticket screen (Nov 2026): the ticket picture is cropped to the ticket's own outline, so the frame follows the ticket's rounded outer corners (the tear-line cut is not followed),
+   and the picture sits closer to the card's edge. Display only: the canvas itself, the JPG and the PDF are unchanged. Outline box in the 2000 x 668 canvas: x 15-1984, y 20-643; outer corner radius about 63 (left) and 54 (right). */
+body[data-step][data-step][data-step] .card.tkcard{padding:12px 10px}
+body[data-step][data-step][data-step] .card.tkcard canvas.tk{border:0;border-radius:0;box-shadow:none;width:101.57%;max-width:none;margin:-1.02% -.81% -1.27% -.76%;clip-path:inset(2.9% .75% 3.65% .7% round 3.15% 2.7% 2.7% 3.15% / 9.4% 8.1% 8.1% 9.4%)}
 </style>
 <style id="burg-sponsor-slide">
 /* ===== Sponsor slider (test style B): the Moments slider look, with the thank-you card as slide 1 and the video as slide 2 ===== */
@@ -1626,7 +1630,7 @@ function vTicket(){
   const r=S.cur,n=r.tickets.length;
   let h=head("Your ticket"+(n>1?"s":""),"Show this QR code at the entry.");
   r.tickets.forEach((t,i)=>{
-    h+=`<div class="card"><canvas id="tc${i}" class="tk" width="2000" height="668" role="img" aria-label="Ticket ${esc(t.label||"")} for ${esc(t.name)}${t.game_message?". Secret message: "+esc(t.game_message):""}${t.game_prize?". "+esc(String(t.game_prize_heading||"").trim()||"You are a winner!")+": "+esc(t.game_prize):""}"></canvas>
+    h+=`<div class="card tkcard"><canvas id="tc${i}" class="tk" width="2000" height="668" role="img" aria-label="Ticket ${esc(t.label||"")} for ${esc(t.name)}${t.game_message?". Secret message: "+esc(t.game_message):""}${t.game_prize?". "+esc(String(t.game_prize_heading||"").trim()||"You are a winner!")+": "+esc(t.game_prize):""}"></canvas>
     <div class="row"><button data-dl="jpg" data-i="${i}">Download JPG</button><button class="ghost" data-dl="pdf" data-i="${i}">Download PDF</button></div></div>`;
   });
   if(n>1)h+=`<div class="card"><b>Everyone in this booking</b><div class="row"><button id="dl-all-pdf">All tickets as one PDF</button><button class="ghost" id="dl-all-jpg">All tickets as JPG</button></div><p class="note">The JPG option downloads one image per person. Your browser may ask permission to download several files.</p></div>`;

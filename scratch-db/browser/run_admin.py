@@ -14,7 +14,7 @@ with sync_playwright() as p:
     # ---- 2. Bookings: transfer booking hidden
     pg.click('button[data-tab="bookings"]'); t = pg.inner_text('#tbl')
     check('Bookings tab hides the transfer booking', 'CODE0003' not in t and 'CODE0001' in t, t[:200])
-    check('Bookings tab explains where it went', 'Transfers tab' in pg.inner_text('#v'))
+    check('Bookings tab explains where it went', 'Transfers page' in pg.inner_text('#v'))
     # ---- 3. People
     pg.click('button[data-tab="people"]'); t = pg.inner_text('#tbl')
     check('People: retired Asha hidden by default', 'Asha' not in t and 'Dan' in t, t[:300])

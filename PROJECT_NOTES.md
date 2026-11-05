@@ -426,6 +426,8 @@ Plan in 7 steps: (1) smoothness engine, merged as PR #48; (2) new frame: side me
 
 **Step 6 (Settings, Scan, Feedback), branch `admin-step6-settings-scan`, stacked on steps 4 and 5 (all unpushed):** the Settings section bar now stays under the top bar while scrolling and jumps leave the section title visible; Feedback dates use the Indian style (`fdt`); the Scan page no longer repeats its title. Settings was already grouped in step 2. Tests: `run_settings.py` (9 checks, 4 deliberate mistakes all caught). Not verified: a real phone.
 
+**Step 7 (final pass), branch `admin-step7-final`:** swept every screen at 360, 390, 768, 1024 and 1300 px in light and dark: no sideways scrolling and no page errors; the selected chip's count is now clearly readable in dark; text that still said "Bookings tab", "Overview" or "Transfers tab" now uses the new names (Payments, Today, Transfers page). All ten suites pass together. **The redesign is complete.** Possible next work: rewrite `run_public.py`; the "Never verified" list in the handover.
+
 ---
 
 ## 14. Never share

@@ -41,7 +41,7 @@ a.lnk{display:inline-flex;align-items:center;text-decoration:none;border:1px sol
 .modal .box{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:var(--r);padding:14px;max-width:960px;width:100%}.modal img{max-width:100%;max-height:78vh;border-radius:12px;display:block;margin:6px auto}.two{display:flex;gap:10px;flex-wrap:wrap}.two>div{flex:1 1 300px}
 #toasts{position:fixed;left:0;right:0;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 14px;z-index:40;pointer-events:none}.toast{background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;max-width:100%;text-align:center;animation:up .15s ease-out}
 @media(max-width:560px){.stat b{font-size:1.7rem}.grid{grid-template-columns:1fr 1fr}.pie{height:200px}}
-.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 12px}.chip{background:transparent;color:var(--ink);border-color:var(--line);border-radius:999px;min-height:40px;padding:8px 14px}.chip span{display:inline-block;min-width:1.5em;margin-left:4px;padding:0 6px;border-radius:999px;background:var(--card2);color:var(--mute);font-size:.82rem;text-align:center}.chip.on{background:var(--brand);color:var(--on);border-color:var(--brand)}.chip.on span{background:rgba(3,21,14,.18);color:var(--on)}.chips .rev{margin:0 0 0 auto;display:flex;align-items:center;gap:8px;font-weight:600}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 12px}.chip{background:transparent;color:var(--ink);border-color:var(--line);border-radius:999px;min-height:40px;padding:8px 14px}.chip span{display:inline-block;min-width:1.5em;margin-left:4px;padding:0 6px;border-radius:999px;background:var(--card2);color:var(--mute);font-size:.82rem;text-align:center}.chip.on{background:var(--brand);color:var(--on);border-color:var(--brand)}.chip.on span{background:color-mix(in srgb,var(--on) 20%,transparent);color:var(--on);font-weight:700}.chips .rev{margin:0 0 0 auto;display:flex;align-items:center;gap:8px;font-weight:600}
 .bks{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}.bk{margin:0;display:flex;flex-direction:column;gap:10px}.bk.st-pending{border-top-color:var(--warn)}.bk.st-paid{border-top-color:var(--ok)}.bk.st-rejected{border-top-color:var(--err)}
 .bk-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.bk-h b{font-size:1.1rem}.bk-r{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}.bk-amt{font-size:1.35rem;font-weight:800}
 .bk-p{display:grid;gap:2px}.bk-id{font-size:.88rem;word-break:break-all}.bk-f .flag{max-width:none}
@@ -462,7 +462,7 @@ function vBookings(){const nT=S.bookings.filter(b=>b.kind==="transfer").length,B
   c=st=>B.filter(b=>b.status===st).length,chip=(v,l,n)=>`<button class="chip ${S.f.pay===v?"on":""}" data-chip="${v}">${l} <span>${n}</span></button>`;
   $("#v").innerHTML=`<div class="bar"><input id="q" type="search" placeholder="Search name, phone or booking ID" value="${esc(S.f.q)}" style="flex:1 1 240px">${c("pending")?`<button data-dk="open">Review payments (${c("pending")})</button>`:""}</div>
   <div class="chips">${chip("pending","Pending",c("pending"))}${chip("paid","Paid",c("paid"))}${chip("rejected","Rejected",c("rejected"))}${chip("","All",B.length)}
-  <label class="rev"><input type="checkbox" id="frev" ${S.f.review?"checked":""}> Needs review only</label></div>`+(nT?`<p class="mute">${nT} transfer booking${nT===1?"":"s"} not shown here: they have no payment screenshot and are handled in the Transfers tab.</p>`:"")+`<div id="tbl"></div>`;tBookings()}
+  <label class="rev"><input type="checkbox" id="frev" ${S.f.review?"checked":""}> Needs review only</label></div>`+(nT?`<p class="mute">${nT} transfer booking${nT===1?"":"s"} not shown here: they have no payment screenshot and are handled on the Transfers page.</p>`:"")+`<div id="tbl"></div>`;tBookings()}
 function amtRemark(b,s){if(!s)return"";if(!s.amounts)return'<div class="mute">Amount: re-scan to check</div>';
   if(!s.amounts.length)return`<div class="err">Amount: couldn't find one</div>`;
   return s.amounts.map(Number).includes(Number(b.amount_expected))?`<div style="color:var(--ok)">Amount ✓ ${inr(b.amount_expected)} found</div>`:`<div class="err">Amount ✗ ${inr(b.amount_expected)} not found</div>`}
@@ -562,7 +562,7 @@ function vScan(){
   $("#v").innerHTML=`<div class="card"><p style="margin-top:0">Reads each payment screenshot on <b>this computer</b> (nothing is sent to any outside service), finds the transaction ID, and flags bookings that share an ID or a near-identical image. Participants see nothing.</p>
   <p>${un.length?`<button class="lk" data-sheet="list:scan_un"><b>${un.length}</b> not scanned yet</button>`:"<b>0</b> not scanned yet"} · ${bad.length?`<button class="lk" data-sheet="list:scan_bad"><b>${bad.length}</b> unreadable or from before the amount check</button>`:"<b>0</b> unreadable or from before the amount check"} · ${S.scans.length?`<button class="lk" data-sheet="list:scan_all"><b>${S.scans.length}</b> scanned in total</button>`:"<b>0</b> scanned in total"}</p>
   <p><button id="scan" ${S.scanning?"disabled":""}>Scan ${un.length} new</button> <button class="ghost" id="rescan" ${S.scanning||!bad.length?"disabled":""}>Re-scan ${bad.length} unreadable / older</button> <button class="ghost" id="rescanall" ${S.scanning||!S.scans.length?"disabled":""}>Re-scan all ${S.scans.length}</button></p>
-  <p id="prog" class="mute"></p><p class="mute">Each screenshot is read twice, so allow about 3 seconds each. The first scan downloads the reading engine (a few MB). Keep this tab open while it runs. Results appear as flags under Bookings.</p></div>`;
+  <p id="prog" class="mute"></p><p class="mute">Each screenshot is read twice, so allow about 3 seconds each. The first scan downloads the reading engine (a few MB). Keep this tab open while it runs. Results appear as flags on the Payments page.</p></div>`;
 }
 function loadScript(src){return new Promise((res,rej)=>{if(window.Tesseract)return res();const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("Could not load the reading engine. Check your internet."));document.head.appendChild(s)})}
 function extractIds(t){const ids=new Set();
@@ -602,7 +602,7 @@ async function runScan(list){
         const blob=await(await fetch(data.signedUrl)).blob(),rd=await readShot(w,blob),ids=rd.ids,amts=rd.amts,hash=await dhash(blob);
         const r=await db.rpc("save_scan",{p_booking:b.id,p_ids:ids,p_hash:hash,p_ok:ids.length>0,p_amounts:amts});if(r.error)throw r.error}
       catch(e){prog.textContent="Problem with "+b.booking_code+": "+e.message}}
-    await w.terminate();await sync("core");prog.textContent="Done. Check the Bookings tab for flags."
+    await w.terminate();await sync("core");prog.textContent="Done. Check the Payments page for flags."
   }catch(e){prog.textContent=e.message}
   S.scanning=false;const p=prog.textContent;vScan();$("#prog").textContent=p;
 }
@@ -802,7 +802,7 @@ function msgChange(t){
 function ipBanner(){const f=S.ipf;if(!f||!f.ips||!f.ips.length)return"";
   return `<div class="card" style="border:2px solid var(--warn)"><b>⚑ Many registrations from one network address</b> <span class="mute">(flag only, nothing is blocked; shared WiFi or a mobile network can look the same)</span>
   <div class="wrap"><table><tr><th>Network address</th><th>Registrations</th><th>People</th><th>Pending</th><th>Paid</th><th>Rejected</th><th>Last</th></tr>${f.ips.map(i=>`<tr><td><button class="lk" data-sheet="list:ip:${esc(i.ip)}">${esc(i.ip)}</button></td><td>${i.bookings}</td><td>${i.people}</td><td>${i.pending}</td><td>${i.paid}</td><td>${i.rejected}</td><td>${esc(fdt(i.last_at))}</td></tr>`).join("")}</table></div>
-  <span class="mute">The affected bookings are marked in the Bookings tab. Flag level: ${f.threshold} or more.</span></div>`}
+  <span class="mute">The affected bookings are marked on the Payments page. Flag level: ${f.threshold} or more.</span></div>`}
 
 /* ---------- Transfers tab ---------- */
 const sellerTk=x=>S.tickets.find(t=>t.id===x.ticket_id);
@@ -815,7 +815,7 @@ async function tcall(fn,args,okMsg){
   await sync(...parts);view({keepForm:true});toast(okMsg);return r.data||true}
 function moneyPanel(){const m=S.money;if(!m)return"";
   const c=(l,k,hint)=>`<div class="card stat" data-sheet="list:t_${k}" role="button" tabindex="0"><span class="mute">${l}</span><b>${inr(m[k].amount)}</b><span class="mute">${m[k].count} transfer${m[k].count===1?"":"s"}${hint?" · "+hint:""}</span><span class="more">Details ›</span></div>`;
-  return `<p class="mute" style="margin-top:8px">Only <b>public</b> transfers move money through you. This never mixes with the registration totals on the Overview.</p>
+  return `<p class="mute" style="margin-top:8px">Only <b>public</b> transfers move money through you. This never mixes with the registration totals on the Today screen.</p>
   <div class="grid">${c("Awaiting payment","awaiting_payment","asked, not paid yet")}${c("Awaiting your check","awaiting_verification","screenshot uploaded")}${c("Verified, waiting for Transfer","verified_waiting_transfer")}${c("To pay out to sellers","to_pay_out")}${c("Paid out","paid_out")}${c("To return to buyers","return_due")}${c("Returned","returned")}
   <div class="card stat" data-sheet="list:t_held_now" role="button" tabindex="0" style="border:2px solid var(--accent)"><span class="mute">Held by you right now</span><b>${inr(m.held_now)}</b><span class="mute">should match the bank, apart from the registration money</span><span class="more">Details ›</span></div></div>`}
 function tCard(x){
@@ -888,7 +888,7 @@ function trCard(s){
   <label><input type="checkbox" id="tfood" ${s.transfer_food_locked?"checked":""}> Lock the food choice (the buyer gets the seller's food)</label>
   <p class="mute" style="margin:4px 0">Switch this on once the food order has been placed.</p>
   <label for="thours">How long a transfer code stays valid (hours, 1 to 168)</label><input id="thours" type="number" min="1" max="168" value="${s.private_code_hours}">
-  <p class="mute" style="margin:4px 0">You can extend any code later from the Transfers tab. The price a public buyer is asked is the “Price per person” above.</p>
+  <p class="mute" style="margin:4px 0">You can extend any code later from the Transfers page. The price a public buyer is asked is the “Price per person” above.</p>
   <p><button id="tsave">Save transfer settings</button></p></div>`}
 function vFeedback(){
   const rated=S.fb.filter(x=>x.rating),avg=rated.length?rated.reduce((a,x)=>a+x.rating,0)/rated.length:0,dist=[5,4,3,2,1].map(n=>[n,rated.filter(x=>x.rating===n).length]);
@@ -1111,7 +1111,7 @@ function pSheet(id){
   ${p.b.kind==="transfer"?row("Ticket origin",'<span class="mute">came through a ticket transfer</span>'):""}
   ${tr.map(x=>{const b=buyerOf(x);return row("Transfer",`${MODE(x.kind)} · ${esc(x.status.replace(/_/g," "))}${b?" → "+buyerLk(x):""}`)}).join("")}</div>
   ${!p.checked_in_at&&!p.transferred_out_at&&p.b.status!=="rejected"?`<p class="sh-f"><button data-act="admitpick" data-id="${esc(p.id)}">Admit ${esc(p.name)}</button></p>`:""}`,
-  tab:adm?["people","Open in People tab ›","person",p.id]:null}}
+  tab:adm?["people","Open in People ›","person",p.id]:null}}
 function bSheet(id){
   const b=S.bookings.find(x=>x.id===id);if(!b)return {title:"Booking",html:`<p class="err">This booking is no longer in the list.</p>`};
   const ts=S.tickets.filter(t=>t.booking_id===b.id).sort((x,y)=>(x.reg_seq||0)-(y.reg_seq||0)),adm=S.staff.role==="admin",fl=adm?(flags()[b.id]||[]):[],row=(k,v)=>`<div class="sr"><span class="mute">${k}</span><span>${v}</span></div>`;
@@ -1121,7 +1121,7 @@ function bSheet(id){
   <h3 class="sh3">People in this booking (${ts.length})</h3>
   <div class="srs">${ts.map(t=>row(esc(tlabel(t)),lk("person",t.id,t.name)+(t.transferred_out_at?' <span class="mute">transferred</span>':t.checked_in_at?' <span style="color:var(--ok)">✔</span>':""))).join("")||'<span class="mute">Nobody.</span>'}</div>
   ${adm&&b.screenshot_path&&b.kind!=="transfer"?`<p><button class="ghost sm" data-shot="${b.id}">Payment screenshot</button></p>`:""}`,
-  tab:adm&&b.kind!=="transfer"?["bookings","Open in Bookings tab ›","booking",b.id]:null}}
+  tab:adm&&b.kind!=="transfer"?["bookings","Open in Payments ›","booking",b.id]:null}}
 const sp=(t,n)=>{const a=t.split(":");return[...a.slice(0,n-1),a.slice(n-1).join(":")]};
 const codeMap=()=>Object.fromEntries(S.bookings.map(b=>[b.booking_code,b.id]));
 const flagH=x=>{const m=codeMap();return esc(x).replace(/\b[A-Z0-9]{8}\b/g,c=>m[c]?lk("booking",m[c],c):c)};
@@ -1139,12 +1139,12 @@ const buyerLk=x=>{const b=buyerOf(x),t=buyerTk(x);return b?(t?lk("person",t.id,b
 function lSheet(key){
   const P=live(),paid=P.filter(p=>p.b.status==="paid"),pend=P.filter(p=>p.b.status==="pending"),liveP=P.filter(p=>p.b.status!=="rejected"),cap=S.settings.cap;
   const bs=st=>S.bookings.filter(b=>b.status===st),intro=t=>`<p class="sum">${t}</p>`,co=paid.filter(p=>p.kind==="coordinator").length;
-  if(key==="active")return{title:"Active tickets",html:intro(`<b>${paid.length}</b> paid tickets (${paid.length-co} guests + ${co} coordinators) from ${bs("paid").length} paid bookings. Money: <b>${inr(bsum(bs("paid")))}</b>.`)+bBlocks(bs("paid")),tab:["people","Open paid people in People tab ›","pf","pay=paid"]};
-  if(key==="pending")return{title:"Pending",html:intro(`<b>${pend.length}</b> people in ${bs("pending").length} bookings, waiting for you to check the payment. <b>${inr(bsum(bs("pending")))}</b>.`)+bBlocks(bs("pending")),tab:["bookings","Open pending in Bookings tab ›","bf","pending"]};
+  if(key==="active")return{title:"Active tickets",html:intro(`<b>${paid.length}</b> paid tickets (${paid.length-co} guests + ${co} coordinators) from ${bs("paid").length} paid bookings. Money: <b>${inr(bsum(bs("paid")))}</b>.`)+bBlocks(bs("paid")),tab:["people","Open paid people in People ›","pf","pay=paid"]};
+  if(key==="pending")return{title:"Pending",html:intro(`<b>${pend.length}</b> people in ${bs("pending").length} bookings, waiting for you to check the payment. <b>${inr(bsum(bs("pending")))}</b>.`)+bBlocks(bs("pending")),tab:["bookings","Open pending in Payments ›","bf","pending"]};
   if(key==="expected")return{title:"Expected total",html:intro(`<b>${inr(bsum(bs("paid")))}</b> confirmed + <b>${inr(bsum(bs("pending")))}</b> pending = <b>${inr(bsum(bs("paid"))+bsum(bs("pending")))}</b>. Compare with your bank (registration money only).`)+`<h3 class="sh3">Confirmed bookings (${bs("paid").length}) · ${inr(bsum(bs("paid")))}</h3>`+bBlocks(bs("paid"))+`<h3 class="sh3">Pending bookings (${bs("pending").length}) · ${inr(bsum(bs("pending")))}</h3>`+bBlocks(bs("pending"))};
   if(key==="spots")return{title:"Spots used",html:intro(`<b>${liveP.length}</b> of ${cap} spots are used: ${paid.length} active + ${pend.length} pending. <b>${Math.max(cap-liveP.length,0)}</b> left. Rejected and transferred-away tickets are not counted.`)+`<h3 class="sh3">Active (${paid.length})</h3>`+pRows(paid)+`<h3 class="sh3">Pending (${pend.length})</h3>`+pRows(pend)};
-  if(key==="present"){const h=paid.filter(p=>p.checked_in_at);return{title:"Present at event",html:intro(`<b>${h.length}</b> of ${paid.length} active tickets have entered.`)+pRows(h,p=>`<span style="color:var(--ok)">✔ ${esc(fdt(p.checked_in_at))}</span>`),tab:["people","Open present people in People tab ›","pf","here=yes"]}}
-  if(key==="coords"){const c=liveP.filter(p=>p.kind==="coordinator");return{title:"Coordinators",html:intro(`<b>${c.length}</b> coordinators, ${c.filter(p=>p.b.status==="paid").length} confirmed.`)+pRows(c),tab:["people","Open coordinators in People tab ›","pf","type=coordinator"]}}
+  if(key==="present"){const h=paid.filter(p=>p.checked_in_at);return{title:"Present at event",html:intro(`<b>${h.length}</b> of ${paid.length} active tickets have entered.`)+pRows(h,p=>`<span style="color:var(--ok)">✔ ${esc(fdt(p.checked_in_at))}</span>`),tab:["people","Open present people in People ›","pf","here=yes"]}}
+  if(key==="coords"){const c=liveP.filter(p=>p.kind==="coordinator");return{title:"Coordinators",html:intro(`<b>${c.length}</b> coordinators, ${c.filter(p=>p.b.status==="paid").length} confirmed.`)+pRows(c),tab:["people","Open coordinators in People ›","pf","type=coordinator"]}}
   if(key.startsWith("t_")){const k=key.slice(2),f=MF[k],am=MAMT[k]||(x=>x.amount_received),L=S.transfers.filter(x=>x.kind==="public"&&f(x)),tot=L.reduce((a,x)=>a+(am(x)||0),0),card=S.money&&S.money[k]!==undefined?(typeof S.money[k]==="object"?S.money[k].amount:S.money[k]):null;
     return{title:MT[k]||"Transfers",html:intro(`<b>${L.length}</b> public transfer${L.length===1?"":"s"} · <b>${inr(tot)}</b>${k==="held_now"?". This is received money not yet paid out or returned: verified payments waiting for a Transfer, plus completed transfers where the seller is not paid yet, plus verified payments due back to buyers.":"."}`+(card!==null&&card!==tot?` <span class="err">The card says ${inr(card)}, this list adds up to ${inr(tot)}. Press Refresh.</span>`:""))+(L.length?L.map(x=>srow(`${sellerLk(x)} → ${buyerLk(x)}<div class="mute nm">${esc(sellerLbl(x))} · ${esc(x.status.replace(/_/g," "))} · ${esc(tAge(x.updated_at||x.created_at))} ago<br>Seller <a href="tel:${esc(x.seller_phone)}">${esc(x.seller_phone)}</a>${buyerOf(x)?` · Buyer <a href="tel:${esc(buyerOf(x).phone)}">${esc(buyerOf(x).phone)}</a>`:""}</div>`,`<b>${inr(am(x))}</b>`,1)).join(""):'<p class="mute">None.</p>')}}
   if(key.startsWith("fb:")){const n=+key.slice(3),L=S.fb.filter(x=>x.rating===n);return{title:n+"★ answers",html:L.length?L.map(x=>{const b=S.bookings.find(y=>y.id===x.booking_id)||{},t=S.tickets.filter(y=>y.booking_id===x.booking_id).sort((a,c)=>(a.reg_seq||0)-(c.reg_seq||0));return srow(`${lk("booking",x.booking_id,b.booking_code||"–")}<div class="nm">${t.map(y=>lk("person",y.id,y.name)).join(", ")}</div>${x.comment?`<div class="mute nm" style="white-space:pre-wrap">${esc(x.comment)}</div>`:""}`,"",1)}).join(""):'<p class="mute">None.</p>'}}

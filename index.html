@@ -1179,16 +1179,16 @@ function homeMount(){
 }
 /* ===== Meet the team (Nov 2026) =====
    ONE place to edit: TEAMS. Each team: name, leg (short name for the colour key), ic (icon), c (the two colours of its initials circles and its ring),
-   obj (the one-line objective) and m (the members). Members are shown in the order listed; the FIRST member of each team is the team lead and is marked "Lead". A member is a plain name ("Anil K.") or an object:
+   obj (the one-line objective) and m (the members). Members are shown in the order listed; the FIRST member of each team is the team lead and is marked "Lead" (except Organizers and Program Anchors, which have no lead: org:1 / nl:1). A member is a plain name ("Anil K.") or an object:
    {n:"Anil K.", p:"assets/team/anil.jpg", r:"Coordinator"}. p (photo) and r (a label shown under the name) are optional; without a photo the circle shows the person's initials.
    Only real members are listed. Teams with no members yet are parked in comments (an empty team would break the Home card). Photos go in assets/personals/ (passport-style 7:9, 420x540 JPG, under 45 KB). */
 const TEAMS=[
  /* ORGANIZERS: a separate group shown above the six teams (org:1). It is not numbered and not counted as a team in the "6 teams" wording, but its people are counted as volunteers. */
  {name:"Organizers",leg:"Organizers",ic:"star",org:1,c:["#7FD6C6","#5CC2B0"],obj:"Leading Ehsaas’26 from the first idea to the last goodbye, and keeping every team moving together.",m:[{n:"Muhammed Irshal",p:"assets/personals/irshal.jpg"},{n:"Zeen Shabeer",p:"assets/personals/zeen-shabeer.jpg"}]},
- {name:"Program Anchors",leg:"Anchors",ic:"chat",c:["#A9B4F2","#8C99E8"],obj:"The voices that guide the day and keep the programme flowing.",m:[{n:"Thamanna Rose",p:"assets/personals/thamanna-rose.jpg"},{n:"Shalini Prasad",p:"assets/personals/shalini-prasad.jpg"}]},
- {name:"Members Co-ordination",leg:"Co-ord",ic:"people",c:["#F3C766","#E9B24C"],obj:"Keeping our community informed and connected, from first registration to the final goodbye.",m:[{n:"Fathima Minna",p:"assets/personals/fathima-minna.jpg"},{n:"Ramiz Muneer",p:"assets/personals/ramiz-muneer.jpg"},{n:"Amjad",p:"assets/personals/amjad.jpg"},{n:"Eshal",p:"assets/personals/eshal.jpg"},{n:"Fouzana K",p:"assets/personals/fouzana-k.jpg"}]},
- {name:"Food & Venue",leg:"Food & Venue",ic:"pin",c:["#F7A45E","#F08A3C"],obj:"Making sure everyone is welcomed, seated and well fed, from the hall at Bloom Creative Zone to the last plate.",m:[{n:"Sahad bin Khalid",p:"assets/personals/sahad-bin-khalid.jpg"},{n:"Abdussalam",p:"assets/personals/abdussalam.jpg"},{n:"Muhammed Haneen K",p:"assets/personals/muhammed-haneen-k-k.jpg"},{n:"Sadiq KK",p:"assets/personals/sadiq-kk.jpg"}]},
- {name:"Activities & Games Planning",leg:"Activities",ic:"game",c:["#F68A7C","#F26B5B"],obj:"Planning the games and icebreakers that turn a room full of strangers into friends.",m:[{n:"Muhammed Rabil C",p:"assets/personals/muhammad-rabil-c.jpg"},{n:"Alan Raju",p:"assets/personals/alen-raju.jpg"},{n:"Aiswarya Dinesh",p:"assets/personals/aiswarya-dinesh.jpg"},{n:"Athulya K",p:"assets/personals/athulya-k.jpg"}]},
+ {name:"Program Anchors",leg:"Anchors",ic:"chat",nl:1,c:["#A9B4F2","#8C99E8"],obj:"The voices that guide the day and keep the programme flowing.",m:[{n:"Thamanna Rose",p:"assets/personals/thamanna-rose.jpg"},{n:"Shalini Prasad",p:"assets/personals/shalini-prasad.jpg"}]},
+ {name:"Members Co-ordination",leg:"Co-ord",ic:"people",c:["#F3C766","#E9B24C"],obj:"Keeping our community informed and connected, from first registration to the final goodbye.",m:[{n:"Ramiz Muneer",p:"assets/personals/ramiz-muneer.jpg"},{n:"Fathima Minna",p:"assets/personals/fathima-minna.jpg"},{n:"Amjad",p:"assets/personals/amjad.jpg"},{n:"Eshal",p:"assets/personals/eshal.jpg"},{n:"Fouzana K",p:"assets/personals/fouzana-k.jpg"}]},
+ {name:"Food & Venue",leg:"Food & Venue",ic:"pin",c:["#F7A45E","#F08A3C"],obj:"Making sure everyone is welcomed, seated and well fed, from the hall at Bloom Creative Zone to the last plate.",m:[{n:"Abdussalam",p:"assets/personals/abdussalam.jpg"},{n:"Sahad bin Khalid",p:"assets/personals/sahad-bin-khalid.jpg"},{n:"Muhammed Haneen K",p:"assets/personals/muhammed-haneen-k-k.jpg"},{n:"Sadiq KK",p:"assets/personals/sadiq-kk.jpg"}]},
+ {name:"Activities & Games Planning",leg:"Activities",ic:"game",c:["#F68A7C","#F26B5B"],obj:"Planning the games and icebreakers that turn a room full of strangers into friends.",m:[{n:"Alan Raju",p:"assets/personals/alen-raju.jpg"},{n:"Muhammed Rabil C",p:"assets/personals/muhammad-rabil-c.jpg"},{n:"Aiswarya Dinesh",p:"assets/personals/aiswarya-dinesh.jpg"},{n:"Athulya K",p:"assets/personals/athulya-k.jpg"}]},
  {name:"Stage Programme Planning",leg:"Stage",ic:"mic",c:["#D79BC8","#C77DB3"],obj:"Shaping the programme on stage, with its flow, performances and the moments people will remember.",m:[{n:"Akhina A R",p:"assets/personals/akhina-a-r.jpg"},{n:"Muhsina"},{n:"Abdul Basith",p:"assets/personals/abdul-basith.jpg"},{n:"Thamanna Rose",p:"assets/personals/thamanna-rose.jpg"},{n:"Sreepriya R"}]},
  {name:"Marketing & Media",leg:"Marketing",ic:"horn",c:["#F07A9A","#E2557A"],obj:"Spreading the word, and designing the posters and visuals that bring Ehsaas’26 to life.",m:[{n:"Syed Sabith",p:"assets/personals/syed-sabith.jpg"},{n:"Safwan Ibrahim",p:"assets/personals/safwan-ibraheem.jpg"},{n:"Mizna"},{n:"Muhammed Shamal"},{n:"Dana Fathima"},{n:"Dilsha"}]},
  /* NO MEMBERS YET (restore by moving out of the comment and adding members):
@@ -1224,7 +1224,7 @@ const tmEv=()=>esc(CONFIG.eventName).replace(/&#39;|'/g,"’");
 const tmSeg=(ts,f)=>ts.map((t,i)=>f(t,(i/ts.length*100).toFixed(2),((i+1)/ts.length*100).toFixed(2))).join(",");
 const tmBg=ts=>"linear-gradient(90deg,"+tmSeg(ts,(t,a,b)=>t.c[0]+" "+a+"%,"+t.c[1]+" "+b+"%")+")";
 const tmRing=ts=>"linear-gradient(90deg,"+tmSeg(ts,(t,a,b)=>t.c[1]+" "+a+"% "+b+"%")+")";
-const tmLeads=(i,m)=>{const f=TEAMS[i].m[0];return !!f&&tmKey(tmM(f).n)===tmKey(m.n)};
+const tmLeads=(i,m)=>{const f=TEAMS[i].m[0];return !TEAMS[i].org&&!TEAMS[i].nl&&!!f&&tmKey(tmM(f).n)===tmKey(m.n)};
 function tmAvQ(q,m){const ts=q.t.map(i=>TEAMS[i]);if(ts.length<2)return tmAv(m,ts[0]);return `<span class="tm-rw" style="background:${tmRing(ts)}">${tmAv(m,ts[0],ts)}</span>`}
 function tmAv(m,t,ts){return `<span class="tm-a" style="--g1:${t.c[0]};--g2:${t.c[1]}${ts&&ts.length>1?";background:"+tmBg(ts):""}">${esc(tmIni(m.n))}${m.p?`<img src="${esc(m.p)}" alt="" loading="lazy" onerror="this.remove()">`:""}</span>`}
 S.tm={team:0};
@@ -1244,7 +1244,7 @@ function vTeam(){
   return `<div class="tm"><button class="ghost tm-back" id="tm-back" type="button">${tmSvg("back")}Teams</button>
   <div class="tm-pg${dc}"><span class="tm-n tm-big">${tmNo(i)}</span><h1>${esc(t.name).replace(/(\S+-\S+)/g,'<span style="white-space:nowrap">$1</span>')}</h1>
   <div class="card"><p class="tm-eb">Our objective</p><p class="tm-obj">${esc(t.obj)}</p></div>
-  <div class="tm-grid">`+ms.map((m,j)=>`<div class="tm-mc">${tmAv(m,t)}<b>${esc(m.n)}</b>${j===0?`<small class="tm-lead">Lead</small>`:tmRole(m)?`<small>${esc(tmRole(m))}</small>`:""}</div>`).join("")+`</div></div>
+  <div class="tm-grid">`+ms.map((m,j)=>`<div class="tm-mc">${tmAv(m,t)}<b>${esc(m.n)}</b>${j===0&&!t.org&&!t.nl?`<small class="tm-lead">Lead</small>`:tmRole(m)?`<small>${esc(tmRole(m))}</small>`:""}</div>`).join("")+`</div></div>
   <div class="row"><button class="ghost" id="tm-prev" type="button">‹ Previous</button><button id="tm-next" type="button">Next ›</button></div>
   <div class="row"><button class="ghost" id="tm-home" type="button">Home</button></div></div>`}
 function vMembers(){

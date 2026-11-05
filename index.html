@@ -301,9 +301,13 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-sl .bh-txt p.bh-thx{display:flex;align-items:center;gap:12px;margin-top:18px;font:600 .82rem/1.35 var(--sans);letter-spacing:.02em;color:var(--cream);opacity:.9}
 .bhome .bh-sl .bh-txt p.bh-thx img{display:block;width:auto;height:58px;flex:none;border-radius:12px}
 .bhome .bh-sl .bh-txt p.bh-thx span{display:block}
-.bhome .bh-sl .bh-txt p.bh-thx2{flex-wrap:wrap}
-.bhome .bh-sl .bh-txt p.bh-thx span.bh-lg{display:flex;align-items:center;gap:10px;flex:none}
-.bhome .bh-sl .bh-txt p.bh-thx2 b+b{margin-top:2px}
+/* two partners (Mizaaniya slide): "With thanks to" on its own line, then each logo with its own name below it, a faint divider between the two */
+.bhome .bh-sl .bh-txt p.bh-thx.bh-thx3{flex-direction:column;align-items:flex-start;gap:10px}
+.bhome .bh-sl .bh-txt p.bh-thx3 .bh-pair{display:flex;align-items:flex-start;flex-wrap:wrap;row-gap:12px}
+.bhome .bh-sl .bh-txt p.bh-thx3 .bh-pt{display:flex;flex-direction:column;align-items:center;gap:7px;padding:0 16px}
+.bhome .bh-sl .bh-txt p.bh-thx3 .bh-pt:first-child{padding-left:0}
+.bhome .bh-sl .bh-txt p.bh-thx3 .bh-pt+.bh-pt{border-left:1px solid rgba(246,215,198,.32)}
+.bhome .bh-sl .bh-txt p.bh-thx3 .bh-pt b{text-align:center}
 .bhome .bh-sl .bh-txt p.bh-thx b{display:block;font:700 .95rem/1.25 var(--sans);color:var(--cream)}
 .bhome .bh-dots{position:absolute;top:12px;right:12px;z-index:5;display:flex;background:rgba(26,4,12,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:99px;padding:0 4px}
 .bhome .bh-dots button{width:32px;height:32px;background:none;border:0;padding:0;cursor:pointer;display:grid;place-items:center}
@@ -1050,7 +1054,7 @@ ${tmHomeCard()}
 <section id="moments"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">Our meetups</p><h2>Moments we’ve <i>shared.</i></h2></div>
 <div class="bh-slider bh-rv" id="bh-slider" role="region" aria-roledescription="carousel" aria-label="Photos from our past meetups"><div class="bh-track" id="bh-track">
 <figure class="bh-sl" aria-roledescription="slide" aria-label="1 of 2"><img src="assets/burg-moment-chai.jpg" alt="The crowd at Chai, Chill and Chartered 2025" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">Last year</p><h3>Chai, Chill <i>and</i> Chartered 2025</h3><p>It was full of warmth, and you made it that way. This year we’re back with <b>${E}</b>, planned even more carefully.</p><p class="bh-thx"><img src="assets/chai-2025-partner-logo.png" alt="IAM Business School logo" width="258" height="178" loading="lazy" onerror="this.remove()"><span>With thanks to<b>IAM Business School</b></span></p></figcaption></figure>
-<figure class="bh-sl" aria-roledescription="slide" aria-label="2 of 2"><img src="assets/burg-moment-mizaaniya.jpg" alt="The crowd at Mizaaniya 1.0, our Iftar meet" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">March 2026 · Iftar meet</p><h3>Mizaaniya <i>1.0</i></h3><p>An evening of Iftar, laughter and good company, with the whole community around one table.</p><p class="bh-thx bh-thx2"><span class="bh-lg"><img src="assets/audire-logo.png" alt="Audire School of Commerce logo" width="600" height="247" loading="lazy" onerror="this.remove()"><img src="assets/placementship-logo.png" alt="Placementship logo" loading="lazy" onerror="this.remove()"></span><span>With thanks to<b>Audire School of Commerce</b><b>Placementship</b></span></p></figcaption></figure>
+<figure class="bh-sl" aria-roledescription="slide" aria-label="2 of 2"><img src="assets/burg-moment-mizaaniya.jpg" alt="The crowd at Mizaaniya 1.0, our Iftar meet" loading="lazy"><figcaption class="bh-txt"><p class="bh-eyebrow">March 2026 · Iftar meet</p><h3>Mizaaniya <i>1.0</i></h3><p>An evening of Iftar, laughter and good company, with the whole community around one table.</p><p class="bh-thx bh-thx3"><span>With thanks to</span><span class="bh-pair"><span class="bh-pt"><img src="assets/audire-logo.png" alt="Audire School of Commerce logo" width="600" height="247" loading="lazy" onerror="this.remove()"><b>Audire</b></span><span class="bh-pt"><img src="assets/placementship-logo.png" alt="Placementship logo" width="600" height="253" loading="lazy" onerror="this.remove()"><b>Placementship</b></span></span></p></figcaption></figure>
 </div><div class="bh-dots" id="bh-dots"><button type="button" aria-label="Show Chai, Chill and Chartered 2025" aria-current="true"></button><button type="button" aria-label="Show Mizaaniya 1.0"></button></div></div></div></section>
 
 <section style="padding-top:0"><div class="bh-w"><div class="bh-final bh-rv" id="home-join"><p class="bh-eyebrow">See you there</p><h2>Ready to join <i>us?</i></h2><p class="bh-lede">Reserve your spot, or open a ticket you already booked.</p>
@@ -1144,13 +1148,29 @@ function homeMount(){
   const sv=root.querySelector("#home-sp-video");
   const lz=()=>{if(sv&&sv.dataset.src){sv.preload="metadata";sv.src=sv.dataset.src;sv.removeAttribute("data-src")}};   /* the video file is only fetched when the visitor scrolls near it */
   if(sv){try{const lo=new IntersectionObserver(es=>{if(es[0].isIntersecting){lz();lo.disconnect()}},{rootMargin:"600px 0px"});lo.observe(sv);sig.addEventListener("abort",()=>lo.disconnect())}catch(_){lz()}}
-  /* the sponsor slider: slide 1 the thank-you card, slide 2 the video. When the visitor first reaches the card it rests 3.5s, slides to the video and plays it; when the video ends it slides back to the card. Dots (below the card) and swipe still work, and take over from the automatic move. */
+  /* the sponsor slider: slide 1 the thank-you card, slide 2 the video. TIMING (all in SD below):
+     - first time the card is properly on screen: rests 3.5s on the thank-you card, then slides to the video and plays it.
+     - the visitor leaves (scrolls the card away, switches tab, locks the phone, closes the page): the video pauses and the thank-you card comes back; when the card is on screen again it waits 2s, then plays the video (from where it stopped).
+     - a swipe or dot tap is always obeyed: to the video = plays at once; back to the thank-you card = the card holds 11s before going to the video (touching the card restarts the 11s).
+     - once the video has finished it slides back to the card and does NOT start again by itself (the visitor can still replay it). */
   const ssl=root.querySelector("#sp-slider"),str=root.querySelector("#sp-track"),sdt=[].slice.call(root.querySelectorAll("#sp-dots button")),sls=[].slice.call(root.querySelectorAll("#sp-track>.bh-spsl"));
-  let sc=0,sx=0,sy=0,ssw=false,sblk=false,sauto=null,sdone=false,amu=false;
+  const SD={first:3500,back:2000,hold:11000};
+  let sc=0,sx=0,sy=0,ssw=false,sblk=false,sauto=null,amu=false,
+      sin=false,     /* the card is properly on screen */
+      sfirst=true,   /* first arrival gets the longer 3.5s rest */
+      sman=false,    /* the visitor swiped / tapped a dot last: the card holds 11s */
+      sfin=false;    /* the video has finished once: no more automatic play */
   /* play with sound; if the browser refuses (no tap on the page yet) play muted instead and offer a "Tap for sound" chip */
   const um=root.querySelector("#home-sp-unmute");
   function vplay(){if(!sv)return;lz();amu=false;try{sv.muted=false;const p=sv.play();if(p&&p.catch)p.catch(()=>{amu=true;sv.muted=true;try{const q=sv.play();if(q&&q.catch)q.catch(()=>{})}catch(_){}})}catch(_){}}
-  function stake(){sdone=true;if(sauto){clearTimeout(sauto);sauto=null}}   /* the visitor took over: no automatic move any more */
+  function sclear(){if(sauto){clearTimeout(sauto);sauto=null}}
+  /* start the countdown to the video: only while the thank-you card is showing AND on screen, the tab is visible, and the video has not already finished */
+  function sarm(){sclear();if(!sv||!sin||sc!==0||sfin||document.hidden)return;
+    sauto=setTimeout(()=>{sauto=null;if(sin&&sc===0&&!document.hidden){sfirst=false;sman=false;sgo(1,true)}},sman?SD.hold:(sfirst?SD.first:SD.back))}
+  /* the visitor swiped or tapped a dot: obeyed straight away. To the video = plays now; to the card = the card holds 11s. */
+  function smanual(n){const t=Math.max(0,Math.min(sdt.length-1,n)),same=t===sc;sman=true;sfirst=false;sclear();sgo(t,!same);if(sc===0)sarm()}
+  /* the visitor is away (scrolled off, other tab, screen locked): pause and bring the thank-you card back; the next arrival waits only 2s */
+  function saway(){sclear();sman=false;sfirst=false;if(sv&&!sv.paused)sv.pause();if(sc!==0)sgo(0,false)}
   function sgo(n,play){if(!str||!sdt.length)return;sc=Math.max(0,Math.min(sdt.length-1,n));str.style.transform="translateX(-"+sc*100+"%)";
     sdt.forEach((d,i)=>d.setAttribute("aria-current",String(i===sc)));sls.forEach((s,i)=>{try{s.inert=i!==sc}catch(_){}});
     if(sc===1){lz();if(play)vplay()}
@@ -1160,20 +1180,28 @@ function homeMount(){
   if(ssl&&str&&sdt.length){sgo(0,false);
     try{const ro=new ResizeObserver(sfit);sls.forEach(s=>ro.observe(s));sig.addEventListener("abort",()=>ro.disconnect())}catch(_){}
     on(window,"resize",sfit);if(sv)on(sv,"loadedmetadata",sfit);
-    sdt.forEach((d,i)=>on(d,"click",()=>{stake();sgo(i,true)}));
-    if(sv){on(sv,"ended",()=>sgo(0,false));   /* when the video finishes it slides back to the thank-you card */
+    sdt.forEach((d,i)=>on(d,"click",()=>smanual(i)));
+    if(sv){on(sv,"ended",()=>{sfin=true;sclear();sgo(0,false)});   /* when the video finishes it slides back to the thank-you card and stays there */
       /* the video keeps its native controls: the browser itself hides them while it plays and brings them back on one tap */
       if(um){on(sv,"playing",()=>{um.hidden=!(sv.muted&&amu)});on(sv,"volumechange",()=>{if(!sv.muted){amu=false;um.hidden=true}});
         on(um,"click",e=>{e.stopPropagation();amu=false;um.hidden=true;sv.muted=false})}
-      /* first time the card is properly in view: rest on the thank-you card for 3.5s, then fade to the video and play it */
-      try{const so=new IntersectionObserver(es=>{if(es[0].isIntersecting&&!sdone){so.disconnect();sdone=true;sauto=setTimeout(()=>{sauto=null;if(sc===0)sgo(1,true)},3500)}},{threshold:.6});so.observe(ssl);sig.addEventListener("abort",()=>{so.disconnect();clearTimeout(sauto)})}catch(_){}}
+      /* "on screen" = at least 60% of the card showing (or, for a card taller than the screen, 60% of the screen filled by it); "away" = under 25%. The gap between the two stops flicker. */
+      try{const th=[];for(let i=0;i<=20;i++)th.push(i/20);
+        const so=new IntersectionObserver(es=>{const e=es[es.length-1],rh=(e.rootBounds&&e.rootBounds.height)||window.innerHeight,h=Math.min(e.boundingClientRect.height,rh),c=h?e.intersectionRect.height/h:0;
+          if(!sin&&e.isIntersecting&&c>=.6){sin=true;sarm()}
+          else if(sin&&(!e.isIntersecting||c<.25)){sin=false;saway()}},{threshold:th});so.observe(ssl);sig.addEventListener("abort",()=>so.disconnect())}catch(_){}
+      /* leaving the tab, locking the phone or closing the page pauses the video; coming back re-starts the 2s wait on the thank-you card */
+      on(document,"visibilitychange",()=>{if(document.hidden){if(sin)saway();else sclear()}else sarm()});
+      on(window,"pagehide",()=>{sclear();if(!sv.paused)sv.pause()});
+      sig.addEventListener("abort",()=>{sclear();if(!sv.paused)sv.pause()});   /* leaving Home for another screen */}
+    on(ssl,"pointerdown",()=>{if(sc===0&&sauto){sman=true;sarm()}});   /* touching the thank-you card while it waits = the visitor is reading it: hold 11s */
     on(ssl,"touchstart",e=>{const t=e.touches[0],v=e.target.closest&&e.target.closest("video");sblk=false;if(v&&v.controls){const r=v.getBoundingClientRect();if(t.clientY>r.bottom-64)sblk=true}sx=t.clientX;sy=t.clientY},{passive:true});   /* a swipe that starts on the video's control bar is the seek bar, not the slider */
-    on(ssl,"touchend",e=>{if(sblk)return;const t=e.changedTouches[0],d=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(d)>40&&Math.abs(d)>Math.abs(dy)*1.5){ssw=true;setTimeout(()=>{ssw=false},500);stake();sgo(sc+(d<0?1:-1),true)}},{passive:true});   /* only a clearly sideways swipe moves it: a diagonal flick while scrolling the page past the card must not */
+    on(ssl,"touchend",e=>{if(sblk)return;const t=e.changedTouches[0],d=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(d)>40&&Math.abs(d)>Math.abs(dy)*1.5){ssw=true;setTimeout(()=>{ssw=false},500);smanual(sc+(d<0?1:-1))}},{passive:true});   /* only a clearly sideways swipe moves it: a diagonal flick while scrolling the page past the card must not */
     on(ssl,"scroll",()=>{if(ssl.scrollLeft)ssl.scrollLeft=0},{passive:true});   /* the card is only ever moved by its dots or a sideways swipe: if the browser nudges the hidden overflow (focus, find, anchors), put it straight back */
     on(ssl,"click",e=>{if(ssw){e.stopPropagation();e.preventDefault();ssw=false}},{capture:true})}
-  if(sv){const gone=()=>{const x=root.querySelector("#home-sp-vfig"),d=root.querySelector("#sp-dots");if(x){const k=sls.indexOf(x);if(k>-1)sls.splice(k,1);x.remove()}if(d)d.remove();stake();sc=0;sls.forEach(z=>{try{z.inert=false}catch(_){}});if(str)str.style.transform="";if(ssl)ssl.style.height="";sdt.length=0};   /* file missing: the slider quietly becomes the plain thank-you card */
+  if(sv){const gone=()=>{const x=root.querySelector("#home-sp-vfig"),d=root.querySelector("#sp-dots");if(x){const k=sls.indexOf(x);if(k>-1)sls.splice(k,1);x.remove()}if(d)d.remove();sclear();sfin=true;sc=0;sls.forEach(z=>{try{z.inert=false}catch(_){}});if(str)str.style.transform="";if(ssl)ssl.style.height="";sdt.length=0};   /* file missing: the slider quietly becomes the plain thank-you card */
     on(sv,"error",gone);if(sv.error)gone();
-    try{const io=new IntersectionObserver(es=>{if(!es[0].isIntersecting&&!sv.paused)sv.pause()},{threshold:.25});io.observe(sv);sig.addEventListener("abort",()=>io.disconnect())}catch(_){}}
+  }
   const sp=root.querySelector("#home-sp-img");
   if(sp){const gone=()=>{const x=root.querySelector("#home-sp-fig"),c=root.querySelector("#home-sp-cap");if(x)x.remove();if(c)c.remove()};
     on(sp,"error",gone);if(sp.complete&&sp.naturalWidth===0&&sp.getAttribute("src"))setTimeout(()=>{if(sp.naturalWidth===0&&sp.complete)gone()},0)}

@@ -58,7 +58,7 @@ a.lnk{display:inline-flex;align-items:center;text-decoration:none;border:1px sol
 .mform{margin-top:12px}.msgrid h3,.plan h3,.mform h3{margin:14px 0 6px;font-size:1rem;font-weight:800}.uses{display:grid;gap:2px;margin-bottom:8px}.plan{margin-top:12px}
 .ros{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:6px 0}.ros summary{cursor:pointer;min-height:32px;display:flex;align-items:center;gap:8px}.rlist{display:grid;gap:4px;padding:6px 0 2px}
 @media(max-width:560px){.msgrid{grid-template-columns:minmax(0,1fr)}.mrow{flex-direction:column}.mright{justify-content:flex-start}}
-.sgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));align-items:start}.sgrid>.card{margin:0}.sgrid>.slog{grid-column:1/-1}
+#snav{position:sticky;top:var(--tbh,60px);z-index:5;background:var(--bg);padding:8px 0;margin:0 0 6px}.sgrid>.card{scroll-margin-top:calc(var(--tbh,60px) + 60px)}.sgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));align-items:start}.sgrid>.card{margin:0}.sgrid>.slog{grid-column:1/-1}
 .sgrid label:has(>input[type=checkbox]){display:flex;gap:10px;align-items:flex-start}.sgrid label>input[type=checkbox]{flex:0 0 auto;margin:1px 0 0}
 @media(max-width:560px){.sgrid{grid-template-columns:1fr}#snav{flex-wrap:nowrap;overflow-x:auto;margin-right:-12px;padding-bottom:4px;scrollbar-width:none}#snav::-webkit-scrollbar{display:none}#snav .chip{flex:0 0 auto}}
 .lk{background:none;border:0;border-bottom:1px dotted var(--brand);border-radius:0;color:var(--ink);padding:3px 0;min-height:0;font:inherit;font-weight:700;text-align:left;cursor:pointer}.lk:hover{filter:none;color:var(--brand)}
@@ -559,7 +559,7 @@ async function shots(items){
 }
 function vScan(){
   const un=S.bookings.filter(b=>b.kind!=="transfer"&&b.status!=="rejected"&&!S.scans.some(s=>s.booking_id===b.id)),bad=S.scans.filter(s=>(!s.read_ok||!s.amounts)&&bk(s.booking_id).status!=="rejected");
-  $("#v").innerHTML=`<div class="card"><h2>Scan screenshots</h2><p>Reads each payment screenshot on <b>this computer</b> (nothing is sent to any outside service), finds the transaction ID, and flags bookings that share an ID or a near-identical image. Participants see nothing.</p>
+  $("#v").innerHTML=`<div class="card"><p style="margin-top:0">Reads each payment screenshot on <b>this computer</b> (nothing is sent to any outside service), finds the transaction ID, and flags bookings that share an ID or a near-identical image. Participants see nothing.</p>
   <p>${un.length?`<button class="lk" data-sheet="list:scan_un"><b>${un.length}</b> not scanned yet</button>`:"<b>0</b> not scanned yet"} · ${bad.length?`<button class="lk" data-sheet="list:scan_bad"><b>${bad.length}</b> unreadable or from before the amount check</button>`:"<b>0</b> unreadable or from before the amount check"} · ${S.scans.length?`<button class="lk" data-sheet="list:scan_all"><b>${S.scans.length}</b> scanned in total</button>`:"<b>0</b> scanned in total"}</p>
   <p><button id="scan" ${S.scanning?"disabled":""}>Scan ${un.length} new</button> <button class="ghost" id="rescan" ${S.scanning||!bad.length?"disabled":""}>Re-scan ${bad.length} unreadable / older</button> <button class="ghost" id="rescanall" ${S.scanning||!S.scans.length?"disabled":""}>Re-scan all ${S.scans.length}</button></p>
   <p id="prog" class="mute"></p><p class="mute">Each screenshot is read twice, so allow about 3 seconds each. The first scan downloads the reading engine (a few MB). Keep this tab open while it runs. Results appear as flags under Bookings.</p></div>`;
@@ -660,7 +660,8 @@ function vSettings(){const s=S.settings;
   ${afterCard(s)}
   ${logCard()}</div>`;
   const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Launch readiness":"Readiness","Advanced":"Advanced","After the event":"After event","Settings log":"Log"};
-  $("#snav").innerHTML=[...document.querySelectorAll(".sgrid>.card")].map((c,i)=>{c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="s-${i}">${esc(SH[h]||h)}</button>`}).join("")}
+  $("#snav").innerHTML=[...document.querySelectorAll(".sgrid>.card")].map((c,i)=>{c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="s-${i}">${esc(SH[h]||h)}</button>`}).join("");
+  const tb=$("#top");if(tb)document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px")}
 
 /* ---------- Messages (game activity): the Messages tab, the Settings switch, one message per person ---------- */
 /* A message has a NAME (only admins see it) and a TEXT (what a ticket holder sees, only while the switch is ON). */
@@ -895,7 +896,7 @@ function vFeedback(){
   $("#v").innerHTML=`<div class="grid"><div class="card stat"><span class="mute">Answers received</span><b>${S.fb.length}</b><span class="mute">${S.bookings.filter(b=>b.kind==="registration").length} registration bookings</span></div>
   <div class="card stat"><span class="mute">Average excitement</span><b>${rated.length?avg.toFixed(1)+" / 5":"–"}</b><span class="mute">${rated.length} ratings · ${dist.map(d=>d[1]?`<button class="lk" data-sheet="list:fb:${d[0]}">${d[0]}★ ${d[1]}</button>`:d[0]+"★ 0").join(" · ")}</span></div></div>
   <div class="card wrap"><table class="rt"><tr><th>When</th><th>Booking</th><th>Name</th><th>Excitement</th><th>Suggestions / ideas / expectations</th></tr>`+
-  (S.fb.length?S.fb.map(x=>`<tr><td>${esc(new Date(x.updated_at).toLocaleString())}</td><td>${bk[x.booking_id]?lk("booking",x.booking_id,bk[x.booking_id].booking_code):"–"}</td><td>${who(x.booking_id)}</td><td>${x.rating?x.rating+" / 5":"–"}</td><td style="white-space:pre-wrap;max-width:420px">${esc(x.comment||"")}</td></tr>`).join(""):`<tr><td colspan="5" class="mute">Nothing yet.</td></tr>`)+`</table></div>`;stackTbl($("#v"))}
+  (S.fb.length?S.fb.map(x=>`<tr><td>${esc(fdt(x.updated_at))}</td><td>${bk[x.booking_id]?lk("booking",x.booking_id,bk[x.booking_id].booking_code):"–"}</td><td>${who(x.booking_id)}</td><td>${x.rating?x.rating+" / 5":"–"}</td><td style="white-space:pre-wrap;max-width:420px">${esc(x.comment||"")}</td></tr>`).join(""):`<tr><td colspan="5" class="mute">Nothing yet.</td></tr>`)+`</table></div>`;stackTbl($("#v"))}
 function advCard(s){
   if(s.ip_flag_threshold===undefined)return"";
   return `<details class="card"><summary style="cursor:pointer;min-height:36px;display:flex;align-items:center"><h2 style="margin:0">Advanced</h2></summary>

@@ -424,6 +424,8 @@ Plan in 7 steps: (1) smoothness engine, merged as PR #48; (2) new frame: side me
 
 **Step 5 (Transfers and Messages), branch `admin-step5-transfers-messages`, stacked on the unpushed step 4 branch:** Transfers opens with four count tiles (Waiting for you, Active codes, To pay sellers, To return to buyers) that jump to their section; the "Transfer money" panel moved to a collapsible section at the bottom (open when money is waiting); the tables on Transfers and Feedback become small labelled cards on a phone (`table.rt`, labels added by `stackTbl`). Messages page unchanged apart from "1 person" wording. Tests: `run_transfers.py` (15 checks, 5 deliberate mistakes all caught). Not verified: a real phone with real transfers.
 
+**Step 6 (Settings, Scan, Feedback), branch `admin-step6-settings-scan`, stacked on steps 4 and 5 (all unpushed):** the Settings section bar now stays under the top bar while scrolling and jumps leave the section title visible; Feedback dates use the Indian style (`fdt`); the Scan page no longer repeats its title. Settings was already grouped in step 2. Tests: `run_settings.py` (9 checks, 4 deliberate mistakes all caught). Not verified: a real phone.
+
 ---
 
 ## 14. Never share

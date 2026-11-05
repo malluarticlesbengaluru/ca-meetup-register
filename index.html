@@ -1940,7 +1940,9 @@ async function blobQR(){
   x.textAlign="center";x.fillStyle=CREAM;x.fillText(upi,cx,yUpi+33+uf*.35);
   return new Promise(r=>c.toBlob(r,"image/png"));
 }
-async function download(){const b=await blobQR(),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="meetup-upi-"+shownAmt()+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+/* ONE picture file for both buttons: Share QR hands this file to the share sheet, Download QR saves this same file (through saveBlob, the same way the ticket downloads work). */
+async function qrFile(){const b=await blobQR();return new File([b],"meetup-upi-"+shownAmt()+".png",{type:"image/png"})}
+async function download(f){f=f||await qrFile();saveBlob(f,f.name)}
 
 function compress(file){return new Promise(res=>{
   const img=new Image(),u=URL.createObjectURL(file);
@@ -2073,9 +2075,9 @@ document.addEventListener("click",async e=>{const el=e.target.closest("button,a"
   if(id==="copy"){try{await navigator.clipboard.writeText(S.pay.upi);toast("UPI ID copied")}catch(_){toast("Press and hold the UPI ID to copy")}}
   if(id==="copyid"){try{await navigator.clipboard.writeText(S.result.booking_code);toast("Booking ID copied")}catch(_){toast("Press and hold the ID to copy")}}
   if(id==="dl")download();
-  if(id==="share"){const b=await blobQR(),f=new File([b],"meetup-upi-"+shownAmt()+".png",{type:"image/png"});
+  if(id==="share"){const f=await qrFile();
     if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:"Pay ₹"+shownAmt()})}catch(_){}}
-    else{await download();toast("Sharing isn't supported here, so the QR was downloaded")}}
+    else{await download(f);toast("Sharing isn't supported here, so the QR was downloaded")}}
   if(id==="submit")submit();
   if(id==="again"){resetBookingForm();S.result=null;S.step="loading";render();load()}
 });

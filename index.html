@@ -1876,29 +1876,68 @@ function drawQR(c,text){
 function toast(t,ms){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),ms||2200)}
 const shownAmt=()=>S.step==="tpay"?S.xp.amount:total();
 /* The picture people Share or Download: the payment QR drawn at its EXACT size (never scaled, so it scans as well as the one on screen),
-   with the amount and payee above it and the UPI ID below it. Only this picture changes; the QR on the page does not. */
+   drawn in the same burgundy look as the Pay card on the page (amount, payee, QR, instructions, the Important box and the UPI ID). Share QR and Download QR both use this ONE function, so they are always identical. Only this picture changes; the QR on the page does not. */
 async function blobQR(){
-  const q=$("#qr"),amt=shownAmt(),upi=(S.pay&&S.pay.upi)||"",payee=(S.pay&&S.pay.payee)||"";
-  try{if(document.fonts&&document.fonts.load)await Promise.all(['800 40px "Manrope"','600 24px "Manrope"'].map(f=>document.fonts.load(f)))}catch(_){}
-  const W=Math.max(q.width,560),side=40,FS='"Manrope",system-ui,-apple-system,"Segoe UI",Arial,sans-serif';
+  const q=$("#qr"),amt=shownAmt(),upi=(S.pay&&S.pay.upi)||"",payee=(S.pay&&S.pay.payee)||"",tpay=S.step==="tpay";
+  const SANS='"Poppins",system-ui,-apple-system,"Segoe UI",Arial,sans-serif',SERIF='"Lora",Georgia,serif';
+  try{if(document.fonts&&document.fonts.load)await Promise.all(['900 90px "Poppins"','800 40px "Poppins"','600 30px "Poppins"','400 26px "Poppins"','italic 500 30px "Lora"'].map(f=>document.fonts.load(f)))}catch(_){}
+  const brand=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src="assets/burg-logo.png";setTimeout(()=>r(null),3000)});
+  const CREAM="#F6D7C6",MUTE="#CBA49B",BLUSH="#FFB3C0",GOLD="#E9B24C",EMBER="#F08A3C",WINE="#1A040C";
+  const W=Math.max(720,q.width+190),cx=W/2,side=34,pad=44,cw=W-side*2,iw=cw-pad*2;   /* card x = side, inner width = iw */
   const c=document.createElement("canvas"),x=c.getContext("2d");
-  function fit(t,w,size,wt){x.font=wt+" "+size+"px "+FS;while(size>14&&x.measureText(t).width>w){size-=2;x.font=wt+" "+size+"px "+FS}return size}
-  const WARN="After you scan, check that the UPI ID shown in your app matches the UPI ID below.";
-  x.font="600 24px "+FS;const words=WARN.split(" "),lines=[];let cur="Important:";   /* wrap the warning to the picture width */
-  words.forEach(w=>{const t=cur+" "+w;if(x.measureText(t).width>W-side*2-48&&cur){lines.push(cur);cur=w}else cur=t});lines.push(cur);
-  const wh=lines.length*32+36,top=payee?170:120,bottom=wh+36+150;
-  c.width=W;c.height=top+q.height+bottom;
-  x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.textAlign="center";x.textBaseline="alphabetic";
-  x.fillStyle="#0A2147";let s=fit("Pay ₹"+amt,W-side*2,76,"800");x.fillText("Pay ₹"+amt,W/2,88);
-  if(payee){x.fillStyle="#444";s=fit("to "+payee,W-side*2,30,"600");x.fillText("to "+payee,W/2,138)}
-  x.drawImage(q,Math.round((W-q.width)/2),top);   /* 1:1, no scaling */
-  let y=top+q.height+16;
-  x.fillStyle="#FFF4D6";x.strokeStyle="#E0A100";x.lineWidth=3;x.beginPath();x.roundRect?x.roundRect(side,y,W-side*2,wh,14):x.rect(side,y,W-side*2,wh);x.fill();x.stroke();
-  x.fillStyle="#5A3B00";x.font="700 24px "+FS;x.textAlign="center";lines.forEach((l,i)=>x.fillText(l,W/2,y+36+i*32));
-  y+=wh+20;
-  x.fillStyle="#666";x.font="600 24px "+FS;x.fillText("UPI ID",W/2,y+38);
-  x.fillStyle="#0A2147";s=fit(upi,W-side*2,40,"800");x.fillText(upi,W/2,y+90);
-  x.fillStyle="#666";x.font="600 22px "+FS;x.fillText("Scan with any UPI app",W/2,y+130);
+  const wrap=(t,font,maxW)=>{x.font=font;const out=[];let cur="";t.split(" ").forEach(w=>{const n=cur?cur+" "+w:w;if(x.measureText(n).width>maxW&&cur){out.push(cur);cur=w}else cur=n});if(cur)out.push(cur);return out};
+  const fit=(t,w,size,wt)=>{x.font=wt+" "+size+"px "+SANS;while(size>14&&x.measureText(t).width>w){size-=2;x.font=wt+" "+size+"px "+SANS}return size};
+  const NOTE=tpay?"Scan this QR with any UPI app, or pay to the UPI ID below.":"Scan this QR with any UPI app to pay. Paying from this phone? Take a screenshot of the QR and upload it in your UPI app, or pay to the UPI ID below.";
+  const noteL=wrap(NOTE,"400 27px "+SANS,iw),vFont="400 25px "+SANS,vL=wrap("Important: After you scan, check that the UPI ID shown in your app matches the UPI ID below.",vFont,iw-60);
+  /* heights, top to bottom */
+  const HDR=120,top0=HDR+34;let y=top0+pad;
+  const hasHead=!tpay,yHead=y;if(hasHead)y+=92+30;   /* "1 Scan and pay" row (the ticket-transfer screen has none) */
+  const yAmt=y;y+=96;                              /* amount */
+  const yPayee=y;if(payee)y+=48;else y+=8;         /* pay to */
+  y+=26;const qp=16,panelW=q.width+qp*2,panelH=q.height+qp*2,yQR=y;y+=panelH+34;
+  const yNote=y;y+=noteL.length*40+14;
+  const vh=vL.length*36+36,yV=y;y+=vh+30;
+  const yUpi=y;y+=76;
+  const cardBottom=y+pad-6;
+  c.width=W;c.height=cardBottom+side;
+  /* page background and header bar (same burgundy glow, wordmark and gradient line as the page) */
+  x.fillStyle=WINE;x.fillRect(0,0,W,c.height);
+  let g=x.createRadialGradient(cx,HDR,20,cx,HDR+60,Math.max(W,c.height)*.75);g.addColorStop(0,"rgba(140,24,56,.55)");g.addColorStop(.6,"rgba(74,10,31,.28)");g.addColorStop(1,"rgba(26,4,12,0)");x.fillStyle=g;x.fillRect(0,HDR,W,c.height-HDR);
+  x.fillStyle="rgba(10,1,5,.9)";x.fillRect(0,0,W,HDR-6);
+  g=x.createLinearGradient(0,0,W,0);g.addColorStop(0,"#F6BFC8");g.addColorStop(.5,GOLD);g.addColorStop(.75,EMBER);g.addColorStop(1,"#F6BFC8");x.fillStyle=g;x.fillRect(0,HDR-6,W,6);
+  x.font="800 25px "+SANS;try{x.letterSpacing="4px"}catch(_){}
+  const bt="MALLU ARTICLES BENGALURU",bw=x.measureText(bt).width,lh=brand?66:0,lw=brand?lh*brand.width/brand.height:0,gap=brand?22:0,sx=cx-(lw+gap+bw)/2;
+  if(brand)x.drawImage(brand,sx,(HDR-6-lh)/2,lw,lh);
+  x.fillStyle=CREAM;x.textAlign="left";x.textBaseline="middle";x.fillText(bt,sx+lw+gap,(HDR-6)/2+2);try{x.letterSpacing="0px"}catch(_){}
+  /* the card */
+  const rr=(X,Y,w,h,r)=>{x.beginPath();if(x.roundRect)x.roundRect(X,Y,w,h,r);else x.rect(X,Y,w,h)};
+  g=x.createLinearGradient(side,top0,side+cw*.4,cardBottom);g.addColorStop(0,"rgba(140,24,56,.42)");g.addColorStop(1,"rgba(74,10,31,.6)");
+  x.save();x.shadowColor="rgba(0,0,0,.55)";x.shadowBlur=40;x.shadowOffsetY=18;rr(side,top0,cw,cardBottom-top0,48);x.fillStyle="rgba(58,11,29,.9)";x.fill();x.restore();
+  rr(side,top0,cw,cardBottom-top0,48);x.fillStyle=g;x.fill();x.lineWidth=2;x.strokeStyle="rgba(255,179,192,.22)";x.stroke();
+  x.textBaseline="alphabetic";
+  /* "1  Scan and pay / Any UPI app will do" */
+  if(hasHead){const bx=side+pad,by=yHead;g=x.createLinearGradient(bx,by,bx+92,by+92);g.addColorStop(0,"#F3C766");g.addColorStop(.5,GOLD);g.addColorStop(1,EMBER);
+    x.save();x.shadowColor="rgba(233,178,76,.3)";x.shadowBlur=22;x.shadowOffsetY=8;rr(bx,by,92,92,30);x.fillStyle=g;x.fill();x.restore();
+    x.fillStyle=WINE;x.font="900 44px "+SANS;x.textAlign="center";x.fillText("1",bx+46,by+60);
+    x.textAlign="left";x.fillStyle=CREAM;x.font="800 38px "+SANS;x.fillText("Scan and pay",bx+92+28,by+42);
+    x.fillStyle=BLUSH;x.font="italic 500 30px "+SERIF;x.fillText("Any UPI app will do",bx+92+28,by+82)}
+  /* amount in the page's gold gradient */
+  x.textAlign="center";const af=fit("₹"+amt,iw,96,"900");x.font="900 "+af+"px "+SANS;
+  g=x.createLinearGradient(0,yAmt,0,yAmt+af);g.addColorStop(0,"#FBDD8E");g.addColorStop(.55,GOLD);g.addColorStop(1,EMBER);x.fillStyle=g;x.fillText("₹"+amt,cx,yAmt+af*.9);
+  if(payee){x.font="400 29px "+SANS;const a="Pay to ",aw=x.measureText(a).width;x.font="600 29px "+SANS;let pf=29;while(pf>16&&x.measureText(payee).width>iw-aw){pf-=1;x.font="600 "+pf+"px "+SANS}const pw=x.measureText(payee).width,px=cx-(aw+pw)/2;
+    x.textAlign="left";x.font="400 "+pf+"px "+SANS;x.fillStyle=MUTE;x.fillText(a,px,yPayee+34);x.font="600 "+pf+"px "+SANS;x.fillStyle="#E3BDB3";x.fillText(payee,px+aw,yPayee+34)}
+  /* QR: white rounded panel, the QR itself drawn 1:1 (never scaled, so it scans as well as the one on screen) */
+  const qx=Math.round(cx-panelW/2);
+  x.save();x.shadowColor="rgba(0,0,0,.7)";x.shadowBlur=38;x.shadowOffsetY=18;rr(qx,yQR,panelW,panelH,34);x.fillStyle="#fff";x.fill();x.restore();
+  rr(qx,yQR,panelW,panelH,34);x.fillStyle="#fff";x.fill();x.lineWidth=2;x.strokeStyle="rgba(255,179,192,.34)";x.stroke();
+  x.drawImage(q,qx+qp,yQR+qp);
+  /* instructions, warning box, UPI ID */
+  x.textAlign="center";x.fillStyle=MUTE;x.font="400 27px "+SANS;noteL.forEach((l,i)=>x.fillText(l,cx,yNote+30+i*40));
+  const vx=side+pad;rr(vx,yV,iw,vh,26);x.fillStyle="rgba(233,178,76,.10)";x.fill();x.lineWidth=2;x.strokeStyle="rgba(233,178,76,.5)";x.stroke();
+  x.textAlign="left";x.font=vFont;vL.forEach((l,i)=>{let tx=vx+30;const ty=yV+18+27+i*36;if(i===0&&l.startsWith("Important:")){x.font="800 25px "+SANS;x.fillStyle=GOLD;x.fillText("Important:",tx,ty);tx+=x.measureText("Important: ").width;l=l.slice(11);x.font=vFont}x.fillStyle="#F3D9A0";x.fillText(l,tx,ty)});
+  const uf=fit(upi,iw-70,30,"600");x.font="600 "+uf+"px "+SANS;const uw=Math.min(iw,x.measureText(upi).width+56),ux=Math.round(cx-uw/2);
+  rr(ux,yUpi,uw,66,18);x.fillStyle="rgba(26,4,12,.5)";x.fill();x.lineWidth=2;x.setLineDash([9,7]);x.strokeStyle="rgba(255,179,192,.4)";x.stroke();x.setLineDash([]);
+  x.textAlign="center";x.fillStyle=CREAM;x.fillText(upi,cx,yUpi+33+uf*.35);
   return new Promise(r=>c.toBlob(r,"image/png"));
 }
 async function download(){const b=await blobQR(),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="meetup-upi-"+shownAmt()+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}

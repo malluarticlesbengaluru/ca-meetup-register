@@ -1713,7 +1713,7 @@ function mallu(x,IM,ink,cx,top,mw,tsz,bsz,ruleW){
   const base=top+tsz*.9+4;x.font="700 "+tsz+"px "+FF;const mt="Mallu Articles";txt(x,mt,cx,base,tsz,"700",ink,"center",0);
   spread(x,"BENGALURU","500 "+bsz+"px "+FF,ink,cx,base+bsz+8,bsz*6.9,"center");
   const ry=base+bsz+22;if(ruleW){x.fillStyle=ink;x.fillRect(cx-ruleW/2,ry,ruleW,2)}return ry}
-function drawQR(x,t,cx,top,size){
+function drawTicketQR(x,t,cx,top,size){
   if(t.secret&&t.label){const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k2=Math.floor(size/m),o=cx-m*k2/2,p=top+(size-m*k2)/2;
     x.fillStyle="#000";for(let r=0;r<m;r++)for(let cc=0;cc<m;cc++)if(q.isDark(r,cc))x.fillRect(o+cc*k2,p+r*k2,k2,k2)}
   else txt(x,"Not ready",cx,top+size/2,30,"600","#444","center",0)}
@@ -1730,7 +1730,7 @@ function infoFinal(x,t,coord,cx,nameY,lineY,INK){
 /* right side of the ticket: logo, large QR, name and ticket number */
 function drawStubContent(x,t,coord,IM,INK,GOLD,CREAM){
   const cx=1646,ry=mallu(x,IM,INK,cx,42,92,44,15,344),qs=312,qy=ry+20;
-  drawQR(x,t,cx,qy,qs);
+  drawTicketQR(x,t,cx,qy,qs);
   infoFinal(x,t,coord,cx,qy+qs+48,qy+qs+88,INK);
 }
 function drawTicket(c,t,code){

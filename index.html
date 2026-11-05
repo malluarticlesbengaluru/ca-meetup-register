@@ -1667,8 +1667,8 @@ function tkDate(){const p=evParts({day:"numeric",month:"long",year:"numeric"});i
 function tkVenue(){const v=String(evVenue()||"").split(",").map(s=>s.trim()).filter(Boolean);let b=v.slice(1).join(" ");if(!/bengaluru|bangalore/i.test(b))b=(b?b+" ":"")+"Bengaluru";return{a:(v[0]||"").toUpperCase(),b:b.toUpperCase()}}
 /* the co-sponsor logo (cropped above its small tagline line, which is drawn as text instead) and the Mallu Articles mark recoloured for the pink stub */
 let TKI=null;
-function loadTicketImgs(){return new Promise(r=>{if(TKI)return r(TKI);let n=0;const o={mark:null,sp:null};const done=()=>{if(++n===2){if(o.mark&&o.sp)TKI=o;r(o)}};
-  [["mark","assets/ticket-mark.png"],["sp","assets/burg-sponsor-logo.png"]].forEach(a=>{const i=new Image();i.onload=()=>{o[a[0]]=i;done()};i.onerror=()=>done();i.src=a[1]})})}
+function loadTicketImgs(){return new Promise(r=>{if(TKI)return r(TKI);let n=0;const o={mark:null,sp:null,left:null};const done=()=>{if(++n===3){if(o.mark&&o.sp&&o.left)TKI=o;r(o)}};
+  [["mark","assets/ticket-mark.png"],["sp","assets/burg-sponsor-logo.png"],["left","assets/ticket-left.jpg?v=1"]].forEach(a=>{const i=new Image();i.onload=()=>{o[a[0]]=i;done()};i.onerror=()=>done();i.src=a[1]})})}
 const TK_SP={cropFrac:372/403,tag:"SPREADING EDUCATION"};   /* burg-sponsor-logo.png is 479 x 403; the top 372 rows are the bird and the name */
 /* the big title: pale pink "EHSAAS'" and orange "26", condensed capitals with a mottled, slightly worn texture and a soft glow */
 function drawTitle(x,name,cx,top,cap,wT){
@@ -1698,6 +1698,41 @@ function drawCrowd(x,X0,X1,Y0,Y1){
 /* soft paper-like mottling, used on the pink stub */
 function drawPaper(x,X,Y,W,H,seed){const r=prng(seed);for(let i=0;i<110;i++){const R=20+r()*80,cx=X+r()*W,cy=Y+r()*H,g=x.createRadialGradient(cx,cy,0,cx,cy,R),lt=r()<.55;g.addColorStop(0,lt?"rgba(255,235,240,.16)":"rgba(214,110,140,.10)");g.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=g;x.fillRect(cx-R,cy-R,R*2,R*2)}
   for(let i=0;i<500;i++){x.fillStyle="rgba("+(r()<.5?"255,255,255":"190,80,110")+","+(.05+r()*.08)+")";x.beginPath();x.arc(X+r()*W,Y+r()*H,.6+r()*1.4,0,7);x.fill()}}
+/* ticket panel: rounded far corners, and a semicircle scoop at the tear line (top and bottom). Drawn in "left panel" orientation; the stub is the mirror image. */
+const G_OLD={cx:1298,R:46,top:22,bot:646,e:18},G_REF={cx:1303.2,R:34,top:21.7,bot:640.7,e:8.8};   /* G_REF matches the left-side picture (assets/ticket-left.jpg) */
+function panelPath(x,D,mirror,G){
+  G=G||G_OLD;const cx=G.cx,R=G.R,Ycap=G.top,Yb=G.bot,e=G.e,th=Math.acos(-e/R),f=Math.asin(8/R),a0=Math.PI-f,fx=cx-R*Math.cos(f),fy=Ycap+8,far=cx-D,rd=56,fx0=8*Math.tan(f)-(R-R*Math.cos(f));
+  x.save();if(mirror){x.translate(2*cx,0);x.scale(-1,1)}
+  x.beginPath();x.moveTo(far+rd,Ycap);x.lineTo(cx-R-fx0-10,Ycap);x.quadraticCurveTo(cx-R-fx0,Ycap,fx,fy);
+  x.arc(cx,Ycap,R,a0,th,true);x.lineTo(cx-e,Yb-R*Math.sin(th));
+  x.arc(cx,Yb,R,-th,-a0,true);x.quadraticCurveTo(cx-R-fx0,Yb,cx-R-fx0-10,Yb);
+  x.lineTo(far+rd,Yb);x.arcTo(far,Yb,far,Yb-rd,rd);x.lineTo(far,Ycap+rd);x.arcTo(far,Ycap,far+rd,Ycap,rd);x.closePath();
+  x.restore()}
+function mallu(x,IM,ink,cx,top,mw,tsz,bsz,ruleW){
+  if(IM.mark){const mh=mw*IM.mark.height/IM.mark.width;x.drawImage(IM.mark,cx-mw/2,top,mw,mh);top+=mh}
+  const base=top+tsz*.9+4;x.font="700 "+tsz+"px "+FF;const mt="Mallu Articles";txt(x,mt,cx,base,tsz,"700",ink,"center",0);
+  spread(x,"BENGALURU","500 "+bsz+"px "+FF,ink,cx,base+bsz+8,bsz*6.9,"center");
+  const ry=base+bsz+22;if(ruleW){x.fillStyle=ink;x.fillRect(cx-ruleW/2,ry,ruleW,2)}return ry}
+function drawQR(x,t,cx,top,size){
+  if(t.secret&&t.label){const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k2=Math.floor(size/m),o=cx-m*k2/2,p=top+(size-m*k2)/2;
+    x.fillStyle="#000";for(let r=0;r<m;r++)for(let cc=0;cc<m;cc++)if(q.isDark(r,cc))x.fillRect(o+cc*k2,p+r*k2,k2,k2)}
+  else txt(x,"Not ready",cx,top+size/2,30,"600","#444","center",0)}
+function infoFinal(x,t,coord,cx,nameY,lineY,INK){
+  const veg=t.food==="Veg",fc=veg?"#0B7A3E":"#B3261E",AN='"Anton","Bebas Neue",Impact,sans-serif';
+  /* name: Fraunces (the serif used on the page), shrinks only if the name is very long */
+  let nz=44;x.font="700 "+nz+"px "+FD;while(nz>22&&x.measureText(t.name).width>430){nz-=2;x.font="700 "+nz+"px "+FD}
+  x.save();x.shadowColor="rgba(255,255,255,.35)";x.shadowBlur=0;txt(x,t.name,cx,nameY,nz,"700",INK,"center",0,FD);x.restore();
+  /* ticket number in Anton, then the food type */
+  const bits=[[(coord?"":"TICKET ")+(t.label||"—"),INK],[veg?"VEG":"NON-VEG",fc]];if(coord)bits.push(["COORDINATOR","#7A4B00"]);
+  const SEP="   |   ";let af=34,sw,ws,tot;
+  for(;af>=16;af--){x.font="400 "+af+"px "+AN;try{x.letterSpacing=(af*.07)+"px"}catch(_){}sw=x.measureText(SEP).width;ws=bits.map(b=>x.measureText(b[0]).width);tot=ws.reduce((a,b)=>a+b,0)+sw*(bits.length-1);if(tot<=440)break}
+  let px=cx-tot/2;x.textAlign="left";x.textBaseline="alphabetic";bits.forEach((b,i)=>{x.fillStyle=b[1];x.fillText(b[0],px,lineY);px+=ws[i];if(i<bits.length-1){x.fillStyle="rgba(26,10,16,.4)";x.fillText(SEP,px,lineY);px+=sw}});try{x.letterSpacing="0px"}catch(_){}}
+/* right side of the ticket: logo, large QR, name and ticket number */
+function drawStubContent(x,t,coord,IM,INK,GOLD,CREAM){
+  const cx=1646,ry=mallu(x,IM,INK,cx,42,92,44,15,344),qs=312,qy=ry+20;
+  drawQR(x,t,cx,qy,qs);
+  infoFinal(x,t,coord,cx,qy+qs+48,qy+qs+88,INK);
+}
 function drawTicket(c,t,code){
   /* LANDSCAPE ticket (Nov 2026 redesign, 2000 x 668): a maroon main panel (title, venue and date, co-sponsor, crowd) and a pink stub (logo, ENTRY TICKET, QR),
      divided by a dotted tear line. Same data as before: date, time, venue, attendee, food, ticket number and the QR of "label|secret". The Booking ID is still NOT on it.
@@ -1708,14 +1743,16 @@ function drawTicket(c,t,code){
   const H=PANELS.length?PY+26:TH;
   c.width=W;c.height=H;const x=c.getContext("2d");x.clearRect(0,0,W,H);
   x.fillStyle="#28080F";x.fillRect(0,0,W,H);
-  const IM=TKI||{mark:null,sp:null};
-  /* ---- main panel ---- */
-  x.save();rrr(x,22,22,1262,624,[56,12,12,56]);x.clip();
+  const IM=TKI||{mark:null,sp:null,left:null},GS=IM.left?G_REF:G_OLD,SD=IM.left?1982-G_REF.cx:680;
+  /* ---- main panel: the fixed left side is one picture (assets/ticket-left.jpg, cut from the design, same on every ticket) ---- */
+  if(IM.left){const k=TW/2170;x.drawImage(IM.left,0,0,IM.left.width,IM.left.height,0,0,IM.left.width*k,TH)}
+  else{
+  x.save();panelPath(x,1276,false);x.clip();
   let g=x.createLinearGradient(22,0,1284,0);g.addColorStop(0,"#3A0C16");g.addColorStop(.5,"#340E15");g.addColorStop(1,"#3F131E");x.fillStyle=g;x.fillRect(22,22,1262,624);
   g=x.createRadialGradient(540,250,40,540,250,700);g.addColorStop(0,"rgba(120,30,50,.30)");g.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=g;x.fillRect(22,22,1262,624);
   drawCrowd(x,22,1284,520,646);
   x.restore();
-  x.lineWidth=4;x.strokeStyle=EDGE;rrr(x,22,22,1262,624,[56,12,12,56]);x.stroke();
+  x.lineWidth=4;x.strokeStyle=EDGE;panelPath(x,1276,false);x.stroke();
   /* header */
   spread(x,String(CONFIG.organiserName).toUpperCase(),"500 24px "+FF,"#F6EEEA",530,66,588,"center");
   spread(x,"PRESENTS","500 22px "+FF,"#F6EEEA",530,108,196,"center");
@@ -1736,36 +1773,15 @@ function drawTicket(c,t,code){
   txt(x,"CO-SPONSORED BY",1120,222,20,"600","#FFFFFF","center",1);
   if(IM.sp){const iw=175,ih=iw*(IM.sp.height*TK_SP.cropFrac)/IM.sp.width;x.drawImage(IM.sp,0,0,IM.sp.width,Math.round(IM.sp.height*TK_SP.cropFrac),1120-iw/2,262,iw,ih);
     spread(x,TK_SP.tag,"400 11px "+FF,"#F6EEEA",1120,412,168,"center")}
-  g=x.createLinearGradient(985,0,1255,0);g.addColorStop(0,"rgba(246,215,198,0)");g.addColorStop(.5,"rgba(246,215,198,.55)");g.addColorStop(1,"rgba(246,215,198,0)");x.fillStyle=g;x.fillRect(985,472,270,1.6);
-  /* attendee, ticket number, food */
-  x.save();x.shadowColor="rgba(16,3,8,.95)";x.shadowBlur=8;
-  txt(x,t.name,1120,513,fit(x,t.name,290,30,16,"600"),"600",CREAM,"center",0);
-  const veg=t.food==="Veg",fc=veg?"#4BE38A":"#FF7B7B",bits=[[(coord?"":"TICKET ")+(t.label||"—"),CREAM],[veg?"VEG":"NON-VEG",fc]];if(coord)bits.push(["COORDINATOR",GOLD]);
-  const SEP="   ·   ";let af=19,sw,ws,tot;
-  for(;af>=11;af--){x.font="600 "+af+"px "+FF;try{x.letterSpacing=(af*.1)+"px"}catch(_){}sw=x.measureText(SEP).width;ws=bits.map(b=>x.measureText(b[0]).width);tot=ws.reduce((a,b)=>a+b,0)+sw*(bits.length-1);if(tot<=296)break}
-  let px=1120-tot/2;x.textAlign="left";bits.forEach((b,i)=>{x.fillStyle=b[1];x.fillText(b[0],px,541);px+=ws[i];if(i<bits.length-1){x.fillStyle="rgba(255,179,192,.7)";x.fillText(SEP,px,541);px+=sw}});try{x.letterSpacing="0px"}catch(_){}
-  x.restore();
+  }
   /* ---- stub ---- */
-  x.save();rrr(x,1312,22,666,624,[12,56,56,12]);x.clip();
-  g=x.createLinearGradient(0,22,0,646);g.addColorStop(0,"#E7B1C1");g.addColorStop(.5,"#F0B9C3");g.addColorStop(1,"#F3A3B1");x.fillStyle=g;x.fillRect(1312,22,666,624);
-  drawPaper(x,1312,22,666,624,91);x.restore();
-  x.lineWidth=4;x.strokeStyle=EDGE;rrr(x,1312,22,666,624,[12,56,56,12]);x.stroke();
+  x.save();panelPath(x,SD,true,GS);x.clip();
+  g=x.createLinearGradient(0,22,0,646);g.addColorStop(0,"#EFB4C6");g.addColorStop(.5,"#F4B6C4");g.addColorStop(1,"#F5A2B4");x.fillStyle=g;x.fillRect(1296,18,700,630);
+  drawPaper(x,1296,18,700,630,91);x.restore();
+  x.lineWidth=4;x.strokeStyle=EDGE;panelPath(x,SD,true,GS);x.stroke();
   /* tear line */
-  x.fillStyle=EDGE;for(let yy=52;yy<=618;yy+=13){x.beginPath();x.arc(1298,yy,3.2,0,7);x.fill()}
-  /* logo */
-  if(IM.mark){const mw=112,mh=mw*IM.mark.height/IM.mark.width;x.drawImage(IM.mark,1645-mw/2,44,mw,mh)}
-  x.font="700 50px "+FF;const mt="Mallu Articles",k=Math.min(1.3,294/x.measureText(mt).width);txt(x,mt,1645,163,50*k,"700",INK,"center",0);
-  spread(x,"BENGALURU","500 15px "+FF,INK,1645,186,104,"center");
-  x.fillStyle=INK;x.fillRect(1473,202,344,2);
-  /* ENTRY TICKET: one wide banner with scooped corners */
-  x.lineWidth=3.5;x.strokeStyle=INK;notchBox(x,1366,222,560,96,14);x.stroke();x.lineWidth=2;rrr(x,1377,233,538,74,[4,4,4,4]);x.stroke();
-  sparkle(x,1409,270,14,INK);sparkle(x,1883,270,14,INK);
-  const es=capFs(x,"400",FT,48);x.font="400 "+es+"px "+FT;x.fillStyle=INK;x.textAlign="center";try{x.letterSpacing="3px"}catch(_){}x.fillText("ENTRY TICKET",1648,293);try{x.letterSpacing="0px"}catch(_){}
-  /* QR: large (about 290 px), straight onto the stub; content and error level unchanged */
-  if(t.secret&&t.label){
-    const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k2=Math.floor(290/m),o=1645-m*k2/2,p=336+(290-m*k2)/2;
-    x.fillStyle="#000";for(let r=0;r<m;r++)for(let cc=0;cc<m;cc++)if(q.isDark(r,cc))x.fillRect(o+cc*k2,p+r*k2,k2,k2);
-  }else txt(x,"Not ready",1645,490,30,"600","#444","center",0);
+  if(!IM.left){x.fillStyle=EDGE;for(let yy=64;yy<=604;yy+=20){x.fillRect(1294,yy,8,9)}}
+  drawStubContent(x,t,coord,IM,INK,GOLD,CREAM);
   /* the optional panels under the ticket */
   PANELS.forEach(pn=>{const y0=pn.y,ML=pn.ML;
     x.fillStyle="rgba(233,178,76,.10)";rr(x,22,y0,W-44,pn.PH,40);x.fill();x.lineWidth=3;x.strokeStyle=GOLD;x.globalAlpha=.7;rr(x,22,y0,W-44,pn.PH,40);x.stroke();x.globalAlpha=1;

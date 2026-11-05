@@ -1710,63 +1710,62 @@ function drawTicket(c,t,code){
   x.fillStyle="#28080F";x.fillRect(0,0,W,H);
   const IM=TKI||{mark:null,sp:null};
   /* ---- main panel ---- */
-  x.save();rrr(x,22,22,1508,624,[56,10,10,56]);x.clip();
-  let g=x.createLinearGradient(22,0,1530,0);g.addColorStop(0,"#3A0C16");g.addColorStop(.5,"#340E15");g.addColorStop(1,"#3F131E");x.fillStyle=g;x.fillRect(22,22,1508,624);
-  g=x.createRadialGradient(640,250,40,640,250,760);g.addColorStop(0,"rgba(120,30,50,.30)");g.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=g;x.fillRect(22,22,1508,624);
-  drawCrowd(x,22,1530,520,646);
+  x.save();rrr(x,22,22,1262,624,[56,12,12,56]);x.clip();
+  let g=x.createLinearGradient(22,0,1284,0);g.addColorStop(0,"#3A0C16");g.addColorStop(.5,"#340E15");g.addColorStop(1,"#3F131E");x.fillStyle=g;x.fillRect(22,22,1262,624);
+  g=x.createRadialGradient(540,250,40,540,250,700);g.addColorStop(0,"rgba(120,30,50,.30)");g.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=g;x.fillRect(22,22,1262,624);
+  drawCrowd(x,22,1284,520,646);
   x.restore();
-  x.lineWidth=4;x.strokeStyle=EDGE;rrr(x,22,22,1508,624,[56,10,10,56]);x.stroke();
+  x.lineWidth=4;x.strokeStyle=EDGE;rrr(x,22,22,1262,624,[56,12,12,56]);x.stroke();
   /* header */
-  spread(x,String(CONFIG.organiserName).toUpperCase(),"500 24px "+FF,"#F6EEEA",610,66,617,"center");
-  spread(x,"PRESENTS","500 22px "+FF,"#F6EEEA",610,108,206,"center");
+  spread(x,String(CONFIG.organiserName).toUpperCase(),"500 24px "+FF,"#F6EEEA",530,66,588,"center");
+  spread(x,"PRESENTS","500 22px "+FF,"#F6EEEA",530,108,196,"center");
   /* title and tagline */
-  drawTitle(x,String(CONFIG.eventName).toUpperCase(),610,143,222,790);
-  spread(x,String(CONFIG.ticketTagline),"italic 400 28px "+FF,"#F3E3DE",610,405,565,"center");
+  drawTitle(x,String(CONFIG.eventName).toUpperCase(),526,140,225,758);
+  spread(x,String(CONFIG.ticketTagline),"italic 400 28px "+FF,"#F3E3DE",526,404,545,"center");
   /* venue | date | area */
-  const V=tkVenue(),vcap=23,lw=wrap2(x,V.a,165,vcap),rw=wrap2(x,V.b,125,vcap);
-  lw.L.forEach((l,i)=>{x.font="400 "+lw.fs+"px "+FT;x.fillStyle="#FFFFFF";x.textAlign="left";x.fillText(l,211,460+i*30)});
-  rw.L.forEach((l,i)=>{x.font="400 "+rw.fs+"px "+FT;x.fillStyle="#FFFFFF";x.textAlign="center";x.fillText(l,939,460+i*30)});
-  x.fillStyle=PINK;x.fillRect(211,506,66,5);x.fillRect(942,506,66,5);x.fillRect(419,437,3,74);x.fillRect(814,437,3,74);
-  const ds=capFs(x,"400",FT,40);x.font="400 "+ds+"px "+FT;x.fillStyle="#FFFFFF";x.textAlign="center";x.fillText(tkDate(),617,486);
+  const V=tkVenue(),vcap=23,lw=wrap2(x,V.a,140,vcap),rw=wrap2(x,V.b,110,vcap);
+  lw.L.forEach((l,i)=>{x.font="400 "+lw.fs+"px "+FT;x.fillStyle="#FFFFFF";x.textAlign="left";x.fillText(l,146,460+i*30)});
+  rw.L.forEach((l,i)=>{x.font="400 "+rw.fs+"px "+FT;x.fillStyle="#FFFFFF";x.textAlign="center";x.fillText(l,842,460+i*30)});
+  x.fillStyle=PINK;x.fillRect(147,507,66,5);x.fillRect(844,507,66,5);x.fillRect(345,436,3,74);x.fillRect(721,436,3,74);
+  const ds=capFs(x,"400",FT,40);x.font="400 "+ds+"px "+FT;x.fillStyle="#FFFFFF";x.textAlign="center";x.fillText(tkDate(),531,488);
   const wd=String(evDate()).split(",")[0].trim().toUpperCase(),tm=String(evTime()).toUpperCase();
-  txt(x,(wd?wd+"  ·  ":"")+tm,618,510,17,"500",BLUSH,"center",4);
+  txt(x,(wd?wd+"  ·  ":"")+tm,532,512,17,"500",BLUSH,"center",4);
   /* divider, co-sponsor */
-  x.fillStyle=PINK;x.fillRect(1071,143,3,292);
-  x.fillStyle="#F6EEEA";x.fillRect(1113,214,44,1.5);x.fillRect(1424,214,44,1.5);
-  txt(x,"CO-SPONSORED BY",1288,223,23,"600","#FFFFFF","center",1);
-  if(IM.sp){const iw=184,ih=iw*(IM.sp.height*TK_SP.cropFrac)/IM.sp.width;x.drawImage(IM.sp,0,0,IM.sp.width,Math.round(IM.sp.height*TK_SP.cropFrac),1288-iw/2,262,iw,ih);
-    spread(x,TK_SP.tag,"400 11px "+FF,"#F6EEEA",1288,414,176,"center")}
-  g=x.createLinearGradient(1128,0,1467,0);g.addColorStop(0,"rgba(246,215,198,0)");g.addColorStop(.5,"rgba(246,215,198,.55)");g.addColorStop(1,"rgba(246,215,198,0)");x.fillStyle=g;x.fillRect(1128,472,339,1.6);
+  x.fillStyle=PINK;x.fillRect(950,140,3,292);
+  x.fillStyle="#F6EEEA";x.fillRect(968,213,36,1.5);x.fillRect(1236,213,36,1.5);
+  txt(x,"CO-SPONSORED BY",1120,222,20,"600","#FFFFFF","center",1);
+  if(IM.sp){const iw=175,ih=iw*(IM.sp.height*TK_SP.cropFrac)/IM.sp.width;x.drawImage(IM.sp,0,0,IM.sp.width,Math.round(IM.sp.height*TK_SP.cropFrac),1120-iw/2,262,iw,ih);
+    spread(x,TK_SP.tag,"400 11px "+FF,"#F6EEEA",1120,412,168,"center")}
+  g=x.createLinearGradient(985,0,1255,0);g.addColorStop(0,"rgba(246,215,198,0)");g.addColorStop(.5,"rgba(246,215,198,.55)");g.addColorStop(1,"rgba(246,215,198,0)");x.fillStyle=g;x.fillRect(985,472,270,1.6);
   /* attendee, ticket number, food */
   x.save();x.shadowColor="rgba(16,3,8,.95)";x.shadowBlur=8;
-  txt(x,t.name,1288,513,fit(x,t.name,370,32,18,"600"),"600",CREAM,"center",0);
+  txt(x,t.name,1120,513,fit(x,t.name,290,30,16,"600"),"600",CREAM,"center",0);
   const veg=t.food==="Veg",fc=veg?"#4BE38A":"#FF7B7B",bits=[[(coord?"":"TICKET ")+(t.label||"—"),CREAM],[veg?"VEG":"NON-VEG",fc]];if(coord)bits.push(["COORDINATOR",GOLD]);
   const SEP="   ·   ";let af=19,sw,ws,tot;
-  for(;af>=11;af--){x.font="600 "+af+"px "+FF;try{x.letterSpacing=(af*.13)+"px"}catch(_){}sw=x.measureText(SEP).width;ws=bits.map(b=>x.measureText(b[0]).width);tot=ws.reduce((a,b)=>a+b,0)+sw*(bits.length-1);if(tot<=400)break}
-  let px=1288-tot/2;x.textAlign="left";bits.forEach((b,i)=>{x.fillStyle=b[1];x.fillText(b[0],px,541);px+=ws[i];if(i<bits.length-1){x.fillStyle="rgba(255,179,192,.7)";x.fillText(SEP,px,541);px+=sw}});try{x.letterSpacing="0px"}catch(_){}
+  for(;af>=11;af--){x.font="600 "+af+"px "+FF;try{x.letterSpacing=(af*.1)+"px"}catch(_){}sw=x.measureText(SEP).width;ws=bits.map(b=>x.measureText(b[0]).width);tot=ws.reduce((a,b)=>a+b,0)+sw*(bits.length-1);if(tot<=296)break}
+  let px=1120-tot/2;x.textAlign="left";bits.forEach((b,i)=>{x.fillStyle=b[1];x.fillText(b[0],px,541);px+=ws[i];if(i<bits.length-1){x.fillStyle="rgba(255,179,192,.7)";x.fillText(SEP,px,541);px+=sw}});try{x.letterSpacing="0px"}catch(_){}
   x.restore();
   /* ---- stub ---- */
-  x.save();rrr(x,1546,22,432,624,[10,56,56,10]);x.clip();
-  g=x.createLinearGradient(0,22,0,646);g.addColorStop(0,"#E7B1C1");g.addColorStop(.5,"#F0B9C3");g.addColorStop(1,"#F3A3B1");x.fillStyle=g;x.fillRect(1546,22,432,624);
-  drawPaper(x,1546,22,432,624,91);x.restore();
-  x.lineWidth=4;x.strokeStyle=EDGE;rrr(x,1546,22,432,624,[10,56,56,10]);x.stroke();
+  x.save();rrr(x,1312,22,666,624,[12,56,56,12]);x.clip();
+  g=x.createLinearGradient(0,22,0,646);g.addColorStop(0,"#E7B1C1");g.addColorStop(.5,"#F0B9C3");g.addColorStop(1,"#F3A3B1");x.fillStyle=g;x.fillRect(1312,22,666,624);
+  drawPaper(x,1312,22,666,624,91);x.restore();
+  x.lineWidth=4;x.strokeStyle=EDGE;rrr(x,1312,22,666,624,[12,56,56,12]);x.stroke();
   /* tear line */
-  x.fillStyle=EDGE;for(let yy=52;yy<=618;yy+=13){x.beginPath();x.arc(1538,yy,3.2,0,7);x.fill()}
+  x.fillStyle=EDGE;for(let yy=52;yy<=618;yy+=13){x.beginPath();x.arc(1298,yy,3.2,0,7);x.fill()}
   /* logo */
-  if(IM.mark){const mw=100,mh=mw*IM.mark.height/IM.mark.width;x.drawImage(IM.mark,1767-mw/2,58,mw,mh)}
-  x.font="700 50px "+FF;const mt="Mallu Articles",k=Math.min(1.2,290/x.measureText(mt).width);txt(x,mt,1767,172,50*k,"700",INK,"center",0);
-  spread(x,"BENGALURU","500 15px "+FF,INK,1767,196,101,"center");
-  x.fillStyle=INK;x.fillRect(1641,211,254,2);
-  /* ENTRY TICKET */
-  x.lineWidth=3.5;x.strokeStyle=INK;notchBox(x,1605,243,332,162,15);x.stroke();x.lineWidth=2;rrr(x,1618,256,306,136,[4,4,4,4]);x.stroke();
-  sparkle(x,1641,326,13,INK);sparkle(x,1893,326,13,INK);
-  const es=capFs(x,"400",FT,50);x.font="400 "+es+"px "+FT;x.fillStyle=INK;x.textAlign="center";try{x.letterSpacing="2px"}catch(_){}x.fillText("ENTRY",1768,318);x.fillText("TICKET",1768,379);try{x.letterSpacing="0px"}catch(_){}
-  /* QR (content and error level unchanged; black on a light plate so it scans reliably) */
-  x.fillStyle="#FFF4F6";rr(x,1662,420,210,210,16);x.fill();
+  if(IM.mark){const mw=112,mh=mw*IM.mark.height/IM.mark.width;x.drawImage(IM.mark,1645-mw/2,44,mw,mh)}
+  x.font="700 50px "+FF;const mt="Mallu Articles",k=Math.min(1.3,294/x.measureText(mt).width);txt(x,mt,1645,163,50*k,"700",INK,"center",0);
+  spread(x,"BENGALURU","500 15px "+FF,INK,1645,186,104,"center");
+  x.fillStyle=INK;x.fillRect(1473,202,344,2);
+  /* ENTRY TICKET: one wide banner with scooped corners */
+  x.lineWidth=3.5;x.strokeStyle=INK;notchBox(x,1366,222,560,96,14);x.stroke();x.lineWidth=2;rrr(x,1377,233,538,74,[4,4,4,4]);x.stroke();
+  sparkle(x,1409,270,14,INK);sparkle(x,1883,270,14,INK);
+  const es=capFs(x,"400",FT,48);x.font="400 "+es+"px "+FT;x.fillStyle=INK;x.textAlign="center";try{x.letterSpacing="3px"}catch(_){}x.fillText("ENTRY TICKET",1648,293);try{x.letterSpacing="0px"}catch(_){}
+  /* QR: large (about 290 px), straight onto the stub; content and error level unchanged */
   if(t.secret&&t.label){
-    const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k2=Math.floor(190/m),o=1662+(210-m*k2)/2,p=420+(210-m*k2)/2;
+    const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k2=Math.floor(290/m),o=1645-m*k2/2,p=336+(290-m*k2)/2;
     x.fillStyle="#000";for(let r=0;r<m;r++)for(let cc=0;cc<m;cc++)if(q.isDark(r,cc))x.fillRect(o+cc*k2,p+r*k2,k2,k2);
-  }else txt(x,"Not ready",1767,532,26,"600","#444","center",0);
+  }else txt(x,"Not ready",1645,490,30,"600","#444","center",0);
   /* the optional panels under the ticket */
   PANELS.forEach(pn=>{const y0=pn.y,ML=pn.ML;
     x.fillStyle="rgba(233,178,76,.10)";rr(x,22,y0,W-44,pn.PH,40);x.fill();x.lineWidth=3;x.strokeStyle=GOLD;x.globalAlpha=.7;rr(x,22,y0,W-44,pn.PH,40);x.stroke();x.globalAlpha=1;

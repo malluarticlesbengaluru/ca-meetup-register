@@ -422,6 +422,8 @@ Plan in 7 steps: (1) smoothness engine, merged as PR #48; (2) new frame: side me
 
 **Step 4 (People and Gate), branch `admin-step4-people-gate`, from `main` after PR #49, not pushed:** People has quick chips (Everyone, Present, Not here yet, Payment pending, Coordinators, with counts) and a Table / Cards switch (table by default on a laptop, cards on a phone; the choice is remembered in the browser under `adm_pview`). Names open the person sheet. Gate has a progress bar of people present and a second list, "Not here yet", with phone numbers and an Open button. The scan overlay and admit/undo rules are unchanged. Tests: `run_people.py` (26 checks, 5 deliberate mistakes all caught); older suites updated to find rows in either layout. Not verified: a real phone, the real camera scan.
 
+**Step 5 (Transfers and Messages), branch `admin-step5-transfers-messages`, stacked on the unpushed step 4 branch:** Transfers opens with four count tiles (Waiting for you, Active codes, To pay sellers, To return to buyers) that jump to their section; the "Transfer money" panel moved to a collapsible section at the bottom (open when money is waiting); the tables on Transfers and Feedback become small labelled cards on a phone (`table.rt`, labels added by `stackTbl`). Messages page unchanged apart from "1 person" wording. Tests: `run_transfers.py` (15 checks, 5 deliberate mistakes all caught). Not verified: a real phone with real transfers.
+
 ---
 
 ## 14. Never share

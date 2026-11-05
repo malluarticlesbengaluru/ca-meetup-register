@@ -1,0 +1,57 @@
+from admin_test import *
+# Browser suite for People and Gate (Step 4 of the admin redesign): quick chips, table / cards layout, Gate progress bar and the "Not here yet" list.
+# Run:  cd scratch-db/browser && python3 run_people.py | tail -1
+def rows(pg): return pg.query_selector_all('#tbl tbody tr')
+def names(pg): return [r.query_selector_all('td')[1].inner_text() for r in rows(pg)]   # the Name column only
+with sync_playwright() as p:
+    here = [dict(t, checked_in_at='2026-11-22T09:00:00Z') if t['id']=='t2' else t for t in TICKETS]
+    d = db(tables=dict(tickets=here))
+    b, pg, errs = open_page(p, d, 'people')
+    check('P1 on a laptop People is a table by default', pg.query_selector('#tbl table.ptbl') is not None and pg.query_selector('#tbl .pc') is None)
+    check('P2 the table has a row for each visible ticket (Ben, Carl, Dan; Asha moved is hidden)', len(rows(pg)) == 3 and all(any(n in r for r in names(pg)) for n in ['Ben','Carl','Dan']), names(pg))
+    check('P3 the chips show counts: Everyone 3, Present 1, Not here yet 2', all(x in pg.inner_text('#pchips') for x in ['Everyone 3','Present 1','Not here yet 2']), pg.inner_text('#pchips'))
+    pg.click('[data-pchip="here"]'); pg.wait_for_timeout(150)
+    check('P4 the Present chip shows only people who are here, and is marked as on', len(rows(pg)) == 1 and 'Ben' in names(pg)[0] and pg.get_attribute('[data-pchip="here"]','aria-pressed') == 'true', names(pg))
+    pg.click('[data-pchip="here"]'); pg.wait_for_timeout(150); check('P5 tapping it again switches it off', len(rows(pg)) == 3)
+    pg.click('[data-pchip="notyet"]'); pg.wait_for_timeout(150); check('P6 Not here yet shows the other two', len(rows(pg)) == 2 and not any('Ben' in r for r in names(pg)), names(pg))
+    pg.click('[data-pchip="all"]'); pg.wait_for_timeout(150); check('P7 Everyone clears the chips', len(rows(pg)) == 3)
+    pg.click('.flt summary'); pg.select_option('#fhere', 'yes'); pg.wait_for_timeout(150)
+    check('P8 using the Filters menu keeps the chips in step', pg.get_attribute('[data-pchip="here"]','aria-pressed') == 'true' and len(rows(pg)) == 1)
+    pg.select_option('#fhere', ''); pg.wait_for_timeout(100)
+    pg.fill('#q', 'carl'); pg.wait_for_timeout(150); check('P9 search narrows the table', len(rows(pg)) == 1 and 'Carl' in names(pg)[0])
+    pg.fill('#q', '')
+    pg.click('[data-pview="cards"]'); pg.wait_for_timeout(200)
+    check('P10 Cards switches to the card layout and the choice is remembered', pg.query_selector('#tbl .pc') is not None and pg.query_selector('#tbl table') is None and pg.evaluate("localStorage.getItem('adm_pview')") == 'cards')
+    pg.reload(); pg.wait_for_selector('#v'); go_tab(pg, 'people')
+    check('P11 after a reload it is still cards', pg.query_selector('#tbl .pc') is not None)
+    pg.click('[data-pview="table"]'); pg.wait_for_timeout(200)
+    pg.click('#tbl [data-co="make"][data-t="t3"]'); pg.wait_for_selector('.dlg'); b.close() if False else None
+    auto(pg, False); pg.click('.dlg [data-dlg="no"]'); pg.wait_for_timeout(200)
+    check('P12 a table row action opens the usual question (Make coordinator)', pg.query_selector('.dlg') is None)
+    pg.click('#tbl tbody tr:has-text("Carl") .lk'); pg.wait_for_timeout(200)
+    check('P13 tapping a name opens that person\'s sheet', 'Carl' in pg.inner_text('.sheet'), pg.inner_text('#v')[:100])
+    check('P14 no email anywhere in the table', '@example.com' not in pg.inner_text('#v') and 'Email' not in pg.inner_text('#v'))
+    check('P15 no page errors', not errs, errs); b.close()
+    # phone: cards by default, chips usable, no sideways scroll
+    b = p.chromium.launch(); pg = b.new_page(viewport={'width': 390, 'height': 800}); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.route('**/*', lambda r: (r.fulfill(body=HTML, content_type='text/html') if r.request.url.endswith('/admin/test.html') else r.fulfill(body='/*stub*/', content_type='text/javascript') if r.request.url.endswith('.js') or '/npm/' in r.request.url else r.fulfill(status=204, body='')))
+    pg.add_init_script('window.__DB=' + json.dumps(d) + ';'); pg.add_init_script(MOCK); pg.add_init_script(CH); pg.add_init_script(DLG_BOT)
+    pg.goto('https://example.test/admin/test.html'); pg.wait_for_selector('#v'); go_tab(pg, 'people')
+    check('P16 phone: People starts as cards', pg.query_selector('#tbl .pc') is not None)
+    check('P17 phone: no sideways scrolling', pg.evaluate('document.documentElement.scrollWidth<=window.innerWidth+1'))
+    pg.click('[data-pview="table"]'); pg.wait_for_timeout(200)
+    check('P18 phone: the table scrolls inside its own box, the page itself does not scroll sideways', pg.evaluate('document.documentElement.scrollWidth<=window.innerWidth+1') and pg.evaluate("document.querySelector('.ptw').scrollWidth>document.querySelector('.ptw').clientWidth"))
+    check('P19 phone: no page errors', not errs, errs); b.close()
+    # Gate
+    b, pg, errs = open_page(p, d, 'gate')
+    check('G1 Gate shows a progress bar of people present', pg.query_selector('#gprog') is not None, pg.inner_text('#v')[:80])
+    w = pg.evaluate("document.querySelector('#gprog i').style.width"); n = pg.evaluate("S.tickets.filter(t=>!t.transferred_out_at&&bk(t.booking_id).status==='paid'&&t.checked_in_at).length"); c = pg.evaluate("S.tickets.filter(t=>!t.transferred_out_at&&bk(t.booking_id).status==='paid').length")
+    check('G2 the bar is as full as present / confirmed', w == f"{round(100*n/c)}%", (w, n, c))
+    check('G3 the list starts on Admitted (Ben)', 'Admitted (1)' in pg.inner_text('#admh') and 'Ben' in pg.inner_text('#admlist'), pg.inner_text('#admh'))
+    pg.click('[data-gl="out"]'); pg.wait_for_timeout(150)
+    check('G4 "Not here yet" lists the confirmed people who have not come', 'Not here yet (' in pg.inner_text('#admh') and 'Ben' not in pg.inner_text('#admlist') and ('Carl' in pg.inner_text('#admlist') or 'Dan' in pg.inner_text('#admlist')), pg.inner_text('#admlist'))
+    check('G5 its list has the phone number for calling', '9000000' in pg.inner_text('#admlist'))
+    pg.click('#admlist [data-pick] >> nth=0'); pg.wait_for_timeout(200); check('G6 Open on someone not here yet shows the usual result screen', pg.query_selector('.ov') is not None or pg.query_selector('.sheet') is not None)
+    check('G7 no page errors', not errs, errs); b.close()
+print(f"{sum(results)} passed, {len(results)-sum(results)} failed")

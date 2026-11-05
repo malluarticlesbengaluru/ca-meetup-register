@@ -420,6 +420,8 @@ Plan in 7 steps: (1) smoothness engine, merged as PR #48; (2) new frame: side me
 
 **Step 3 (payment review desk), branch `admin-step3-review`, built on top of step 2, not pushed:** Payments page has "Review payments (N)". It opens a full-screen desk: oldest waiting booking first, screenshot beside the details (stacked on a phone), Paid / Reject / Skip / Back, keys P, R, right and left arrows, Escape; Reject asks first, Paid does not; after each decision it moves to the next and closes with "All caught up". The phone back gesture closes it. No background refresh while it is open. Tests: `run_desk.py` (25 checks, 4 of 5 deliberate mistakes caught; the fifth was an equivalent change). Not verified: real screenshots from the real storage bucket, a real phone.
 
+**Step 4 (People and Gate), branch `admin-step4-people-gate`, from `main` after PR #49, not pushed:** People has quick chips (Everyone, Present, Not here yet, Payment pending, Coordinators, with counts) and a Table / Cards switch (table by default on a laptop, cards on a phone; the choice is remembered in the browser under `adm_pview`). Names open the person sheet. Gate has a progress bar of people present and a second list, "Not here yet", with phone numbers and an Open button. The scan overlay and admit/undo rules are unchanged. Tests: `run_people.py` (26 checks, 5 deliberate mistakes all caught); older suites updated to find rows in either layout. Not verified: a real phone, the real camera scan.
+
 ---
 
 ## 14. Never share

@@ -149,6 +149,10 @@ body:not(.adm) .app{grid-template-columns:minmax(0,1fr)}body:not(.adm) .rail,bod
 .dk-i{overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}.dk-amt{font:700 2rem var(--display)}.dk-i .flag{display:block;margin:2px 0}
 .dk-f{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--card)}.dk-f button{flex:1}.dk-f kbd{font:600 .72rem var(--mono);opacity:.7;margin-left:6px}
 @media(max-width:820px){.dk-b{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}.dk-i{max-height:38vh}.dk-f kbd{display:none}.dk-amt{font-size:1.5rem}}
+.pq{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px}.pq .chips{margin:0;flex:1}.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.seg button{border:0;border-radius:0;background:transparent;color:var(--ink);min-height:38px;padding:6px 12px}.seg button[aria-pressed="true"]{background:var(--brand);color:var(--on)}
+.ptw{overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}.ptbl{width:100%;border-collapse:collapse;font-size:.92rem}.ptbl th{position:sticky;top:0;background:var(--card);text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);white-space:nowrap;z-index:1}
+.ptbl td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}.ptbl tr:last-child td{border-bottom:0}.ptbl tr.moved{opacity:.55}.ptbl tr.co td:first-child{box-shadow:inset 3px 0 var(--accent)}.ptbl .nw{white-space:nowrap}.ptbl .ac{white-space:nowrap;text-align:right}.ptbl .ac button{min-height:34px;padding:4px 10px}.ptbl .here{color:var(--ok);font-weight:800}
+.gprog{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:0 0 12px}.gprog i{display:block;height:100%;background:var(--ok);transition:width .3s}
 </style></head>
 <body><div class="app"><nav class="rail" id="rail" aria-label="Main"></nav><main><header class="tbar" id="top"></header><div class="page" id="app"></div></main></div><nav class="bnav" id="bnav" aria-label="Main"></nav><div class="more" id="more" hidden></div><div id="wbar"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
@@ -475,8 +479,22 @@ function tBookings(){
 }
 function filteredPeople(){const f=S.f,q=f.q.toLowerCase();
   return people().filter(p=>(S.showMoved||!p.transferred_out_at)&&(!f.pay||p.b.status===f.pay)&&(!f.food||p.food===f.food)&&(!f.loc||p.location===f.loc)&&(!f.role||p.occupation===f.role)&&(!f.type||p.kind===f.type)&&(!f.here||(f.here==="yes")===!!p.checked_in_at)&&(!q||p.name.toLowerCase().includes(q)||p.phone.includes(q)||tlabel(p).toLowerCase().includes(q)||(p.b.booking_code||"").toLowerCase().includes(q)))}
-function vPeople(){$("#v").innerHTML=filtBar(true)+`<div id="tbl"></div>`;tPeople()}
-function tPeople(){const r=filteredPeople(),here=r.filter(p=>p.checked_in_at).length;
+const pview=()=>{let v=null;try{v=localStorage.getItem("adm_pview")}catch(_){}return v==="cards"||v==="table"?v:(window.innerWidth>820?"table":"cards")};
+function pChipsRow(){const P=people().filter(p=>!p.transferred_out_at),f=S.f,n=fn=>P.filter(fn).length,
+  c=(k,l,cnt,on)=>`<button class="chip ${on?"on":""}" data-pchip="${k}" aria-pressed="${on?"true":"false"}">${l} <span>${cnt}</span></button>`;
+  return `<div class="chips" id="pchips">${c("all","Everyone",P.length,!f.here&&!f.pay&&!f.type)}${c("here","Present",n(p=>p.checked_in_at),f.here==="yes")}${c("notyet","Not here yet",n(p=>!p.checked_in_at),f.here==="no")}${c("pending","Payment pending",n(p=>p.b.status==="pending"),f.pay==="pending")}${c("co","Coordinators",n(p=>p.kind==="coordinator"),f.type==="coordinator")}</div>`}
+const pChips=()=>`<div class="pq">${pChipsRow()}
+  <div class="seg" role="group" aria-label="Layout"><button data-pview="table" aria-pressed="${pview()==="table"}">Table</button><button data-pview="cards" aria-pressed="${pview()==="cards"}">Cards</button></div></div>`;
+function vPeople(){$("#v").innerHTML=pChips()+filtBar(true)+`<div id="tbl"></div>`;tPeople()}
+function tPeopleTable(r,here){
+  const tag=t=>`<span class="tg">${esc(t)}</span>`;
+  $("#tbl").innerHTML=`<p class="mute" style="margin:0 0 8px">${r.length} people shown${here?" · "+here+" present":""}</p><div class="ptw"><table class="ptbl"><thead><tr><th>Ticket</th><th>Name</th><th>Phone</th><th>Food</th><th>Booking</th><th>Payment</th><th></th></tr></thead><tbody>`+r.map(p=>{
+    const co=p.kind==="coordinator",mv=!!p.transferred_out_at,msg=S.msgOk&&S.tm[p.id]?" "+tag("✉ "+msgName(S.tm[p.id])):"",pz=S.pzOk&&S.pz[p.id]?" "+tag("🎲 picked"):"";
+    return `<tr class="${mv?"moved":""} ${co?"co":""}" data-pid="${p.id}"><td class="nw">${esc(tlabel(p))}</td><td>${lk("person",p.id,p.name)}${co?" "+tag("Coordinator"):""}${msg}${pz}${p.occupation?`<div class="mute">${esc(p.occupation)}${p.occupation_detail?" · "+esc(p.occupation_detail):""}</div>`:""}</td><td class="nw"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a></td><td>${esc(p.food||"")}<div class="mute">${esc(p.location||"")}</div></td><td class="nw"><button class="tg lk2" data-sheet="booking:${p.booking_id}">${esc(p.b.booking_code)} ›</button></td>
+    <td>${mv?'<span class="pill">Transferred</span>':`<span class="pill p-${p.b.status}">${p.b.status}</span>`}</td>
+    <td class="ac">${mv?"":p.checked_in_at?`<span class="here">✔ Present</span> <button class="sm ghost" data-undo="${p.id}">Undo</button> `:""}${mv||p.b.status==="rejected"?"":co?`<button class="sm ghost" data-co="remove" data-t="${p.id}">Remove coordinator</button>`:`<button class="sm ghost" data-co="make" data-t="${p.id}">Make coordinator</button>`}</td></tr>`}).join("")+`</tbody></table></div>${r.length?"":'<p class="mute">Nobody matches these filters.</p>'}`}
+function tPeople(){const r=filteredPeople(),here=r.filter(p=>p.checked_in_at).length,pc=$("#pchips");if(pc)pc.outerHTML=pChipsRow();
+  if(pview()==="table")return tPeopleTable(r,here);
   const tag=t=>`<span class="tg">${esc(t)}</span>`;
   $("#tbl").innerHTML=`<p class="mute" style="margin:0 0 8px">${r.length} people shown${here?" · "+here+" present":""}</p><div class="pcs">`+r.map(p=>{
     const em="";
@@ -919,14 +937,17 @@ function gStats(){
   return{conf:P.length,here:here.length,vC:f(P,"Veg"),vH:f(here,"Veg"),nC:f(P,"Non-veg"),nH:f(here,"Non-veg")}
 }
 function gCounts(){const el=$("#counts");if(!el)return;const s=gStats();
-  el.innerHTML=`<div><b>${s.here} / ${s.conf}</b><span>Present</span></div><div><b>${s.vH} / ${s.vC}</b><span><i class="vm v"></i>Veg present</span></div><div><b>${s.nH} / ${s.nC}</b><span><i class="vm n"></i>Non-veg present</span></div>`;gAdmitted();renderSheet()}
+  el.innerHTML=`<div><b>${s.here} / ${s.conf}</b><span>Present</span></div><div><b>${s.vH} / ${s.vC}</b><span><i class="vm v"></i>Veg present</span></div><div><b>${s.nH} / ${s.nC}</b><span><i class="vm n"></i>Non-veg present</span></div>`;
+  let pb=$("#gprog");if(!pb&&el.parentNode){el.insertAdjacentHTML("afterend",`<div class="gprog" id="gprog" role="progressbar" aria-label="Present so far"><i></i></div>`);pb=$("#gprog")}
+  if(pb){pb.firstChild.style.width=(s.conf?Math.round(100*s.here/s.conf):0)+"%";pb.setAttribute("aria-valuenow",s.here);pb.setAttribute("aria-valuemax",s.conf)}
+  gAdmitted();renderSheet()}
 function vGate(){
   $("#v").innerHTML=`<div class="counts" id="counts"></div>
   <div class="card"><div class="cam"><video id="vid" playsinline muted></video><div class="frame"></div><div class="off" id="camoff">${S.cam?"":esc(S.camAsk?"Asking for camera permission… tap Allow.":S.camErr||"Camera is off")}</div></div>
     <div class="row"><button id="camtoggle" ${S.camAsk?"disabled":""}>${S.cam?"Stop camera":S.camAsk?"Asking…":S.camErr?"Try again":"Start camera"}</button></div>
     <p class="note" style="margin-bottom:0">Point the camera at the QR code on the ticket. If the camera doesn't work, use the search below.</p></div>
   <div class="card"><h2>Find a person</h2><input id="gfq" placeholder="Name, phone, ticket number or booking ID" value="${esc(S.gfind)}" autocomplete="off" style="width:100%"><div id="gres"></div></div>
-  <div class="card"><h2 id="admh">Admitted</h2><div id="admlist"></div></div>`;
+  <div class="card"><div class="seg" role="group" aria-label="List"><button data-gl="in" aria-pressed="${S.gl!=="out"}">Admitted</button><button data-gl="out" aria-pressed="${S.gl==="out"}">Not here yet</button></div><h2 id="admh" style="margin-top:12px">Admitted</h2><div id="admlist"></div></div>`;
   gCounts();gResults();if(S.cam)gCamAttach();
 }
 function gResults(){
@@ -941,6 +962,8 @@ function gResults(){
 }
 function gAdmitted(){
   const el=$("#admlist");if(!el)return;
+  if(S.gl==="out"){const L=S.tickets.filter(t=>!t.checked_in_at&&!t.transferred_out_at&&bk(t.booking_id).status==="paid").sort((a,b)=>(a.kind==="coordinator")-(b.kind==="coordinator")||(a.ticket_no||a.coord_no||0)-(b.ticket_no||b.coord_no||0)),h=$("#admh");if(h)h.textContent="Not here yet ("+L.length+")";
+    return void(el.innerHTML=L.length?L.map(t=>`<div class="res"><div>${lk("person",t.id,t.name)}<div class="note">${esc(tlabel(t))} · ${esc(t.phone)}</div></div><div style="text-align:right"><button class="sm" data-pick="${t.id}">Open</button></div></div>`).join(""):`<p class="note">Everyone with a confirmed ticket is here.</p>`)}
   const L=S.tickets.filter(t=>t.checked_in_at&&!t.transferred_out_at).sort((a,b)=>new Date(b.checked_in_at)-new Date(a.checked_in_at));
   const h=$("#admh");if(h)h.textContent="Admitted ("+L.length+")";
   el.innerHTML=L.length?L.map(t=>`<div class="res"><div>${lk("person",t.id,t.name)}<div class="note">${esc(tlabel(t))} · ${esc(bk(t.booking_id).booking_code||"")}</div></div><div style="text-align:right"><span class="pill p-here">${esc(gtm(t.checked_in_at))}</span></div></div>`).join(""):`<p class="note">No one has been admitted yet.</p>`;
@@ -1167,6 +1190,11 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
   if(t.dataset.jump){document.getElementById(t.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(t.dataset.chip!==undefined){S.f.pay=t.dataset.chip;vBookings();return}
   if(t.matches&&t.matches('#dkimg img')){t.classList.toggle('z');return}
+  if(t.dataset.gl){S.gl=t.dataset.gl;document.querySelectorAll('[data-gl]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.gl===S.gl)));return gAdmitted()}
+  if(t.dataset.pview){try{localStorage.setItem("adm_pview",t.dataset.pview)}catch(_){}return view({keepForm:true})}
+  if(t.dataset.pchip){const k=t.dataset.pchip,f=S.f,tg=(key,val)=>{f[key]=f[key]===val?"":val};
+    if(k==="all"){f.here="";f.pay="";f.type=""}else if(k==="here")tg("here","yes");else if(k==="notyet")tg("here","no");else if(k==="pending")tg("pay","pending");else if(k==="co")tg("type","coordinator");
+    return view({keepForm:true})}
   if(t.dataset.dk){return t.dataset.dk==='open'?openDesk():deskAct(t.dataset.dk)}
   if(t.dataset.shot){const b=bk(t.dataset.shot),F=flags()[b.id]||[],items=[{path:b.screenshot_path,label:b.booking_code}];
     S.scans.filter(s=>s.booking_id!==b.id).forEach(s=>{const o=bk(s.booking_id);if(F.some(x=>x.includes(o.booking_code)))items.push({path:o.screenshot_path,label:o.booking_code+" (flagged match)"})});return shots(items)}
@@ -1210,7 +1238,7 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
     if(r.error)return toast("Failed: "+r.error.message);await sync("core","reg","log");view({keepForm:true});toast("Settings saved")}
 }
 document.addEventListener("click",async e=>{
-  const b=e.target.closest&&e.target.closest("button"),quick=!b||b.matches(".lk,.chip,.tg,[data-tab],.nav,#theme,#morebtn,[data-sheet],[data-sback],[data-jump],[data-gotab],[data-medit],[data-muse],[data-act],[data-pick],[data-dlg],[data-dk],#camtoggle");
+  const b=e.target.closest&&e.target.closest("button"),quick=!b||b.matches(".lk,.chip,.tg,[data-tab],.nav,#theme,#morebtn,[data-sheet],[data-sback],[data-jump],[data-gotab],[data-medit],[data-muse],[data-act],[data-pick],[data-dlg],[data-dk],[data-pview],[data-pchip],[data-gl],#camtoggle");
   if(!quick&&b.dataset.run)return;   // this button is still working on the last tap
   if(!quick)b.dataset.run="1";
   try{await onClick(e)}catch(err){toast("Something went wrong: "+String((err&&err.message)||err).slice(0,120),6000)}

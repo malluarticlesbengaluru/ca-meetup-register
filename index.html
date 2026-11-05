@@ -1668,7 +1668,7 @@ function tkVenue(){const v=String(evVenue()||"").split(",").map(s=>s.trim()).fil
 /* the co-sponsor logo (cropped above its small tagline line, which is drawn as text instead) and the Mallu Articles mark recoloured for the pink stub */
 let TKI=null;
 function loadTicketImgs(){return new Promise(r=>{if(TKI)return r(TKI);let n=0;const o={mark:null,sp:null,left:null};const done=()=>{if(++n===3){if(o.mark&&o.sp&&o.left)TKI=o;r(o)}};
-  [["mark","assets/ticket-mark.png"],["sp","assets/burg-sponsor-logo.png"],["left","assets/ticket-left.jpg?v=1"]].forEach(a=>{const i=new Image();i.onload=()=>{o[a[0]]=i;done()};i.onerror=()=>done();i.src=a[1]})})}
+  [["mark","assets/ticket-mark.png"],["sp","assets/burg-sponsor-logo.png"],["left","assets/ticket-left.jpg?v=2"]].forEach(a=>{const i=new Image();i.onload=()=>{o[a[0]]=i;done()};i.onerror=()=>done();i.src=a[1]})})}
 const TK_SP={cropFrac:372/403,tag:"SPREADING EDUCATION"};   /* burg-sponsor-logo.png is 479 x 403; the top 372 rows are the bird and the name */
 /* the big title: pale pink "EHSAAS'" and orange "26", condensed capitals with a mottled, slightly worn texture and a soft glow */
 function drawTitle(x,name,cx,top,cap,wT){

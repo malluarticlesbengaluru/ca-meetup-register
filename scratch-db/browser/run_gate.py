@@ -75,7 +75,7 @@ with sync_playwright() as p:
     check('admin: Gate is a tab, and the old "Gate scanner" link is gone', pg.query_selector('button[data-tab="gate"]') is not None and pg.query_selector('a[href*="gate"]') is None)
     A.go_tab(pg,'gate'); check('admin: Gate tab shows the counts, camera card, find and admitted list', all(pg.query_selector(x) is not None for x in ['#counts','#camtoggle','#gfq','#admlist']))
     pg.fill('#gfq','Ben'); check('admin: find works inside the Gate tab', 'Ben' in pg.inner_text('#gres'))
-    pg.click('button[data-tab="people"]'); check('admin: other tabs still work after visiting Gate', pg.query_selector('#tbl .pc') is not None)
+    pg.click('button[data-tab="people"]'); check('admin: other tabs still work after visiting Gate', pg.query_selector('#tbl .pc,#tbl tbody tr') is not None)
     check('no page errors for admin on the merged page', not errs, errs); b.close()
     # the old address just forwards
     old = open('/home/claude/ca-meetup-register/gate/index.html', encoding='utf-8').read()

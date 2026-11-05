@@ -14,14 +14,14 @@ with sync_playwright() as p:
     # ---- 2. Bookings: transfer booking hidden
     pg.click('button[data-tab="bookings"]'); t = pg.inner_text('#tbl')
     check('Bookings tab hides the transfer booking', 'CODE0003' not in t and 'CODE0001' in t, t[:200])
-    check('Bookings tab explains where it went', 'Transfers tab' in pg.inner_text('#v'))
+    check('Bookings tab explains where it went', 'Transfers page' in pg.inner_text('#v'))
     # ---- 3. People
     pg.click('button[data-tab="people"]'); t = pg.inner_text('#tbl')
     check('People: retired Asha hidden by default', 'Asha' not in t and 'Dan' in t, t[:300])
     check('People: no email is shown (email is never asked)', 'dan@example.com' not in t and '@' not in t.replace('@example','x') or 'example.com' not in t, t[:200])
     pg.click('.flt summary'); pg.check('#fmoved'); t = pg.inner_text('#tbl')
     check('People: toggle shows retired ticket as Transferred, with no buttons', 'Asha' in t and 'Transferred' in t)
-    rows = pg.query_selector_all('#tbl .pc'); asha=[r for r in rows if 'Asha' in r.inner_text()][0]
+    rows = pg.query_selector_all('#tbl .pc,#tbl tbody tr'); asha=[r for r in rows if 'Asha' in r.inner_text()][0]
     check('retired row has no Make-coordinator button', asha.query_selector('[data-co],[data-undo]') is None)
     # ---- 4. Scan queue ignores transfer bookings
     go_tab(pg, 'scan'); t = pg.inner_text('#v')
@@ -108,7 +108,7 @@ with sync_playwright() as p:
     # ---- 11. Sheets, links and the back gesture
     b, pg, errs = open_page(p, db())
     pg.click('button[data-tab="people"]')
-    ben = [c for c in pg.query_selector_all('#tbl .pc') if 'Ben' in c.inner_text()][0]
+    ben = [c for c in pg.query_selector_all('#tbl .pc,#tbl tbody tr') if 'Ben' in c.inner_text()][0]
     ben.query_selector('.lk2').click()
     sh = pg.inner_text('#sheetbg')
     check('booking sheet opens from a People card and lists everyone in the booking', 'Ben' in sh and 'Asha' in sh and 'People in this booking' in sh, sh[:200])
@@ -122,7 +122,7 @@ with sync_playwright() as p:
     ben.query_selector('.lk2').click(); pg.click('#sheetbg [data-gotab^="bookings"]')
     check('Open in Bookings tab goes there, closes the sheet, highlights the booking', pg.query_selector('#sheetbg') is None and pg.query_selector('button[data-tab="bookings"][aria-current="page"]') is not None and pg.query_selector('.bk.flash') is not None)
     pg.go_back()
-    check('back from there returns to People with the same sheet open, as it was', pg.query_selector('button[data-tab="people"][aria-current="page"]') is not None and pg.query_selector('#tbl .pc') is not None and 'CODE0001' in pg.inner_text('#sheetbg .sh-h h2'))
+    check('back from there returns to People with the same sheet open, as it was', pg.query_selector('button[data-tab="people"][aria-current="page"]') is not None and pg.query_selector('#tbl .pc,#tbl tbody tr') is not None and 'CODE0001' in pg.inner_text('#sheetbg .sh-h h2'))
     pg.click('#sheetbg [data-sback]')
     check('the close button closes the sheet', pg.query_selector('#sheetbg') is None)
     pg.click('.flt summary'); pg.select_option('#fhere', 'yes')

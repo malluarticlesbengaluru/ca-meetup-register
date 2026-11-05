@@ -914,7 +914,7 @@ setInterval(beat,30000);setInterval(paintBar,1000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)beat()});
 /* ===== payment details: always fresh when the Pay step opens, and re-checked every 30 seconds while it is open ===== */
 async function goPay(){
-  S.step="pay";S.payErr="";S.payFail=false;S.payChanged=false;S.payLoading=true;render();
+  S.step="pay";S.payErr="";S.payFail=false;S.payChanged=false;S.priceChanged=false;S.qrPrice=null;S.payLoading=true;render();
   const ok=await loadPay();
   S.payLoading=false;S.payFail=!ok;
   if(S.step==="pay")render();
@@ -925,8 +925,9 @@ async function checkPay(){
     const{data,error}=await db.rpc("get_payment_info");if(error)throw error;
     const p=payFrom(data);if(S.step!=="pay"||S.busy)return;
     const changed=p.upi!==(S.pay&&S.pay.upi)||p.payee!==(S.pay&&S.pay.payee);
+    const pc=S.qrPrice!=null&&price()!==S.qrPrice;   /* the price per person changed while this QR was on screen */
     S.pay=p;
-    if(changed){S.payChanged=true;const y=window.scrollY;render();window.scrollTo(0,y)}
+    if(changed||pc){if(changed)S.payChanged=true;if(pc)S.priceChanged=true;const y=window.scrollY;render();window.scrollTo(0,y)}
   }catch(_){}
 }
 
@@ -937,7 +938,7 @@ function render(){
   const a=$("#app");document.body.dataset.step=S.step;tmClose();
   const fb=$("#fbar");if(fb)fb.innerHTML=S.step==="form"?fBar():"";   /* the Register form's sticky bar sits outside #app */
   a.innerHTML=stepBar()+({home:vHome,loading:()=>head("Loading…","One moment."),error:vError,closed:vClosed,form:vForm,summary:vSummary,pay:vPay,done:vDone,tickets:vTickets,ticket:vTicket,about:vAbout,teams:vTeams,team:vTeam,members:vMembers,xmenu:vXMenu,xsell:vXSell,xcode:vXCode,xbuy:vXBuy,xform:vXForm,xdone:vXDone,tpay:vTPay})[S.step]()+foot();
-  if(S.step==="pay"&&$("#qr"))whenQR(()=>{const c=$("#qr");if(c&&S.step==="pay")drawQR(c,upiLink())});
+  if(S.step==="pay"&&$("#qr"))whenQR(()=>{const c=$("#qr");if(c&&S.step==="pay"){S.qrPrice=price();drawQR(c,upiLink(S.n*S.qrPrice))}});
   if(S.step==="tpay"&&$("#qr"))whenQR(()=>{const c=$("#qr");if(c&&S.step==="tpay")drawQR(c,upiLink(S.xp.amount,"Meetup ticket transfer"))});
   if(S.step==="ticket")drawTickets().catch(()=>{});
   window.scrollTo(0,0);
@@ -1367,6 +1368,7 @@ function vPay(){
   if(!S.pay||!S.pay.upi)return head("Payment isn't ready yet","The organisers are still setting up payments. Please try again shortly.")+`<div class="row"><button class="ghost" id="back">Back</button>${contactBtn("Hi, I couldn't pay for my "+CONFIG.eventName+" registration because the payment details are missing.","Contact the organisers")}</div>`;
   const qrc=`<canvas id="qr" class="qr" aria-label="UPI payment QR for ₹${total()}"></canvas>`;
   return head("Pay ₹"+total(),S.n+" "+(S.n>1?"people":"person")+" × ₹"+price())+
+  (S.priceChanged?`<div class="card errbox" role="alert"><b>The ticket price was just updated to ₹${price()} per person.</b> Please use the new QR below, which is for ₹${total()}. If you have already paid, don't pay again: upload your screenshot and let the organisers know.</div>`:"")+
   (S.payChanged?`<div class="card errbox" role="alert"><b>The payment details were just updated.</b> Please use the QR below. If you have already paid, don't pay again: upload your screenshot and let the organisers know.</div>`:"")+
   (S.payErr?`<div class="card errbox" role="alert">${esc(S.payErr)}</div>`:"")+
   `<div class="card" style="text-align:center"><div class="pch"><span class="ico">1</span><div><h2>Scan and pay</h2><small>Any UPI app will do</small></div></div><div class="amt">₹${total()}</div>${S.pay.payee?`<div class="note">Pay to <b>${esc(S.pay.payee)}</b></div>`:""}${qrc}
@@ -1874,7 +1876,7 @@ function drawQR(c,text){
   if(!QRLOGO.complete)QRLOGO.addEventListener("load",()=>paintLogo(c,m,k,pad),{once:true});
 }
 function toast(t,ms){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),ms||2200)}
-const shownAmt=()=>S.step==="tpay"?S.xp.amount:total();
+const shownAmt=()=>S.step==="tpay"?S.xp.amount:(S.step==="pay"&&S.qrPrice!=null?S.n*S.qrPrice:total());
 /* The picture people Share or Download: the payment QR drawn at its EXACT size (never scaled, so it scans as well as the one on screen),
    drawn in the same burgundy look as the Pay card on the page (amount, payee, QR, instructions, the Important box and the UPI ID). Share QR and Download QR both use this ONE function, so they are always identical. Only this picture changes; the QR on the page does not. */
 async function blobQR(){

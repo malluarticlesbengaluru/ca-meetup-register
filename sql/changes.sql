@@ -2455,3 +2455,5 @@ select (select pg_get_constraintdef(oid) like '%Industrial Trainee%' from pg_con
 -- RUN THIS IN THE SUPABASE SQL EDITOR *BEFORE* MERGING THE PAGES. Safe to run twice.
 -- NOT tested on a scratch database (it is one UPDATE on three existing columns).
 update public.settings set show_about = true, ask_email = false, ask_feedback = true where id = 1;
+
+   -- 7 Nov 2026: r2_16 gate accounts can no longer approve payments, only admins can (run in Supabase by the owner on 7 Nov; full file: sql/r2_16_gate_no_approve.sql)

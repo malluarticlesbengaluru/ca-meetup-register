@@ -987,6 +987,7 @@ function gOverlay(){
 function gShow(cls,html,extra){S.ov={cls,html,...extra};gOverlay()}
 function gClose(){S.ov=null;S.cool=Date.now()+1500;gOverlay()}   // short pause so the same ticket is not read twice
 const gBtns=`<button data-act="next">Next scan</button><button class="line" data-act="home">Home page</button>`;
+const gIsAdmin=()=>!!(S.staff&&S.staff.role==="admin");   // approving a payment is admin-only (also enforced in the database)
 const gPerson=r=>`<div class="name">${esc(r.name||"")}</div>${r.label?`<div class="lab">${esc(r.label)}</div>`:""}${r.food?`<div class="sub">${gvm(r.food)}</div>`:""}${r.booking_code?`<div class="sub">Booking ${esc(r.booking_code)}${r.people_count>1?" · "+r.people_count+" people":""}</div>`:""}`;
 function gResult(r){
   const kind=r.kind==="coordinator"?`<div class="sub">COORDINATOR</div>`:"";
@@ -994,7 +995,7 @@ function gResult(r){
   else if(r.result==="already_scanned"){const t=r.checked_in_at?gtm(r.checked_in_at):"";
     gShow("r",`<div class="big">ALREADY SCANNED</div>${kind}${gPerson(r)}<div class="sub">Entered at ${esc(t)}${r.checked_in_by?" · checked by "+esc(r.checked_in_by):""}</div>${gBtns}`)}
   else if(r.result==="pending")gShow("a",`<div class="big">PAYMENT PENDING</div>${kind}${gPerson(r)}<div class="sub">${inr(r.amount_expected)} expected</div>
-    <button data-act="shot">View payment screenshot</button><div id="shotbox"></div><button data-act="approve">Approve and admit</button><button class="line" data-act="next">Don't admit, next scan</button><button class="line" data-act="home">Home page</button>`,{res:r})
+    <button data-act="shot">View payment screenshot</button><div id="shotbox"></div>${gIsAdmin()?`<button data-act="approve">Approve and admit</button>`:`<div class="sub">Only an admin can approve this payment. Ask an admin.</div>`}<button class="line" data-act="next">Don't admit, next scan</button><button class="line" data-act="home">Home page</button>`,{res:r})
   else if(r.result==="rejected")gShow("r",`<div class="big">PAYMENT REJECTED</div>${gPerson(r)}<div class="sub">Do not admit. Ask them to contact the organisers.</div>${gBtns}`)
   else if(r.result==="cancelled")gShow("r",`<div class="big">TICKET CANCELLED</div><div class="name">${esc(r.name||"")}</div><div class="sub">${esc(r.old_label||"This number")} is no longer valid.</div><div class="sub">Ask for their current ticket:</div><div class="lab">${esc(r.label||"")}</div>${gBtns}`)
   else gShow("r",`<div class="big">INVALID TICKET</div><div class="sub">This ticket is not valid.</div>${gBtns}`);
@@ -1016,7 +1017,7 @@ async function gUndo(r){
 async function gAdmit(args){
   if(S.busy)return;S.busy=true;
   try{const{data,error}=await db.rpc("admit_ticket",args);if(error)throw error;gResult(data);await gSync(!!args.p_approve);gCounts();gResults()}
-  catch(e){gShow("n",`<div class="big">COULDN'T CHECK</div><div class="sub">${esc(((e&&e.message)||"Network problem").slice(0,120))}</div><div class="sub">Check the internet and scan again. If it then says ALREADY SCANNED, the person was admitted.</div>${gBtns}`)}
+  catch(e){if(/ADMIN_ONLY/.test(String((e&&e.message)||"")))gShow("r",`<div class="big">ADMIN ONLY</div><div class="sub">Only an admin can approve a payment. Ask an admin.</div>${gBtns}`);else gShow("n",`<div class="big">COULDN'T CHECK</div><div class="sub">${esc(((e&&e.message)||"Network problem").slice(0,120))}</div><div class="sub">Check the internet and scan again. If it then says ALREADY SCANNED, the person was admitted.</div>${gBtns}`)}
   S.busy=false;
 }
 function gPayload(text){
@@ -1069,10 +1070,10 @@ async function gAct(t){
   if(act==="shot"){const r=S.ov&&S.ov.res,box=$("#shotbox");if(!r||!box)return;box.textContent="Loading…";
     const{data,error}=await db.storage.from("payment-proofs").createSignedUrl(r.screenshot_path,300);
     box.innerHTML=error?`<div class="sub">Couldn't open the screenshot.</div>`:`<img src="${data.signedUrl}" alt="Payment screenshot">`;return}
-  if(act==="approve"){const r=S.ov&&S.ov.res;if(!r)return;
+  if(act==="approve"){const r=S.ov&&S.ov.res;if(!r)return;if(!gIsAdmin())return gResult(r);
     return gShow("a",`<div class="big">APPROVE PAYMENT?</div><div class="sub">This marks the <b>whole booking</b> ${esc(r.booking_code)} (${r.people_count} ${r.people_count>1?"people":"person"}, ${inr(r.amount_expected)}) as <b>Paid</b> and admits <b>${esc(r.name)}</b>.</div>
       <button data-act="approve2">Yes, approve and admit</button><button class="line" data-act="keep">No, go back</button>`,{res:r})}
-  if(act==="approve2"){const r=S.ov&&S.ov.res;if(!r)return;gClose();return gAdmit({p_id:r.id,p_approve:true})}
+  if(act==="approve2"){const r=S.ov&&S.ov.res;if(!r)return;if(!gIsAdmin())return gResult(r);gClose();return gAdmit({p_id:r.id,p_approve:true})}
 }
 document.addEventListener("visibilitychange",async()=>{if(document.visibilityState==="visible"&&S.cam){try{S.lock=await navigator.wakeLock.request("screen")}catch(_){}}});
 setInterval(async()=>{if(S.staff&&S.tab==="gate"&&!S.ov&&!S.busy){await gSync();gCounts();gResults()}},30000);

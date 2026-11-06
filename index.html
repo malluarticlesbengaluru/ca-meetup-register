@@ -4,7 +4,7 @@
 <meta name="theme-color" content="#1A040C">
 <link rel="icon" type="image/png" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta property="og:type" content="website"><meta property="og:title" content="Ehsaas'26 – Register"><meta property="og:description" content="Register for Ehsaas'26 by Mallu Articles Bengaluru.">
-<meta property="og:image" content="https://rameezmunirrr-gh.github.io/ca-meetup-register/assets/og-image.jpg"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://malluarticlesbengaluru.github.io/ca-meetup-register/assets/og-image.jpg"><meta name="twitter:card" content="summary_large_image">
 <title>Ehsaas'26 – Register</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Lora:ital,wght@1,500&family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
@@ -778,7 +778,7 @@ const CONFIG={
   ticketTime:"2:00 PM",                            // shown on the ticket
   ticketVenue:"Bloom Creative Zone, Haralur",  // shown on the ticket
   organiserName:"Mallu Articles Bengaluru",        // shown on the ticket
-  ticketTagline:"Where strangers feels like home", // slogan under the title on the ticket
+  ticketTagline:"Where strangers feel like home", // slogan under the title on the ticket
   // The UPI ID, the payee name and the organisers' WhatsApp number are NOT here any more:
   // they are set in Admin > Settings > Payment details and read from the database.
   supabaseUrl:"https://jddrwajazpsdrqpwlncu.supabase.co",
@@ -1019,7 +1019,7 @@ function vHome(){
 <img class="bh-logo" src="assets/burg-logo.png" alt="" width="104" height="70">
 <p class="bh-pres">${O} presents</p>
 <h1 aria-label="${E}">${nameHtml()}</h1>
-<p class="bh-tag">Where strangers feels like home</p>
+<p class="bh-tag">Where strangers feel like home</p>
 <div class="bh-cta"><button class="bh-btn bh-gold" id="hero-register" type="button">${ret?"View my ticket":"Register"}</button><button class="bh-btn bh-ghost" id="hero-tickets" type="button">${esc(Q)}</button></div>
 ${spots}
 </div></section>
@@ -1044,7 +1044,7 @@ ${spots}
 <section style="padding-top:0" id="sec-how"><div class="bh-w"><div class="bh-head bh-rv"><p class="bh-eyebrow">How it works</p><h2>Booked in <i>three taps.</i></h2></div>
 <div class="bh-steps">
 <div class="bh-step bh-rv"><h3>Click Register now and fill the form</h3><p data-fr>${esc(frText())}</p></div>
-<div class="bh-step bh-rv"><h3>Pay by UPI</h3><p>We calculate the total and open your UPI app. Make the payment, upload the screenshot and submit.</p></div>
+<div class="bh-step bh-rv"><h3>Pay by UPI</h3><p>We show the total and a QR code. Scan it with any UPI app, pay, then upload the screenshot and submit.</p></div>
 <div class="bh-step bh-rv"><h3>Get your QR ticket</h3><p>Once verified, download your ticket and show it at the gate on the day of the meet.</p></div></div></div></section>
 
 <section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-slider bh-spslider bh-rv" id="sp-slider" role="region" aria-roledescription="carousel" aria-label="Our co-sponsor"><div class="bh-track" id="sp-track"><div class="bh-spsl bh-sponsor on" aria-roledescription="slide" aria-label="1 of 2">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you.</p></div></div>${SPONSOR.video?`<div class="bh-spsl bh-spvid" id="home-sp-vfig" aria-roledescription="slide" aria-label="2 of 2"><video id="home-sp-video" data-src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="none" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video><button class="bh-unmute" id="home-sp-unmute" type="button" hidden>🔊 Tap for sound</button></div>`:""}</div></div>${SPONSOR.video?`<div class="bh-dots bh-spdots" id="sp-dots"><button type="button" aria-label="Show the thank-you card" aria-current="true"></button><button type="button" aria-label="Show the video"></button></div>`:""}</div></section>

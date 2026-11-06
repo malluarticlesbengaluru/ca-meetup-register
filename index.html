@@ -1419,7 +1419,7 @@ function fbCard(r){
   <div class="lbl">How excited are you for ${esc(CONFIG.eventName)}?</div>
   <div class="opts rate" role="radiogroup" aria-label="Excitement, 1 to 5">${[1,2,3,4,5].map(n=>`<label><input type="radio" name="fb_r" data-fb="rating" value="${n}" ${f.rating===n?"checked":""}><span>${n}</span></label>`).join("")}</div>
   <p class="note" style="margin:6px 0 0">1 = a little excited &nbsp;·&nbsp; 5 = can't wait!</p>
-  <label for="fb_c">This is where you say whatever you want to say to the organizers of the program</label><textarea id="fb_c" data-fb="comment" maxlength="1000" rows="4" placeholder="It could be anything: your suggestions, expectations, ideas and more. This helps us run the program better!">${esc(f.comment)}</textarea>
+  <label for="fb_c">This is where you say whatever you want to say to the organizers of the program</label><textarea id="fb_c" data-fb="comment" maxlength="1000" rows="4" placeholder="It could be anything: your suggestions, expectations, ideas or even a simple wishing us all the best!. This helps us run the program better.">${esc(f.comment)}</textarea>
   ${f.err?`<p class="err" role="alert">${esc(f.err)}</p>`:""}
   <div class="row"><button id="fbsend" ${f.busy?"disabled":""}>${f.busy?"Sending…":"Send"}</button></div></div>`}
 async function fbSend(){

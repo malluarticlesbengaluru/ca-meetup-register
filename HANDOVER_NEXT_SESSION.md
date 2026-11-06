@@ -1,5 +1,21 @@
 # HANDOVER FOR THE NEXT CLAUDE SESSION
 
+> **6 Nov 2026, ownership transfer and gate scanner fix:**
+> - **Repo moved:** it is now `malluarticlesbengaluru/ca-meetup-register` (transferred from `rameezmunirrr-gh`). Older links in this file still name the old owner. GitHub redirects them, so they work; replace them when convenient.
+> - **Bug found and fixed: the gate camera could not scan since the 28 Oct merge.** `admin/index.html` calls `jsQR(...)` in the camera loop (`gCamAttach`) but never loaded the library. The old stand-alone gate page loaded it, and `gate/index.html` is now only a forwarder. Fix: added `<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>` after the Chart.js tag in `admin/index.html`. The browser suites missed it because they fake the camera.
+> - **Verified on a real phone, 6 Nov 2026:** a real ticket QR scans and checks in; scanning it again is refused; a short non-ticket QR shows NOT A TICKET. A Google Pay UPI QR (logo in the middle, long link) is not decoded, which is a known jsQR limit and harmless because it is not a ticket.
+> - **Still not verified:** a real gate-staff login (the scan above was on the admin page), scanning in bright light or on older phones, and printed tickets.
+>
+> **Open items found by a code review on 6 Nov (read from the code, not all re-checked):**
+> 1. The ticket's left side is a fixed picture (`assets/ticket-left.jpg`) with "Bloom Creative Zone / Haralur", "NOV 22, 2026" and the co-sponsor baked in. Changing the date or venue in Admin Settings will not change the ticket. Its tagline reads "Where strangers feels like home" (likely a typo).
+> 2. The venue is inconsistent: the page's built-in `CONFIG` says Bloom Creative Zone, Haralur, but the database default is Savoury Business Hotel, Madiwala. The live page prefers the Admin value, so check Admin → Settings → Event details.
+> 3. About page says "600+ members" in the text and "1000+" in its facts chip.
+> 4. Home step 2 says "open your UPI app", but the app deliberately does not open one. Reword.
+> 5. Member photos referenced but missing: `abay`, `dana-fathima`, `muhammed-shamal`, `muhsina` (those people show initials).
+> 6. The sponsor video is about 10 MB.
+> 7. The share-preview image address (`og:image`) needs checking.
+> 8. The database suites were not re-run and need a rebuilt test database. The test counts quoted below (public 101, admin 73, gate 35) may be out of date after the 4 and 5 Nov redesigns.
+
 > **4 Nov 2026 cleanup of the public Home (owner request):** `assets/home-fx.js`, `assets/logo-fluid.js` and the stray root `akhina-a-r.jpg` were deleted, together with the old Home design's CSS (about 20 KB, all of it dead since the BURGUNDY `.bhome` Home: nothing renders `.home` or `#logo`) and the browser suite `scratch-db/browser/run_homefx.py`. Any other mention of `home-fx.js` or `logo-fluid.js` in this file or the handover describes the old design. The Home pop-up on scroll now lives in `homeMount()` in `index.html` (each section follows whichever is further along: a timed pop from the moment it enters the screen, or its scroll position). `run_home.py`, `run_home_touch.py` and `run_public.py` still test the OLD Home and fail on the current one; they need rewriting for `.bhome`.
 
 **Project:** Ehsaas'26 meetup registration app (repo `rameezmunirrr-gh/ca-meetup-register`, public; GitHub Pages + Supabase project `CA-meetup-2026`).

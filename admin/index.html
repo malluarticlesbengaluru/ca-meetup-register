@@ -46,6 +46,7 @@ a.lnk{display:inline-flex;align-items:center;text-decoration:none;border:1px sol
 .bk-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.bk-h b{font-size:1.1rem}.bk-r{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}.bk-amt{font-size:1.35rem;font-weight:800}
 .bk-p{display:grid;gap:2px}.bk-id{font-size:.88rem;word-break:break-all}.bk-f .flag{max-width:none}
 .bk-a{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin-top:auto}.bk-a button{min-height:46px;padding:10px 8px}
+.bk-sel{display:inline-flex;vertical-align:middle;margin:0 8px 0 0}#selbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}.apv{max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:8px;margin:10px 0}.apv>div{padding:8px 10px;border-bottom:1px solid var(--line)}.apv>div:last-child{border-bottom:0}
 @media(max-width:560px){.chip{padding:8px 10px}.chip span{margin-left:2px}.bks{grid-template-columns:1fr}.chips .rev{margin-left:0;flex:1 1 100%}}
 .flt{margin:0 0 10px}.flt summary{cursor:pointer;font-weight:700;color:var(--brand);padding:8px 14px;min-height:42px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--brand);border-radius:12px;list-style:none}.flt summary::-webkit-details-marker{display:none}.flt summary::after{content:"▾";transition:transform .15s}.flt[open] summary::after{transform:rotate(180deg)}.flt .bar{margin-top:4px}
 .pcs{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}.pc{margin:0;display:flex;flex-direction:column;gap:9px}.pc.co{border-top-color:var(--accent)}.pc.moved{opacity:.6;border-top-color:var(--line)}
@@ -191,6 +192,7 @@ function ask(o){
     bg.className="dlg-bg";box.className="dlg"+(o.danger?" danger":"");box.setAttribute("role","alertdialog");box.setAttribute("aria-modal","true");box.setAttribute("aria-labelledby","dlgt");
     const h=document.createElement("h2");h.id="dlgt";h.textContent=o.title||(o.input?"Please type":"Please confirm");box.appendChild(h);
     if(o.text){const p=document.createElement("div");p.className="dlg-t";p.textContent=o.text;box.appendChild(p)}
+    if(o.node)box.appendChild(o.node);
     if(inp){const i=o.input;inp.type=i.type||"text";inp.value=i.value||"";if(i.placeholder)inp.placeholder=i.placeholder;if(i.min!=null)inp.min=i.min;if(i.max!=null)inp.max=i.max;if(i.maxLength)inp.maxLength=i.maxLength;inp.autocomplete="off";inp.setAttribute("aria-label",o.title||"Answer");box.appendChild(inp)}
     const act=document.createElement("div"),no=document.createElement("button"),yes=document.createElement("button");act.className="dlg-a";
     no.className="ghost";no.dataset.dlg="no";no.textContent=o.cancel||"Cancel";yes.dataset.dlg="yes";yes.textContent=o.ok||"OK";if(o.danger)yes.className="bad";
@@ -468,6 +470,33 @@ function amtRemark(b,s){if(!s)return"";if(!s.amounts)return'<div class="mute">Am
   if(!s.amounts.length)return`<div class="err">Amount: couldn't find one</div>`;
   return s.amounts.map(Number).includes(Number(b.amount_expected))?`<div style="color:var(--ok)">Amount ✓ ${inr(b.amount_expected)} found</div>`:`<div class="err">Amount ✗ ${inr(b.amount_expected)} not found</div>`}
 function idRead(id){const s=S.scans.find(x=>x.booking_id===id),b=bk(id);return !s?'<span class="mute">not scanned</span>':(s.txn_ids&&s.txn_ids.length?s.txn_ids.map(esc).join("<br>"):'<span class="mute">no ID found</span>')+amtRemark(b,s)}
+/* ---------- approve payments with a confirmation: tick bookings, see the ticket numbers they will get, then approve ---------- */
+const selSet=()=>S.sel||(S.sel=new Set());
+function selIds(){const s=selSet();return S.bookings.filter(b=>s.has(b.id)&&b.kind!=="transfer"&&b.status==="pending").sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).map(b=>b.id)}   // oldest first, so earlier registrations get the lower numbers
+function selBoxH(id){return `<label class="bk-sel"><input type="checkbox" data-sel="${id}" ${selSet().has(id)?"checked":""} aria-label="Select ${esc(bk(id).booking_code)}"></label>`}
+function selBarH(){const n=selIds().length,k=(S.shown||[]).length;if(!k&&!n)return '<div id="selbar"></div>';
+  return `<div id="selbar">${k?`<button class="ghost sm" data-selall="1">Select all pending (${k})</button>`:""}${n?`<button data-approve="1">Approve (${n})</button><button class="ghost sm" data-selclear="1">Clear</button>`:""}</div>`}
+async function approveFlow(ids){
+  const p=await db.rpc("admin_preview_approval",{p_ids:ids});
+  if(p.error){toast("Failed: "+p.error.message);return null}
+  const pj=p.data||{},all=pj.rows||[],rows=all.filter(r=>r.ok),gone=all.length-rows.length;
+  if(!rows.length){toast("Nothing to approve: "+(gone===1?"this booking is":"these bookings are")+" no longer pending.",5000);await sync("core","reg","ip");view({keepForm:true});if(S.desk)renderDesk();return null}
+  const num=x=>x.kind==="coordinator"?" (coordinator)":(x.ticket_no==null?"":" "+tlabel({ticket_no:x.ticket_no})),nd=document.createElement("div"),list=document.createElement("div");list.className="apv";
+  rows.forEach(r=>{const d=document.createElement("div"),a=document.createElement("b"),m=document.createElement("span"),c=document.createElement("div");
+    a.textContent=r.booking_code;m.className="mute";m.textContent=" · "+r.people_count+(r.people_count===1?" person":" people")+" · "+inr(r.amount);c.textContent=r.people.map(x=>x.name+num(x)).join(", ");d.append(a,m,c);list.appendChild(d)});
+  nd.appendChild(list);
+  if(gone){const g=document.createElement("p");g.className="mute";g.textContent=gone+(gone===1?" booking is":" bookings are")+" no longer pending and left out.";nd.appendChild(g)}
+  const w=document.createElement("p");w.className="mute";w.textContent="Check these against your bank statement before approving.";nd.appendChild(w);
+  const one=rows[0],tk=one.people.filter(x=>x.kind!=="coordinator"&&x.ticket_no!=null).map(x=>tlabel({ticket_no:x.ticket_no})),
+    title=rows.length===1?"This will approve the payment of "+one.people.map(x=>x.name).join(" & ")+", "+inr(one.amount)+"."+(tk.length?" "+(tk.length===1?"Ticket ":"Tickets ")+tk.join(", ")+".":""):
+      "This will approve the payments of "+pj.bookings+" bookings ("+pj.people+(pj.people===1?" person":" people")+", "+inr(pj.amount)+" total)";
+  if(!await ask({title,node:nd,ok:"Yes, approve",cancel:"Cancel"}))return null;
+  const r=await db.rpc("admin_approve_bookings",{p_ids:rows.map(x=>x.booking_id),p_expected_next:pj.next_ticket});
+  if(r.error){const ch=/NUMBERS_CHANGED/.test(r.error.message||"");toast(ch?"Numbers changed. Nothing approved. Please review again.":"Failed: "+r.error.message,ch?6000:undefined);await sync("core","reg","ip");view({keepForm:true});if(S.desk)renderDesk();return null}
+  return {...r.data,_shown:rows}}
+function apvToast(j){const sh=Object.fromEntries((j._shown||[]).map(r=>[r.booking_id,r.people.map(x=>x.ticket_no).join()])),
+  diff=(j.approved||[]).filter(r=>sh[r.booking_id]!==r.people.map(x=>x.ticket_no).join()).map(r=>r.booking_code),n=j.bookings,sk=(j.skipped||[]).length;
+  toast(n+(n===1?" booking":" bookings")+" approved"+(sk?". "+sk+" skipped: no longer pending":"")+(diff.length?". Ticket numbers differ from the confirmation for "+diff.join(", ")+". Check the list.":"."),diff.length||sk?9000:4000)}
 function tBookings(){
   const F=flags(),q=S.f.q.toLowerCase(),rows=S.bookings.filter(b=>{
     if(b.kind==="transfer")return false;
@@ -475,9 +504,9 @@ function tBookings(){
     if(S.f.pay&&b.status!==S.f.pay)return false;if(S.f.review&&!(F[b.id]||[]).length)return false;
     return !q||b.booking_code.toLowerCase().includes(q)||names.some(t=>t.name.toLowerCase().includes(q)||t.phone.includes(q))}).reverse();
   const rank={pending:0,paid:1,rejected:2};rows.sort((x,y)=>rank[x.status]-rank[y.status]);   // pending first, newest first inside each group
-  $("#tbl").innerHTML=`<p class="mute" style="margin:0 0 8px">${rows.length} booking${rows.length===1?"":"s"} shown${S.f.pay==="" ?"":" · "+S.f.pay}</p><div class="bks">`+rows.map(b=>{
+  S.shown=rows.filter(b=>b.status==="pending").map(b=>b.id);$("#tbl").innerHTML=selBarH()+`<p class="mute" style="margin:0 0 8px">${rows.length} booking${rows.length===1?"":"s"} shown${S.f.pay==="" ?"":" · "+S.f.pay}</p><div class="bks">`+rows.map(b=>{
     const ts=S.tickets.filter(t=>t.booking_id===b.id),fl=F[b.id]||[];
-    return `<div class="card bk st-${b.status}" data-bid="${b.id}"><div class="bk-h"><div><b>${esc(b.booking_code)}</b><div class="mute">${new Date(b.created_at).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div></div><div class="bk-r"><span class="bk-amt">${inr(b.amount_expected)}</span><span class="pill p-${b.status}">${b.status}</span></div></div>
+    return `<div class="card bk st-${b.status}" data-bid="${b.id}"><div class="bk-h"><div>${b.status==="pending"?selBoxH(b.id):""}<b>${esc(b.booking_code)}</b><div class="mute">${new Date(b.created_at).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div></div><div class="bk-r"><span class="bk-amt">${inr(b.amount_expected)}</span><span class="pill p-${b.status}">${b.status}</span></div></div>
     <div class="bk-p">${ts.map(t=>`<div><span class="mute">${esc(tlabel(t))}</span> ${lk("person",t.id,t.name)}</div>`).join("")}</div>
     <div class="bk-id"><span class="mute">Payment ID read</span><br>${idRead(b.id)}</div>
     ${fl.length?`<div class="bk-f">${fl.map(x=>`<span class="flag">⚑ ${flagH(x)}</span>`).join("")}</div>`:""}
@@ -547,9 +576,10 @@ async function deskAct(kind){const D=S.desk;if(!D||D.busy)return;
   try{const id=D.ids[D.i];
     if(kind==="reject"&&!await ask({title:"Reject this payment?",text:bk(id).booking_code+" will be marked rejected.",ok:"Reject",danger:true}))return;
     if(S.desk!==D)return;
-    const r=await db.rpc("set_booking_status",{p_booking:id,p_status:kind==="paid"?"paid":"rejected"});if(r.error)return toast("Failed: "+r.error.message);
+    if(kind==="paid"){const j=await approveFlow([id]);if(!j)return;apvToast(j);if(!j.bookings){await sync("core","reg","ip");if(S.desk===D)renderDesk();return}}
+    else{const r=await db.rpc("set_booking_status",{p_booking:id,p_status:"rejected"});if(r.error)return toast("Failed: "+r.error.message)}
     await sync("core","reg","ip");if(S.desk!==D)return;D.done++;D.ids.splice(D.i,1);if(D.i>=D.ids.length)D.i=0;
-    toast(kind==="paid"?"Marked paid. Ticket numbers given.":"Marked rejected");view({keepForm:true});renderDesk()}
+    if(kind!=="paid")toast("Marked rejected");view({keepForm:true});renderDesk()}
   finally{D.busy=false}}
 async function shots(items){
   const m=document.createElement("div");m.className="modal";m.innerHTML=`<div class="box"><div class="bar"><b style="flex:1">Payment screenshot</b><button class="sm" id="mx">Close</button></div><div class="two" id="mi">Loading…</div></div>`;document.body.appendChild(m);
@@ -1225,6 +1255,9 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
   if(t.dataset.dk){return t.dataset.dk==='open'?openDesk():deskAct(t.dataset.dk)}
   if(t.dataset.shot){const b=bk(t.dataset.shot),F=flags()[b.id]||[],items=[{path:b.screenshot_path,label:b.booking_code}];
     S.scans.filter(s=>s.booking_id!==b.id).forEach(s=>{const o=bk(s.booking_id);if(F.some(x=>x.includes(o.booking_code)))items.push({path:o.screenshot_path,label:o.booking_code+" (flagged match)"})});return shots(items)}
+  if(t.dataset.selall){S.shown.forEach(i=>selSet().add(i));return tBookings()}
+  if(t.dataset.selclear){S.sel=new Set();return tBookings()}
+  if(t.dataset.approve||(t.dataset.st==="paid"&&bk(t.dataset.b).status==="pending")){const j=await approveFlow(t.dataset.approve?selIds():[t.dataset.b]);if(!j)return;S.sel=new Set();await sync("core","reg","ip");view({keepForm:true});return apvToast(j)}
   if(t.dataset.st){const r=await db.rpc("set_booking_status",{p_booking:t.dataset.b,p_status:t.dataset.st});if(r.error)return toast("Failed: "+r.error.message);await sync("core","reg","ip");view();return toast("Marked "+t.dataset.st+(t.dataset.st==="paid"?". Ticket numbers given.":""))}
   if(t.dataset.co){const tk=S.tickets.find(x=>x.id===t.dataset.t),make=t.dataset.co==="make";if(!tk)return;
     const msg=make?"Make "+tk.name+" a coordinator?"+(tk.ticket_no!=null?"\n\nTheir guest number "+tlabel(tk)+" will be cancelled and they will get the next coordinator number. Other numbers do not change.":"\n\nThey will get the next coordinator number (E26-"+pad(S.settings.next_coord)+"C)."):"Remove "+tk.name+" as coordinator?\n\nThe coordinator number is retired and never reused. They go back to being a guest.";
@@ -1289,6 +1322,7 @@ document.addEventListener("change",e=>{const t=e.target;
   if(t.id==="sopen"&&$("#pausebox"))$("#pausebox").style.display=t.checked?"block":"none";
   if(t.id==="mode"){S.mode=t.value;view()}
   if(t.id==="fmoved"){S.showMoved=t.checked;tPeople()}
+  if(t.dataset.sel){t.checked?selSet().add(t.dataset.sel):selSet().delete(t.dataset.sel);const sb=$("#selbar");if(sb)sb.outerHTML=selBarH()}
   if(t.dataset.tcall){tcall("admin_transfer_confirm_call",{p_transfer:t.dataset.tcall,p_confirmed:t.checked},t.checked?"Call confirmed":"Call tick removed")}
   if(["fpay","ffood","floc","frole","ftype","fhere","frev"].includes(t.id)){S.f.pay=$("#fpay")?.value??S.f.pay;if($("#ffood")){S.f.food=$("#ffood").value;S.f.loc=$("#floc").value;S.f.role=$("#frole").value;S.f.type=$("#ftype").value;S.f.here=$("#fhere").value}if($("#frev"))S.f.review=$("#frev").checked;S.tab==="people"?tPeople():tBookings()}});
 document.addEventListener("input",e=>{if(e.target.id==="lbody"){S.mf.lot.body=e.target.value;return}if(e.target.id==="lhead"){S.mf.lot.head=e.target.value;return}if(e.target.id==="ln"){S.mf.lot.n=e.target.value;return}if(e.target.id==="mname"){S.mf.name=e.target.value;return}if(e.target.id==="mbody"){S.mf.body=e.target.value;return}if(e.target.id==="gfq"){S.gfind=e.target.value;gResults();return}if(e.target.id==="gtop"){S.gq=e.target.value;gSearch();return}if(e.target.id==="q"){S.f.q=e.target.value;S.tab==="people"?tPeople():tBookings()}});

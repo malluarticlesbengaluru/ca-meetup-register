@@ -1332,6 +1332,7 @@ AS $function$
 declare t tickets%rowtype; b bookings%rowtype; info jsonb; who text; nt tickets%rowtype; nx tickets%rowtype; hops int;
 begin
   if not is_staff() then raise exception 'NOT_ALLOWED'; end if;
+  if p_approve and not is_admin() then raise exception 'ADMIN_ONLY'; end if;
   if p_approve then perform 1 from settings where id = 1 for update; end if;
 
   if p_id is not null then

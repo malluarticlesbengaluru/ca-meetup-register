@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>How to book · Ehsaas'26 (tutorial recorder)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== TUTORIAL RECORDER ===== 
+   Open this page, press Start, and screen-record it. A pretend finger taps through the REAL registration page (tutorial-app.html, which uses demo data only).
+   The picture is a 9:16 stage (540 x 960) that scales to fit your window, so record the stage or crop it later.
+   R = restart. Add ?speed=1.3 to the address for a faster run, ?auto=1 to start without pressing the button. */
+html,body{margin:0;height:100%;overflow:hidden;font-family:Poppins,system-ui,sans-serif}
+body{background:#080104}
+#fit{position:absolute;left:50%;top:50%;width:540px;height:960px;transform-origin:center center}
+#stage{position:relative;width:540px;height:960px;overflow:clip;color:#F6D7C6;
+  background:radial-gradient(120% 70% at 50% 0%,#5a0f28 0%,#2a0816 55%,#14030a 100%)}
+.glow{position:absolute;border-radius:50%;filter:blur(60px);opacity:.35;pointer-events:none}
+.g1{width:300px;height:300px;left:-90px;top:-80px;background:#E9B24C}.g2{width:260px;height:260px;right:-90px;bottom:-60px;background:#8C1838}
+#cap{position:absolute;left:30px;right:30px;top:18px;height:150px;display:flex;flex-direction:column;justify-content:flex-start;transition:opacity .35s,transform .35s}
+#cap.out{opacity:0;transform:translateY(8px)}
+#cap .k{font:700 13px/1 Poppins;letter-spacing:.2em;text-transform:uppercase;color:#E9B24C;margin:6px 0 9px}
+#cap .t{font:700 25px/1.2 Poppins;color:#FFF1E6;letter-spacing:-.01em}
+#cap .n{font:400 14px/1.4 Poppins;color:#F6D7C6;opacity:.8;margin-top:6px}
+#phone{position:absolute;left:50%;top:180px;width:390px;height:844px;margin-left:-195px;transform:scale(.85);transform-origin:50% 0;
+  border-radius:46px;box-shadow:0 0 0 10px #0b0206,0 0 0 12px #3b1a24,0 30px 80px rgba(0,0,0,.6);background:#1A040C;overflow:clip;transition:opacity .4s}
+#phone.off{opacity:0}
+#app{width:390px;height:844px;border:0;display:block;background:#1A040C}
+#cursor{position:absolute;left:195px;top:700px;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:rgba(255,255,255,.85);border:3px solid #E9B24C;
+  box-shadow:0 4px 14px rgba(0,0,0,.5);pointer-events:none;z-index:5;opacity:0;transition:left .75s cubic-bezier(.4,.1,.2,1),top .75s cubic-bezier(.4,.1,.2,1),opacity .3s,transform .15s}
+#cursor.on{opacity:1}#cursor.press{transform:scale(.75)}
+.rip{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:3px solid #E9B24C;pointer-events:none;z-index:4;animation:rip .65s ease-out forwards}
+@keyframes rip{from{transform:scale(.6);opacity:.95}to{transform:scale(2.6);opacity:0}}
+#dots{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:center;gap:8px}
+#dots i{width:8px;height:8px;border-radius:99px;background:rgba(246,215,198,.3);transition:all .3s}
+#dots i.on{width:26px;background:#E9B24C}#dots i.done{background:rgba(233,178,76,.7)}
+#start{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:40px;
+  background:rgba(12,2,6,.82);backdrop-filter:blur(6px)}
+#start h1{margin:0;font:800 34px/1.15 Poppins;color:#FFF1E6}
+#start p{margin:0;font:400 16px/1.5 Poppins;opacity:.85;max-width:380px}
+#start button{margin-top:6px;font:800 20px Poppins;padding:16px 38px;border:0;border-radius:99px;color:#2a0816;background:linear-gradient(180deg,#F7CE70,#F08A3C);cursor:pointer}
+#start small{opacity:.6;font:400 13px Poppins}
+#err{position:absolute;left:10px;right:10px;top:4px;z-index:30;background:#7a0b22;color:#fff;font:600 13px Poppins;padding:8px 12px;border-radius:10px;display:none}
+</style></head><body>
+<div id="fit"><div id="stage">
+  <div class="glow g1"></div><div class="glow g2"></div>
+  <div id="cap"><div class="k" id="ck"></div><div class="t" id="ct"></div><div class="n" id="cn"></div></div>
+  <div id="phone" class="off"><iframe id="app" title="Registration page (demo)"></iframe><div id="cursor"></div></div>
+  <div id="dots"></div>
+  <div id="start"><h1>How to book your<br>Ehsaas’26 ticket</h1>
+    <p>Start your screen recording, then press Start. Everything below is the real booking page with demo data, nothing is saved or sent.</p>
+    <button id="go">▶ Start</button><small>Press R any time to restart</small></div>
+  <div id="err"></div>
+</div></div>
+<script>
+/* ---------- the words on screen: edit these ---------- */
+const STEPS=[
+ {k:"Step 1",t:"Open the link and tap Register"},
+ {k:"Step 2",t:"Enter your details",n:"Booking for friends too? Switch that on and add their details."},
+ {k:"Step 3",t:"Check your details, then continue to pay"},
+ {k:"Step 4",t:"Pay the exact amount by UPI",n:"Check that the UPI ID in your app matches the one shown."},
+ {k:"Step 5",t:"Upload your payment screenshot and submit"},
+ {k:"Step 6",t:"Your Booking ID is saved on this phone automatically",n:"Your ticket shows Pending verification until the organisers confirm your payment."},
+ {k:"Step 7",t:"Later, open the page and tap View my ticket",n:"Tap your saved Booking ID, enter your phone number and tap Check."},
+ {k:"Step 8",t:"Once verified, your ticket is ready",n:"Tap View Ticket, then download it as JPG or PDF."},
+ {k:"Step 9",t:"Opening it on a different phone?",n:"Copy your Booking ID first, then enter it with your phone number under Tickets."}
+];
+const INTRO={k:"Ehsaas’26",t:"How to book your ticket",n:"Mallu Articles Bengaluru"};
+const OUTRO={k:"That’s it!",t:"See you at Ehsaas’26",n:"Sunday 22 November · Bloom Creative Zone, Haralur"};
+const DEMO_PERSON={name:"Anjali Menon",phone:"9876543210",firm:"CA article at ABC & Co."};
+
+/* ---------- engine ---------- */
+const $=s=>document.querySelector(s),Q=new URLSearchParams(location.search),SPEED=+Q.get("speed")||1;
+const frame=$("#app"),cursor=$("#cursor"),phone=$("#phone"),fit=$("#fit");
+let win,doc,runId=0;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms/SPEED));
+setInterval(()=>{for(const e of [document.documentElement,document.body,fit,$("#stage"),phone]){if(e.scrollTop||e.scrollLeft){e.scrollTop=0;e.scrollLeft=0}}},50);
+function scale(){const s=Math.min(innerWidth/540,innerHeight/960);fit.style.transform="translate(-50%,-50%) scale("+s+")"}
+addEventListener("resize",scale);scale();
+$("#dots").innerHTML=STEPS.map(()=>"<i></i>").join("");
+function dot(n){[...$("#dots").children].forEach((d,i)=>{d.className=i+1<n?"done":i+1===n?"on":""})}
+async function caption(c,n){const el=$("#cap");el.classList.add("out");await sleep(300);
+  $("#ck").textContent=c.k||"";$("#ct").textContent=c.t||"";$("#cn").textContent=c.n||"";$("#cn").style.display=c.n?"":"none";
+  el.classList.remove("out");if(typeof n==="number")dot(n)}
+function loadApp(){return new Promise(res=>{frame.onload=()=>{win=frame.contentWindow;doc=frame.contentDocument;res()};frame.src="tutorial-app.html?"+Date.now()})}
+async function waitFor(sel,ms){const t0=Date.now();while(Date.now()-t0<(ms||12000)){const e=doc.querySelector(sel);if(e)return e;await new Promise(r=>setTimeout(r,80))}throw new Error("Not found: "+sel)}
+function rectOf(e){const r=e.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,r}}
+function centre(e){const r=e.getBoundingClientRect(),h=win.innerHeight;win.scrollTo({top:Math.max(0,win.scrollY+r.top-(h/2-r.height/2)),behavior:"smooth"})}
+async function bring(e){const r=e.getBoundingClientRect(),h=win.innerHeight;
+  if(r.top<90||r.bottom>h-100){centre(e);await sleep(900)}}
+async function moveTo(e,vis){await bring(e);const p=rectOf(vis||e);cursor.classList.add("on");
+  cursor.style.left=Math.max(20,Math.min(370,p.x))+"px";cursor.style.top=Math.max(20,Math.min(824,p.y))+"px";await sleep(850);return p}
+function ripple(p){const d=document.createElement("div");d.className="rip";d.style.left=cursor.style.left;d.style.top=cursor.style.top;phone.appendChild(d);setTimeout(()=>d.remove(),700)}
+async function tap(sel,o){o=o||{};const e=typeof sel==="string"?await waitFor(sel):sel;const vis=o.vis?(typeof o.vis==="string"?e.closest(o.vis)||e:o.vis):null;
+  const p=await moveTo(e,vis);cursor.classList.add("press");ripple(p);await sleep(160);cursor.classList.remove("press");
+  if(!o.point){e.click()}await sleep(o.after==null?500:o.after);return e}
+async function point(sel,ms){await tap(sel,{point:true,after:ms||900})}
+async function typeInto(sel,text){const e=await waitFor(sel);const p=await moveTo(e);cursor.classList.add("press");ripple(p);await sleep(140);cursor.classList.remove("press");
+  e.focus({preventScroll:true});e.value="";for(const ch of text){e.value+=ch;e.dispatchEvent(new win.Event("input",{bubbles:true}));await sleep(65)}await sleep(300)}
+async function pick(name,value){const e=await waitFor('input[name="'+name+'"][value="'+value+'"]');await tap(e,{vis:"label"})}
+function scrollTo(y){win.scrollTo({top:y,behavior:"smooth"})}
+async function fakeScreenshot(){const c=document.createElement("canvas");c.width=540;c.height=960;const x=c.getContext("2d");
+  x.fillStyle="#f4f7f4";x.fillRect(0,0,540,960);x.fillStyle="#1f8a4c";x.fillRect(0,0,540,300);
+  x.fillStyle="#fff";x.beginPath();x.arc(270,120,52,0,7);x.fill();x.strokeStyle="#1f8a4c";x.lineWidth=12;x.beginPath();x.moveTo(246,120);x.lineTo(264,140);x.lineTo(298,98);x.stroke();
+  x.fillStyle="#fff";x.font="700 34px Poppins,sans-serif";x.textAlign="center";x.fillText("Payment successful",270,236);
+  x.fillStyle="#222";x.font="800 64px Poppins,sans-serif";x.fillText("₹"+(window.__DEMO.price),270,400);
+  x.fillStyle="#555";x.font="400 26px Poppins,sans-serif";x.fillText("Paid to Mallu Articles Bengaluru",270,460);x.fillText("UPI Ref: 000000000000",270,510);x.fillText("Sample screenshot (demo)",270,560);
+  const b=await new Promise(r=>c.toBlob(r,"image/png"));return new win.File([b],"payment.png",{type:"image/png"})}
+
+/* ---------- the story ---------- */
+async function story(id){
+  const live=()=>{if(id!==runId)throw new Error("stopped")};
+  window.__DEMO={price:250,maxGroup:5,spots:120,verified:false,code:"A7C93E1B",people:[],phone:""};
+  phone.classList.add("off");cursor.classList.remove("on");dot(0);
+  await caption(INTRO);await loadApp();phone.classList.remove("off");await sleep(2600);live();
+
+  /* 1 Home -> Register */
+  await caption(STEPS[0],1);await waitFor("#bar-register");await sleep(1800);
+  await tap("#bar-register");await sleep(500);await tap("#go-register");await waitFor("#n0");await sleep(900);live();
+
+  /* 2 Details */
+  await caption(STEPS[1],2);
+  if(doc.querySelector("#fr"))await point("#fr",1800);
+  await typeInto("#n0",DEMO_PERSON.name);await typeInto("#t0",DEMO_PERSON.phone);
+  await pick("p0_occ","Article Assistant");await typeInto("#od0",DEMO_PERSON.firm);
+  await pick("p0_loc","In Bengaluru");await pick("p0_food","Veg");await sleep(700);live();
+
+  /* 3 Review */
+  await caption(STEPS[2],3);await tap("#review",{after:1200});await waitFor("#topay");await sleep(2600);
+  await tap("#topay");await waitFor("#qr");await sleep(1500);live();
+
+  /* 4 Pay */
+  await caption(STEPS[3],4);scrollTo(0);await sleep(1800);
+  const v=doc.querySelector(".verify");if(v){centre(v);await sleep(2800)}
+  await point("#copy",1400);live();
+
+  /* 5 Upload + submit */
+  await caption(STEPS[4],5);const inp=await waitFor("#shot");await moveTo(inp);await sleep(500);
+  const f=await fakeScreenshot();const dt=new win.DataTransfer();dt.items.add(f);inp.files=dt.files;inp.dispatchEvent(new win.Event("change",{bubbles:true}));
+  await sleep(1800);await tap("#submit",{after:900});await waitFor("#copyid",20000);live();
+
+  /* 6 Booking saved, pending */
+  await caption(STEPS[5],6);scrollTo(0);await sleep(2800);
+  const pend=doc.querySelector(".pill.p-wait");if(pend){centre(pend);await sleep(3200)}
+  await tap("#copyid",{after:1600});live();
+
+  /* 7 Later: View my ticket */
+  await caption(STEPS[6],7);await tap("#go-home");await waitFor("#bar-register");await sleep(1400);
+  await tap("#bar-register");await sleep(500);await tap("#go-register");await waitFor(".chip[data-hist]");await sleep(1200);
+  await tap(".chip[data-hist]");await typeInto("#tkph",DEMO_PERSON.phone);await tap("#tsearch",{after:600});await waitFor(".pill.p-wait");await sleep(3400);live();
+
+  /* 8 Verified: view + download */
+  await caption(STEPS[7],8);window.__DEMO.verified=true;await sleep(900);
+  await tap("#tsearch",{after:600});await waitFor(".pill.p-ok");await sleep(1800);
+  await tap("[data-view]");await waitFor("#tc0");
+  for(let i=0;i<60;i++){let ok=false;try{ok=win.eval("S.cv.length>0")}catch(_){}if(ok)break;await new Promise(r=>setTimeout(r,250))}
+  await sleep(3800);
+  const dl=await waitFor('[data-dl="jpg"]');await tap(dl,{after:2200});await point('[data-dl="pdf"]',1800);live();
+
+  /* 9 Different phone */
+  await caption(STEPS[8],9);phone.classList.add("off");await sleep(600);await loadApp();phone.classList.remove("off");cursor.classList.remove("on");await sleep(1200);
+  await waitFor("#go-tickets");await tap("#go-tickets");await waitFor("#bq");await sleep(900);
+  await typeInto("#bq",window.__DEMO.code);await typeInto("#tkph",DEMO_PERSON.phone);await tap("#tsearch",{after:600});await waitFor(".pill.p-ok");await sleep(3200);live();
+
+  /* the end */
+  phone.classList.add("off");cursor.classList.remove("on");await caption(OUTRO,0);dot(9);await sleep(3500);
+}
+async function run(){const id=++runId;$("#start").style.display="none";$("#err").style.display="none";
+  try{await story(id)}catch(e){if(e.message!=="stopped"){$("#err").textContent="Tutorial stopped: "+e.message;$("#err").style.display="block";console.error(e)}}}
+$("#go").onclick=run;
+addEventListener("keydown",e=>{if(e.key==="r"||e.key==="R"){run()}});
+if(Q.get("auto"))run();
+</script></body></html>

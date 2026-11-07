@@ -85,6 +85,11 @@ settings|25|show_about|boolean|t|true
 settings|26|ask_email|boolean|t|true
 settings|27|ask_feedback|boolean|t|true
 settings|28|show_messages|boolean|t|false
+settings|29|contact1_name|text|f|
+settings|30|contact2_name|text|f|
+settings|31|contact2_number|text|f|
+settings|32|contact3_name|text|f|
+settings|33|contact3_number|text|f|
 settings_log|1|id|bigint|t|
 settings_log|2|at|timestamp with time zone|t|now()
 settings_log|3|changed_by|uuid|f|
@@ -204,6 +209,9 @@ screenshot_scans | screenshot_scans_pkey | PRIMARY KEY (booking_id)
 screenshot_scans | screenshot_scans_scanned_by_fkey | FOREIGN KEY (scanned_by) REFERENCES auth.users(id)
 settings | settings_cap_check | CHECK ((cap >= 0))
 settings | settings_code_hours_check | CHECK (((private_code_hours >= 1) AND (private_code_hours <= 168)))
+settings | settings_contact_names_check | CHECK ((((contact1_name IS NULL) OR ((char_length(contact1_name) >= 1) AND (char_length(contact1_name) <= 40))) AND ((contact2_name IS NULL) OR ((char_length(contact2_name) >= 1) AND (char_length(contact2_name) <= 40))) AND ((contact3_name IS NULL) OR ((char_length(contact3_name) >= 1) AND (char_length(contact3_name) <= 40)))))
+settings | settings_contact_numbers_check | CHECK ((((contact2_number IS NULL) OR (contact2_number ~ '^[0-9]{11,15}$'::text)) AND ((contact3_number IS NULL) OR (contact3_number ~ '^[0-9]{11,15}$'::text))))
+settings | settings_contact_pairs_check | CHECK ((((contact2_name IS NULL) = (contact2_number IS NULL)) AND ((contact3_name IS NULL) = (contact3_number IS NULL))))
 settings | settings_grace_check | CHECK (((grace_minutes >= 1) AND (grace_minutes <= 60)))
 settings | settings_id_check | CHECK ((id = 1))
 settings | settings_ip_flag_check | CHECK (((ip_flag_threshold >= 2) AND (ip_flag_threshold <= 1000)))
@@ -738,6 +746,51 @@ AS $function$
   insert into settings_log (changed_by, who, area, field, old_value, new_value)
   values (auth.uid(), _actor(), 'transfer', p_field, p_old, p_new) $function$
 
+--- admin_approve_bookings(p_ids uuid[], p_expected_next integer) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_approve_bookings(p_ids uuid[], p_expected_next integer DEFAULT NULL::integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  s_next int; r record; b bookings%rowtype; t record;
+  ok_rows jsonb := '[]'::jsonb; skip_rows jsonb := '[]'::jsonb; ppl jsonb;
+  n_ok int := 0; n_people int := 0; n_amt bigint := 0;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  if p_ids is null or cardinality(p_ids) = 0 then raise exception 'NO_BOOKINGS'; end if;
+  if cardinality(p_ids) > 200 then raise exception 'TOO_MANY'; end if;
+  -- same lock as set_booking_status: nobody else hands out numbers while this runs
+  perform 1 from settings where id = 1 for update;
+  select next_ticket into s_next from settings where id = 1;
+  if p_expected_next is not null and p_expected_next <> s_next then
+    raise exception 'NUMBERS_CHANGED' using detail = 'The next free ticket number is now ' || s_next || ', not ' || p_expected_next || '. Nothing was approved.';
+  end if;
+  for r in select id from (select u.id, min(u.ord) o from unnest(p_ids) with ordinality u(id, ord) group by u.id) q order by o loop
+    select * into b from bookings where id = r.id for update;
+    if not found then
+      skip_rows := skip_rows || jsonb_build_object('booking_id', r.id, 'reason', 'NOT_FOUND');
+    elsif b.kind = 'transfer' then
+      skip_rows := skip_rows || jsonb_build_object('booking_id', b.id, 'booking_code', b.booking_code, 'reason', 'TRANSFER');
+    elsif b.status <> 'pending' then
+      skip_rows := skip_rows || jsonb_build_object('booking_id', b.id, 'booking_code', b.booking_code, 'reason', 'NOT_PENDING', 'status', b.status);
+    else
+      -- exactly what set_booking_status does for 'paid'
+      update bookings set status = 'paid', reviewed_by = auth.uid(), reviewed_at = now(), reviewed_via = 'admin'
+      where id = b.id;
+      perform _assign_numbers(b.id);
+      ppl := '[]'::jsonb;
+      for t in select name, ticket_no from tickets where booking_id = b.id order by reg_seq loop
+        ppl := ppl || jsonb_build_object('name', t.name, 'ticket_no', t.ticket_no);
+      end loop;
+      ok_rows := ok_rows || jsonb_build_object('booking_id', b.id, 'booking_code', b.booking_code, 'people_count', b.people_count, 'amount', b.amount_expected, 'people', ppl);
+      n_ok := n_ok + 1; n_people := n_people + b.people_count; n_amt := n_amt + b.amount_expected;
+    end if;
+  end loop;
+  return jsonb_build_object('approved', ok_rows, 'skipped', skip_rows, 'bookings', n_ok, 'people', n_people, 'amount', n_amt);
+end $function$
+
 --- admin_assign_messages(p_pairs jsonb) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.admin_assign_messages(p_pairs jsonb)
  RETURNS integer
@@ -880,13 +933,56 @@ declare r record;
 begin
   if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
   select at, changed_by, who into r from settings_log
-   where area = 'settings' and field in ('upi_id', 'payee_name', 'whatsapp_number') and at > now() - interval '7 days'
+   where area = 'settings' and field in ('upi_id', 'payee_name', 'whatsapp_number', 'contact1_name', 'contact2_name', 'contact2_number', 'contact3_name', 'contact3_number') and at > now() - interval '7 days'
    order by at desc, id desc limit 1;
   if not found then return null; end if;
   return jsonb_build_object('at', r.at, 'who', r.who,
     'by_me', r.changed_by is not null and r.changed_by = auth.uid(),
     'fields', (select coalesce(jsonb_agg(l.field order by l.field), '[]'::jsonb) from settings_log l
-               where l.area = 'settings' and l.at = r.at and l.field in ('upi_id', 'payee_name', 'whatsapp_number')));
+               where l.area = 'settings' and l.at = r.at and l.field in ('upi_id', 'payee_name', 'whatsapp_number', 'contact1_name', 'contact2_name', 'contact2_number', 'contact3_name', 'contact3_number')));
+end $function$
+
+--- admin_preview_approval(p_ids uuid[]) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_preview_approval(p_ids uuid[])
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  nxt int; r record; b bookings%rowtype; t record;
+  rows jsonb := '[]'::jsonb; ppl jsonb; n_ok int := 0; n_people int := 0; n_amt bigint := 0;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  if p_ids is null or cardinality(p_ids) = 0 then return jsonb_build_object('rows','[]'::jsonb,'next_ticket',null,'bookings',0,'people',0,'amount',0); end if;
+  if cardinality(p_ids) > 200 then raise exception 'TOO_MANY'; end if;
+  select next_ticket into nxt from settings where id = 1;
+  -- same order as given, each booking once
+  for r in select id from (select u.id, min(u.ord) o from unnest(p_ids) with ordinality u(id, ord) group by u.id) q order by o loop
+    select * into b from bookings where id = r.id;
+    if not found then
+      rows := rows || jsonb_build_object('booking_id', r.id, 'ok', false, 'reason', 'NOT_FOUND');
+    elsif b.kind = 'transfer' then
+      rows := rows || jsonb_build_object('booking_id', b.id, 'booking_code', b.booking_code, 'ok', false, 'reason', 'TRANSFER');
+    elsif b.status <> 'pending' then
+      rows := rows || jsonb_build_object('booking_id', b.id, 'booking_code', b.booking_code, 'ok', false, 'reason', 'NOT_PENDING', 'status', b.status);
+    else
+      ppl := '[]'::jsonb;
+      for t in select id, name, kind, ticket_no from tickets where booking_id = b.id order by reg_seq loop
+        if t.kind = 'guest' and t.ticket_no is null then
+          ppl := ppl || jsonb_build_object('name', t.name, 'ticket_no', nxt); nxt := nxt + 1;   -- same rule as _assign_numbers
+        else
+          ppl := ppl || jsonb_build_object('name', t.name, 'ticket_no', t.ticket_no, 'kind', t.kind);
+        end if;
+      end loop;
+      rows := rows || jsonb_build_object('booking_id', b.id, 'booking_code', b.booking_code, 'ok', true,
+                'people_count', b.people_count, 'amount', b.amount_expected, 'people', ppl);
+      n_ok := n_ok + 1; n_people := n_people + b.people_count; n_amt := n_amt + b.amount_expected;
+    end if;
+  end loop;
+  return jsonb_build_object('rows', rows,
+           'next_ticket', (select next_ticket from settings where id = 1),   -- the number the preview started from
+           'bookings', n_ok, 'people', n_people, 'amount', n_amt);
 end $function$
 
 --- admin_registration_status() | execute rights: {postgres=X/postgres,authenticated=X/postgres}
@@ -965,6 +1061,54 @@ begin
   if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
   if p_ask is null then raise exception 'INVALID_VALUE'; end if;
   update settings set ask_feedback = p_ask where id = 1;
+end $function$
+
+--- admin_set_contacts(p_name1 text, p_num1 text, p_name2 text, p_num2 text, p_name3 text, p_num3 text) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_set_contacts(p_name1 text, p_num1 text, p_name2 text DEFAULT NULL::text, p_num2 text DEFAULT NULL::text, p_name3 text DEFAULT NULL::text, p_num3 text DEFAULT NULL::text)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  n1 text; w1 text; n2 text; w2 text; n3 text; w3 text;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  n1 := btrim(regexp_replace(coalesce(p_name1, ''), '\s+', ' ', 'g'));
+  n2 := btrim(regexp_replace(coalesce(p_name2, ''), '\s+', ' ', 'g'));
+  n3 := btrim(regexp_replace(coalesce(p_name3, ''), '\s+', ' ', 'g'));
+  w1 := regexp_replace(coalesce(p_num1, ''), '[^0-9]', '', 'g');          -- allows "+91 62352 02168"
+  w2 := regexp_replace(coalesce(p_num2, ''), '[^0-9]', '', 'g');
+  w3 := regexp_replace(coalesce(p_num3, ''), '[^0-9]', '', 'g');
+
+  -- contact 1 is required: both name and number
+  if n1 = '' or w1 = '' then
+    raise exception 'FIRST_CONTACT_REQUIRED' using detail = 'contact 1';
+  end if;
+  if char_length(n1) > 40 then raise exception 'INVALID_CONTACT_NAME' using detail = 'contact 1'; end if;
+  if w1 !~ '^[0-9]{11,15}$' then raise exception 'INVALID_WHATSAPP' using detail = 'contact 1'; end if;
+
+  -- contacts 2 and 3 are optional, but name and number come together
+  if (n2 = '') <> (w2 = '') then raise exception 'CONTACT_INCOMPLETE' using detail = 'contact 2'; end if;
+  if n2 <> '' then
+    if char_length(n2) > 40 then raise exception 'INVALID_CONTACT_NAME' using detail = 'contact 2'; end if;
+    if w2 !~ '^[0-9]{11,15}$' then raise exception 'INVALID_WHATSAPP' using detail = 'contact 2'; end if;
+  end if;
+  if (n3 = '') <> (w3 = '') then raise exception 'CONTACT_INCOMPLETE' using detail = 'contact 3'; end if;
+  if n3 <> '' then
+    if char_length(n3) > 40 then raise exception 'INVALID_CONTACT_NAME' using detail = 'contact 3'; end if;
+    if w3 !~ '^[0-9]{11,15}$' then raise exception 'INVALID_WHATSAPP' using detail = 'contact 3'; end if;
+  end if;
+
+  -- one single update: all three contacts are saved together or not at all
+  update settings set
+    contact1_name   = n1,
+    whatsapp_number = w1,
+    contact2_name   = nullif(n2, ''),
+    contact2_number = nullif(w2, ''),
+    contact3_name   = nullif(n3, ''),
+    contact3_number = nullif(w3, '')
+  where id = 1;
 end $function$
 
 --- admin_set_event(p_event_at timestamp with time zone, p_venue text) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
@@ -1435,7 +1579,12 @@ CREATE OR REPLACE FUNCTION public.get_payment_info()
  STABLE SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
-  select jsonb_build_object('upi_id', upi_id, 'payee_name', payee_name, 'whatsapp', whatsapp_number)
+  select jsonb_build_object('upi_id', upi_id, 'payee_name', payee_name, 'whatsapp', whatsapp_number,
+    'contacts', (select coalesce(jsonb_agg(jsonb_build_object('name', c.nm, 'number', c.num) order by c.ord), '[]'::jsonb)
+                 from (values (1, contact1_name, whatsapp_number),
+                              (2, contact2_name, contact2_number),
+                              (3, contact3_name, contact3_number)) as c(ord, nm, num)
+                 where c.num is not null))
   from settings where id = 1 $function$
 
 --- get_public_status(p_session uuid) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}

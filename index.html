@@ -336,7 +336,6 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-final .bh-lede{margin:0 auto 28px}
 .bhome .bh-foot{padding:34px 0 110px;text-align:center;font:600 .78rem/1.8 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--rose)}
 .bhome .bh-foot b{color:var(--cream)}
-.bhome .bh-foot .bh-with{font-size:.7rem;letter-spacing:.16em;color:var(--gold);opacity:.9}
 .bhome .bh-flogos{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:22px}
 .bhome .bh-flogos img{display:block;width:auto}
 .bhome .bh-flogos .bh-fm{height:46px}
@@ -410,6 +409,7 @@ body:not([data-step="home"]):not([data-step="form"]) h2{font:800 1.2rem/1.2 var(
 body:not([data-step="home"]):not([data-step="form"]) .sub{font:italic 500 1.05rem/1.6 var(--serif);color:rgba(246,215,198,.88)}
 body:not([data-step="home"]):not([data-step="form"]) a:not(.btn){color:var(--blush)}
 body:not([data-step="home"]):not([data-step="form"]) .foot{font:600 .74rem/1.6 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--rose)}
+body:not([data-step="home"]):not([data-step="form"]) .foot.foot-r6{margin-top:2px;font-size:.68rem;color:#F3D9A0;opacity:.9}   /* light gold, About us page only */
 body:not([data-step="home"]):not([data-step="form"]) label,body:not([data-step="home"]):not([data-step="form"]) .lbl{color:var(--cream);font-weight:600}
 body:not([data-step="home"]):not([data-step="form"]) .amt{font:900 3.2rem/1 var(--sans);letter-spacing:-.02em;background:linear-gradient(180deg,#FBDD8E,var(--gold) 55%,var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent}
 body:not([data-step="home"]):not([data-step="form"]) .idcard .amt{font:900 2.4rem/1.1 var(--sans);letter-spacing:.1em}
@@ -966,7 +966,7 @@ async function checkPay(){
 
 function stepBar(){const i=({summary:2,pay:3})[S.step];if(!i)return"";
   return `<ol class="steps" aria-label="Progress">`+["Details","Review","Payment"].map((n,j)=>`<li class="${j+1<i?"done":j+1===i?"cur":""}"${j+1===i?' aria-current="step"':""}><i>${j+1<i?"✓":j+1}</i><span>${n}</span></li>`).join("")+`</ol>`}
-function foot(){return S.step==="home"||S.step==="form"?"":`<p class="foot">${esc(CONFIG.organiserName)}</p>`}
+function foot(){return S.step==="home"||S.step==="form"?"":`<p class="foot">${esc(CONFIG.organiserName)}</p>`+(S.step==="about"?`<p class="foot foot-r6">with R6 Invitations</p>`:"")}
 function render(){
   const a=$("#app");document.body.dataset.step=S.step;tmClose();
   const fb=$("#fbar");if(fb)fb.innerHTML=S.step==="form"?fBar():"";   /* the Register form's sticky bar sits outside #app */
@@ -1095,7 +1095,7 @@ ${ret?`<p class="bh-note">${n===1?"Your booking is saved on this device. Enter y
 <div class="bh-cd" id="bh-cd" role="timer" aria-label="Countdown to the meetup"><div><b>00</b><span>days</span></div><div><b>00</b><span>hours</span></div><div><b>00</b><span>mins</span></div><div><b>00</b><span>secs</span></div></div>
 <p class="bh-cdwhen"><span data-ev="d">${esc(evDate())}</span> · <span data-ev="t">${esc(evTime())}</span></p></div></div></section>
 
-<footer class="bh-foot"><div class="bh-w"><b>${O}</b> · ${E}<br><span class="bh-with">with R6 Invitations</span>${SPONSOR.name?`<br>Co-sponsored by ${esc(SPONSOR.name)}`:""}<div class="bh-flogos"><img class="bh-fm" src="assets/burg-logo.png" alt="${O} logo">${SPONSOR.logo?`<span class="bh-fsep" aria-hidden="true"></span><img class="bh-fe" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.previousElementSibling.remove();this.remove()">`:""}</div></div></footer>
+<footer class="bh-foot"><div class="bh-w"><b>${O}</b> · ${E}${SPONSOR.name?`<br>Co-sponsored by ${esc(SPONSOR.name)}`:""}<div class="bh-flogos"><img class="bh-fm" src="assets/burg-logo.png" alt="${O} logo">${SPONSOR.logo?`<span class="bh-fsep" aria-hidden="true"></span><img class="bh-fe" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.previousElementSibling.remove();this.remove()">`:""}</div></div></footer>
 </div>`;
 }
 

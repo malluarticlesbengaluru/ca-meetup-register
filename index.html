@@ -1716,8 +1716,8 @@ function tkDate(){const p=evParts({day:"numeric",month:"long",year:"numeric"});i
 function tkVenue(){const v=String(evVenue()||"").split(",").map(s=>s.trim()).filter(Boolean);let b=v.slice(1).join(" ");if(!/bengaluru|bangalore/i.test(b))b=(b?b+" ":"")+"Bengaluru";return{a:(v[0]||"").toUpperCase(),b:b.toUpperCase()}}
 /* the co-sponsor logo (cropped above its small tagline line, which is drawn as text instead) and the Mallu Articles mark recoloured for the pink stub */
 let TKI=null;
-function loadTicketImgs(){return new Promise(r=>{if(TKI)return r(TKI);let n=0;const o={mark:null,sp:null,left:null};const done=()=>{if(++n===3){if(o.mark&&o.sp&&o.left)TKI=o;r(o)}};
-  [["mark","assets/ticket-mark.png"],["sp","assets/burg-sponsor-logo.png"],["left","assets/ticket-left.jpg?v=2"]].forEach(a=>{const i=new Image();i.onload=()=>{o[a[0]]=i;done()};i.onerror=()=>done();i.src=a[1]})})}
+function loadTicketImgs(){return new Promise(r=>{if(TKI)return r(TKI);let n=0;const o={mark:null,sp:null,left:null,leftC:null};const done=()=>{if(++n===4){if(o.mark&&o.sp&&o.left)TKI=o;r(o)}};
+  [["mark","assets/ticket-mark.png"],["sp","assets/burg-sponsor-logo.png"],["left","assets/ticket-left.jpg?v=2"],["leftC","assets/ticket-left-coord.jpg?v=1"]].forEach(a=>{const i=new Image();i.onload=()=>{o[a[0]]=i;done()};i.onerror=()=>done();i.src=a[1]})})}
 const TK_SP={cropFrac:372/403,tag:"SPREADING EDUCATION"};   /* burg-sponsor-logo.png is 479 x 403; the top 372 rows are the bird and the name */
 /* the big title: pale pink "EHSAAS'" and orange "26", condensed capitals with a mottled, slightly worn texture and a soft glow */
 function drawTitle(x,name,cx,top,cap,wT){
@@ -1745,8 +1745,8 @@ function drawCrowd(x,X0,X1,Y0,Y1){
   row("#18060C","rgba(255,135,175,.36)",38,64,15,23,40);
   x.fillStyle="#150409";x.fillRect(X0,Y1-28,X1-X0,34)}
 /* soft paper-like mottling, used on the pink stub */
-function drawPaper(x,X,Y,W,H,seed){const r=prng(seed);for(let i=0;i<110;i++){const R=20+r()*80,cx=X+r()*W,cy=Y+r()*H,g=x.createRadialGradient(cx,cy,0,cx,cy,R),lt=r()<.55;g.addColorStop(0,lt?"rgba(255,235,240,.16)":"rgba(214,110,140,.10)");g.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=g;x.fillRect(cx-R,cy-R,R*2,R*2)}
-  for(let i=0;i<500;i++){x.fillStyle="rgba("+(r()<.5?"255,255,255":"190,80,110")+","+(.05+r()*.08)+")";x.beginPath();x.arc(X+r()*W,Y+r()*H,.6+r()*1.4,0,7);x.fill()}}
+function drawPaper(x,X,Y,W,H,seed,P){P=P||{lt:"rgba(255,235,240,.16)",dk:"rgba(214,110,140,.10)",sp:"190,80,110"};const r=prng(seed);for(let i=0;i<110;i++){const R=20+r()*80,cx=X+r()*W,cy=Y+r()*H,g=x.createRadialGradient(cx,cy,0,cx,cy,R),lt=r()<.55;g.addColorStop(0,lt?P.lt:P.dk);g.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=g;x.fillRect(cx-R,cy-R,R*2,R*2)}
+  for(let i=0;i<500;i++){x.fillStyle="rgba("+(r()<.5?"255,255,255":P.sp)+","+(.05+r()*.08)+")";x.beginPath();x.arc(X+r()*W,Y+r()*H,.6+r()*1.4,0,7);x.fill()}}
 /* ticket panel: rounded far corners, and a semicircle scoop at the tear line (top and bottom). Drawn in "left panel" orientation; the stub is the mirror image. */
 const G_OLD={cx:1298,R:46,top:22,bot:646,e:18},G_REF={cx:1303.2,R:34,top:21.7,bot:640.7,e:8.8};   /* G_REF matches the left-side picture (assets/ticket-left.jpg) */
 function panelPath(x,D,mirror,G){
@@ -1766,33 +1766,38 @@ function drawTicketQR(x,t,cx,top,size){
   if(t.secret&&t.label){const q=qrcode(0,"M");q.addData(t.label+"|"+t.secret);q.make();const m=q.getModuleCount(),k2=Math.floor(size/m),o=cx-m*k2/2,p=top+(size-m*k2)/2;
     x.fillStyle="#000";for(let r=0;r<m;r++)for(let cc=0;cc<m;cc++)if(q.isDark(r,cc))x.fillRect(o+cc*k2,p+r*k2,k2,k2)}
   else txt(x,"Not ready",cx,top+size/2,30,"600","#444","center",0)}
-function infoFinal(x,t,coord,cx,nameY,lineY,INK){
+function infoFinal(x,t,coord,cx,nameY,lineY,INK,PAL){PAL=PAL||{sep:"rgba(26,10,16,.4)",coord:"#7A4B00"};
   const veg=t.food==="Veg",fc=veg?"#0B7A3E":"#B3261E",AN='"Anton","Bebas Neue",Impact,sans-serif';
   /* name: Fraunces (the serif used on the page), shrinks only if the name is very long */
   let nz=44;x.font="700 "+nz+"px "+FD;while(nz>22&&x.measureText(t.name).width>430){nz-=2;x.font="700 "+nz+"px "+FD}
   x.save();x.shadowColor="rgba(255,255,255,.35)";x.shadowBlur=0;txt(x,t.name,cx,nameY,nz,"700",INK,"center",0,FD);x.restore();
   /* ticket number in Anton, then the food type */
-  const bits=[[(coord?"":"TICKET ")+(t.label||"—"),INK],[veg?"VEG":"NON-VEG",fc]];if(coord)bits.push(["COORDINATOR","#7A4B00"]);
+  const bits=[[(coord?"":"TICKET ")+(t.label||"—"),INK],[veg?"VEG":"NON-VEG",fc]];if(coord)bits.push(["COORDINATOR",PAL.coord]);
   const SEP="   |   ";let af=34,sw,ws,tot;
   for(;af>=16;af--){x.font="400 "+af+"px "+AN;try{x.letterSpacing=(af*.07)+"px"}catch(_){}sw=x.measureText(SEP).width;ws=bits.map(b=>x.measureText(b[0]).width);tot=ws.reduce((a,b)=>a+b,0)+sw*(bits.length-1);if(tot<=440)break}
-  let px=cx-tot/2;x.textAlign="left";x.textBaseline="alphabetic";bits.forEach((b,i)=>{x.fillStyle=b[1];x.fillText(b[0],px,lineY);px+=ws[i];if(i<bits.length-1){x.fillStyle="rgba(26,10,16,.4)";x.fillText(SEP,px,lineY);px+=sw}});try{x.letterSpacing="0px"}catch(_){}}
+  let px=cx-tot/2;x.textAlign="left";x.textBaseline="alphabetic";bits.forEach((b,i)=>{x.fillStyle=b[1];x.fillText(b[0],px,lineY);px+=ws[i];if(i<bits.length-1){x.fillStyle=PAL.sep;x.fillText(SEP,px,lineY);px+=sw}});try{x.letterSpacing="0px"}catch(_){}}
 /* right side of the ticket: logo, large QR, name and ticket number */
-function drawStubContent(x,t,coord,IM,INK,GOLD,CREAM){
+function drawStubContent(x,t,coord,IM,INK,GOLD,CREAM,PAL){
   const cx=1646,ry=mallu(x,IM,INK,cx,42,92,44,15,344),qs=312,qy=ry+20;
   drawTicketQR(x,t,cx,qy,qs);
-  infoFinal(x,t,coord,cx,qy+qs+48,qy+qs+88,INK);
+  infoFinal(x,t,coord,cx,qy+qs+48,qy+qs+88,INK,PAL);
 }
 function drawTicket(c,t,code){
   /* LANDSCAPE ticket (Nov 2026 redesign, 2000 x 668): a maroon main panel (title, venue and date, co-sponsor, crowd) and a pink stub (logo, ENTRY TICKET, QR),
      divided by a dotted tear line. Same data as before: date, time, venue, attendee, food, ticket number and the QR of "label|secret". The Booking ID is still NOT on it.
      Under the ticket come the two optional panels (secret message, prize line), each present only when that ticket has it. */
-  const coord=t.kind==="coordinator",W=TW,GOLD="#E9B24C",CREAM="#F6D7C6",BLUSH="#FFB3C0",PINK="#F05E7B",INK="#1A0A10",EDGE="#F6EEEA";
+  const coord=t.kind==="coordinator",W=TW,GOLD="#E9B24C",CREAM="#F6D7C6",BLUSH="#FFB3C0",PINK="#F05E7B",EDGE="#F6EEEA";
+  /* coordinator tickets: blue left picture (assets/ticket-left-coord.jpg) and a matching icy-blue stub; if that picture did not load, the normal maroon and pink ticket is drawn instead */
+  const BLUE=coord&&!!(TKI&&TKI.leftC),INK=BLUE?"#06182A":"#1A0A10",
+    STUB=BLUE?["#C4E9F7","#AEDFF4","#93D2EE"]:["#EFB4C6","#F4B6C4","#F5A2B4"],
+    PAPER=BLUE?{lt:"rgba(238,251,255,.20)",dk:"rgba(60,150,200,.10)",sp:"40,120,170"}:null,
+    PAL=BLUE?{sep:"rgba(6,24,42,.4)",coord:"#0A4A73"}:null;
   const PANELS=[["Your secret message",t.game_message],[String(t.game_prize_heading||"").trim()||"You are a winner!",t.game_prize]].map(a=>[a[0],String(a[1]||"").trim()]).filter(a=>a[1]).map(a=>{const m=msgLines(a[1]);return {label:a[0],ML:m,PH:250+m.lines.length*m.lh}});
   let PY=TH+16;PANELS.forEach((pn,i)=>{pn.y=PY;PY+=pn.PH+(i<PANELS.length-1?18:0)});
   const H=PANELS.length?PY+26:TH;
   c.width=W;c.height=H;const x=c.getContext("2d");x.clearRect(0,0,W,H);
-  x.fillStyle="#28080F";x.fillRect(0,0,W,H);
-  const IM=TKI||{mark:null,sp:null,left:null},GS=IM.left?G_REF:G_OLD,SD=IM.left?1982-G_REF.cx:680;
+  x.fillStyle=BLUE?"#011423":"#28080F";x.fillRect(0,0,W,H);
+  const IM0=TKI||{mark:null,sp:null,left:null,leftC:null},IM=BLUE?Object.assign({},IM0,{left:IM0.leftC}):IM0,GS=IM.left?G_REF:G_OLD,SD=IM.left?1982-G_REF.cx:680;
   /* ---- main panel: the fixed left side is one picture (assets/ticket-left.jpg, cut from the design, same on every ticket) ---- */
   if(IM.left){const k=TW/2170;x.drawImage(IM.left,0,0,IM.left.width,IM.left.height,0,0,IM.left.width*k,TH)}
   else{
@@ -1825,12 +1830,12 @@ function drawTicket(c,t,code){
   }
   /* ---- stub ---- */
   x.save();panelPath(x,SD,true,GS);x.clip();
-  g=x.createLinearGradient(0,22,0,646);g.addColorStop(0,"#EFB4C6");g.addColorStop(.5,"#F4B6C4");g.addColorStop(1,"#F5A2B4");x.fillStyle=g;x.fillRect(1296,18,700,630);
-  drawPaper(x,1296,18,700,630,91);x.restore();
+  g=x.createLinearGradient(0,22,0,646);g.addColorStop(0,STUB[0]);g.addColorStop(.5,STUB[1]);g.addColorStop(1,STUB[2]);x.fillStyle=g;x.fillRect(1296,18,700,630);
+  drawPaper(x,1296,18,700,630,91,PAPER);x.restore();
   x.lineWidth=4;x.strokeStyle=EDGE;panelPath(x,SD,true,GS);x.stroke();
   /* tear line */
   if(!IM.left){x.fillStyle=EDGE;for(let yy=64;yy<=604;yy+=20){x.fillRect(1294,yy,8,9)}}
-  drawStubContent(x,t,coord,IM,INK,GOLD,CREAM);
+  drawStubContent(x,t,coord,IM,INK,GOLD,CREAM,PAL);
   /* the optional panels under the ticket */
   PANELS.forEach(pn=>{const y0=pn.y,ML=pn.ML;
     x.fillStyle="rgba(233,178,76,.10)";rr(x,22,y0,W-44,pn.PH,40);x.fill();x.lineWidth=3;x.strokeStyle=GOLD;x.globalAlpha=.7;rr(x,22,y0,W-44,pn.PH,40);x.stroke();x.globalAlpha=1;

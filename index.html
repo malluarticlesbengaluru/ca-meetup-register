@@ -336,6 +336,7 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-final .bh-lede{margin:0 auto 28px}
 .bhome .bh-foot{padding:34px 0 110px;text-align:center;font:600 .78rem/1.8 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--rose)}
 .bhome .bh-foot b{color:var(--cream)}
+.bhome .bh-foot .bh-with{font-size:.7rem;letter-spacing:.16em;color:var(--gold);opacity:.9}
 .bhome .bh-flogos{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:22px}
 .bhome .bh-flogos img{display:block;width:auto}
 .bhome .bh-flogos .bh-fm{height:46px}
@@ -1094,7 +1095,7 @@ ${ret?`<p class="bh-note">${n===1?"Your booking is saved on this device. Enter y
 <div class="bh-cd" id="bh-cd" role="timer" aria-label="Countdown to the meetup"><div><b>00</b><span>days</span></div><div><b>00</b><span>hours</span></div><div><b>00</b><span>mins</span></div><div><b>00</b><span>secs</span></div></div>
 <p class="bh-cdwhen"><span data-ev="d">${esc(evDate())}</span> · <span data-ev="t">${esc(evTime())}</span></p></div></div></section>
 
-<footer class="bh-foot"><div class="bh-w"><b>${O}</b> · ${E}${SPONSOR.name?`<br>Co-sponsored by ${esc(SPONSOR.name)}`:""}<div class="bh-flogos"><img class="bh-fm" src="assets/burg-logo.png" alt="${O} logo">${SPONSOR.logo?`<span class="bh-fsep" aria-hidden="true"></span><img class="bh-fe" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.previousElementSibling.remove();this.remove()">`:""}</div></div></footer>
+<footer class="bh-foot"><div class="bh-w"><b>${O}</b> · ${E}<br><span class="bh-with">with R6 Invitations</span>${SPONSOR.name?`<br>Co-sponsored by ${esc(SPONSOR.name)}`:""}<div class="bh-flogos"><img class="bh-fm" src="assets/burg-logo.png" alt="${O} logo">${SPONSOR.logo?`<span class="bh-fsep" aria-hidden="true"></span><img class="bh-fe" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.previousElementSibling.remove();this.remove()">`:""}</div></div></footer>
 </div>`;
 }
 

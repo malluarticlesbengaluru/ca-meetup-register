@@ -850,10 +850,22 @@ function evVenue(){return(S.ev&&S.ev.venue)||CONFIG.ticketVenue}
 function head(t,s){return `<h1>${t}</h1><p class="sub">${s}</p>`}
 function closeDate(){try{return new Date(S.status.deadline).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Kolkata"})}catch(_){return""}}
 /* payment details (UPI ID, payee name) and the organisers' WhatsApp number come from the database (Admin > Settings) */
-function payFrom(d){d=d||{};return{upi:String(d.upi_id||""),payee:String(d.payee_name||""),wa:String(d.whatsapp||"")}}
+function payFrom(d){d=d||{};
+  /* contacts: the organiser list from get_payment_info (up to 3, each with a name and a WhatsApp number). Before r2_17 is run the list is missing; then the one old number is the only contact. */
+  let cs=Array.isArray(d.contacts)?d.contacts.map(c=>({name:String((c&&c.name)||"").trim(),number:String((c&&c.number)||"").replace(/\D/g,"")})).filter(c=>c.number):(d.whatsapp?[{name:"",number:String(d.whatsapp).replace(/\D/g,"")}]:[]);
+  return{upi:String(d.upi_id||""),payee:String(d.payee_name||""),wa:String(d.whatsapp||""),contacts:cs.slice(0,3)}}
 async function loadPay(){try{const{data,error}=await db.rpc("get_payment_info");if(error)throw error;S.pay=payFrom(data);return true}catch(_){return false}}
 function waLink(text){return S.pay&&S.pay.wa?"https://wa.me/"+S.pay.wa+"?text="+encodeURIComponent(text):""}
-function contactBtn(text,label){const l=waLink(text);return l?`<a class="btn ghost" href="${esc(l)}" target="_blank" rel="noopener">${label||"Contact the organisers"}</a>`:""}
+function contactBtn(text,label){
+  const cs=(S.pay&&S.pay.contacts)||[];
+  if(cs.length>1)return `<button class="btn ghost" type="button" data-contact="${esc(text)}">${label||"Contact the organisers"}</button>`;   /* 2 or 3 contacts: a small popup lets the person choose */
+  const l=cs.length?"https://wa.me/"+cs[0].number+"?text="+encodeURIComponent(text):"";return l?`<a class="btn ghost" href="${esc(l)}" target="_blank" rel="noopener">${label||"Contact the organisers"}</a>`:""}   /* 1 contact: straight to WhatsApp, as before */
+function contactOpen(text){
+  const cs=(S.pay&&S.pay.contacts)||[];if(cs.length<2)return;
+  tmClose();const d=document.createElement("div");
+  d.className="tm-sheet";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-label","Contact the organisers");
+  d.innerHTML=`<div class="tm-card"><h3>Contact the organisers</h3><p>Choose who to message on WhatsApp.</p><div class="row col">${cs.map((c,i)=>`<a class="btn" style="flex:none" href="https://wa.me/${esc(c.number)}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">${esc(c.name||"Organiser "+(i+1))}</a>`).join("")}<button class="ghost" style="flex:none" id="tm-x" type="button">Close</button></div></div>`;
+  document.body.appendChild(d);const x=d.querySelector("a.btn");if(x)x.focus()}
 
 /* Home asks for the live status (spots left, price, deadline) so it can show them. It is the same read-only call the Register page makes. It never blocks Home,
    it is asked at most every 30 seconds, and it is dropped if the visitor has already moved on. */
@@ -2069,6 +2081,7 @@ document.addEventListener("click",async e=>{const el=e.target.closest("button,a"
   if(id==="tm-prev"||id==="tm-next"){tmStep(id==="tm-next"?1:-1)}
   if(ds.tmMem!==undefined&&ds.tmMem!==""){tmOpen(+ds.tmMem)}
   if(id==="tm-x")tmClose();
+  if(ds.contact!==undefined&&ds.contact!=="")contactOpen(ds.contact);   /* "Contact the organisers" with 2 or 3 contacts */
   if(id==="tm-home"){S.step="home";render();try{const t=document.getElementById("home-team");if(t)t.scrollIntoView({block:"center",behavior:"instant"})}catch(_){}loadHomeStatus().then(()=>{if(S.step==="home")refreshHome()})}
   if(id==="go-register"){S.step="loading";render();load()}
   if(id==="go-tickets")openTickets(S.step==="done"&&S.result?S.result.booking_code:S.step==="xdone"&&S.xb.result?S.xb.result.booking_code:"");

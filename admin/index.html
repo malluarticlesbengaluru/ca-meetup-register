@@ -170,7 +170,7 @@ const SIMILAR_BITS=8;                // images differing by <= this many of 1024
 const db=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true}});
 const $=s=>document.querySelector(s),esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const pad=n=>String(n).padStart(3,"0"),inr=n=>"₹"+Number(n||0).toLocaleString("en-IN");
-const S={staff:null,tab:"overview",bookings:[],tickets:[],scans:[],settings:null,mode:"both",f:{q:"",food:"",loc:"",role:"",pay:"",type:"",review:false,here:""},msg:"",charts:[],scanning:false,alert:null,log:[],payOpen:false,
+const S={staff:null,tab:"overview",bookings:[],tickets:[],scans:[],settings:null,mode:"both",f:{q:"",food:"",loc:"",role:"",pay:"",type:"",review:false,here:""},msg:"",charts:[],scanning:false,alert:null,log:[],payOpen:false,ctOpen:false,
   fb:[],fbOk:false,transfers:[],buyers:[],tReady:false,money:null,ipf:null,showMoved:false};
 function toast(t,ms){let c=document.getElementById("toasts");if(!c){c=document.createElement("div");c.id="toasts";c.setAttribute("role","status");c.setAttribute("aria-live","polite");document.body.appendChild(c)}
   const d=document.createElement("div");d.className="toast";d.textContent=t;c.appendChild(d);setTimeout(()=>d.remove(),ms||2400)}
@@ -288,7 +288,7 @@ const TERR={NOT_ALLOWED:"Only admins can do this.",INVALID_TRANSFER:"That transf
   CALL_NOT_CONFIRMED:"Tick “I phoned the seller” first.",PAYMENT_NOT_VERIFIED:"Verify the buyer's payment first.",NOT_PUBLIC:"This only applies to public transfers.",ALREADY_REQUESTED:"Payment was already requested.",NOT_SUBMITTED:"The buyer has not uploaded a payment screenshot yet.",ALREADY_VERIFIED:"The payment is already verified.",INVALID_AMOUNT:"Type the amount that actually arrived (₹1 to ₹10,00,000).",
   SELLER_CHECKED_IN:"The seller has already entered the hall, so this ticket cannot be transferred. Reject this transfer.",SELLER_ALREADY_TRANSFERRED:"This ticket was already transferred.",SELLER_TICKET_INVALID:"The seller's ticket is no longer valid (booking not confirmed, or the ticket changed). Reject this transfer.",BUYER_BOOKING_INVALID:"The buyer's booking is no longer valid. Reject this transfer.",
   INVALID_HOURS:"Hours must be between 1 and 168.",INVALID_NOTE:"The note is too long (300 characters at most).",INVALID_REFERENCE:"Type a reference of 3 to 80 characters (for example the UPI transaction ID).",ALREADY_PAID:"The seller is already marked as paid.",NOT_DONE:"The transfer is not completed yet.",ALREADY_RETURNED:"Already marked as returned.",NO_RETURN_DUE:"No return is due for this transfer.",
-  INVALID_THRESHOLD:"The number must be between 2 and 1000.",INVALID_CUTOFF:"Choose either a cut-off date or 'no limit', not both.",PAYMENT_INFO_MISSING:"Fill in the UPI ID, payee name and WhatsApp number (Settings, Payment details) before switching transfers on."};
+  INVALID_THRESHOLD:"The number must be between 2 and 1000.",INVALID_CUTOFF:"Choose either a cut-off date or 'no limit', not both.",PAYMENT_INFO_MISSING:"Fill in the UPI ID and payee name (Settings, Payment details) and Contact 1 (Settings, Contacts) before switching transfers on."};
 function terr(e){const m=((e&&e.message)||"").match(/[A-Z][A-Z_]{4,}/);return TERR[m&&m[0]]||("Failed: "+((e&&e.message)||"unknown error"))}
 const people=()=>S.tickets.map(t=>({...t,b:bk(t.booking_id)})).sort((a,b)=>rank(a)-rank(b)||(rank(a)===0?a.coord_no-b.coord_no:rank(a)===1?a.ticket_no-b.ticket_no:a.reg_seq-b.reg_seq));
 function flags(){
@@ -618,22 +618,31 @@ function evCard(s){
   <p><button id="evsave">Save event details</button></p></div>`}
 
 /* ---------- payment details, change banner, settings log ---------- */
-const FIELD_NAMES={upi_id:"UPI ID",payee_name:"payee name",whatsapp_number:"WhatsApp number"};
+const FIELD_NAMES={upi_id:"UPI ID",payee_name:"payee name",whatsapp_number:"Contact 1 number",contact1_name:"Contact 1 name",contact2_name:"Contact 2 name",contact2_number:"Contact 2 number",contact3_name:"Contact 3 name",contact3_number:"Contact 3 number"};
 function alertBanner(){const a=S.alert;if(!a)return"";
   const f=(a.fields||[]).map(x=>FIELD_NAMES[x]||x).join(", ");
   return `<div class="card" role="alert" style="border:2px solid ${a.by_me?"var(--line)":"var(--warn)"};background:${a.by_me?"var(--card)":"var(--card2)"}"><b>${a.by_me?"You changed":esc(a.who)+" changed"} the payment details</b> (${esc(f)}) on ${esc(new Date(a.at).toLocaleString("en-IN",{timeZone:"Asia/Calcutta",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}.${a.by_me?"":" If this was not agreed, check Settings now: payments go to the UPI ID shown there."}</div>`}
-function payCard(s){const set=s.upi_id&&s.payee_name&&s.whatsapp_number,ro=!S.payOpen;
+function payCard(s){const set=s.upi_id&&s.payee_name,ro=!S.payOpen;
   return `<div class="card"><h2>Payment details</h2>
-  ${set?"":`<p class="err">Not set up yet. The registration page cannot take payments until all three are filled in.</p>`}
-  <p class="mute" style="margin-top:0">Shown to participants on the pay screen and used for the QR code and the WhatsApp buttons. They are locked: press Change to edit.</p>
+  ${set?"":`<p class="err">Not set up yet. The registration page cannot take payments until both are filled in.</p>`}
+  <p class="mute" style="margin-top:0">Shown to participants on the pay screen and used for the QR code. They are locked: press Change to edit.</p>
   <label for="pupi">UPI ID</label><input id="pupi" value="${esc(s.upi_id||"")}" ${ro?"readonly":""} autocomplete="off" placeholder="name@bank">
   <label for="ppayee">Payee name (shown on the pay screen)</label><input id="ppayee" value="${esc(s.payee_name||"")}" ${ro?"readonly":""} maxlength="60">
-  <label for="pwa">Organisers' WhatsApp number (with country code)</label><input id="pwa" value="${esc(s.whatsapp_number||"")}" ${ro?"readonly":""} inputmode="tel" placeholder="91XXXXXXXXXX">
   <p>${ro?`<button id="pchange">Change</button>`:`<button id="psave">Save payment details</button> <button class="ghost" id="pcancel">Cancel</button>`}</p></div>`}
+function contactsCard(s){const ro=!S.ctOpen,set=!!(s.contact1_name&&s.whatsapp_number);
+  const one=(n,nm,num)=>`<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:4px"><b>Contact ${n}${n===1?" (required)":" (optional)"}</b>
+    <label for="cn${n}">Name</label><input id="cn${n}" value="${esc(nm||"")}" ${ro?"readonly":""} maxlength="40" autocomplete="off" placeholder="Name shown to participants">
+    <label for="cp${n}">WhatsApp number (with country code)</label><input id="cp${n}" value="${esc(num||"")}" ${ro?"readonly":""} inputmode="tel" placeholder="91XXXXXXXXXX"></div>`;
+  return `<div class="card"><h2>Contacts</h2>
+  ${set?"":`<p class="err">Contact 1 needs a name and a WhatsApp number. Transfers cannot be switched on until it is filled in.</p>`}
+  <p class="mute" style="margin-top:0">Up to three organisers. When a participant taps "Contact the organisers" they see these names and choose who to message on WhatsApp (with only one contact, the button goes straight to WhatsApp). To remove Contact 2 or 3, clear both of its boxes. They are locked: press Change to edit.</p>
+  ${one(1,s.contact1_name,s.whatsapp_number)}${one(2,s.contact2_name,s.contact2_number)}${one(3,s.contact3_name,s.contact3_number)}
+  <p>${ro?`<button id="ctchange">Change</button>`:`<button id="ctsave">Save contacts</button> <button class="ghost" id="ctcancel">Cancel</button>`}</p></div>`}
 function logCard(){
-  const rows=S.log.map(l=>`<tr><td>${esc(new Date(l.at).toLocaleString("en-IN",{timeZone:"Asia/Calcutta",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}</td><td>${esc(l.who)}</td><td>${esc(l.field)}</td><td>${l.area==="settings"&&["upi_id","whatsapp_number"].includes(l.field)?esc(l.old_value||"–"):esc(l.old_value||"–")}</td><td>${esc(l.new_value||"–")}</td></tr>`).join("");
+  const rows=S.log.map(l=>`<tr><td>${esc(new Date(l.at).toLocaleString("en-IN",{timeZone:"Asia/Calcutta",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}</td><td>${esc(l.who)}</td><td>${esc(/^contact/.test(l.field)?(FIELD_NAMES[l.field]||l.field):l.field)}</td><td>${l.area==="settings"&&["upi_id","whatsapp_number"].includes(l.field)?esc(l.old_value||"–"):esc(l.old_value||"–")}</td><td>${esc(l.new_value||"–")}</td></tr>`).join("");
   return `<div class="card slog" style="overflow-x:auto"><h2>Settings log</h2><p class="mute" style="margin-top:0">Every change to the settings and the organiser list. It cannot be edited or deleted. "database" means someone changed it directly in Supabase.</p>
   ${rows?`<table><thead><tr><th>When</th><th>Who</th><th>What</th><th>Before</th><th>After</th></tr></thead><tbody>${rows}</tbody></table>`:`<p class="mute">Nothing logged yet.</p>`}</div>`}
+const CT_ERR={FIRST_CONTACT_REQUIRED:"Contact 1 needs both a name and a WhatsApp number.",INVALID_CONTACT_NAME:"The name can be up to 40 letters.",INVALID_WHATSAPP:"The WhatsApp number needs the country code, for example 91XXXXXXXXXX.",CONTACT_INCOMPLETE:"Fill in both the name and the number, or clear both.",NOT_ALLOWED:"Only admins can change this."};
 const PAY_ERR={INVALID_UPI:"That UPI ID doesn't look right. It should look like name@bank.",INVALID_PAYEE:"Type the payee name (up to 60 letters).",INVALID_WHATSAPP:"The WhatsApp number needs the country code, for example 91XXXXXXXXXX.",NOT_ALLOWED:"Only admins can change this."};
 function vSettings(){const s=S.settings;
   const hm=x=>String(x||"").slice(0,5);
@@ -654,6 +663,7 @@ function vSettings(){const s=S.settings;
   <p class="mute">The form closes at the deadline or when the cap is reached, whichever comes first. Changing the price affects new bookings only.</p>
   <p><button id="ssave">Save settings</button></p></div>
   ${payCard(s)}
+  ${contactsCard(s)}
   ${evCard(s)}
   ${trCard(s)}
   ${readyCard(s)}
@@ -915,7 +925,7 @@ function readyCard(s){
   const row=(good,t,h)=>`<li><span style="color:var(${good?"--ok":"--err"});font-weight:800">${good?"✓":"✗"}</span><div><b>${t}</b>${good?"":`<div class="mute">${h}</div>`}</div></li>`,
     pay=!!(s.upi_id&&s.payee_name&&s.whatsapp_number),dl=s.deadline&&new Date(s.deadline)>new Date(),ev=!!(s.event_at&&s.venue&&new Date(s.event_at)>new Date());
   return `<div class="card"><h2>Launch readiness</h2><p class="mute" style="margin-top:0">Worked out from your settings.</p><ul class="checks">
-  ${row(pay,"Payment details are filled in","Add the UPI ID, payee name and WhatsApp number under Payment details.")}
+  ${row(pay,"Payment details are filled in","Add the UPI ID and payee name under Payment details, and Contact 1 under Contacts.")}
   ${row(s.price_per_head>0,"Price per person is set","Set the final price under Registration settings.")}
   ${row(s.cap>0,"Cap is set","Set how many people can register.")}
   ${row(!!dl,"Deadline is in the future","Set the deadline under Registration settings.")}
@@ -1243,11 +1253,24 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
   if(id==="pchange"){S.payOpen=true;view();setTimeout(()=>$("#pupi")&&$("#pupi").focus(),0)}
   if(id==="pcancel"){S.payOpen=false;view()}
   if(id==="psave"){
-    const u=$("#pupi").value.trim(),n=$("#ppayee").value.trim(),w=$("#pwa").value.trim(),o=S.settings;
-    if(!await yes("Change the payment details?\n\nUPI ID: "+(o.upi_id||"(none)")+"  →  "+u+"\nPayee: "+(o.payee_name||"(none)")+"  →  "+n+"\nWhatsApp: "+(o.whatsapp_number||"(none)")+"  →  "+w+"\n\nNew payments will go to this UPI ID straight away. The other admin will be shown a notice.",{ok:"Change payment details",danger:true}))return;
+    const u=$("#pupi").value.trim(),n=$("#ppayee").value.trim(),o=S.settings;
+    /* admin_set_payment_info still wants a WhatsApp number: pass back the Contact 1 number exactly as stored (read fresh, so another admin's change is never undone) */
+    const cur=await db.from("settings").select("whatsapp_number").eq("id",1).single(),w=cur.data&&cur.data.whatsapp_number||"";
+    if(!w)return toast("Set Contact 1 first (Settings, Contacts), then save the payment details.",6000);
+    if(!await yes("Change the payment details?\n\nUPI ID: "+(o.upi_id||"(none)")+"  →  "+u+"\nPayee: "+(o.payee_name||"(none)")+"  →  "+n+"\n\nNew payments will go to this UPI ID straight away. The other admin will be shown a notice.",{ok:"Change payment details",danger:true}))return;
     const r=await db.rpc("admin_set_payment_info",{p_upi:u,p_payee:n,p_whatsapp:w});
     if(r.error){const m=(r.error.message||"").match(/[A-Z_]{6,}/);return toast(PAY_ERR[m&&m[0]]||("Failed: "+r.error.message))}
     S.payOpen=false;await sync("core","log","alert");view({keepForm:true});toast("Payment details saved")}
+  if(id==="ctchange"){S.ctOpen=true;view();setTimeout(()=>$("#cn1")&&$("#cn1").focus(),0)}
+  if(id==="ctcancel"){S.ctOpen=false;view()}
+  if(id==="ctsave"){
+    const o=S.settings,v=n=>[$("#cn"+n).value.trim(),$("#cp"+n).value.trim()],c=[v(1),v(2),v(3)];
+    const was=[[o.contact1_name,o.whatsapp_number],[o.contact2_name,o.contact2_number],[o.contact3_name,o.contact3_number]];
+    const show=a=>a&&(a[0]||a[1])?(a[0]||"(no name)")+", "+(a[1]||"(no number)"):"(none)";
+    if(!await yes("Save the contacts?\n\n"+[1,2,3].map(n=>"Contact "+n+": "+show(was[n-1])+"  →  "+show(c[n-1])).join("\n")+"\n\nParticipants will see these names straight away. The other admin will be shown a notice.",{ok:"Save contacts",danger:true}))return;
+    const r=await db.rpc("admin_set_contacts",{p_name1:c[0][0],p_num1:c[0][1],p_name2:c[1][0],p_num2:c[1][1],p_name3:c[2][0],p_num3:c[2][1]});
+    if(r.error){const m=(r.error.message||"").match(/[A-Z_]{6,}/),d=(r.error.details||"").trim();return toast((CT_ERR[m&&m[0]]||("Failed: "+r.error.message))+(d&&CT_ERR[m&&m[0]]&&m[0]!=="NOT_ALLOWED"?" ("+d.charAt(0).toUpperCase()+d.slice(1)+")":""),6000)}
+    S.ctOpen=false;await sync("core","log","alert");view({keepForm:true});toast("Contacts saved")}
   if(id==="ssave"){
     if($("#sclose").value&&$("#sclose").value===$("#sreopen").value)return toast("Close time and reopen time must be different");
     const r=await db.rpc("admin_update_settings",{p_cap:+$("#scap").value,p_price:+$("#sprice").value,p_deadline:$("#sdl").value?new Date($("#sdl").value+":59+05:30").toISOString():null,p_is_open:$("#sopen").checked,

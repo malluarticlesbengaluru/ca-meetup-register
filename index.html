@@ -309,6 +309,13 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 .bhome .bh-sl .bh-txt p.bh-thx3 .bh-pt+.bh-pt{border-left:1px solid rgba(246,215,198,.32)}
 .bhome .bh-sl .bh-txt p.bh-thx3 .bh-pt b{text-align:center}
 .bhome .bh-sl .bh-txt p.bh-thx b{display:block;font:700 .95rem/1.25 var(--sans);color:var(--cream)}
+/* phones: shrink the two partner logos so both sit side by side on one row */
+@media(max-width:560px){
+.bhome .bh-sl .bh-txt p.bh-thx3 .bh-pair{flex-wrap:nowrap;max-width:100%}
+.bhome .bh-sl .bh-txt p.bh-thx3 .bh-pt{padding:0 10px;min-width:0;flex:0 1 auto}
+.bhome .bh-sl .bh-txt p.bh-thx3 .bh-pt img{height:42px;width:auto;max-width:100%}
+.bhome .bh-sl .bh-txt p.bh-thx3 .bh-pt b{font-size:.8rem}
+}
 .bhome .bh-dots{position:absolute;top:12px;right:12px;z-index:5;display:flex;background:rgba(26,4,12,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:99px;padding:0 4px}
 .bhome .bh-dots button{width:32px;height:32px;background:none;border:0;padding:0;cursor:pointer;display:grid;place-items:center}
 .bhome .bh-dots button:before{content:"";width:9px;height:9px;border-radius:99px;background:rgba(246,215,198,.55);transition:all .3s}

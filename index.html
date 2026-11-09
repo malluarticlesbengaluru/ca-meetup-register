@@ -338,7 +338,13 @@ background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transpar
 @media(min-width:760px){.bhome .bh-wt-panel{grid-template-columns:minmax(0,1fr) minmax(0,380px);align-items:start;gap:34px;padding:28px}}
 .bhome button.bh-btn.bh-wt-all{width:100%}
 .bhome button.bh-wt-all[aria-pressed=true]{box-shadow:0 0 0 3px rgba(233,178,76,.4),0 10px 34px rgba(233,178,76,.38)}
-.bhome .bh-wt-lbl{margin:22px 0 10px;font:800 .72rem/1 var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+.bhome .bh-wt-lbl{margin:0;font:800 .72rem/1.3 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.bhome .bh-wt-grp{margin-top:22px}
+.bhome .bh-wt-gh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin:0 0 10px}
+.bhome button.bh-wt-pl{display:inline-flex;align-items:center;gap:6px;font:700 .76rem/1 var(--sans);letter-spacing:.02em;padding:8px 13px;border-radius:99px;background:transparent;border:1.5px solid var(--gold);color:var(--gold);box-shadow:none;transform:none}
+.bhome button.bh-wt-pl svg{width:12px;height:12px}
+.bhome button.bh-wt-pl:hover{background:rgba(233,178,76,.16);box-shadow:none;transform:none}
+.bhome button.bh-wt-pl[aria-pressed=true]{background:var(--gold);color:var(--wine)}
 .bhome .bh-wt-tabs{display:flex;flex-wrap:wrap;gap:8px}
 .bhome button.bh-wt-tab{display:inline-flex;gap:5px;font:600 .84rem/1.3 var(--sans);letter-spacing:0;text-align:left;padding:10px 14px;border-radius:14px;background:rgba(26,4,12,.35);border:1.5px solid rgba(246,215,198,.28);color:var(--cream);box-shadow:none;transform:none}
 .bhome button.bh-wt-tab b{font-weight:800;color:var(--gold);white-space:nowrap}
@@ -1054,8 +1060,10 @@ function refreshHome(){
   root.querySelectorAll(".bh-spots").forEach(p=>{const s=p.querySelector("span");if(!s)return;p.classList.toggle("bh-nosp",!v);if(p.dataset.v!==v){p.dataset.v=v;s.innerHTML=v}});
   root.querySelectorAll("[data-fr]").forEach(el=>{const t=frText();if(el.textContent!==t)el.textContent=t});
 }
-/* "See walkthrough" (Home): the short names on the step buttons. Same order and count as STEPS inside tutorial.html (the demo page itself holds the long captions). */
-const WT_STEPS=["Tap Register","Enter your details","Review and continue","Pay by UPI","Upload payment screenshot","Your Booking ID is saved","Open View my ticket","Organiser checks payment","Download your ticket","Use a different phone"];
+/* "See walkthrough" (Home): the two processes and the short names on their step buttons. Steps are numbered 1-8 across both, in the same order as STEPS inside tutorial.html (the demo page holds the long captions). */
+const WT_GROUPS=[
+ {name:"Process 1: Registration",steps:["Tap Register","Enter your details","Review and continue","Pay by UPI","Upload payment screenshot"]},
+ {name:"Process 2: Viewing your ticket",steps:["Open View my ticket","Organiser checks payment","Download your ticket"]}];
 const hAbout=()=>`<button class="bh-btn bh-ghost" id="go-about" type="button">About us</button>`;
 /* the event name in the big heading: "Ehsaas'26" is drawn as Ehsaas + a coloured ’26 */
 function nameHtml(){const m=/^(.*?)['’](\d{2,4})$/.exec(CONFIG.eventName);return m?esc(m[1])+"<em>’"+esc(m[2])+"</em>":esc(CONFIG.eventName)}
@@ -1102,8 +1110,8 @@ ${spots}
 <div class="bh-wt bh-rv" id="wt"><button class="bh-btn bh-ghost bh-wt-open" id="wt-open" type="button" aria-expanded="false" aria-controls="wt-panel"><svg class="bh-wt-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>See walkthrough<svg class="bh-wt-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
 <div class="bh-wt-panel" id="wt-panel" role="region" aria-label="Booking walkthrough" hidden>
 <div class="bh-wt-side"><button class="bh-btn bh-gold bh-wt-all" type="button" data-wt="all" aria-pressed="false"><svg class="bh-wt-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>See full walkthrough</button>
-<p class="bh-wt-lbl">Or jump to one step</p>
-<div class="bh-wt-tabs">${WT_STEPS.map((t,i)=>`<button class="bh-wt-tab" type="button" data-wt="${i+1}" aria-pressed="false"><b>Step ${i+1}:</b> ${esc(t)}</button>`).join("")}</div></div>
+${(()=>{let n=0,from=1;return WT_GROUPS.map((g,gi)=>{const f=from;from+=g.steps.length;return `<div class="bh-wt-grp"><div class="bh-wt-gh"><p class="bh-wt-lbl">${esc(g.name)}</p><button class="bh-wt-pl" type="button" data-wt="p${gi+1}" data-from="${f}" aria-pressed="false"><svg class="bh-wt-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Play this process</button></div>
+<div class="bh-wt-tabs">${g.steps.map((t,i)=>{n++;return `<button class="bh-wt-tab" type="button" data-wt="${n}" aria-pressed="false"><b>Step ${i+1}:</b> ${esc(t)}</button>`}).join("")}</div></div>`}).join("")})()}</div>
 <div class="bh-wt-stage" id="wt-stage"></div></div></div></div></section>
 
 <section style="padding-top:0" id="home-sponsor"><div class="bh-w"><div class="bh-slider bh-spslider bh-rv" id="sp-slider" role="region" aria-roledescription="carousel" aria-label="Our co-sponsor"><div class="bh-track" id="sp-track"><div class="bh-spsl bh-sponsor on" aria-roledescription="slide" aria-label="1 of 2">${spLogo}<div><p class="bh-eyebrow">Our co-sponsor</p><h2>${SPONSOR.name?`Thank you, <i>${esc(SPONSOR.name)}.</i>`:"Thank you for the <i>support.</i>"}</h2><p>Their support helps bring this meetup to you.</p></div>${SPONSOR.video?`<div class="bh-swh" aria-hidden="true"><span>Swipe to view trailer</span><i>&rarr;</i></div>`:""}</div>${SPONSOR.video?`<div class="bh-spsl bh-spvid" id="home-sp-vfig" aria-roledescription="slide" aria-label="2 of 2"><video id="home-sp-video" data-src="${esc(SPONSOR.video)}#t=0.1" controls playsinline preload="none" aria-label="Video from ${esc(SPONSOR.name||"our co-sponsor")}"></video><button class="bh-unmute" id="home-sp-unmute" type="button" hidden>🔊 Tap for sound</button></div>`:""}</div></div>${SPONSOR.video?`<div class="bh-dots bh-spdots" id="sp-dots"><button type="button" aria-label="Show the thank-you card" aria-current="true"></button><button type="button" aria-label="Show the video"></button></div>`:""}</div></section>
@@ -1141,22 +1149,29 @@ function homeUnmount(){if(homeAC){homeAC.abort();homeAC=null}}
 function wtMount(root,on,sig,RM){
   const wt=root.querySelector("#wt");if(!wt)return;
   const open=wt.querySelector("#wt-open"),panel=wt.querySelector("#wt-panel"),box=wt.querySelector("#wt-stage"),btns=[].slice.call(wt.querySelectorAll("[data-wt]"));
-  let fr=null,ready=false,pend=null,mode="",cur=0;
-  const paint=()=>btns.forEach(b=>{const k=b.dataset.wt,sel=k==="all"?mode==="all":mode==="one"&&+k===cur;b.setAttribute("aria-pressed",String(sel));
-    if(k!=="all"){if(mode==="all"&&+k===cur)b.setAttribute("data-now","");else b.removeAttribute("data-now")}});
+  const starts=[].slice.call(wt.querySelectorAll("[data-from]")).map(b=>+b.dataset.from);   /* the first step of each process */
+  const grpOf=n=>"p"+(starts.filter(f=>n>=f).length||1);
+  let fr=null,ready=false,pend=null,mode="",cur=0,grp="";   /* mode: all / proc (one process) / one (one step) */
+  const paint=()=>btns.forEach(b=>{const k=b.dataset.wt,tab=/^\d+$/.test(k),
+      sel=k==="all"?mode==="all":tab?mode==="one"&&+k===cur:mode==="proc"&&k===grp;
+    b.setAttribute("aria-pressed",String(sel));
+    if(tab){if((mode==="all"||mode==="proc")&&+k===cur)b.setAttribute("data-now","");else b.removeAttribute("data-now")}});
   const send=m=>{if(ready&&fr){try{fr.contentWindow.postMessage(m,location.origin)}catch(_){}}else pend=m};
   const drop=()=>{if(fr){fr.remove();fr=null}ready=false;pend=null};
-  function shut(){drop();mode="";cur=0;panel.hidden=true;open.setAttribute("aria-expanded","false");paint()}
+  function shut(){drop();mode="";cur=0;grp="";panel.hidden=true;open.setAttribute("aria-expanded","false");paint()}
   function show(){panel.hidden=false;open.setAttribute("aria-expanded","true");
     if(!fr){fr=document.createElement("iframe");fr.title="Step-by-step booking walkthrough";fr.src="tutorial.html?embed=1";box.appendChild(fr)}}   /* loads while the visitor picks */
   on(open,"click",()=>{panel.hidden?show():shut()});
   on(wt,"click",e=>{const b=e.target.closest("[data-wt]");if(!b||!wt.contains(b))return;
-    const k=b.dataset.wt;mode=k==="all"?"all":"one";cur=k==="all"?0:+k;paint();
-    send({wt:"play",step:cur,single:k!=="all"});
+    const k=b.dataset.wt;
+    if(k==="all"){mode="all";cur=0}
+    else if(/^\d+$/.test(k)){mode="one";cur=+k}
+    else{mode="proc";grp=k;cur=+b.dataset.from}
+    paint();send({wt:"play",step:cur,mode:mode});
     if(matchMedia("(max-width:759px)").matches)box.scrollIntoView({behavior:RM?"auto":"smooth",block:"nearest"})});   /* stacked layout: bring the player into view */
   on(window,"message",e=>{if(e.origin!==location.origin||!fr||e.source!==fr.contentWindow)return;const d=e.data;if(!d||typeof d!=="object")return;
     if(d.wt==="ready"){ready=true;if(pend){const m=pend;pend=null;send(m)}}
-    else if(d.wt==="step"){if(!mode)mode="all";cur=+d.n||0;paint()}});   /* no mode yet = the visitor pressed Play inside the player, which is the full walkthrough */
+    else if(d.wt==="step"){if(!mode)mode="all";cur=+d.n||0;if(mode==="proc"&&cur)grp=grpOf(cur);paint()}});   /* no mode yet = the visitor pressed Play inside the player, which is the full walkthrough */
   sig.addEventListener("abort",drop);
 }
 function homeMount(){

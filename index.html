@@ -1628,7 +1628,7 @@ async function doSearch(){
 }
 function openTickets(pre){S.step="tickets";const T=S.tk;ensureTicketFonts();loadLogo();loadEvent();T.res=null;T.nf=false;T.msg="";T.phone="";T.q=pre||"";render();(S.pay?Promise.resolve():loadPay()).then(loadTI).then(()=>{if(S.step==="tickets")render()})}
 async function viewTickets(){const T=S.tk;const d=T.res;if(!d)return;
-  const live=d.tickets.filter(t=>!t.transferred&&t.secret);if(!live.length)return;S.cur={booking_code:d.booking_code,tickets:live};S.step="ticket";render();
+  const live=d.tickets.filter(t=>!t.transferred&&t.secret);if(!live.length)return;S.cur={booking_code:d.booking_code,tickets:live};S.step="ticket";render();logAct("view",live.map(t=>t.label));
   /* speed: the ticket is drawn at once from what is already on screen. The database is then asked again in the background, so a game message or prize
      switched on since the page was opened still appears: the ticket is drawn again only if something on it changed. */
   if(T.code&&T.ph){try{const r=await Promise.race([db.rpc("lookup_tickets",{p_code:T.code,p_phone:T.ph}),new Promise((_,j)=>setTimeout(j,4000))]);
@@ -1984,14 +1984,20 @@ function makePDF(imgs){
 }
 async function pdfOf(idx){const out=[];for(const i of idx){const c=S.cv[i],b=await jpegBlob(c);out.push({w:c.width,h:c.height,bytes:new Uint8Array(await b.arrayBuffer())})}return makePDF(out)}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+/* Records "ticket page opened" and Download presses for the organisers (sql/r2_19). It never waits, never shows an error and never stops a download:
+   if the database has not been updated yet, or the network is down, the answer is simply ignored. */
+function logAct(action,labels){try{const T=S.tk,c=T&&T.code,p=T&&T.ph;if(!c||!p)return;
+  Promise.resolve(db.rpc("log_ticket_activity",{p_code:c,p_phone:p,p_action:action,p_tickets:labels&&labels.length?labels:null})).then(()=>{},()=>{})}catch(_){}}
 async function downloadTicket(kind,i){
   const t=S.cur.tickets[i];if(!S.cv[i])return toast("Ticket is still loading, try again");
   if(kind==="jpg")saveBlob(await jpegBlob(S.cv[i]),fname(t)+".jpg");else saveBlob(await pdfOf([i]),fname(t)+".pdf");
+  logAct(kind==="jpg"?"jpg":"pdf",[t.label]);
 }
 async function downloadAll(kind){
   const r=S.cur,idx=r.tickets.map((_,i)=>i);if(idx.some(i=>!S.cv[i]))return toast("Tickets are still loading, try again");
-  if(kind==="pdf")saveBlob(await pdfOf(idx),"Ehsaas26-"+(r.tickets[0].label||"tickets")+"-tickets.pdf");
-  else for(const i of idx){saveBlob(await jpegBlob(S.cv[i]),fname(r.tickets[i])+".jpg");await sleep(500)}
+  const labs=idx.map(i=>r.tickets[i].label);
+  if(kind==="pdf"){saveBlob(await pdfOf(idx),"Ehsaas26-"+(r.tickets[0].label||"tickets")+"-tickets.pdf");logAct("all-pdf",labs)}
+  else{for(const i of idx){saveBlob(await jpegBlob(S.cv[i]),fname(r.tickets[i])+".jpg");await sleep(500)}logAct("jpg",labs)}
 }
 
 /* Payment QR only (the ticket QR is drawn elsewhere and is NOT changed). Error-correction level Q with a small round logo patch in the middle,

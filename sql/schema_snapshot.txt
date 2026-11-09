@@ -101,6 +101,10 @@ settings_log|8|new_value|text|f|
 staff|1|user_id|uuid|t|
 staff|2|name|text|t|
 staff|3|role|text|t|
+ticket_activity|1|id|bigint|t|
+ticket_activity|2|ticket_id|uuid|t|
+ticket_activity|3|action|text|t|
+ticket_activity|4|created_at|timestamp with time zone|t|now()
 ticket_emails|1|ticket_id|uuid|t|
 ticket_emails|2|email|text|t|
 ticket_messages|1|ticket_id|uuid|t|
@@ -229,6 +233,9 @@ settings_log | settings_log_pkey | PRIMARY KEY (id)
 staff | staff_pkey | PRIMARY KEY (user_id)
 staff | staff_role_check | CHECK ((role = ANY (ARRAY['admin'::text, 'gate'::text])))
 staff | staff_user_id_fkey | FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+ticket_activity | ticket_activity_action_check | CHECK ((action = ANY (ARRAY['view'::text, 'jpg'::text, 'pdf'::text, 'all-pdf'::text])))
+ticket_activity | ticket_activity_pkey | PRIMARY KEY (id)
+ticket_activity | ticket_activity_ticket_id_fkey | FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
 ticket_emails | ticket_emails_email_check | CHECK ((((char_length(email) >= 5) AND (char_length(email) <= 120)) AND (email ~ '^[^@\s]+@[^@\s]+\.[^@\s]+$'::text)))
 ticket_emails | ticket_emails_pkey | PRIMARY KEY (ticket_id)
 ticket_emails | ticket_emails_ticket_id_fkey | FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
@@ -302,6 +309,8 @@ settings | CREATE UNIQUE INDEX settings_pkey ON public.settings USING btree (id)
 settings_log | CREATE INDEX settings_log_at_idx ON public.settings_log USING btree (at DESC)
 settings_log | CREATE UNIQUE INDEX settings_log_pkey ON public.settings_log USING btree (id)
 staff | CREATE UNIQUE INDEX staff_pkey ON public.staff USING btree (user_id)
+ticket_activity | CREATE UNIQUE INDEX ticket_activity_pkey ON public.ticket_activity USING btree (id)
+ticket_activity | CREATE INDEX ticket_activity_ticket_idx ON public.ticket_activity USING btree (ticket_id, created_at DESC)
 ticket_emails | CREATE UNIQUE INDEX ticket_emails_pkey ON public.ticket_emails USING btree (ticket_id)
 ticket_messages | CREATE INDEX ticket_messages_message_idx ON public.ticket_messages USING btree (message_id)
 ticket_messages | CREATE UNIQUE INDEX ticket_messages_pkey ON public.ticket_messages USING btree (ticket_id)
@@ -360,6 +369,7 @@ screenshot_scans : rls=true
 settings : rls=true
 settings_log : rls=true
 staff : rls=true
+ticket_activity : rls=true
 ticket_emails : rls=true
 ticket_messages : rls=true
 ticket_prizes : rls=true
@@ -376,6 +386,7 @@ public.screenshot_scans | staff_read_scans | SELECT | {authenticated} | using: i
 public.settings | staff_read_settings | SELECT | {authenticated} | using: is_staff() | check: -
 public.settings_log | admin_read_log | SELECT | {authenticated} | using: is_admin() | check: -
 public.staff | staff_read_staff | SELECT | {authenticated} | using: ((user_id = auth.uid()) OR is_admin()) | check: -
+public.ticket_activity | admin_read_ticket_activity | SELECT | {authenticated} | using: is_admin() | check: -
 public.ticket_emails | admin_read_ticket_emails | SELECT | {authenticated} | using: is_admin() | check: -
 public.ticket_messages | admin_read_ticket_messages | SELECT | {authenticated} | using: is_admin() | check: -
 public.ticket_prizes | admin_read_ticket_prizes | SELECT | {authenticated} | using: is_admin() | check: -
@@ -1222,6 +1233,28 @@ begin
   where id = 1;
 end $function$
 
+--- admin_ticket_activity() | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_ticket_activity()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+             'ticket_id', s.ticket_id, 'views', s.views, 'last_view', s.last_view,
+             'downloads', s.downloads, 'last_download', s.last_download, 'last_format', s.last_format))
+    from (select ticket_id,
+                 count(*) filter (where action = 'view')                          as views,
+                 max(created_at) filter (where action = 'view')                   as last_view,
+                 count(*) filter (where action <> 'view')                         as downloads,
+                 max(created_at) filter (where action <> 'view')                  as last_download,
+                 (array_agg(action order by created_at desc, id desc) filter (where action <> 'view'))[1] as last_format
+          from ticket_activity group by ticket_id) s), '[]'::jsonb);
+end $function$
+
 --- admin_transfer_approve(p_transfer uuid) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.admin_transfer_approve(p_transfer uuid)
  RETURNS jsonb
@@ -1643,6 +1676,45 @@ CREATE OR REPLACE FUNCTION public.is_staff()
  STABLE SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$ select exists (select 1 from public.staff where user_id = auth.uid()) $function$
+
+--- log_ticket_activity(p_code text, p_phone text, p_action text, p_tickets text[]) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.log_ticket_activity(p_code text, p_phone text, p_action text, p_tickets text[] DEFAULT NULL::text[])
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare c text; ph text; b bookings%rowtype; t record; n integer := 0;
+begin
+  c  := replace(replace(replace(upper(coalesce(p_code, '')), 'O', '0'), ' ', ''), '-', '');
+  ph := replace(replace(coalesce(p_phone, ''), ' ', ''), '-', '');
+  if length(c) <> 8 or ph !~ '^[0-9]{10}$'
+     or p_action is null or p_action not in ('view','jpg','pdf','all-pdf')
+     or (p_tickets is not null and cardinality(p_tickets) > 10) then
+    return jsonb_build_object('ok', true, 'logged', 0);
+  end if;
+  select * into b from bookings where booking_code = c;
+  if not found or b.status <> 'paid' then return jsonb_build_object('ok', true, 'logged', 0); end if;
+  if b.kind = 'transfer' and not exists (select 1 from transfer_buyers x where x.booking_id = b.id and x.phone = ph) then
+    return jsonb_build_object('ok', true, 'logged', 0);
+  end if;
+  for t in
+    select k.id from tickets k
+    where k.booking_id = b.id and k.phone = ph
+      and k.transferred_out_at is null
+      and (k.ticket_no is not null or k.coord_no is not null)
+      and (p_tickets is null or _ticket_label(k.kind, k.ticket_no, k.coord_no) = any(p_tickets))
+    order by k.reg_seq
+  loop
+    if p_action = 'view' and exists (select 1 from ticket_activity a
+         where a.ticket_id = t.id and a.action = 'view' and a.created_at > now() - interval '10 minutes') then
+      continue;
+    end if;
+    insert into ticket_activity (ticket_id, action) values (t.id, p_action);
+    n := n + 1;
+  end loop;
+  return jsonb_build_object('ok', true, 'logged', n);
+end $function$
 
 --- lookup_tickets(p_code text, p_phone text) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.lookup_tickets(p_code text, p_phone text)
@@ -2226,6 +2298,7 @@ screenshot_scans : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authen
 settings : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 settings_log : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 staff : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
+ticket_activity : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 ticket_emails : {postgres=arwdDxtm/postgres,authenticated=r/postgres}
 ticket_messages : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 ticket_prizes : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}

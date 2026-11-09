@@ -13,13 +13,13 @@
 > - **Verified on a real phone, 6 Nov 2026:** a real ticket QR scans and checks in; scanning it again is refused; a short non-ticket QR shows NOT A TICKET. A Google Pay UPI QR (logo in the middle, long link) is not decoded, which is a known jsQR limit and harmless because it is not a ticket.
 > - **Still not verified:** a real gate-staff login (the scan above was on the admin page), scanning in bright light or on older phones, and printed tickets.
 >
-> **Status of the 6 Nov open items, re-checked against the code on 9 Nov 2026 (repo `6d84e02`):**
-> 1. **Still true:** the ticket's left side is a fixed picture (`assets/ticket-left.jpg`; coordinators have `assets/ticket-left-coord.jpg`), drawn by `drawTicket`. Changing the date or venue in Admin Settings does not change that picture (the image itself was not re-inspected on 9 Nov). **Fixed:** the tagline typo; the code now says "Where strangers feel like home" (`CONFIG.ticketTagline` and the Home page).
-> 2. **Still true:** the venue is recorded in two ways. The database default in the snapshot is "Savoury Business Hotel, Madiwala"; the page's built-in `CONFIG` (`eventLine`, `ticketVenue`) says "Bloom Creative Zone, Haralur". The value actually live is in Admin, Settings, Event details (settings values are not in the snapshot).
+> **Status of the 6 Nov open items, re-checked against the code on 9 Nov 2026 (repo `6d84e02`); items 1, 2, 5 and 6 were then settled by the owner on 9 Nov 2026 (decisions, not open work):**
+> 1. **Owner decision, 9 Nov 2026: no change.** The ticket's left side is a fixed picture (`assets/ticket-left.jpg`; coordinators have `assets/ticket-left-coord.jpg`), drawn by `drawTicket`, with the venue and date baked in. It stays as it is; changing the date or venue in Admin Settings will not change that picture. **Fixed earlier:** the tagline typo; the code now says "Where strangers feel like home".
+> 2. **Owner decision, 9 Nov 2026: the venue is fixed as Bloom Creative Zone, Haralur.** The page's built-in `CONFIG` and the ticket already say this. The database default in the snapshot still says "Savoury Business Hotel, Madiwala" (a leftover); the live page prefers the Admin value, so Admin, Settings, Event details should show Bloom Creative Zone, Haralur (the live value was not read in the 9 Nov sync).
 > 3. **Fixed:** the About page now says "1000+ members" in both places (no "600+" remains in `index.html`).
 > 4. **Fixed:** Home step 2 now says "Scan it with any UPI app, pay, then upload the screenshot and submit."
-> 5. **Still true:** photos for `abay`, `dana-fathima`, `muhammed-shamal` and `muhsina` are referenced in `index.html` but are not in `assets/personals/`.
-> 6. **Still true:** `assets/sponsor-video.mp4` is 10,165,981 bytes (about 9.7 MB).
+> 5. **Owner decision, 9 Nov 2026: no change.** Photos for `abay`, `dana-fathima`, `muhammed-shamal` and `muhsina` are not available. `index.html` still references them, so those people show initials; that is accepted.
+> 6. **Owner decision, 9 Nov 2026: no change.** `assets/sponsor-video.mp4` is 10,165,981 bytes (about 9.7 MB) and stays as it is.
 > 7. **Checked:** `og:image` points to `https://malluarticlesbengaluru.github.io/ca-meetup-register/assets/og-image.jpg` and the file exists in the repo.
 > 8. **Still true:** the test suites were not re-run in the 9 Nov sync; the counts quoted in section 10 are from 28 Oct.
 
@@ -64,7 +64,7 @@ Last updated: 28 Oct 2026 for most sections; see the 9 Nov 2026 block at the top
 A custom registration, payment-verification, ticket-transfer and entry app for **Ehsaas'26**, a Malayalee CA meet-up in Bengaluru.
 
 - **Organiser:** Mallu Articles Bengaluru. It began as a WhatsApp group started by 3 people who struggled with articleship, interviews and preparation. It guides CA, CMA and ACCA students and trainees coming to Bengaluru from Kerala with articleship vacancies, application links and interview preparation. It has grown to 700+ members, and the meet-up (party, food, enjoyment, relief) is the first in a year.
-- **Event:** Sunday 22 Nov 2026, 2 PM, Bengaluru. The venue is recorded two ways: the database default is Savoury Business Hotel, Madiwala; the page's built-in `CONFIG` and the ticket picture say Bloom Creative Zone, Haralur. The live value is in Admin, Settings, Event details.
+- **Event:** Sunday 22 Nov 2026, 2 PM, **Bloom Creative Zone, Haralur, Bengaluru** (fixed by the owner on 9 Nov 2026; the ticket picture and the page's built-in `CONFIG` already say this). The database default for `settings.venue` still says Savoury Business Hotel, Madiwala; the live value is in Admin, Settings, Event details.
 - **Why not a Google Form:** custom look and feel, plus features a form can't do:
   - several people in one booking (up to 5)
   - automatic UPI QR (scan-only) with the amount calculated from group size
@@ -311,6 +311,7 @@ A participant submits; an admin opens Bookings, checks the screenshot and the fl
 - **One page for staff** (owner, 28 Oct 2026): the gate scanner is a tab of the admin page; one login for everybody; gate staff see only the Gate tab. `/gate/` just forwards.
 - **Gate results never close by themselves.** The gate person chooses Next scan, Home page or Undo. **Undo: gate staff for 2 minutes, admins any time** (owner, 28 Oct 2026).
 - **Detail views are previews first** (bottom sheet or side panel); only the clearly labelled "Open in ... tab" buttons change tab, and the back gesture must always return to where the person was (owner, 28 Oct 2026).
+- **Owner decisions of 9 Nov 2026:** the venue is fixed as Bloom Creative Zone, Haralur; the ticket's left-side picture (venue and date baked in) is not changed; the four missing team-member photos (`abay`, `dana-fathima`, `muhammed-shamal`, `muhsina`) are not available and those people keep showing initials; the sponsor video stays at about 9.7 MB.
 
 ---
 

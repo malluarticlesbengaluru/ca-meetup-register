@@ -2459,3 +2459,5 @@ update public.settings set show_about = true, ask_email = false, ask_feedback = 
 -- 7 Nov 2026: r2_16 gate accounts can no longer approve payments, only admins can (run in Supabase by the owner on 7 Nov; full file: sql/r2_16_gate_no_approve.sql)
 -- 7 Nov 2026: r2_17 up to three organiser contacts with names; Contacts card in Admin Settings (run in Supabase by the owner on 7 Nov; full file: sql/r2_17_contacts.sql)
 -- 7 Nov 2026: r2_18 admin-only bulk approve with ticket-number preview (run in Supabase by the owner on 7 Nov; full file: sql/r2_18_bulk_approve.sql)
+
+-- 9 Nov 2026: r2_19 record ticket page views and Download JPG / PDF presses (table ticket_activity, functions log_ticket_activity and admin_ticket_activity). NOT run in Supabase yet; full file: sql/r2_19_ticket_downloads.sql. Run it BEFORE merging the pages.

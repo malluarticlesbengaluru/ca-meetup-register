@@ -16,7 +16,7 @@
 > **Status of the 6 Nov open items, re-checked against the code on 9 Nov 2026 (repo `6d84e02`); items 1, 2, 5 and 6 were then settled by the owner on 9 Nov 2026 (decisions, not open work):**
 > 1. **Owner decision, 9 Nov 2026: no change.** The ticket's left side is a fixed picture (`assets/ticket-left.jpg`; coordinators have `assets/ticket-left-coord.jpg`), drawn by `drawTicket`, with the venue and date baked in. It stays as it is; changing the date or venue in Admin Settings will not change that picture. **Fixed earlier:** the tagline typo; the code now says "Where strangers feel like home".
 > 2. **Owner decision, 9 Nov 2026: the venue is fixed as Bloom Creative Zone, Haralur.** The page's built-in `CONFIG` and the ticket already say this. The database default in the snapshot still says "Savoury Business Hotel, Madiwala" (a leftover); the live page prefers the Admin value, so Admin, Settings, Event details should show Bloom Creative Zone, Haralur (the live value was not read in the 9 Nov sync).
-> 3. **Fixed:** the About page now says "1000+ members" in both places (no "600+" remains in `index.html`).
+> 3. **Fixed, and confirmed by the owner on 9 Nov 2026: the correct number is 1000+.** The About page says "1000+ members" in both places (no "600+" remains in `index.html`); section 1 below now says 1000+ too.
 > 4. **Fixed:** Home step 2 now says "Scan it with any UPI app, pay, then upload the screenshot and submit."
 > 5. **Owner decision, 9 Nov 2026: no change.** Photos for `abay`, `dana-fathima`, `muhammed-shamal` and `muhsina` are not available. `index.html` still references them, so those people show initials; that is accepted.
 > 6. **Owner decision, 9 Nov 2026: no change.** `assets/sponsor-video.mp4` is 10,165,981 bytes (about 9.7 MB) and stays as it is.
@@ -63,7 +63,7 @@ Last updated: 28 Oct 2026 for most sections; see the 9 Nov 2026 block at the top
 
 A custom registration, payment-verification, ticket-transfer and entry app for **Ehsaas'26**, a Malayalee CA meet-up in Bengaluru.
 
-- **Organiser:** Mallu Articles Bengaluru. It began as a WhatsApp group started by 3 people who struggled with articleship, interviews and preparation. It guides CA, CMA and ACCA students and trainees coming to Bengaluru from Kerala with articleship vacancies, application links and interview preparation. It has grown to 700+ members, and the meet-up (party, food, enjoyment, relief) is the first in a year.
+- **Organiser:** Mallu Articles Bengaluru. It began as a WhatsApp group started by 3 people who struggled with articleship, interviews and preparation. It guides CA, CMA and ACCA students and trainees coming to Bengaluru from Kerala with articleship vacancies, application links and interview preparation. It has grown to 1000+ members, and the meet-up (party, food, enjoyment, relief) is the first in a year.
 - **Event:** Sunday 22 Nov 2026, 2 PM, **Bloom Creative Zone, Haralur, Bengaluru** (fixed by the owner on 9 Nov 2026; the ticket picture and the page's built-in `CONFIG` already say this). The database default for `settings.venue` still says Savoury Business Hotel, Madiwala; the live value is in Admin, Settings, Event details.
 - **Why not a Google Form:** custom look and feel, plus features a form can't do:
   - several people in one booking (up to 5)

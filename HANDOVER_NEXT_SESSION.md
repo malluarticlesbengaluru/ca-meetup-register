@@ -1,5 +1,14 @@
 # HANDOVER FOR THE NEXT CLAUDE SESSION
 
+> **9 Nov 2026, handover synced with the code (read from the repo at `5796ab9`; `main` already includes the notes pull request #52; nothing was run, no test, and no live database or Admin value was read).** Where this block disagrees with an older line below, this block is right for the code. `PROJECT_NOTES.md` has the same facts in its own 9 Nov block.
+> - **Owner decisions of 9 Nov 2026 (not open work):** the venue is fixed as Bloom Creative Zone, Haralur (the database default for `settings.venue` still says Savoury Business Hotel, Madiwala; the live page prefers the Admin value, so check Admin, Settings, Event details); the ticket's left-side picture (`assets/ticket-left.jpg`, venue and date baked in) is not changed; the photos for `abay`, `dana-fathima`, `muhammed-shamal` and `muhsina` are not available, so those people keep showing initials; the sponsor video (about 9.7 MB) stays; the member count is 1000+ (the About page says so in both places).
+> - **SQL that is live and not described further down:** `r2_13` game messages, `r2_14` pick random people, the 2 Nov "What best describes you?" change (`tickets.occupation`, `tickets.occupation_detail`; answers Article Assistant, Industrial Trainee, Employee, Student, Others; it exists only inside `sql/changes.sql`, labelled "piece 15"), **`r2_15_fixed_switches.sql`** (About always on, Email never asked, Feedback always on), **`r2_16_gate_no_approve.sql`** (`admit_ticket` with approve on stops with `ADMIN_ONLY` for a gate account), **`r2_17`** (up to three organiser contacts; `admin_set_contacts`; `get_payment_info` now also returns `contacts`) and **`r2_18_bulk_approve.sql`** (`admin_preview_approval`, `admin_approve_bookings`). **`sql/r2_17_contacts.sql` was never committed and is lost** (the test `scratch-db/test_r2_17.py` still expects it at `/home/claude/sql/r2_17_contacts.sql`); r2_17 was run in Supabase on 7 Nov and its result is in the snapshot. The plan agreed with the owner: look for the original in the Supabase SQL editor history or the earlier chat; if it cannot be found, add a clearly marked reconstruction built from the snapshot.
+> - **Database (snapshot of 9 Nov 2026, 13:18 IST):** 16 tables, the `report` view, 77 functions of which 22 are internal helpers (names starting with `_`) and 55 have other names (54 are callable by `authenticated`, 16 of those also by `anon`; the 55th is Supabase's own `rls_auto_enable`). Section 7 and Appendix A below were patched on 9 Nov for the functions added or changed since 26 Oct.
+> - **Registration form (as the database now expects it):** `submit_booking` takes `name`, `phone`, `loc`, `food`, `occ` and `occ_detail` per person. It no longer takes an email or an attendance answer (`tickets.attendance` is nullable and nothing fills it); the old error codes `INVALID_EMAIL` and `INVALID_ATTENDANCE` are gone and `INVALID_OCCUPATION` and `INVALID_OCCUPATION_DETAIL` are new. `get_site_flags()` still exists, but neither page reads it any more.
+> - **Pages:** the public page has a new Home (hero, poster, **"See walkthrough" panel that loads `tutorial.html?embed=1` in an iframe**), `members`, `teams` and `team` views, a landscape 2000 x 668 ticket (coordinators get a blue picture) with optional message and prize panels, and no `home-fx.js` or `logo-fluid.js` (deleted 4 Nov; `assets/page-fx.js` remains). The staff page screens are now **Today, Payments (with Scan screenshots), People, Gate, Transfers, Game messages, Feedback, Settings**, with light and dark themes; Settings has a Contacts card; Payments has bulk approve with a ticket-number preview; the Approve and admit button on the gate result is shown to admins only. `tutorial.html` holds embedded copies of the two pages; whether they are regenerated when the pages change was not checked.
+> - **Test files in the repo on 9 Nov (none re-run):** database `test_r2_01` to `_06`, `_08` to `_14`, `_17`, `_18` and `mutate_r2_12` to `_14` (there is no `test_r2_15` or `_16`); browser scripts `run_admin`, `run_approve`, `run_desk`, `run_form`, `run_frame`, `run_gamemsg`, `run_gate`, `run_home`, `run_home_touch`, `run_messages`, `run_pagefx`, `run_people`, `run_public`, `run_public_fixed`, `run_qrimage`, `run_settings`, `run_smooth`, `run_startup`, `run_transfers`. The suite counts quoted in sections 0, 9 and 11 are from 28 to 29 Oct and are out of date; several older public-page scripts are known to test the old Home or form.
+> - **Still never verified by anyone:** a real gate-staff login on a phone (the 6 Nov real scan was on the admin page), a complete real payment, the real database through the newest pages, and the pages on a range of real phones.
+>
 > **6 Nov 2026, ownership transfer and gate scanner fix:**
 > - **Repo moved:** it is now `malluarticlesbengaluru/ca-meetup-register` (transferred from `rameezmunirrr-gh`). Older links in this file still name the old owner. GitHub redirects them, so they work; replace them when convenient.
 > - **Bug found and fixed: the gate camera could not scan since the 28 Oct merge.** `admin/index.html` calls `jsQR(...)` in the camera loop (`gCamAttach`) but never loaded the library. The old stand-alone gate page loaded it, and `gate/index.html` is now only a forwarder. Fix: added `<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>` after the Chart.js tag in `admin/index.html`. The browser suites missed it because they fake the camera.
@@ -18,7 +27,7 @@
 
 > **4 Nov 2026 cleanup of the public Home (owner request):** `assets/home-fx.js`, `assets/logo-fluid.js` and the stray root `akhina-a-r.jpg` were deleted, together with the old Home design's CSS (about 20 KB, all of it dead since the BURGUNDY `.bhome` Home: nothing renders `.home` or `#logo`) and the browser suite `scratch-db/browser/run_homefx.py`. Any other mention of `home-fx.js` or `logo-fluid.js` in this file or the handover describes the old design. The Home pop-up on scroll now lives in `homeMount()` in `index.html` (each section follows whichever is further along: a timed pop from the moment it enters the screen, or its scroll position). `run_home.py`, `run_home_touch.py` and `run_public.py` still test the OLD Home and fail on the current one; they need rewriting for `.bhome`.
 
-**Project:** Ehsaas'26 meetup registration app (repo `rameezmunirrr-gh/ca-meetup-register`, public; GitHub Pages + Supabase project `CA-meetup-2026`).
+**Project:** Ehsaas'26 meetup registration app (repo `malluarticlesbengaluru/ca-meetup-register` since 6 Nov 2026, public; GitHub Pages + Supabase project `CA-meetup-2026`).
 **Rewritten:** 26 Oct 2026 (evening, India time), by the session that took the project over from the previous Claude session after its credits ran out. It replaces the earlier version, which had grown into three layers (a 23 Oct body under two "override" blocks) and described a world where nothing was applied yet.
 **How it was checked:** against the repo (`main` at `abb7817`, PR #12 merged), the live database snapshot of 26 Oct 11:17 UTC (`b86a59c`, run by the owner by hand on request), and a test database rebuilt from the repo in this session. Where something was NOT verified, the line says so.
 **Updated later on 26 Oct 2026 (same day):** the owner's answers to the section-1 questions are recorded in section 1 and 0.1; `PROJECT_NOTES.md` was brought up to date (commit `b53fee7`, verified); the task list in section 11 is updated.
@@ -115,6 +124,9 @@ The original questions follow, for reference.
 ---
 
 ## 2. STATE OF EACH ENVIRONMENT
+
+> **9 Nov 2026:** the table below was written on 26 to 28 Oct. For the current state (repo `main`, the SQL list through `r2_18`, the database size, the files) use the 9 Nov block at the top and the `sql/` folder itself.
+
 
 | Place | What is there (verified 26 Oct 2026 unless stated) |
 |---|---|
@@ -220,6 +232,9 @@ The meetup is limited to a hall of 150. People cannot get refunds, only **transf
 
 ## 4. THE PAGES AS BUILT (updated 28 Oct 2026)
 
+> **9 Nov 2026:** this section describes the pages as of 28 Oct. Since then the public Home, the ticket, the registration form and the whole staff page layout were redesigned (see the 9 Nov block at the top). The code is the truth: read `index.html` and `admin/index.html` before relying on a screen description here.
+
+
 All three are single HTML files with inline JavaScript and the Supabase client `db`, drawing views by building HTML strings. Only the public publishable key is in them (safe by design). Everything that changes data goes through database functions.
 
 ### 4.1 Public page `index.html`
@@ -229,7 +244,7 @@ All three are single HTML files with inline JavaScript and the Supabase client `
 - **Startup order (29 Oct 2026, part B):** the two library tags (`#qr-lib`, `#sb-lib`) are `async` in the head. `libReady()` resolves when a tag loaded, failed, or after 20 s; `db` is a wrapper object, not the Supabase client (the client is created on the first call, in `sbGet()`), and answers `{error:{message:"no client"}}` if the library never arrives, which every caller already treated as a failure. `loadEvent()` starts its 2.5 s limit only after the library is there, so a slow download no longer loses the live date. **Any new code that uses `db.auth`, `db.from` or another client method must add it to the wrapper first.** Any new code that draws a QR must go through `whenQR()` (or `await qrReady`).
 - **Home motion (30 Oct 2026):** see the update line at the top of this file. `HomeFX.mount()` is called by `render()` for Home, `HomeFX.unmount()` for every other step; the entrance title is split into letter spans once per visit (the `h1` keeps its text and an `aria-label`). Do not give the particle canvas (`#fxc`) a z-index above `main` (a test paints it red to prove it cannot reach a card).
 - **Home updates in place (29 Oct 2026):** at start the page draws Home once with the built-in text (`CONFIG`), then `refreshHome()` patches the live date, time, venue and the About button into that same card when `get_event_info` and `get_site_flags` answer. The payment details do not touch Home (it shows none), so only the closed and done screens redraw for them. Do not call `render()` for Home when data arrives: it restarts the fade-in and the logo and scrolls to the top.
-- **Flags:** on load the page calls `get_site_flags()`; `S.flags.show_about`, `ask_email` and `ask_feedback` switch the About link, the Email boxes and the feedback questions. If the call fails the page behaves as the defaults (all on).
+- **Flags (changed Nov 2026):** `loadFlags()` still calls `get_site_flags()` into `S.flags`, but nothing reads it any more: since `r2_15` and the admin redesign the About link is always on, the Email box is never asked and the feedback card is always on. The database switches `show_about`, `ask_email` and `ask_feedback` and their admin functions still exist.
 - **Views (`S.step`):** `loading`, `home`, `about` (says "Coming soon" until the owner sends content), `closed`, `error`; registration: `form` (1 to 5 people, fixed "+91" box, Email right after Phone when the switch is on), `summary`, `pay` (UPI QR drawn in the page with the logo in a round patch, copy UPI ID, share/download QR, screenshot upload), `done` (Booking ID, "Pending verification", then the optional "Share your thoughts" feedback card; no Name/Food table); `tickets` (Booking ID + phone, saved Booking IDs as tap-to-fill chips, never the phone), `ticket` (tickets drawn on a canvas, JPG/PDF; a navy header with the logo; guest badge amber, coordinator badge ivory with maroon accents; no Booking ID drawn on the ticket); transfers: `xmenu` (Transfer tickets, shown only when `get_transfer_info().open` and the cut-off has not passed), `xsell` (seller form, private or public), `xcode` (the seller's code, its expiry and a Copy button; the seller's later status and a Cancel-code button appear on the Tickets page for a confirmed booking, via `transfer_status` and `transfer_cancel`), `xbuy` (type the code; ONE "I want to buy" button, the code itself decides private or public), `xform` (Transfer Form), `xdone` (the buyer's new Booking ID), `tpay` (public buyer: amount, UPI QR, screenshot upload).
 - **On the device:** only Booking IDs are remembered (`mm_mine` up to 20, `mm_hist` up to 10, `mm_last`). The phone number is never stored.
 - **Payment QR with the logo (27 Oct 2026):** `drawQR()` draws the QR with error-correction level **Q** and a navy circle 24% of the QR's width carrying the logo (`paintLogo`, logo preloaded as `QRLOGO`). Used by the Pay and transfer-Pay screens, so also by Share QR and Download QR. The TICKET QR (`drawTickets`) is unchanged. Tested with the real `qrcode-generator` and three decoders (OpenCV, ZXing, jsQR) on five UPI links at several sizes, blurred and as JPEG: readable up to about 28% (square patch), failing from 35%; an oversized circle fails every copy. **Level H was tried and is WORSE**: the QR gets so dense (up to 65 x 65 modules) that decoders miss it even without a logo. Do not enlarge the logo or change the level without re-running that test (method in section 9). The owner scanned the QR in several UPI apps on 27 Oct 2026: it works.
@@ -242,7 +257,7 @@ One email-and-password login for everybody. **Admins** get the dashboard tabs; *
 - **Overview:** six cards (Active tickets, Spots used with a progress bar, Pending, Expected total, Present at event, Coordinators). **Each card opens the list behind its number with the working** (for example "₹750 confirmed + ₹0 pending = ₹750", booking by booking). Three **full pie charts** (Food, Location, Attendance; Chart.js, percentage on each slice, an HTML legend, drawn at 2x sharpness) with a switch between Confirmed + Pending and **Confirmed only** (use this for final food and hall numbers). Pie slices are NOT yet tappable (the owner left that out on 28 Oct). The IP banner's network addresses open the bookings behind them. The registration status banner and the payment-details-changed banner are unchanged.
 - **Bookings:** one **card** per registration booking (code, time, amount, status, people as links, OCR-read transaction ID, review flags with tappable booking codes, big Screenshot / Paid / Reject / Pending buttons). Status chips Pending / Paid / Rejected / All with counts, a search box, "Needs review only". Pending first, newest first.
 - **People:** one **card** per person (tap-to-call phone, tap-to-mail email, location / attendance / food tags, booking-ID chip that opens the booking preview, Make / Remove coordinator, Present with Undo); a collapsible **Filters** panel (payment, food, location, attendance, **Present / Not present yet**, type, show transferred tickets); the shown and present counts; **Download Excel (CSV)** with an Email column; retired tickets dimmed as Transferred.
-- **Gate tab (merged 28 Oct 2026):** live counters (Present / Confirmed, Veg, Non-veg; paid bookings only, retired tickets ignored; refreshed every 30 seconds while the tab is open); camera scan (jsQR) of `E26-007|<12 hex>` or `E26-001C|<12 hex>` (anything else shows NOT A TICKET); **Find a person** (at least 2 characters; tapping Open then Admit skips the QR checks; a retired ticket shows a Transferred pill, never an Admit button); the **Admitted (N)** list, latest first, with name, ticket, Booking ID and entry time, whose names open the same person / booking previews (a person's preview has an **Admit** button when they are not in yet). The camera turns **off when you leave the tab**. **Result screens no longer close by themselves** (ADMITTED, ALREADY SCANNED, PAYMENT PENDING with Approve and admit, PAYMENT REJECTED, TICKET CANCELLED, INVALID TICKET, COULDN'T CHECK): buttons **Next scan** (closes and starts the camera if it is off), **Home page** (closes and turns the camera off) and, on ADMITTED only, **Undo** (asks first, then calls `gate_undo_checkin`, falling back to `undo_checkin`). **Gate staff can undo for 2 minutes, admins any time**; after 2 minutes the page says "ask an admin" without calling the database. **Camera permission:** the button shows Asking, then Try again after a denial with plain steps (browsers decide whether the prompt returns; a page cannot force it) and the camera starts by itself if the permission is allowed later. The only functions the Gate tab calls are `admit_ticket` and the undo functions. Gate staff load only a few columns of `tickets` and `bookings`.
+- **Gate tab (merged 28 Oct 2026):** live counters (Present / Confirmed, Veg, Non-veg; paid bookings only, retired tickets ignored; refreshed every 30 seconds while the tab is open); camera scan (jsQR) of `E26-007|<12 hex>` or `E26-001C|<12 hex>` (anything else shows NOT A TICKET); **Find a person** (at least 2 characters; tapping Open then Admit skips the QR checks; a retired ticket shows a Transferred pill, never an Admit button); the **Admitted (N)** list, latest first, with name, ticket, Booking ID and entry time, whose names open the same person / booking previews (a person's preview has an **Admit** button when they are not in yet). The camera turns **off when you leave the tab**. **Result screens no longer close by themselves** (ADMITTED, ALREADY SCANNED, PAYMENT PENDING with Approve and admit (admins only since `r2_16`: a gate account sees a note to ask an admin, and the database refuses with `ADMIN_ONLY`), PAYMENT REJECTED, TICKET CANCELLED, INVALID TICKET, COULDN'T CHECK): buttons **Next scan** (closes and starts the camera if it is off), **Home page** (closes and turns the camera off) and, on ADMITTED only, **Undo** (asks first, then calls `gate_undo_checkin`, falling back to `undo_checkin`). **Gate staff can undo for 2 minutes, admins any time**; after 2 minutes the page says "ask an admin" without calling the database. **Camera permission:** the button shows Asking, then Try again after a denial with plain steps (browsers decide whether the prompt returns; a page cannot force it) and the camera starts by itself if the permission is allowed later. The only functions the Gate tab calls are `admit_ticket` and the undo functions. Gate staff load only a few columns of `tickets` and `bookings`.
 - **Transfers** (appears only once the database has the transfer tables; shows the number waiting): the money cards **each open the list of transfers that add up to the amount** (the list checks itself against the card and warns if they differ), seller and buyer names are previews, waiting transfers (call tick, Ask to pay, verify the amount received, **Transfer**, or Reject), active codes with Extend and Cancel, seller payouts, buyer returns, history.
 - **Scan screenshots:** OCR runs in the admin's browser (nothing leaves the computer) and saves transaction IDs, an image hash and amounts; the three counts (not scanned, unreadable, scanned) open their booking lists.
 - **Feedback** (appears only when the feedback table exists): answers with the average and a 1-to-5 split (the rating counts open the answers); "Name and N others" opens the booking and everyone in it; booking codes open the booking preview.
@@ -271,6 +286,8 @@ One email-and-password login for everybody. **Admins** get the dashboard tabs; *
 | Email box | `ask_email` (default ON) | `admin_set_ask_email` | `get_site_flags` |
 | Feedback questions | `ask_feedback` (default ON) | `admin_set_ask_feedback` | `get_site_flags` |
 | (unused) | `max_resale_price` | nobody | nobody |
+
+**Since `r2_15` (Nov 2026) these three switches are fixed in the database (About on, Email off, Feedback on) and neither page reads them; the paragraph below describes how they worked before.** Another switch, `settings.show_messages` (default OFF, `admin_set_show_messages`), decides whether tickets show the game message and the picked-people line. The organiser contacts (up to three, `contact1_name`, `whatsapp_number`, `contact2_*`, `contact3_*`) are set with `admin_set_contacts` (contact 1 required, numbers 11 to 15 digits).
 
 Switch behaviour: **Email OFF**: forms hide the box, no email is asked or stored, emails already collected stay (admin-only). **Feedback OFF**: the questions are hidden and `submit_feedback` answers `FEEDBACK_OFF`; saved answers stay. Feedback is one row per registration booking (rating 1 to 5 and/or a comment up to 1000 characters; sending again replaces it), readable by admins only. `ticket_emails`, `transfers`, `transfer_buyers`, `booking_ips` and `booking_feedback` are admin-read-only; gate staff see zero rows. Values at the last record (14 to 16 Oct, notes section 1): cap 150, price ₹250, deadline 31 Oct 2026 23:59:59 IST; the owner set the transfer code lifetime to 24 hours. **Read the live values in Admin → Settings; the database is the truth.**
 
@@ -314,7 +331,7 @@ Earlier, still binding: emails admin-only in their own table (G3); Booking ID + 
 
 ---
 
-## 7. API REFERENCE (from the live snapshot of 26 Oct 2026; real responses in Appendix B)
+## 7. API REFERENCE (from the live snapshot of 26 Oct 2026, patched 9 Nov 2026 for the functions added or changed since; real responses in Appendix B)
 
 ### 7.1 Visitor functions (anyone with the public key)
 
@@ -328,7 +345,7 @@ Seller, buyer and feedback functions never raise for user mistakes; they **retur
 | `get_event_info()` | | `event_at`, `venue` |
 | `get_site_flags()` | | `{show_about, ask_email, ask_feedback}` |
 | `get_transfer_info()` | | `{open, cutoff_at, cutoff_passed, food_locked, code_hours, ask_price, server_now}` |
-| `submit_booking(p_submission_id, p_people jsonb, p_screenshot_path)` | 1 to 5 objects `name, phone (10 digits), email (not needed when the Email switch is off), loc, att, food` | the booking (code, status, tickets); **raises** on invalid input |
+| `submit_booking(p_submission_id, p_people jsonb, p_screenshot_path)` | 1 to 5 objects `name, phone (10 digits), loc, food, occ, occ_detail` (checked against the 9 Nov snapshot: no email and no attendance any more; `occ` is Article Assistant, Industrial Trainee, Employee, Student or Others; `occ_detail` is 1 to 100 characters) | the booking (code, status, tickets); **raises** on invalid input |
 | `submit_feedback(p_booking_code, p_rating, p_comment)` | rating 1 to 5 and/or comment | `{ok:true}` or `{ok:false,error}` |
 | `lookup_tickets(p_code, p_phone)` | Booking ID + 10-digit phone | `{found:true, kind, booking_code, status, people_count, amount_expected, tickets:[...]}`; transfer bookings also `transfer:{type, state, amount_due}` |
 | `private_sell(p_booking_code, p_ticket, p_phone)` | ticket like `E26-001` | `{ok, code, expires_at, hours, ticket_label}` |
@@ -344,7 +361,7 @@ Screenshots go straight to the `payment-proofs` storage bucket (anyone may uploa
 ### 7.2 Staff and admin functions (login required; each checks the role inside)
 - **Staff:** `admit_ticket`, `save_scan`, `admin_registration_status`, `is_staff`.
 - **Admin, existing:** `undo_checkin`, `set_booking_status` (refuses transfer bookings: `USE_TRANSFER_TOOLS`), `set_coordinator` (refuses a retired ticket: `ALREADY_TRANSFERRED`), `admin_update_settings`, `admin_set_event`, `admin_set_payment_info`, `admin_payment_alert`, `is_admin`.
-- **Admin, Release 2:** `admin_set_transfer_settings`, `admin_set_show_about`, `admin_set_ask_email`, `admin_set_ask_feedback`, `admin_transfer_confirm_call(id, bool)`, `admin_transfer_extend_code(id, hours)`, `admin_transfer_request_payment(id)`, `admin_transfer_verify_payment(id, amount)`, `admin_transfer_approve(id)`, `admin_transfer_reject(id, note)`, `admin_transfer_mark_paid(id, reference)`, `admin_transfer_mark_returned(id, reference)`, `admin_transfer_money()`, `admin_ip_flags()`, `admin_clear_client_ips()`.
+- **Admin, Release 2:** `admin_set_transfer_settings`, `admin_set_show_about`, `admin_set_ask_email`, `admin_set_ask_feedback`, `admin_transfer_confirm_call(id, bool)`, `admin_transfer_extend_code(id, hours)`, `admin_transfer_request_payment(id)`, `admin_transfer_verify_payment(id, amount)`, `admin_transfer_approve(id)`, `admin_transfer_reject(id, note)`, `admin_transfer_mark_paid(id, reference)`, `admin_transfer_mark_returned(id, reference)`, `admin_transfer_money()`, `admin_ip_flags()`, `admin_clear_client_ips()`. **Added after 26 Oct (checked against the 9 Nov snapshot):** `gate_undo_checkin(id)` (r2_12); `admin_set_show_messages`, `admin_save_message`, `admin_delete_message`, `admin_assign_messages`, `admin_clear_messages` (r2_13); `admin_set_prizes`, `admin_clear_prizes` (r2_14); `admin_set_contacts(name1, num1, name2, num2, name3, num3)` (r2_17); `admin_preview_approval(ids)` and `admin_approve_bookings(ids, expected_next)` (r2_18, admin only). `admit_ticket` with approve on stops with `ADMIN_ONLY` for a gate account (r2_16). `get_payment_info` also returns `contacts`, a list of name and number.
 - **Internal (not callable by anyone but the database owner):** 19 helpers such as `_assign_numbers`, `_booking_json`, `_client_ip`, `_find_seller_ticket`, `_tlog`. `_ticket_label` is callable by anyone (pure formatting, harmless). `rls_auto_enable` is Supabase's own event-trigger function.
 
 - **`gate_undo_checkin(p_id uuid)`** (added 28 Oct 2026, `sql/r2_12_gate_undo.sql`; not in the 26 Oct snapshot the rest of this section was generated from): `NOT_ALLOWED` for non-staff; admins can clear any check-in; other staff only if it was made within 2 minutes, else `UNDO_EXPIRED`. Returns nothing. The older `undo_checkin(p_ticket_no, p_coord, p_id)` stays admin-only.
@@ -394,6 +411,9 @@ One open transfer per seat; a code is unique among active codes; Transfer needs 
 ---
 
 ### 8.4 Open after 28 Oct 2026
+
+> **9 Nov 2026:** still open from this list: the real gate account test, the housekeeping and the owner's knowingly left gaps. New since: the lost `sql/r2_17_contacts.sql` and the out-of-date test counts (see the 9 Nov block at the top).
+
 - **Real gate account:** none exists yet. Test with a real gate login on a phone: sign in at `/admin/` (it should show only the Gate tab), scan a real ticket, press Undo within 2 minutes (it should work) and after 2 minutes (it should say ask an admin), and try the camera permission flow (deny, then Try again).
 - **`r2_12`:** in `sql/changes.sql` and confirmed in the 28 Oct snapshot. Its database suite now exists (`scratch-db/test_r2_12.py`, 56 checks, 29 Oct 2026). One behaviour worth knowing, found while writing it and not changed: a wrong id, an empty id and a ticket that was never admitted all raise the same `UNDO_EXPIRED`, so the Gate page's "ask an admin" wording also appears in those cases. The function also leaves no record of who undid what.
 - **Gaps the owner knowingly left:** tappable pie slices; the Settings log is not linked; the Present card's "rejected: N" is not tappable.
@@ -401,11 +421,14 @@ One open transfer per seat; a code is unique among active codes; Transfer needs 
 
 ## 9. THE TEST ENVIRONMENT (rebuild in about 10 minutes; Claude's container is wiped between chats)
 
+> **9 Nov 2026:** the commands and counts below are from 29 Oct (`test_r2_01` to `_12`, 731 checks). The repo now also has `test_r2_13`, `_14`, `_17` and `_18` and many more browser scripts (listed in the 9 Nov block at the top); none was re-run on 9 Nov, and `test_r2_17` cannot run until `r2_17_contacts.sql` exists again.
+
+
 **Principle:** the test database is built from the **pre-Release-2** snapshot (commit `161e7ed`, 17 Oct 2026), then `r2_01` to `r2_11` are applied on top. The current snapshot already contains them. Run everything with bash. `github.com`, PyPI and npm are reachable; the repo is public, so no login is needed (a full clone, not a shallow one, because `git show` needs history).
 
 ```bash
 mkdir -p /home/claude/sql /home/claude/scratch && cd /home/claude
-git clone https://github.com/rameezmunirrr-gh/ca-meetup-register.git && cd ca-meetup-register
+git clone https://github.com/malluarticlesbengaluru/ca-meetup-register.git && cd ca-meetup-register
 git show 161e7ed:sql/schema_snapshot.txt > /home/claude/sql/schema_snapshot.txt   # the BASE (pre-Release-2)
 cp sql/r2_*.sql /home/claude/scratch/ && cp scratch-db/*.py /home/claude/scratch/
 cp sql/r2_0*.sql sql/r2_1*.sql scratch-db/      # test_r2_08/09 look here (G17); do not commit these copies
@@ -457,6 +480,9 @@ for n in 01 02 03 04 05 06 08 09 10 11 12; do python3 test_r2_$n.py | tail -1; d
 5. Small housekeeping when convenient: fix G17, optionally G15, delete merged branches, write a real `README.md`.
 5b. **First real-account tests of the staff page (new, 28 Oct 2026):** a real gate login and the real camera on a phone, the 2-minute undo with a gate account, and an admin undo after 2 minutes; then take a new snapshot (section 8.4; `r2_12` is already in `sql/changes.sql`). (`test_r2_12` was written on 29 Oct 2026.)
 6. **Pre-launch checks with the owner** (section 1, question 3; `PROJECT_NOTES.md` section 11), then opening registration when the owner decides. Done when each item is confirmed in Admin → Settings and the Actions tab shows green ticks.
+6b. **New 9 Nov 2026:** recover or reconstruct `sql/r2_17_contacts.sql` (see the 9 Nov block); then re-run the database and browser suites, rebuild the test database if needed, and record the new counts here and in `PROJECT_NOTES.md` section 10. Done when the counts are written down and every failure is either fixed or listed as a known failure.
+6c. **New 9 Nov 2026:** the owner has an idea to track who downloaded tickets and when. Agreed design, not built yet: an admin-only table `ticket_downloads` (ticket, booking, time, format), a public function `log_ticket_download` that requires Booking ID plus phone like `lookup_tickets`, a call to it from `downloadTicket` and `downloadAll` in `index.html`, and admin screens (a Downloaded tag, a Not downloaded yet filter, a CSV column). It records the press of Download, not that the file was saved. Ask the owner before building.
+
 7. **After the event:** section 8.1 item 5.
 
 After each task: update `PROJECT_NOTES.md` (changelog + status) and this file's state lines, and say what was not verified.
@@ -477,19 +503,29 @@ After each task: update `PROJECT_NOTES.md` (changelog + status) and this file's 
 
 ---
 
-## APPENDIX A. ERROR CODES PER FUNCTION (regenerated 26 Oct 2026 from the live snapshot `b86a59c`; "File" = the latest `sql/` file that defines the function)
+## APPENDIX A. ERROR CODES PER FUNCTION (regenerated 26 Oct 2026 from the live snapshot `b86a59c`; "File" = the latest `sql/` file that defines the function)  **Patched 9 Nov 2026 from the snapshot of 9 Nov:** rows added for `admin_approve_bookings`, `admin_preview_approval`, `admin_set_contacts`, the message and prize functions and `gate_undo_checkin`; rows changed for `admit_ticket` and `submit_booking`.
 
 | Function | File | Style | Codes |
 |---|---|---|---|
+| `admin_approve_bookings` | r2_18_bulk_approve | raises | NOT_ALLOWED, NO_BOOKINGS, NUMBERS_CHANGED, TOO_MANY |
+| `admin_assign_messages` | r2_13_game_messages | raises | DUPLICATE_TICKET, INVALID_PAIRS, MESSAGE_NOT_FOUND, NOT_ALLOWED, TICKET_NOT_FOUND, TOO_MANY |
 | `admin_clear_client_ips` | r2_05_cleanup_and_ip | raises | NOT_ALLOWED |
+| `admin_clear_messages` | r2_13_game_messages | raises | NOT_ALLOWED, NOT_FOUND |
+| `admin_clear_prizes` | r2_14_game_prizes | raises | NOT_ALLOWED |
+| `admin_delete_message` | r2_13_game_messages | raises | NOT_ALLOWED, NOT_FOUND |
 | `admin_ip_flags` | r2_05_cleanup_and_ip | raises | NOT_ALLOWED |
 | `admin_payment_alert` | Release 1 (see changes.sql) | raises | NOT_ALLOWED |
+| `admin_preview_approval` | r2_18_bulk_approve | raises | NOT_ALLOWED, TOO_MANY |
 | `admin_registration_status` | Release 1 (see changes.sql) | raises | NOT_ALLOWED |
+| `admin_save_message` | r2_13_game_messages | raises | INVALID_MESSAGE, INVALID_NAME, NAME_TAKEN, NOT_ALLOWED, NOT_FOUND |
 | `admin_set_ask_email` | r2_10_email_switch | raises | INVALID_VALUE, NOT_ALLOWED |
 | `admin_set_ask_feedback` | r2_11_feedback | raises | INVALID_VALUE, NOT_ALLOWED |
+| `admin_set_contacts` | r2_17 (file lost; see the 9 Nov block) | raises | CONTACT_INCOMPLETE, FIRST_CONTACT_REQUIRED, INVALID_CONTACT_NAME, INVALID_WHATSAPP, NOT_ALLOWED |
 | `admin_set_event` | Release 1 (see changes.sql) | raises | INVALID_EVENT, NOT_ALLOWED |
 | `admin_set_payment_info` | Release 1 (see changes.sql) | raises | INVALID_PAYEE, INVALID_UPI, INVALID_WHATSAPP, NOT_ALLOWED |
+| `admin_set_prizes` | r2_14_game_prizes | raises | DUPLICATE_TICKET, INVALID_MESSAGE, INVALID_NAME, INVALID_PAIRS, NOT_ALLOWED, TICKET_NOT_FOUND, TOO_MANY |
 | `admin_set_show_about` | r2_09_about_link | raises | INVALID_VALUE, NOT_ALLOWED |
+| `admin_set_show_messages` | r2_13_game_messages | raises | INVALID_VALUE, NOT_ALLOWED |
 | `admin_set_transfer_settings` | r2_06_transfer_settings | raises | INVALID_CUTOFF, INVALID_HOURS, INVALID_THRESHOLD, NOT_ALLOWED, PAYMENT_INFO_MISSING |
 | `admin_transfer_approve` | r2_10_email_switch | raises | BUYER_BOOKING_INVALID, CALL_NOT_CONFIRMED, INVALID_TRANSFER, NOT_ALLOWED, NOT_PENDING, NO_BUYER, PAYMENT_NOT_VERIFIED, SELLER_ALREADY_TRANSFERRED, SELLER_CHECKED_IN, SELLER_TICKET_INVALID |
 | `admin_transfer_confirm_call` | r2_03_private_transfer | raises | INVALID_TRANSFER, NOT_ALLOWED, NOT_PENDING |
@@ -501,7 +537,8 @@ After each task: update `PROJECT_NOTES.md` (changelog + status) and this file's 
 | `admin_transfer_request_payment` | r2_04_public_via_code | raises | ALREADY_REQUESTED, CALL_NOT_CONFIRMED, INVALID_TRANSFER, NOT_ALLOWED, NOT_PENDING, NOT_PUBLIC |
 | `admin_transfer_verify_payment` | r2_04_public_via_code | raises | ALREADY_VERIFIED, INVALID_AMOUNT, INVALID_TRANSFER, NOT_ALLOWED, NOT_PENDING, NOT_SUBMITTED |
 | `admin_update_settings` | Release 1 (see changes.sql) | raises | INVALID_PAUSE_TIMES, NOT_ALLOWED |
-| `admit_ticket` | r2_03_private_transfer | raises | NOT_ALLOWED |
+| `admit_ticket` | r2_16_gate_no_approve | raises | ADMIN_ONLY, NOT_ALLOWED |
+| `gate_undo_checkin` | r2_12_gate_undo | raises | NOT_ALLOWED, UNDO_EXPIRED |
 | `get_event_info` | Release 1 (see changes.sql) | (returns {found:false} or data) |  |
 | `get_payment_info` | Release 1 (see changes.sql) | (returns {found:false} or data) |  |
 | `get_public_status` | Release 1 (see changes.sql) | (returns {found:false} or data) |  |
@@ -514,7 +551,7 @@ After each task: update `PROJECT_NOTES.md` (changelog + status) and this file's 
 | `save_scan` | Release 1 (see changes.sql) | raises | NOT_ALLOWED |
 | `set_booking_status` | r2_03_private_transfer | raises | INVALID_STATUS, NOT_ALLOWED, USE_TRANSFER_TOOLS |
 | `set_coordinator` | r2_08_coordinator_transfer | raises | ALREADY_TRANSFERRED, INVALID_TICKET, NOT_ALLOWED |
-| `submit_booking` | r2_10_email_switch | raises | INVALID_ATTENDANCE, INVALID_DATA, INVALID_EMAIL, INVALID_FOOD, INVALID_GROUP_SIZE, INVALID_LOCATION, INVALID_NAME, INVALID_PHONE, NOT_ENOUGH_SPOTS, REGISTRATION_CLOSED, SCREENSHOT_MISSING |
+| `submit_booking` | 2 Nov occupation change (changes.sql only) | raises | INVALID_DATA, INVALID_FOOD, INVALID_GROUP_SIZE, INVALID_LOCATION, INVALID_NAME, INVALID_OCCUPATION, INVALID_OCCUPATION_DETAIL, INVALID_PHONE, NOT_ENOUGH_SPOTS, REGISTRATION_CLOSED, SCREENSHOT_MISSING |
 | `submit_feedback` | r2_11_feedback | returns {ok:false,error} | BOOKING_NOT_FOUND, EMPTY_FEEDBACK, FEEDBACK_OFF, INVALID_COMMENT, INVALID_RATING |
 | `transfer_cancel` | r2_03_private_transfer | returns {ok:false,error} | CONTACT_ADMIN, MISMATCH, NOTHING_TO_CANCEL |
 | `transfer_open` | r2_03_private_transfer | returns {ok:false,error} | CUTOFF_PASSED, INVALID_CODE, NOT_AVAILABLE, TRANSFERS_CLOSED |

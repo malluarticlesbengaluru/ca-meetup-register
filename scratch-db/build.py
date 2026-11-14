@@ -138,5 +138,5 @@ for l in raw_section('TABLE AND VIEW PERMISSIONS'):
         if privs: out.append(f"grant {', '.join(privs)} on public.{tbl} to {mm.group(1)};")
 # settings row
 out.append("insert into public.settings (id) values (1) on conflict do nothing;")
-open('build.sql', 'w').write('\n'.join(out))
+open('build.sql', 'w').write('set check_function_bodies = off;\n' + '\n'.join(out))
 print(len(cols), 'tables;', len(funcs), 'functions')

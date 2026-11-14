@@ -472,3 +472,6 @@ Plan in 7 steps: (1) smoothness engine, merged as PR #48; (2) new frame: side me
 ## 14. Never share
 
 Supabase **service role key**, database password, the `snapshot_reader` password or connection string, staff passwords, or anything from the Supabase dashboard's secret key section. The publishable key in the pages is safe by design.
+
+## Transfer buyers are asked the registration questions (r2_21)
+A person taking over a ticket is asked "What best describes you?" and the follow-up (firm / company / exam / what they do), both required, same rules as registration. Stored on `transfer_buyers`, copied onto the new ticket by `admin_transfer_approve`, shown on the admin transfer card. Applications made before this have no answers and still approve (the ticket has no role). SQL: `sql/r2_21_transfer_buyer_details.sql`. Tests: `scratch-db/test_r2_21.py`, `mutate_r2_21.py`.

@@ -1552,13 +1552,15 @@ function vDone(){
 /* ---------- Tickets page ---------- */
 /* ---------- helpers for phone (fixed +91) and the transfer screens ---------- */
 const phoneBox=(id,attr,val,ph)=>`<div class="pf"><span aria-hidden="true">+91</span><input type="tel" class="ph" id="${id}" ${attr} value="${esc(val||"")}" inputmode="numeric" placeholder="${ph||"10-digit mobile number"}" autocomplete="off" aria-label="Phone number, 10 digits, India +91"></div>`;
-const optX=(k,v,cur)=>`<label><input type="radio" name="x_${k}" data-x="${k}" value="${v}" ${cur===v?"checked":""}><span>${v}</span></label>`;
+const optX=(k,v,cur,lab)=>`<label><input type="radio" name="x_${k}" data-x="${k}" value="${v}" ${cur===v?"checked":""}><span>${lab||v}</span></label>`;
+/* the buyer is asked the same two questions as at registration (OCC and occLab are shared with the Register form) */
+function xOccBox(b){const o=OCC[b.occ];if(!o)return"";return `<label for="xf_od">${esc(o.q)}</label><input type="text" id="xf_od" data-x="occd" value="${esc(b.occd||"")}" maxlength="100" placeholder="${esc(o.ph)}" autocomplete="off">`}
 /* a pasted number such as "+91 98765-43210", "919876543210" or "09876543210" becomes the plain 10 digits */
 const cleanPhone=v=>{let d=String(v||"").replace(/\D/g,"");if(d.length===12&&d.startsWith("91"))d=d.slice(2);else if(d.length===11&&d[0]==="0")d=d.slice(1);return d.slice(0,10)};
 const XERR={MISMATCH:"The details don't match. Please check the Booking ID, the ticket number and the phone number registered for that ticket.",TRANSFERS_CLOSED:"Ticket transfers aren't open right now.",CUTOFF_PASSED:"The deadline for ticket transfers has passed.",NOT_CONFIRMED:"This ticket isn't confirmed yet, so it can't be transferred.",
   COORDINATOR:"Coordinator tickets can't be transferred here. Please contact the organisers.",ALREADY_CHECKED_IN:"This ticket has already been used at the entry.",ALREADY_TRANSFERRED:"This ticket has already been transferred.",ALREADY_PENDING:"A buyer has already applied for this ticket and the organisers are handling it. Please wait, or contact them.",
   TRY_AGAIN:"That didn't go through. Please tap the button again.",INVALID_UPI:"That payout UPI ID or phone number doesn't look right. Use name@bank or a 10-digit number.",INVALID_CODE:"This code isn't valid. Please check it, or ask for a new one. Codes expire after a while.",NOT_AVAILABLE:"This ticket is no longer available for transfer.",
-  INVALID_NAME:"Please enter your name.",INVALID_PHONE:"Please enter a 10-digit phone number.",INVALID_EMAIL:"Please enter a valid email address.",FEEDBACK_OFF:"Sorry, we are no longer collecting responses.",EMPTY_FEEDBACK:"Please pick a number or write a few words first.",INVALID_RATING:"Please pick a number from 1 to 5.",INVALID_COMMENT:"That message is too long. Please keep it under 1000 characters.",BOOKING_NOT_FOUND:"We couldn't find this booking.",INVALID_LOCATION:"Please select where you are currently based.",INVALID_ATTENDANCE:"Please select Surely or Most probably.",INVALID_FOOD:"Please select Veg or Non-veg.",INVALID_CONSENT:"Please tick the box to confirm you understand.",INVALID_DATA:"Some details were not accepted. Please check each field.",
+  INVALID_NAME:"Please enter your name.",INVALID_PHONE:"Please enter a 10-digit phone number.",INVALID_OCCUPATION:"Please select what best describes you.",INVALID_OCCUPATION_DETAIL:"Please answer the question under \u201cWhat best describes you?\u201d (up to 100 characters).",INVALID_EMAIL:"Please enter a valid email address.",FEEDBACK_OFF:"Sorry, we are no longer collecting responses.",EMPTY_FEEDBACK:"Please pick a number or write a few words first.",INVALID_RATING:"Please pick a number from 1 to 5.",INVALID_COMMENT:"That message is too long. Please keep it under 1000 characters.",BOOKING_NOT_FOUND:"We couldn't find this booking.",INVALID_LOCATION:"Please select where you are currently based.",INVALID_ATTENDANCE:"Please select Surely or Most probably.",INVALID_FOOD:"Please select Veg or Non-veg.",INVALID_CONSENT:"Please tick the box to confirm you understand.",INVALID_DATA:"Some details were not accepted. Please check each field.",
   CONTACT_ADMIN:"A buyer has already applied. Only the organisers can end this now. Please contact them.",NOTHING_TO_CANCEL:"There is no active code to cancel.",NOT_ACTIVE:"This transfer is no longer open.",PAYMENT_NOT_REQUESTED:"The organisers haven't asked for payment yet.",ALREADY_SUBMITTED:"You've already uploaded a payment screenshot.",SCREENSHOT_MISSING:"The screenshot didn't upload. Please select it again."};
 const xerr=r=>XERR[r&&r.error]||"Something went wrong. Please try again.";
 
@@ -1681,7 +1683,9 @@ function vXForm(){
   (b.err?`<div class="card errbox" role="alert">${esc(b.err)}</div>`:"")+
   `<div class="card"><label for="xf_n">Full name</label><input type="text" id="xf_n" data-x="name" value="${esc(b.name||"")}" maxlength="80" autocomplete="name">
   <label for="xf_p">Phone number</label>${phoneBox("xf_p",'data-x="phone"',b.phone)}
-  <div class="lbl">Where are you currently based?</div><div class="opts">${optX("loc","In Bengaluru",b.loc)}${optX("loc","Outside Bengaluru",b.loc)}</div>
+  <div class="lbl">What best describes you?</div><div class="opts">${Object.keys(OCC).map(k=>optX("occ",k,b.occ,occLab(k))).join("")}</div>
+  <div id="xob">${xOccBox(b)}</div>
+  <div class="lbl">Are you currently based in Bengaluru?</div><div class="opts">${optX("loc","In Bengaluru",b.loc,"Yes")}${optX("loc","Outside Bengaluru",b.loc,"No")}</div>
   <div class="lbl">Will you be attending?</div><div class="opts">${optX("att","Surely",b.att)}${optX("att","Most probably",b.att)}</div>
   ${b.food_locked?`<div class="lbl">Food preference</div><p class="note" style="margin-top:0">The food order has already been placed, so your meal will be the same as the seller's: <b>${esc(b.food)}</b>.</p>`:`<div class="lbl">Food preference</div><div class="opts">${optX("food","Veg",b.food)}${optX("food","Non-veg",b.food)}</div>`}
   <label style="display:flex;gap:10px;align-items:flex-start;font-weight:400;margin-top:18px"><input type="checkbox" id="xf_ok" ${b.consent?"checked":""} style="margin-top:5px;flex:none"><span>${pub?"I understand that the organisers will ask me to pay the standard ticket price once they have confirmed with the seller, and that the seat becomes mine only after they complete the transfer.":"I understand that any payment between me and the seller is our own arrangement, and the organisers are not responsible for it."}</span></label>
@@ -1734,11 +1738,11 @@ async function xOpenCode(){
 async function xSubmit(){
   const b=S.xb;if(b.busy)return;b.err="";
   const e=[];if(!String(b.name||"").trim())e.push("enter your name");if(!/^\d{10}$/.test(b.phone||""))e.push("enter a 10-digit phone number");
-  if(!b.loc)e.push("select where you are currently based");if(!b.att)e.push("select Surely or Most probably");if(!b.food_locked&&!b.food)e.push("select Veg or Non-veg");if(!b.consent)e.push("tick the box to confirm you understand");
+  if(!b.occ)e.push("select what best describes you");else if(!String(b.occd||"").trim())e.push(OCC[b.occ].err.charAt(0).toLowerCase()+OCC[b.occ].err.slice(1));if(!b.loc)e.push("select where you are currently based");if(!b.att)e.push("select Surely or Most probably");if(!b.food_locked&&!b.food)e.push("select Veg or Non-veg");if(!b.consent)e.push("tick the box to confirm you understand");
   if(e.length){b.err="Please complete the following: "+e.join("; ")+".";return render()}
   b.busy=true;render();
   try{
-    const{data,error}=await db.rpc("transfer_submit",{p_code:b.code,p_submission_id:b.sid,p_buyer:{name:b.name.trim(),phone:b.phone,email:"",loc:b.loc,att:b.att,food:b.food_locked?"":b.food,consent:"true"}});if(error)throw error;
+    const{data,error}=await db.rpc("transfer_submit",{p_code:b.code,p_submission_id:b.sid,p_buyer:{name:b.name.trim(),phone:b.phone,email:"",occ:b.occ,occ_detail:String(b.occd||"").trim(),loc:b.loc,att:b.att,food:b.food_locked?"":b.food,consent:"true"}});if(error)throw error;
     if(data&&data.ok){b.result=data;b.at=new Date();remember("mm_mine",data.booking_code,20);S.step="xdone";b.busy=false;return render()}
     b.err=xerr(data);
   }catch(_){b.err="We couldn't reach the server. Please check your internet and tap Submit again. Tapping again won't create a duplicate request."}
@@ -2195,7 +2199,7 @@ document.addEventListener("change",e=>{const t=e.target;
     const b=document.getElementById("ob"+i);if(b){b.classList.remove("bad");b.innerHTML=occBox(i,p)}}
   else if(t.dataset&&t.dataset.k&&t.type==="radio"){fClear(t)}
   else if(t.name==="cnt"){setN(+t.value);S.ferr=null;render()}
-  else if(t.dataset&&t.dataset.x&&t.type==="radio"){S.xb[t.dataset.x]=t.value}
+  else if(t.dataset&&t.dataset.x&&t.type==="radio"){S.xb[t.dataset.x]=t.value;if(t.dataset.x==="occ"){if(S.xb.occFor!==S.xb.occ){S.xb.occd="";S.xb.occFor=S.xb.occ}const bx=document.getElementById("xob");if(bx)bx.innerHTML=xOccBox(S.xb)}}
   else if(t.dataset&&t.dataset.fb==="rating"&&S.fb){S.fb.rating=+t.value}
   else if(t.id==="xf_ok"){S.xb.consent=t.checked}
   else if(t.id==="tshot"){const f=t.files[0],P=S.xp;

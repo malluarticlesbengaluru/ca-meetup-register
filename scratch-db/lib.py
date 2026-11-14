@@ -74,7 +74,7 @@ def seed():
     def book(name_phones, tag):
         sid = uuid.uuid4(); path = f'{sid}.jpg'
         sql("insert into storage.objects values ('payment-proofs', %s)", (path,))
-        people = [dict(name=n, phone=p, email=f'{n.lower()}@example.com', loc='In Bengaluru', att='Surely', food='Veg') for n,p in name_phones]
+        people = [dict(name=n, phone=p, email=f'{n.lower()}@example.com', loc='In Bengaluru', att='Surely', food='Veg', occ='Student', occ_detail='Student') for n,p in name_phones]
         r = call('anon', "select submit_booking(%s,%s::jsonb,%s)", (str(sid), json.dumps(people), path))
         assert r[0]=='ok', r
         j = r[1][0][0]

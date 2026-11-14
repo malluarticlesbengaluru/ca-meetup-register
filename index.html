@@ -900,6 +900,8 @@ function payFrom(d){d=d||{};
   let cs=Array.isArray(d.contacts)?d.contacts.map(c=>({name:String((c&&c.name)||"").trim(),number:String((c&&c.number)||"").replace(/\D/g,"")})).filter(c=>c.number):(d.whatsapp?[{name:"",number:String(d.whatsapp).replace(/\D/g,"")}]:[]);
   return{upi:String(d.upi_id||""),payee:String(d.payee_name||""),wa:String(d.whatsapp||""),contacts:cs.slice(0,3)}}
 async function loadPay(){try{const{data,error}=await db.rpc("get_payment_info");if(error)throw error;S.pay=payFrom(data);return true}catch(_){return false}}
+function waInfo(o){return Object.keys(o).filter(k=>o[k]!==undefined&&o[k]!==null&&String(o[k]).trim()!=="").map(k=>"\n"+k+": "+String(o[k]).trim()).join("")}
+function istNow(d){return (d||new Date()).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit",hour12:true,timeZone:"Asia/Kolkata"})+" IST"}
 function waLink(text){return S.pay&&S.pay.wa?"https://wa.me/"+S.pay.wa+"?text="+encodeURIComponent(text):""}
 function contactBtn(text,label){
   const cs=(S.pay&&S.pay.contacts)||[];
@@ -1431,7 +1433,7 @@ function vClosed(){
   const m={not_open:["Registration hasn't opened yet","Please check back soon."],
     paused:["Registration is paused for a short while","This is a brief daily break while the organisers verify payments. "+(re?"Registration reopens at "+re+".":"Please check back soon.")],deadline:["Registration is closed","The registration deadline has passed."],full:["All spots are taken","Registration is full. Please contact the organisers if you need help."]}[r]||["Registration is closed",""];
   let h=head(m[0],esc(CONFIG.eventName)+". "+m[1]);
-  if(S.graceLost&&(r==="paused"||r==="not_open"||r==="deadline"))h+=`<div class="card"><b>Your 10-minute window to finish has ended.</b><p class="note">If you have already paid, please don't pay again. Message the organisers with your payment screenshot and they will sort it out.</p>${contactBtn("Hi, I was registering for "+CONFIG.eventName+" when registration closed. I have paid Rs "+total()+" for "+S.n+" person(s). Name: "+((S.people[0]||{}).name||""),"Message the organisers")}</div>`;
+  if(S.graceLost&&(r==="paused"||r==="not_open"||r==="deadline"))h+=`<div class="card"><b>Your 10-minute window to finish has ended.</b><p class="note">If you have already paid, please don't pay again. Message the organisers with your payment screenshot and they will sort it out.</p>${contactBtn("Hi, I was registering for "+CONFIG.eventName+" when registration closed. I have paid Rs "+total()+" for "+S.n+" person(s)."+waInfo({Name:(S.people[0]||{}).name,Phone:(S.people[0]||{}).phone,Time:istNow()}),"Message the organisers")}</div>`;
   return h+`<div class="row"><button class="ghost" id="retry">Check again</button><button class="ghost" id="go-home">Home</button></div>`;
 }
 /* ---------- Register form (redesign Nov 2026) ---------- */
@@ -1495,7 +1497,7 @@ function upiLink(amt,note){amt=amt==null?total():amt;note=note||("Meetup "+S.n+"
 function vPay(){
   if(S.payLoading)return head("Payment","Loading the payment details…");
   if(S.payFail)return head("Couldn't load the payment details","Please check your internet connection and try again.")+`<div class="row"><button class="ghost" id="back">Back</button><button id="payretry">Try again</button></div>`;
-  if(!S.pay||!S.pay.upi)return head("Payment isn't ready yet","The organisers are still setting up payments. Please try again shortly.")+`<div class="row"><button class="ghost" id="back">Back</button>${contactBtn("Hi, I couldn't pay for my "+CONFIG.eventName+" registration because the payment details are missing.","Contact the organisers")}</div>`;
+  if(!S.pay||!S.pay.upi)return head("Payment isn't ready yet","The organisers are still setting up payments. Please try again shortly.")+`<div class="row"><button class="ghost" id="back">Back</button>${contactBtn("Hi, I couldn't pay for my "+CONFIG.eventName+" registration because the payment details are missing."+waInfo({Name:(S.people[0]||{}).name,Phone:(S.people[0]||{}).phone,People:S.n,Amount:"₹"+total(),Time:istNow()}),"Contact the organisers")}</div>`;
   const qrc=`<canvas id="qr" class="qr" aria-label="UPI payment QR for ₹${total()}"></canvas>`;
   return head("Pay ₹"+total(),S.n+" "+(S.n>1?"people":"person")+" × ₹"+price())+
   (S.priceChanged?`<div class="card errbox" role="alert"><b>The ticket price was just updated to ₹${price()} per person.</b> Please use the new QR below, which is for ₹${total()}. If you have already paid, don't pay again: upload your screenshot and let the organisers know.</div>`:"")+
@@ -1541,7 +1543,7 @@ function vDone(){
   <p>Your payment of <b>₹${r.amount_expected}</b> is being verified. Ticket numbers are issued once the organisers confirm it.</p>
   <p class="note">Your Booking ID is saved on this device. On another device, open Tickets and enter your Booking ID and phone number.</p></div>
   ${fbCard(r)}
-  <div class="row"><button id="go-tickets">Go to Tickets</button>${contactBtn("Hi, I'm checking on my "+CONFIG.eventName+" booking, ID "+r.booking_code+".")}</div>
+  <div class="row"><button id="go-tickets">Go to Tickets</button>${contactBtn("Hi, I'm checking on my "+CONFIG.eventName+" booking."+waInfo({Name:(r.who||{}).name,Phone:(r.who||{}).phone,"Booking ID":r.booking_code,People:(r.who||{}).n,Amount:r.amount_expected!=null?"₹"+r.amount_expected:"",Time:istNow()}))}</div>
   <div class="row"><button class="ghost" id="again">Register another booking</button><button class="ghost" id="go-home">Home</button></div>`;
 }
 
@@ -1577,7 +1579,7 @@ function transferNote(tr){
     if(x.status==="rejected")h+=`<p class="note" style="margin:6px 0 0">The organisers didn't approve this transfer. Your ticket remains unchanged.</p>`;
     return h+`</div>`}).join("")+`</div>`}
 function bookingCard(d){
-  const msg="Hi, I'm checking on my "+CONFIG.eventName+" booking, ID "+d.booking_code+".";
+  const msg="Hi, I'm checking on my "+CONFIG.eventName+" booking."+waInfo({Type:d.kind==="transfer"?((d.transfer||{}).type==="public"?"Public":"Private")+" ticket transfer":"Registration",Name:d.kind==="transfer"?(d.name||((d.tickets||[])[0]||{}).name):(d.tickets||[]).map(t=>t.name).join(", "),Phone:(S.tk||{}).ph,"Booking ID":d.booking_code,Status:(d.transfer&&d.transfer.state)||d.status,Amount:d.kind!=="transfer"&&d.amount_expected!=null?"₹"+d.amount_expected:"",Time:istNow()});
   const idl=`<b style="letter-spacing:.08em">${esc(d.booking_code)}</b>`;
   const live=d.tickets.filter(t=>!t.transferred),moved=d.tickets.filter(t=>t.transferred);
   const names=d.tickets.length?`<ul class="names">`+d.tickets.map(t=>`<li>${esc(t.name)} <span class="note">· ${esc(t.food)}${t.label&&t.label!=="—"?" · "+esc(t.label):""}</span>${t.transferred?` ${pill("wait","Transferred")}`:""}</li>`).join("")+`</ul>`:"";
@@ -1603,7 +1605,7 @@ function vTickets(){
   <label for="tkph">Phone number used in the booking</label>${phoneBox("tkph","",T.phone)}
   <div class="row"><button id="tsearch" ${T.busy?"disabled":""}>${T.busy?"Checking…":"Check"}</button></div>${T.msg?`<div class="err" role="alert">${esc(T.msg)}</div>`:""}</div>`;
   if(ids.length)h+=`<div class="lbl">Booking IDs used on this device <span class="note">(tap to fill)</span></div><div class="chips" style="margin-bottom:14px">${ids.map(c=>`<button class="chip" data-hist="${esc(c)}">${esc(c)}</button>`).join("")}</div>`;
-  if(T.nf)h+=NF.replace("@@HELP@@",contactBtn("Hi, I couldn't find my "+CONFIG.eventName+" booking.","Need help?"));
+  if(T.nf)h+=NF.replace("@@HELP@@",contactBtn("Hi, I couldn't find my "+CONFIG.eventName+" booking."+waInfo({"Booking ID I entered":T.q,"Phone I entered":T.phone,Time:istNow()}),"Need help?"));
   else if(T.res)h+=bookingCard(T.res);
   h+=`<div class="row">${xOpen()?`<button class="ghost" id="go-xmenu">Transfer tickets</button>`:""}${T.res?`<button class="ghost" id="trefresh">Refresh status</button>`:""}<button class="ghost" id="go-home">Home</button></div>`;
   return h;
@@ -1664,7 +1666,7 @@ function vXCode(){
   <div class="card">${pub?`<p style="margin-top:0"><b>What happens next</b></p><p class="note">Please contact the organisers. They will find a buyer and share this code with them. They may call your registered number to confirm before the ticket is transferred, and they will pay you once the transfer is complete.</p>`
   :`<p style="margin-top:0"><b>What happens next</b></p><p class="note">Give this code to the person taking your seat. They need to open Tickets, tap Transfer tickets, then I want to buy, and enter the code. After they apply, the organisers may call your registered number to confirm. Your ticket stays valid until the transfer is complete.</p>`}
   <p class="note">If the code expires, simply create a new one; the old code stops working. You can check or cancel your code any time from Tickets, using your Booking ID and phone number.</p></div>
-  <div class="row">${contactBtn("Hi, I made a ticket transfer code ("+r.code+") for ticket "+r.ticket_label+" for "+CONFIG.eventName+".","Contact the organisers")}<button class="ghost" id="go-tickets">Back to Tickets</button></div>`}
+  <div class="row">${contactBtn("Hi, I made a "+(pub?"public":"private")+" ticket transfer code ("+r.code+") for "+CONFIG.eventName+"."+waInfo({Ticket:r.ticket_label,"Seller phone":S.xs.phone,"Booking ID":S.xs.code,Time:istNow()}),"Contact the organisers")}<button class="ghost" id="go-tickets">Back to Tickets</button></div>`}
 function vXBuy(){
   const b=S.xb;
   return head("Buy a ticket","Enter the code you received from the seller or the organisers.")+
@@ -1693,7 +1695,7 @@ function vTPay(){
   const p=S.xp;
   if(S.payLoading)return head("Payment","Loading the payment details…");
   if(S.payFail)return head("Couldn't load the payment details","Please check your internet connection and try again.")+`<div class="row"><button class="ghost" id="tp-back">Back</button><button id="tp-retry">Try again</button></div>`;
-  if(!S.pay||!S.pay.upi)return head("Payment isn't ready yet","The organisers are still setting up payments. Please try again shortly.")+`<div class="row"><button class="ghost" id="tp-back">Back</button>${contactBtn("Hi, I couldn't pay for my ticket transfer because the payment details are missing.","Contact the organisers")}</div>`;
+  if(!S.pay||!S.pay.upi)return head("Payment isn't ready yet","The organisers are still setting up payments. Please try again shortly.")+`<div class="row"><button class="ghost" id="tp-back">Back</button>${contactBtn("Hi, I couldn't pay for my ticket transfer because the payment details are missing."+waInfo({Name:((S.tk||{}).res||{}).name,Phone:p.ph,"Booking ID":p.code,Amount:p.amount!=null?"₹"+p.amount:"",Time:istNow()}),"Contact the organisers")}</div>`;
   return head("Pay ₹"+p.amount,"Ticket transfer payment")+(p.err?`<div class="card errbox" role="alert">${esc(p.err)}</div>`:"")+
   `<div class="card" style="text-align:center"><div class="amt">₹${p.amount}</div>${S.pay.payee?`<div class="note">Pay to <b>${esc(S.pay.payee)}</b></div>`:""}<canvas id="qr" class="qr" aria-label="UPI payment QR for ₹${p.amount}"></canvas>
   <p class="note" style="margin:0 0 6px">Scan this QR with any UPI app, or pay to the UPI ID below.</p><p class="verify" role="note"><b>Important:</b> After you scan, check that the UPI ID shown in your app matches the UPI ID below.</p><div class="upi"><code id="uid">${esc(S.pay.upi)}</code><button class="ghost" id="copy">Copy UPI ID</button></div>
@@ -2114,7 +2116,7 @@ async function submit(){
       const{data,error}=await db.rpc("submit_booking",{p_submission_id:S.sid,
         p_people:S.people.map(p=>({name:p.name.trim(),phone:p.phone,occ:p.occ,occ_detail:p.occd.trim(),loc:p.loc,food:p.food})),p_screenshot_path:path});
       if(error)throw error;
-      S.result=data;S.step="done";resetBookingForm();
+      data.who={name:(S.people[0]||{}).name,phone:(S.people[0]||{}).phone,n:S.n};S.result=data;S.step="done";resetBookingForm();
       try{localStorage.setItem("mm_last",JSON.stringify({code:data.booking_code}))}catch(_){}
       remember("mm_mine",data.booking_code,20);
     }

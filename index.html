@@ -1688,7 +1688,7 @@ function vXDone(){
   `<div class="card idcard"><div class="note">Booking ID</div><div class="amt" style="letter-spacing:.08em">${esc(r.booking_code)}</div><div class="row"><button class="ghost" id="copyxid">Copy Booking ID</button></div></div>
   <div class="card"><span class="pill p-wait">Pending verification</span><p>The organisers have been notified of your request and will take the next steps shortly.</p>
   <p class="note">${pub?"They will confirm with the seller first, then ask you to pay the standard ticket price here. Open Tickets with your Booking ID and phone number to see the next step.":"They will confirm with the seller by phone. Once it is done, open Tickets with your Booking ID and phone number to get your ticket."} You won't have a ticket or a seat until the transfer is complete.</p></div>
-  <div class="row">${contactBtn("Hi, I submitted a ticket transfer request for "+CONFIG.eventName+". My Booking ID is "+r.booking_code+".","Contact the organisers")}<button class="ghost" id="go-tickets">Go to Tickets</button></div>`}
+  <div class="row">${contactBtn("Hi, I submitted a "+(pub?"public":"private")+" ticket transfer request for "+CONFIG.eventName+".\nName: "+String(S.xb.name||"").trim()+"\nBooking ID: "+r.booking_code+"\nSubmitted: "+(S.xb.at||new Date()).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit",hour12:true,timeZone:"Asia/Kolkata"})+" IST","Contact the organisers")}<button class="ghost" id="go-tickets">Go to Tickets</button></div>`}
 function vTPay(){
   const p=S.xp;
   if(S.payLoading)return head("Payment","Loading the payment details…");
@@ -1735,7 +1735,7 @@ async function xSubmit(){
   b.busy=true;render();
   try{
     const{data,error}=await db.rpc("transfer_submit",{p_code:b.code,p_submission_id:b.sid,p_buyer:{name:b.name.trim(),phone:b.phone,email:"",loc:b.loc,att:b.att,food:b.food_locked?"":b.food,consent:"true"}});if(error)throw error;
-    if(data&&data.ok){b.result=data;remember("mm_mine",data.booking_code,20);S.step="xdone";b.busy=false;return render()}
+    if(data&&data.ok){b.result=data;b.at=new Date();remember("mm_mine",data.booking_code,20);S.step="xdone";b.busy=false;return render()}
     b.err=xerr(data);
   }catch(_){b.err="We couldn't reach the server. Please check your internet and tap Submit again. Tapping again won't create a duplicate request."}
   b.busy=false;render();

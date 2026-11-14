@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="../assets/icon-192.png"><link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<title>Photographer · Meetup 2026</title>
+<style>
+:root{color-scheme:light;--bg:#F2F4F9;--card:#fff;--ink:#0E1730;--mute:#5A6584;--brand:#2447F0;--line:#DCE1EE;--err:#B8312A;--ok:#0F7B57;--warn:#A85F00;--on:#fff;--field:#fff}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0A0F1F;--card:#121A31;--ink:#E9EDFA;--mute:#96A2C4;--brand:#7D95FF;--line:#232D4D;--err:#FF8A80;--ok:#4FD6A0;--warn:#FFB454;--on:#0A0F1F;--field:#0B1226}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom))}
+main{max-width:560px;margin:0 auto}h1{font-size:1.4rem;margin:18px 0 4px}.mute{color:var(--mute)}.err{color:var(--err)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 12px}
+label{display:block;font-weight:700;margin:10px 0 4px}input[type=email],input[type=password]{width:100%;font:inherit;padding:11px;min-height:46px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink)}
+button,.btn{font:inherit;font-weight:700;border-radius:14px;padding:12px 16px;min-height:52px;border:1px solid var(--brand);background:var(--brand);color:var(--on);cursor:pointer;display:flex;align-items:center;justify-content:center;width:100%;text-align:center}
+button.ghost,.btn.ghost{background:transparent;color:var(--brand)}button:disabled{opacity:.5}
+button.sm{min-height:38px;width:auto;padding:6px 12px;font-size:.9rem}
+.row{display:flex;gap:10px}.row>*{flex:1}.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.meter{height:14px;border-radius:99px;background:var(--bg);border:1px solid var(--line);overflow:hidden;margin:8px 0}.meter i{display:block;height:100%;background:var(--brand)}.meter i.low{background:var(--warn)}.meter i.full{background:var(--err)}
+.q{display:grid;gap:6px;margin-top:10px}.it{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;font-size:.92rem}
+.it b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.it .bar{grid-column:1/3;height:6px;border-radius:9px;background:var(--bg);overflow:hidden}.it .bar i{display:block;height:100%;width:0;background:var(--brand)}
+.ok{color:var(--ok)}.off{background:#0003;border-radius:12px;padding:10px}
+input[type=file]{display:none}
+</style></head><body><main id="app"></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="../assets/photo-upload.js"></script>
+<script>
+var CFG={url:"https://jddrwajazpsdrqpwlncu.supabase.co",key:"sb_publishable_W3tJTLdbCOuwkUwkjLW1Iw_9m1zGHFT"};
+var db=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true}});
+var $=function(s){return document.querySelector(s)},esc=function(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+var S={user:null,name:"",st:null,msg:"",items:[],busy:false,n:0};
+var P=window.PhotoUp;
+async function boot(){
+  var r=await db.auth.getSession();var ses=r.data.session;
+  if(!ses){S.user=null;return view()}
+  var q=await db.from("staff").select("name,role").eq("user_id",ses.user.id).maybeSingle();
+  if(q.error||!q.data||(q.data.role!=="camera"&&q.data.role!=="admin")){S.msg="This login is not a photographer login. Ask the admin.";await db.auth.signOut();S.user=null;return view()}
+  S.user=ses.user;S.name=q.data.name;await status();view();
+}
+async function status(){var r=await db.rpc("photo_camera_status");if(!r.error)S.st=r.data}
+function view(){
+  var h="";
+  if(!S.user){
+    h='<h1>Photographer login</h1><p class="mute">Meetup 2026 · photos</p><div class="card"><label for="em">Email</label><input id="em" type="email" autocomplete="username"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password"><p class="err" role="alert">'+esc(S.msg)+'</p><button id="go">Sign in</button></div>';
+    $("#app").innerHTML=h;$("#go").onclick=login;$("#pw").onkeydown=function(e){if(e.key==="Enter")login()};return;
+  }
+  var st=S.st||{};var pct=st.pool_bytes?Math.min(100,st.used_bytes/st.pool_bytes*100):0;
+  h='<div class="top"><div><h1>'+esc(S.name)+'</h1><span class="mute">Photographer</span></div><button class="ghost sm" id="out">Sign out</button></div>';
+  if(st.on===false)h+='<div class="card off"><b>Photo uploads are switched off right now.</b><br><span class="mute">The admin will turn them on for the event.</span></div>';
+  h+='<div class="card"><b>Shared photographer space</b><div class="meter"><i class="'+(pct>=100?"full":pct>=85?"low":"")+'" style="width:'+pct+'%"></i></div>'+
+     '<span>'+P.bytes(Math.max(0,st.left_bytes||0))+' left</span> <span class="mute">of '+P.bytes(st.pool_bytes||0)+' (all photographers together)</span><br>'+
+     '<span class="mute">Yours: '+(st.my_count||0)+' photos, '+P.bytes(st.my_bytes||0)+' · biggest single photo '+P.mb(st.max_bytes||0)+'</span></div>';
+  h+='<div class="row"><label class="btn" for="f1">Take photo</label><label class="btn ghost" for="f2">From phone</label></div>'+
+     '<input id="f1" type="file" accept="image/*" capture="environment"><input id="f2" type="file" accept="image/*" multiple>'+
+     '<p class="mute" style="margin-top:10px">Tip: on iPhone, Settings → Camera → Formats → <b>High Efficiency</b> keeps full quality at a smaller size. Uploads keep working if you switch apps, but keep this page open until each photo shows a tick.</p>';
+  h+='<div class="q" id="q">'+S.items.slice().reverse().map(function(i){return '<div class="it"><b>'+esc(i.name)+'</b><span class="'+(i.state==="done"?"ok":i.state==="fail"?"err":"mute")+'">'+(i.state==="done"?"✓ Uploaded":i.state==="fail"?"Failed":i.state==="up"?Math.round(i.p*100)+"%":"Waiting")+'</span>'+(i.state==="up"||i.state==="wait"?'<div class="bar"><i style="width:'+Math.round(i.p*100)+'%"></i></div>':"")+(i.state==="fail"?'<span class="err" style="grid-column:1/3">'+esc(i.err)+' <button class="sm ghost" data-r="'+i.id+'">Try again</button></span>':"")+'</div>'}).join("")+'</div>';
+  $("#app").innerHTML=h;
+  $("#out").onclick=async function(){await db.auth.signOut();S.user=null;S.items=[];view()};
+  var pick=function(e){Array.prototype.forEach.call(e.target.files,add);e.target.value="";pump()};$("#f1").onchange=pick;$("#f2").onchange=pick;
+  Array.prototype.forEach.call(document.querySelectorAll("[data-r]"),function(b){b.onclick=function(){var i=S.items.find(function(x){return x.id==b.dataset.r});if(i){i.state="wait";i.p=0;pump()}}});
+}
+function add(f){S.items.push({id:++S.n,file:f,name:f.name||"photo",state:"wait",p:0,err:""})}
+var tick=0;function soft(){var n=Date.now();if(n-tick<250)return;tick=n;view()}
+async function pump(){
+  if(S.busy)return;S.busy=true;view();
+  var it;while((it=S.items.find(function(x){return x.state==="wait"}))){
+    it.state="up";
+    var ses=(await db.auth.getSession()).data.session;
+    var r=await P.upload({url:CFG.url,key:CFG.key,token:ses&&ses.access_token},{kind:"camera"},it.file,function(p){it.p=p;soft()});
+    if(r.ok){it.state="done";it.p=1}else{it.state="fail";it.err=r.message}
+    await status();view();
+  }
+  S.busy=false;view();
+}
+async function login(){
+  var r=await db.auth.signInWithPassword({email:$("#em").value.trim(),password:$("#pw").value});
+  S.msg=r.error?"Wrong email or password.":"";return r.error?view():boot();
+}
+boot();
+</script></body></html>

@@ -813,6 +813,7 @@ html.fx .tm-pg.tm-out-n .tm-mc,html.fx .tm-pg.tm-out-p .tm-mc{animation:none}
 <main id="app"></main>
 <div id="fbar" class="fbar"></div>
 <script src="assets/page-fx.js?v=1"></script>
+<script src="assets/photo-upload.js"></script>
 <script>
 /* ===== CONFIG: change these in one place ===== */
 const CONFIG={
@@ -1000,7 +1001,7 @@ function foot(){return S.step==="home"||S.step==="form"?"":`<p class="foot">${es
 function render(){
   const a=$("#app");document.body.dataset.step=S.step;tmClose();
   const fb=$("#fbar");if(fb)fb.innerHTML=S.step==="form"?fBar():"";   /* the Register form's sticky bar sits outside #app */
-  a.innerHTML=stepBar()+({home:vHome,loading:()=>head("Loading…","One moment."),error:vError,closed:vClosed,form:vForm,summary:vSummary,pay:vPay,done:vDone,tickets:vTickets,ticket:vTicket,about:vAbout,teams:vTeams,team:vTeam,members:vMembers,xmenu:vXMenu,xsell:vXSell,xcode:vXCode,xbuy:vXBuy,xform:vXForm,xdone:vXDone,tpay:vTPay})[S.step]()+foot();
+  a.innerHTML=stepBar()+({home:vHome,loading:()=>head("Loading…","One moment."),error:vError,closed:vClosed,form:vForm,summary:vSummary,pay:vPay,done:vDone,tickets:vTickets,ticket:vTicket,about:vAbout,photos:vPhotos,teams:vTeams,team:vTeam,members:vMembers,xmenu:vXMenu,xsell:vXSell,xcode:vXCode,xbuy:vXBuy,xform:vXForm,xdone:vXDone,tpay:vTPay})[S.step]()+foot();
   if(S.step==="pay"&&$("#qr"))whenQR(()=>{const c=$("#qr");if(c&&S.step==="pay"){S.qrPrice=price();drawQR(c,upiLink(S.n*S.qrPrice))}});
   if(S.step==="tpay"&&$("#qr"))whenQR(()=>{const c=$("#qr");if(c&&S.step==="tpay")drawQR(c,upiLink(S.xp.amount,"Meetup ticket transfer"))});
   if(S.step==="ticket")drawTickets().catch(()=>{});
@@ -1427,6 +1428,7 @@ function vAbout(){
     <div class="row col"><a class="btn" id="ab-r6wa" href="https://wa.me/916235202168" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5.2A8.5 8.5 0 1 1 21 11.5Z"/><path d="M9 8.5c.2 3 2.7 5.8 5.8 6.3l1-1.4-2-1-.9.8c-.9-.4-1.8-1.3-2.2-2.2l.8-.9-1-2Z"/></svg>WhatsApp 6235202168</a></div></div>
   <div class="row"><button class="ghost" id="go-home">Home</button></div>`}
 function loadFlags(){return db.rpc("get_site_flags").then(r=>{S.flags=r.error?null:r.data}).catch(()=>{S.flags=null})}
+function loadPhotoInfo(){return db.rpc("get_photos_info").then(r=>{S.photos=r.error?null:r.data}).catch(()=>{S.photos=null})}
 function vError(){return head("We couldn't load this page","Please check your internet connection and try again.")+`<div class="row"><button id="retry">Try again</button><button class="ghost" id="go-home">Home</button></div>`}
 function vClosed(){
   const st=S.status||{},r=st.closed_reason,re=st.reopen_at?fmtWhen(st.reopen_at):"";
@@ -1772,9 +1774,46 @@ function vTicket(){
     <div class="row"><button data-dl="jpg" data-i="${i}">Download JPG</button><button class="ghost" data-dl="pdf" data-i="${i}">Download PDF</button></div></div>`;
   });
   if(n>1)h+=`<div class="card"><b>Everyone in this booking</b><div class="row"><button id="dl-all-pdf">All tickets as one PDF</button><button class="ghost" id="dl-all-jpg">All tickets as JPG</button></div><p class="note">The JPG option downloads one image per person. Your browser may ask permission to download several files.</p></div>`;
+  if(S.photos&&S.photos.on&&S.tk.code)h+=`<div class="card"><b>Event photos</b><p class="note">Share your photos from the day. They are kept at full quality.</p><div class="row"><button id="go-photos">Upload photos</button></div></div>`;
   return h+`<div class="row"><button class="ghost" id="back-tickets">Back to Tickets</button><button class="ghost" id="go-home">Home</button></div>`;
 }
 
+/* ---------- Photos (public): Booking ID + phone, then upload straight to storage. Limits are decided by the database. ---------- */
+S.pho={code:"",ph:"",ok:false,st:null,msg:"",busy:false,items:[],n:0};
+const PHO_ERR={PHOTOS_OFF:"Photo uploads are not open right now.",MISMATCH:"That Booking ID and phone number do not match a ticket.",NOT_PAID:"This booking is not confirmed yet.",NOT_PRESENT:"Photo upload opens once you have checked in at the venue gate. Please try again after you are inside."};
+function phoCfg(){return{url:CONFIG.supabaseUrl,key:CONFIG.supabaseKey}}
+function vPhotos(){
+  const P=S.pho,st=P.st;let h=head("Event <i>photos</i>","Upload your photos from the day, at full quality.");
+  if(!P.ok){
+    return h+`<div class="card"><label for="pho-code">Booking ID</label><input id="pho-code" value="${esc(P.code)}" autocomplete="off" autocapitalize="characters" placeholder="8 characters"><label for="pho-ph">Phone number on your ticket</label><input id="pho-ph" value="${esc(P.ph)}" inputmode="numeric" maxlength="10" placeholder="10 digits">${P.msg?`<p class="err" role="alert">${esc(P.msg)}</p>`:""}<div class="row"><button id="pho-go" ${P.busy?"disabled":""}>${P.busy?"Checking…":"Continue"}</button></div></div><div class="row"><button class="ghost" id="pho-back">Back to my ticket</button></div>`}
+  return h+`<div class="card"><b>Your photo space</b><div id="pho-meter"></div></div>
+  <div class="card"><div class="row"><button id="pho-take">Take photo</button><button class="ghost" id="pho-pick">From phone</button></div>
+  <input id="pho-f1" type="file" accept="image/*" capture="environment" hidden><input id="pho-f2" type="file" accept="image/*" multiple hidden>
+  <p class="note">Keep this page open until each photo shows a tick. Photos are kept for the organisers' memories album.</p><div id="pho-list"></div></div>
+  <div class="row"><button class="ghost" id="pho-back">Back to my ticket</button></div>`}
+function phoMeter(){const P=S.pho,st=P.st,m=$("#pho-meter");if(!m||!st)return;const L=PhotoUp,u=Math.min(100,st.limit_bytes?st.used_bytes/st.limit_bytes*100:0);
+  m.innerHTML=`<div style="height:12px;border-radius:99px;border:1px solid var(--line);overflow:hidden;margin:8px 0"><i style="display:block;height:100%;width:${u}%;background:var(--accent)"></i></div><span>${L.bytes(st.left_bytes)} left</span> <span class="note">of ${L.bytes(st.limit_bytes)} for you · biggest single photo ${L.mb(st.max_bytes)}</span>${st.pool_left_bytes<=0?`<p class="err">The shared photo space is full.</p>`:""}`}
+function phoList(){const l=$("#pho-list");if(!l)return;l.innerHTML=S.pho.items.slice().reverse().map(i=>`<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:8px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.name)}</span><b>${i.state==="done"?"✓":i.state==="fail"?"Failed":i.state==="up"?Math.round(i.p*100)+"%":"Waiting"}</b></div>${i.state==="fail"?`<span class="err">${esc(i.err)}</span> <button class="ghost" data-phoretry="${i.id}" style="padding:6px 12px">Try again</button>`:""}</div>`).join("")}
+async function phoStatus(){const P=S.pho,r=await db.rpc("photo_public_status",{p_code:P.code,p_phone:P.ph});if(r.error||!r.data)return false;if(!r.data.ok){P.msg=PHO_ERR[r.data.error]||"Could not check. Try again.";return false}P.st=r.data;return true}
+async function phoPump(){const P=S.pho;if(P.busy)return;P.busy=true;let it;
+  while((it=P.items.find(x=>x.state==="wait"))){it.state="up";phoList();
+    const r=await PhotoUp.upload(phoCfg(),{kind:"public",code:P.code,phone:P.ph},it.file,p=>{it.p=p;phoList()});
+    if(r.ok){it.state="done";it.p=1}else{it.state="fail";it.err=r.message}
+    await phoStatus();phoMeter();phoList()}
+  P.busy=false}
+document.addEventListener("change",e=>{const t=e.target;if(!t||(t.id!=="pho-f1"&&t.id!=="pho-f2")||S.step!=="photos")return;
+  Array.prototype.forEach.call(t.files,f=>S.pho.items.push({id:++S.pho.n,file:f,name:f.name||"photo",state:"wait",p:0,err:""}));t.value="";phoList();phoPump()});
+document.addEventListener("click",async e=>{const el=e.target.closest("button"),id=el?el.id:"";if(!el)return;const P=S.pho;
+  if(id==="go-photos"){P.code=S.tk.code||"";P.ph=S.tk.ph||"";P.ok=false;P.msg="";P.st=null;S.step="photos";render();
+    if(P.code&&P.ph){P.busy=true;const ok=await phoStatus();P.busy=false;if(ok){P.ok=true}render();if(ok){phoMeter();phoList()}}return}
+  if(S.step!=="photos")return;
+  if(id==="pho-take"){$("#pho-f1").click();return}
+  if(id==="pho-pick"){$("#pho-f2").click();return}
+  if(id==="pho-back"){S.step=S.cur?"ticket":"tickets";render();return}
+  if(id==="pho-go"){P.code=($("#pho-code").value||"").trim();P.ph=($("#pho-ph").value||"").replace(/\D/g,"");P.msg="";P.busy=true;render();
+    const ok=await phoStatus();P.busy=false;P.ok=ok;render();if(ok){phoMeter();phoList()}return}
+  if(el.dataset.phoretry){const i=P.items.find(x=>x.id==el.dataset.phoretry);if(i){i.state="wait";i.p=0;phoList();phoPump()}}
+});
 /* ---------- ticket drawing (canvas) ---------- */
 const TW=2000,TH=668;   /* landscape ticket, same proportions as the design */
 function rr(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);x.arcTo(X+W,Y+H,X,Y+H,r);x.arcTo(X,Y+H,X,Y,r);x.arcTo(X,Y,X+W,Y,r);x.closePath()}
@@ -2236,4 +2275,5 @@ render();loadEvent().then(()=>{if(S.step==="home")refreshHome()});
 loadHomeStatus().then(()=>{if(S.step==="home")refreshHome()});
 loadPay().then(()=>{if(["closed","done"].includes(S.step))render()});   /* Home shows nothing from the payment details, so it is not redrawn for them */
 loadFlags().then(()=>{if(S.step==="home")refreshHome()});
+loadPhotoInfo();
 </script></body></html>

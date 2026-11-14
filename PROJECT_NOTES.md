@@ -473,5 +473,9 @@ Plan in 7 steps: (1) smoothness engine, merged as PR #48; (2) new frame: side me
 
 Supabase **service role key**, database password, the `snapshot_reader` password or connection string, staff passwords, or anything from the Supabase dashboard's secret key section. The publishable key in the pages is safe by design.
 
+
+## Photos (r2_20)
+Photographers (staff role `camera`, page `/camera/`) and attendees (ticket page → Upload photos) upload photos to Storj through the Supabase Edge Function `photos` (`supabase/functions/photos/index.ts`). The database (`sql/r2_20_photos.sql`) decides everything: shared photographer space, shared public space, per-person space = lower of (public space ÷ people Present) and a MB cap, size per photo, who may upload. `is_staff()` now means admin or gate ONLY; `is_camera()` is new. Settings are in Admin → Settings → Photos. Setup steps and what is unverified: `PHOTOS_SETUP.md`. Tests: `scratch-db/test_r2_20.py` and `mutate_r2_20.py`.
+
 ## Transfer buyers are asked the registration questions (r2_21)
 A person taking over a ticket is asked "What best describes you?" and the follow-up (firm / company / exam / what they do), both required, same rules as registration. Stored on `transfer_buyers`, copied onto the new ticket by `admin_transfer_approve`, shown on the admin transfer card. Applications made before this have no answers and still approve (the ticket has no role). SQL: `sql/r2_21_transfer_buyer_details.sql`. Tests: `scratch-db/test_r2_21.py`, `mutate_r2_21.py`.

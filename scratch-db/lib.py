@@ -21,6 +21,10 @@ def fresh(extra_sql_files=()):
         r = subprocess.run(["psql","-h","/tmp","-p","5544","-q","-d","postgres","-U","postgres","-v","ON_ERROR_STOP=1","-f",f],
                            capture_output=True, text=True)
         if r.returncode != 0: print("SQL FILE FAILED:", f, r.stderr[-1500:]); sys.exit(1)
+    import os
+    for f in filter(None, os.environ.get("ALSO_SQL", "").split(",")):   # optional: apply more files on top (used to check a new file against the older suites)
+        r = subprocess.run(["psql","-h","/tmp","-p","5544","-q","-d","postgres","-U","postgres","-v","ON_ERROR_STOP=1","-f",f], capture_output=True, text=True)
+        if r.returncode != 0: print("SQL FILE FAILED:", f, r.stderr[-1500:]); sys.exit(1)
 conn = None
 def db():
     global conn
@@ -74,7 +78,7 @@ def seed():
     def book(name_phones, tag):
         sid = uuid.uuid4(); path = f'{sid}.jpg'
         sql("insert into storage.objects values ('payment-proofs', %s)", (path,))
-        people = [dict(name=n, phone=p, email=f'{n.lower()}@example.com', loc='In Bengaluru', att='Surely', food='Veg') for n,p in name_phones]
+        people = [dict(name=n, phone=p, email=f'{n.lower()}@example.com', loc='In Bengaluru', att='Surely', food='Veg', occ='Student', occ_detail='Student') for n,p in name_phones]
         r = call('anon', "select submit_booking(%s,%s::jsonb,%s)", (str(sid), json.dumps(people), path))
         assert r[0]=='ok', r
         j = r[1][0][0]

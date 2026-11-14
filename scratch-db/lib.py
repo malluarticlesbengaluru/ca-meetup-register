@@ -21,6 +21,10 @@ def fresh(extra_sql_files=()):
         r = subprocess.run(["psql","-h","/tmp","-p","5544","-q","-d","postgres","-U","postgres","-v","ON_ERROR_STOP=1","-f",f],
                            capture_output=True, text=True)
         if r.returncode != 0: print("SQL FILE FAILED:", f, r.stderr[-1500:]); sys.exit(1)
+    import os
+    for f in filter(None, os.environ.get("ALSO_SQL", "").split(",")):   # optional: apply more files on top (used to check a new file against the older suites)
+        r = subprocess.run(["psql","-h","/tmp","-p","5544","-q","-d","postgres","-U","postgres","-v","ON_ERROR_STOP=1","-f",f], capture_output=True, text=True)
+        if r.returncode != 0: print("SQL FILE FAILED:", f, r.stderr[-1500:]); sys.exit(1)
 conn = None
 def db():
     global conn

@@ -164,6 +164,7 @@ details.mny>summary{cursor:pointer;min-height:38px;display:flex;align-items:cent
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="../assets/photo-upload.js"></script>
 <script>
 try{const th=localStorage.getItem("adm_theme");if(th==="dark"||th==="light")document.documentElement.dataset.theme=th}catch(_){}
 const CFG={url:"https://jddrwajazpsdrqpwlncu.supabase.co",key:"sb_publishable_W3tJTLdbCOuwkUwkjLW1Iw_9m1zGHFT"};
@@ -230,6 +231,7 @@ async function boot(){
   if(!session){S.staff=null;return view()}
   const{data,error}=await db.from("staff").select("name,role").eq("user_id",session.user.id).maybeSingle();
   if(error||!data){S.staff=null;S.msg="This account is not set up as an organiser yet. Ask the admin to add it.";await db.auth.signOut();return view()}
+  if(data.role==="camera"){S.staff=null;S.msg="This is a photographer login. Please use the camera page (…/camera/) instead.";await db.auth.signOut();return view()}
   S.staff=data;
   if(data.role==="admin"){await load();if(location.hash==="#gate")S.tab="gate"}else{S.tab="gate";await gLoad()}
   try{history.replaceState({tab:S.tab,sheets:[],y:0},"")}catch(_){}
@@ -659,7 +661,7 @@ function evCard(s){
   <p><button id="evsave">Save event details</button></p></div>`}
 
 /* ---------- payment details, change banner, settings log ---------- */
-const FIELD_NAMES={upi_id:"UPI ID",payee_name:"payee name",whatsapp_number:"Contact 1 number",contact1_name:"Contact 1 name",contact2_name:"Contact 2 name",contact2_number:"Contact 2 number",contact3_name:"Contact 3 name",contact3_number:"Contact 3 number"};
+const FIELD_NAMES={photos_on:"photo uploads on",photo_pool_cam_mb:"photographer space (MB)",photo_pool_pub_mb:"public space (MB)",photo_cap_pub_mb:"public cap per person (MB)",photo_max_cam_mb:"biggest photo, photographers (MB)",photo_max_pub_mb:"biggest photo, public (MB)",photo_total_mb:"total photo space (MB)",photo_public_mode:"who can upload",upi_id:"UPI ID",payee_name:"payee name",whatsapp_number:"Contact 1 number",contact1_name:"Contact 1 name",contact2_name:"Contact 2 name",contact2_number:"Contact 2 number",contact3_name:"Contact 3 name",contact3_number:"Contact 3 number"};
 function alertBanner(){const a=S.alert;if(!a)return"";
   const f=(a.fields||[]).map(x=>FIELD_NAMES[x]||x).join(", ");
   return `<div class="card" role="alert" style="border:2px solid ${a.by_me?"var(--line)":"var(--warn)"};background:${a.by_me?"var(--card)":"var(--card2)"}"><b>${a.by_me?"You changed":esc(a.who)+" changed"} the payment details</b> (${esc(f)}) on ${esc(new Date(a.at).toLocaleString("en-IN",{timeZone:"Asia/Calcutta",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}.${a.by_me?"":" If this was not agreed, check Settings now: payments go to the UPI ID shown there."}</div>`}
@@ -680,7 +682,7 @@ function contactsCard(s){const ro=!S.ctOpen,set=!!(s.contact1_name&&s.whatsapp_n
   ${one(1,s.contact1_name,s.whatsapp_number)}${one(2,s.contact2_name,s.contact2_number)}${one(3,s.contact3_name,s.contact3_number)}
   <p>${ro?`<button id="ctchange">Change</button>`:`<button id="ctsave">Save contacts</button> <button class="ghost" id="ctcancel">Cancel</button>`}</p></div>`}
 function logCard(){
-  const rows=S.log.map(l=>`<tr><td>${esc(new Date(l.at).toLocaleString("en-IN",{timeZone:"Asia/Calcutta",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}</td><td>${esc(l.who)}</td><td>${esc(/^contact/.test(l.field)?(FIELD_NAMES[l.field]||l.field):l.field)}</td><td>${l.area==="settings"&&["upi_id","whatsapp_number"].includes(l.field)?esc(l.old_value||"–"):esc(l.old_value||"–")}</td><td>${esc(l.new_value||"–")}</td></tr>`).join("");
+  const rows=S.log.map(l=>`<tr><td>${esc(new Date(l.at).toLocaleString("en-IN",{timeZone:"Asia/Calcutta",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}</td><td>${esc(l.who)}</td><td>${esc(/^(contact|photo)/.test(l.field)?(FIELD_NAMES[l.field]||l.field):l.field)}</td><td>${l.area==="settings"&&["upi_id","whatsapp_number"].includes(l.field)?esc(l.old_value||"–"):esc(l.old_value||"–")}</td><td>${esc(l.new_value||"–")}</td></tr>`).join("");
   return `<div class="card slog" style="overflow-x:auto"><h2>Settings log</h2><p class="mute" style="margin-top:0">Every change to the settings and the organiser list. It cannot be edited or deleted. "database" means someone changed it directly in Supabase.</p>
   ${rows?`<table><thead><tr><th>When</th><th>Who</th><th>What</th><th>Before</th><th>After</th></tr></thead><tbody>${rows}</tbody></table>`:`<p class="mute">Nothing logged yet.</p>`}</div>`}
 const CT_ERR={FIRST_CONTACT_REQUIRED:"Contact 1 needs both a name and a WhatsApp number.",INVALID_CONTACT_NAME:"The name can be up to 40 letters.",INVALID_WHATSAPP:"The WhatsApp number needs the country code, for example 91XXXXXXXXXX.",CONTACT_INCOMPLETE:"Fill in both the name and the number, or clear both.",NOT_ALLOWED:"Only admins can change this."};
@@ -710,10 +712,64 @@ function vSettings(){const s=S.settings;
   ${readyCard(s)}
   ${advCard(s)}
   ${afterCard(s)}
+  <div class="card" id="photocard"><h2>Photos</h2><p class="mute">Loading…</p></div>
   ${logCard()}</div>`;
-  const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Launch readiness":"Readiness","Advanced":"Advanced","After the event":"After event","Settings log":"Log"};
+  const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Launch readiness":"Readiness","Advanced":"Advanced","After the event":"After event","Photos":"Photos","Settings log":"Log"};
   $("#snav").innerHTML=[...document.querySelectorAll(".sgrid>.card")].map((c,i)=>{c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="s-${i}">${esc(SH[h]||h)}</button>`}).join("");
-  const tb=$("#top");if(tb)document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px")}
+  const tb=$("#top");if(tb)document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px");phLoad()}
+
+/* ---------- Photos: the Settings card (limits, usage, gallery, download links). Photos live in Storj; this page only shows numbers and tiny previews. ---------- */
+Object.assign(TERR,{POOLS_TOO_BIG:"The two pools together are bigger than the total space. Lower a pool or raise the total.",INVALID_POOL:"A pool must be a number of GB between 0 and 1000.",INVALID_CAP:"The per-person limit must be at least 1 MB.",INVALID_MAX:"The biggest single photo size is not allowed (photographers: 1 to 500 MB, public: 1 to 100 MB).",INVALID_TOTAL:"The total space is not a valid number.",INVALID_MODE:"Choose who can upload."});
+S.ph=null;S.phPics=[];
+const phGB=mb=>(mb/1024).toFixed(1).replace(/\.0$/,""),phB=n=>PhotoUp.bytes(n||0);
+async function phFn(body){const ses=(await db.auth.getSession()).data.session;return PhotoUp.call({url:CFG.url,key:CFG.key,token:ses&&ses.access_token},body)}
+async function phLoad(){
+  if(S.tab!=="settings")return;
+  if(S.ph)phDraw();
+  const[a,b]=await Promise.all([db.rpc("admin_photo_summary"),db.from("photos").select("id,kind,bytes_actual,thumb,created_at").eq("status","stored").order("created_at",{ascending:false}).limit(48)]);
+  if(a.error){const c=$("#photocard");if(c)c.innerHTML="<h2>Photos</h2><p class=\"err\">Photos are not set up yet (the database update has not been run).</p>";return}
+  S.ph=a.data;S.phPics=b.data||[];phDraw();
+}
+function phPerPerson(){const g=id=>+($(id)||{}).value||0,pool=Math.round(g("#phpub")*1024),cap=Math.max(1,g("#phcap")),n=Math.max(1,S.ph.present);return Math.min(cap*1048576,Math.floor(pool*1048576/n))}
+function phDraw(){
+  const c=$("#photocard");if(!c||!S.ph)return;const d=S.ph,s=S.settings,mbOf=b=>Math.round(b/1048576),
+    bar=(u,t)=>{const p=t?Math.min(100,u/t*100):0;return `<div class="meter"><i class="m1" style="width:${p}%"></i></div><span class="mute">${phB(u)} used of ${phB(t)} (${p.toFixed(0)}%)</span>`};
+  const open=c.querySelector("details")?.open;
+  c.innerHTML=`<h2>Photos</h2>
+  <label><input type="checkbox" id="phon" ${d.on?"checked":""}> Photo uploads on</label>
+  <p class="mute" style="margin-top:0">Off by default. Turn on at the event. Photos are kept at full quality in Storj; nothing is ever deleted when you lower a limit.</p>
+  <h3 style="margin:10px 0 2px">Photographers (shared space)</h3>${bar(d.cam.used_bytes,d.cam.pool_bytes)}<p class="mute" style="margin:2px 0 8px">${d.cam.count} photos${d.by_camera.length?" · "+d.by_camera.map(x=>`${esc(x.name)} ${x.count}`).join(", "):""}</p>
+  <h3 style="margin:10px 0 2px">Public (everyone else)</h3>${bar(d.pub.used_bytes,d.pub.pool_bytes)}<p class="mute" style="margin:2px 0 8px">${d.pub.count} photos from ${d.pub.people} people</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+   <div><label for="phtot">Total space (GB)</label><input id="phtot" type="number" min="0" step="0.5" value="${phGB(mbOf(d.total_bytes))}"></div>
+   <div><label for="phcam">Photographers (GB)</label><input id="phcam" type="number" min="0" step="0.5" value="${phGB(mbOf(d.cam.pool_bytes))}"></div>
+   <div><label for="phpub">Public (GB)</label><input id="phpub" type="number" min="0" step="0.5" value="${phGB(mbOf(d.pub.pool_bytes))}"></div>
+   <div><label for="phcap">Public cap per person (MB)</label><input id="phcap" type="number" min="1" value="${s.photo_cap_pub_mb}"></div>
+   <div><label for="phmc">Biggest photo, photographers (MB)</label><input id="phmc" type="number" min="1" max="500" value="${s.photo_max_cam_mb}"></div>
+   <div><label for="phmp">Biggest photo, public (MB)</label><input id="phmp" type="number" min="1" max="100" value="${s.photo_max_pub_mb}"></div></div>
+  <label for="phmode">Who can upload (public)</label><select id="phmode"><option value="present" ${d.mode==="present"?"selected":""}>Only people marked Present at the gate</option><option value="any" ${d.mode==="any"?"selected":""}>Anyone with a valid Booking ID and phone</option></select>
+  <p id="phprev" class="mute"></p>
+  <p><button id="phsave">Save photo settings</button></p>
+  <details style="margin-top:10px"><summary><b>Gallery</b> (latest ${S.phPics.length}) and download</summary>
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:10px 0">${S.phPics.map(x=>`<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">${x.thumb?`<img src="${x.thumb}" alt="" style="width:100%;height:90px;object-fit:cover;display:block">`:`<div style="height:90px;display:flex;align-items:center;justify-content:center" class="mute">no preview</div>`}<div style="padding:4px 6px;font-size:.78rem" class="mute">${x.kind==="camera"?"Photographer":"Public"} · ${phB(x.bytes_actual)}</div><div style="display:flex;gap:4px;padding:0 6px 6px"><button class="sm ghost" data-phview="${x.id}">Open</button><button class="sm ghost" data-phrm="${x.id}">Remove</button></div></div>`).join("")||'<span class="mute">No photos yet.</span>'}</div>
+   <p class="mute" style="margin:0 0 6px">Your free Storj trial deletes everything after 30 days. Before that, download the originals: this makes a text file of download links (each works for 1 hour) that you can open or paste into a download manager.</p>
+   <p><button class="ghost" id="phexp">Make download links file</button></p></details>`;
+  const det=c.querySelector("details");if(det&&open)det.open=true;
+  const prev=()=>{const pp=phPerPerson(),pools=Math.round((+$("#phcam").value+(+$("#phpub").value))*1024),tot=Math.round(+$("#phtot").value*1024);
+    $("#phprev").innerHTML=`<b>Right now:</b> ${d.present} ${d.present===1?"person is":"people are"} marked Present, so each person may upload up to <b>${phB(pp)}</b> (the lower of public space ÷ people present, and the cap). ${pools>tot?`<span class="err">The two pools (${phGB(pools)} GB) are more than the total (${phGB(tot)} GB).</span>`:`Space left over for safety: ${phGB(tot-pools)} GB.`}`};
+  ["#phtot","#phcam","#phpub","#phcap"].forEach(i=>$(i).oninput=prev);prev();
+  $("#phsave").onclick=async()=>{const g=i=>+$(i).value;
+    if(Math.round((g("#phcam")+g("#phpub"))*1024)>Math.round(g("#phtot")*1024))return toast("The two pools together are bigger than the total space.",6000);
+    const r=await db.rpc("admin_set_photo_settings",{p_on:$("#phon").checked,p_pool_cam_mb:Math.round(g("#phcam")*1024),p_pool_pub_mb:Math.round(g("#phpub")*1024),p_cap_pub_mb:Math.round(g("#phcap")),p_max_cam_mb:Math.round(g("#phmc")),p_max_pub_mb:Math.round(g("#phmp")),p_total_mb:Math.round(g("#phtot")*1024),p_mode:$("#phmode").value});
+    if(r.error)return toast(terr(r.error),6000);toast("Photo settings saved");await sync("core","log");S.ph=null;view();};
+  $("#phon").onchange=async()=>{const r=await db.rpc("admin_set_photo_settings",{p_on:$("#phon").checked});if(r.error)return toast(terr(r.error),6000);toast($("#phon").checked?"Photo uploads are ON":"Photo uploads are OFF");await sync("core","log");S.ph=null;view()};
+  c.querySelectorAll("[data-phview]").forEach(b=>b.onclick=async()=>{const r=await phFn({action:"view",id:b.dataset.phview});if(r.ok)window.open(r.url,"_blank","noopener");else toast("Could not open that photo.",5000)});
+  c.querySelectorAll("[data-phrm]").forEach(b=>b.onclick=async()=>{if(!await ask({title:"Remove this photo?",text:"It is deleted from storage and cannot be recovered.",danger:true,ok:"Remove"}))return;
+    const r=await phFn({action:"remove",id:b.dataset.phrm});if(r.ok){toast("Photo removed");S.ph=null;phLoad()}else toast("Could not remove it.",5000)});
+  $("#phexp").onclick=async()=>{let from=0,lines=[],n=0;toast("Preparing the list…");
+    for(let i=0;i<200;i++){const r=await phFn({action:"export",from});if(!r.ok)return toast("Could not prepare the list.",5000);r.items.forEach(x=>{n++;lines.push(x.key+"\t"+x.bytes+"\t"+x.url)});if(r.next==null)break;from=r.next}
+    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["path\tbytes\tdownload link (valid 1 hour)\n"+lines.join("\n")],{type:"text/plain"}));a.download="photo-download-links.txt";a.click();toast(n+" photos listed")};
+}
 
 /* ---------- Messages (game activity): the Messages tab, the Settings switch, one message per person ---------- */
 /* A message has a NAME (only admins see it) and a TEXT (what a ticket holder sees, only while the switch is ON). */

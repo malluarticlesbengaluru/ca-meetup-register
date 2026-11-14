@@ -472,3 +472,7 @@ Plan in 7 steps: (1) smoothness engine, merged as PR #48; (2) new frame: side me
 ## 14. Never share
 
 Supabase **service role key**, database password, the `snapshot_reader` password or connection string, staff passwords, or anything from the Supabase dashboard's secret key section. The publishable key in the pages is safe by design.
+
+
+## Photos (r2_20)
+Photographers (staff role `camera`, page `/camera/`) and attendees (ticket page → Upload photos) upload photos to Storj through the Supabase Edge Function `photos` (`supabase/functions/photos/index.ts`). The database (`sql/r2_20_photos.sql`) decides everything: shared photographer space, shared public space, per-person space = lower of (public space ÷ people Present) and a MB cap, size per photo, who may upload. `is_staff()` now means admin or gate ONLY; `is_camera()` is new. Settings are in Admin → Settings → Photos. Setup steps and what is unverified: `PHOTOS_SETUP.md`. Tests: `scratch-db/test_r2_20.py` and `mutate_r2_20.py`.

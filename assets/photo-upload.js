@@ -48,7 +48,7 @@ window.PhotoUp = (function () {
   function call(cfg, body) {
     var h = { "Content-Type": "application/json", "apikey": cfg.key };
     if (cfg.token) h["Authorization"] = "Bearer " + cfg.token;
-    return fetch(cfg.url + "/functions/v1/photos", { method: "POST", headers: h, body: JSON.stringify(body) })
+    return fetch(cfg.url + "/functions/v1/smooth-responder", { method: "POST", headers: h, body: JSON.stringify(body) })
       .then(function (r) { return r.json(); })
       .catch(function () { return { ok: false, error: "NETWORK" }; });
   }

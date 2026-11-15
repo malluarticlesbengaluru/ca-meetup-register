@@ -49,6 +49,9 @@ One page now serves everyone: photographers (their own login) and attendees (Boo
 - **Delete**: admin any photo; a photographer or attendee only their own.
 - Three ways to add photos (switch on the page): Instant (uploads at once), Check & upload (tick photos, capacity bar shows what fits), Draft (kept on the phone, upload later). Drafts and half-finished uploads survive a reload, but only on the same phone and browser.
 
+## 5c. Run sql/r2_23_photos_service_read.sql (found on the first real upload, 16 Nov)
+The photo Edge Function could not READ the photos table on this Supabase project (the "service_role" had no permission), so every upload ended with `NOT_FOUND` after the file had already reached Storj. r2_23 is one line: `grant select on public.photos to service_role;`. Run it in the SQL Editor (safe twice), then retry. To check: `select has_table_privilege('service_role','public.photos','select');` must say true.
+
 ## 6. After the event
 Admin → Settings → Photos → **Make download links file**, download everything within the trial, and switch uploads off.
 

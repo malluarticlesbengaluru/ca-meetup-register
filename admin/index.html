@@ -715,7 +715,7 @@ function vSettings(){const s=S.settings;
   <div class="card" id="photocard"><h2>Photos</h2><p class="mute">Loading…</p></div>
   ${logCard()}</div>`;
   const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Launch readiness":"Readiness","Advanced":"Advanced","After the event":"After event","Photos":"Photos","Settings log":"Log"};
-  $("#snav").innerHTML=[...document.querySelectorAll(".sgrid>.card")].map((c,i)=>{c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="s-${i}">${esc(SH[h]||h)}</button>`}).join("");
+  $("#snav").innerHTML=[...document.querySelectorAll(".sgrid>.card")].map((c,i)=>{if(!c.id)c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="${c.id}">${esc(SH[h]||h)}</button>`}).join("");
   const tb=$("#top");if(tb)document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px");phLoad()}
 
 /* ---------- Photos: the Settings card (limits, usage, gallery, download links). Photos live in Storj; this page only shows numbers and tiny previews. ---------- */

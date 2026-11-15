@@ -1,0 +1,12 @@
+-- ============================================================================
+-- Release 2, piece 23: let the photo Edge Function READ the photos table
+-- Written 16 Nov 2026. Run AFTER r2_20 (and r2_22). Safe to run twice. Changes no data.
+--
+-- What went wrong: the photo Edge Function runs as Supabase's "service_role". After an upload it looks up the photo's
+-- record by id (to confirm the real file size, to delete, to download). On this project that role had no permission to
+-- READ the photos table (the new table did not get the usual automatic grant), so the lookup found nothing and every
+-- upload ended with NOT_FOUND even though the file had reached Storj.
+-- This gives service_role read access to that one table. Nothing else changes: visitors (anon) still have no access,
+-- logged-in users still only read through the existing admin rule, and all writes still go through the database functions.
+-- ============================================================================
+grant select on public.photos to service_role;

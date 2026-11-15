@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="../assets/icon-192.png"><link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<title>Photos · Meetup 2026</title>
+<style>
+:root{color-scheme:light;--bg:#F2F4F9;--card:#fff;--ink:#0E1730;--mute:#5A6584;--brand:#2447F0;--line:#DCE1EE;--err:#B8312A;--ok:#0F7B57;--warn:#A85F00;--on:#fff;--field:#fff}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0A0F1F;--card:#121A31;--ink:#E9EDFA;--mute:#96A2C4;--brand:#7D95FF;--line:#232D4D;--err:#FF8A80;--ok:#4FD6A0;--warn:#FFB454;--on:#0A0F1F;--field:#0B1226}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 16px calc(28px + env(safe-area-inset-bottom))}
+main{max-width:640px;margin:0 auto}h1{font-size:1.4rem;margin:18px 0 4px}h2{font-size:1.05rem;margin:0 0 6px}.mute{color:var(--mute)}.err{color:var(--err)}.ok{color:var(--ok)}.warn{color:var(--warn)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 12px}
+label.l{display:block;font-weight:700;margin:10px 0 4px}
+input[type=email],input[type=password],input[type=text],input[type=tel]{width:100%;font:inherit;padding:11px;min-height:46px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink)}
+button,.btn{font:inherit;font-weight:700;border-radius:14px;padding:12px 16px;min-height:52px;border:1px solid var(--brand);background:var(--brand);color:var(--on);cursor:pointer;display:flex;align-items:center;justify-content:center;width:100%;text-align:center}
+button.ghost,.btn.ghost{background:transparent;color:var(--brand)}button.danger{background:transparent;color:var(--err);border-color:var(--err)}button:disabled{opacity:.45;cursor:default}
+button.sm{min-height:38px;width:auto;padding:6px 12px;font-size:.9rem}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:120px}.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tabs{display:flex;gap:6px;margin:12px 0}.tabs button{min-height:44px;background:transparent;color:var(--mute);border-color:var(--line)}.tabs button.on{background:var(--brand);color:var(--on);border-color:var(--brand)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.seg button{min-height:46px;font-size:.92rem;background:transparent;color:var(--brand);padding:6px}.seg button.on{background:var(--brand);color:var(--on)}
+.meter{height:14px;border-radius:99px;background:var(--bg);border:1px solid var(--line);overflow:hidden;margin:8px 0;display:flex}.meter i{display:block;height:100%;background:var(--brand)}.meter i.sel{background:var(--ok)}.meter.over i.sel{background:var(--err)}.meter i.low{background:var(--warn)}.meter i.full{background:var(--err)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin:10px 0}
+.tile{position:relative;aspect-ratio:1;border:2px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg);cursor:pointer;display:block;padding:0;min-height:0}
+.tile img{width:100%;height:100%;object-fit:cover;display:block}.tile .nop{display:flex;align-items:center;justify-content:center;height:100%;padding:6px;font-size:.75rem;text-align:center;color:var(--mute);word-break:break-all}
+.tile .sz{position:absolute;left:4px;bottom:4px;background:#000a;color:#fff;font-size:.72rem;padding:1px 6px;border-radius:8px}
+.tile .mine{position:absolute;right:4px;top:4px;background:var(--brand);color:var(--on);font-size:.68rem;padding:1px 6px;border-radius:8px}
+.tile input{position:absolute;left:6px;top:6px;width:24px;height:24px;margin:0;accent-color:var(--brand)}
+.tile.sel{border-color:var(--brand)}.tile.bad{opacity:.5}.tile .why{position:absolute;left:0;right:0;top:34px;text-align:center;font-size:.7rem;color:#fff;background:#B8312Ad0;padding:1px 4px}
+.q{display:grid;gap:6px;margin-top:10px}.it{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;font-size:.92rem;align-items:center}
+.it b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.it .bar{grid-column:1/3;height:6px;border-radius:9px;background:var(--bg);overflow:hidden}.it .bar i{display:block;height:100%;width:0;background:var(--brand)}
+.it .acts{grid-column:1/3;display:flex;gap:8px}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:14px;text-align:center;color:var(--mute);margin-top:10px;display:none}.drop.hot{border-color:var(--brand);color:var(--brand)}
+@media (hover:hover) and (pointer:fine){.drop{display:block}}
+input[type=file]{display:none}.off{background:#0003;border-radius:12px;padding:10px}
+.lb{position:fixed;inset:0;background:#000d;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px}
+.lb img{max-width:100%;max-height:62vh;border-radius:10px;object-fit:contain;background:#111}.lb .cap{color:#fff;text-align:center;font-size:.92rem}.lb .nop{color:#fff;padding:40px}
+.lb .row{width:100%;max-width:420px}.lb button{background:var(--card);color:var(--ink);border-color:var(--line)}.lb button.danger{color:var(--err)}
+.note{font-size:.9rem;color:var(--mute)}
+</style></head><body><main id="app"></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="../assets/photo-upload.js"></script>
+<script>
+"use strict";
+/* ONE page for everyone who handles photos. Photographers sign in with their own login; attendees use Booking ID + phone, like the Tickets page.
+   The page never decides limits or who sees what: the database and the "photos" Edge Function do. Numbers shown here come from the server. */
+const CFG={url:"https://jddrwajazpsdrqpwlncu.supabase.co",key:"sb_publishable_W3tJTLdbCOuwkUwkjLW1Iw_9m1zGHFT"};
+const db=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true}});
+const P=window.PhotoUp,$=s=>document.querySelector(s);
+const esc=t=>String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LSget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(_){return d}};
+const LSset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}};
+const EXT_OK={cam:["jpg","jpeg","png","heic","heif","webp","dng"],pub:["jpg","jpeg","png","heic","heif","webp"]};
+const MODES={instant:["Instant","Each photo uploads as soon as you take or choose it."],check:["Check & upload","Look at your photos first, untick any, then upload."],draft:["Draft","Save photos on this phone now, upload later."]};
+const VIS={own:"You can see the photos you uploaded.",photographers:"Photographers can see every photo. Attendees see their own.",all:"Everyone who is logged in can see every photo."};
+const S={role:null,uid:null,isAdmin:false,name:"",code:"",phone:"",st:null,stErr:"",tab:"upload",mode:LSget("gal_mode","instant"),loginTab:"cam",msg:"",note:"",
+  sel:[],q:[],drafts:[],photos:[],more:false,loading:false,lb:null,vis:"own",canDl:false,loaded:false};
+if(!MODES[S.mode])S.mode="instant";
+let idb=null,running=0,lastDraw=0;
+
+/* ---------- local storage of photos (IndexedDB): instant photos are saved here first, drafts live here ---------- */
+function idbOpen(){return new Promise(res=>{try{const r=indexedDB.open("mm-photos",1);r.onupgradeneeded=()=>r.result.createObjectStore("q",{keyPath:"id"});r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);r.onblocked=()=>res(null)}catch(_){res(null)}})}
+function idbDo(mode,fn){return new Promise(res=>{if(!idb)return res(null);try{const t=idb.transaction("q",mode);let r=fn(t.objectStore("q"));t.oncomplete=()=>res(r&&r.result!==undefined?r.result:true);t.onerror=()=>res(null);t.onabort=()=>res(null)}catch(_){res(null)}})}
+const idbPut=(it,state)=>idbDo("readwrite",s=>s.put({id:it.id,owner:it.owner,file:it.file,name:it.name,size:it.size,type:it.type,lm:it.lm,state}));
+const idbDel=id=>idbDo("readwrite",s=>s.delete(id));
+const idbAll=()=>idbDo("readonly",s=>s.getAll()).then(r=>Array.isArray(r)?r:[]);
+function persist(){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}}
+
+/* ---------- small helpers ---------- */
+const ownerId=()=>S.role==="cam"?"cam:"+S.uid:"pub:"+S.code;
+const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function extOf(f){const m=/\.([a-z0-9]+)$/i.exec(f.name||"");let e=m?m[1].toLowerCase():"";if(!e){const t=(f.type||"").split("/")[1]||"";e=t==="jpeg"?"jpg":t}return e}
+const fdt=s=>{try{return new Date(s).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})}catch(_){return""}};
+const cfg=async()=>{let token=null;if(S.role==="cam"){const s=(await db.auth.getSession()).data.session;token=s&&s.access_token}return{url:CFG.url,key:CFG.key,token}};
+const maxBytes=()=>(S.st&&S.st.max_bytes)||0;
+const leftBytes=()=>Math.max(0,(S.st&&S.st.left_bytes)||0);
+const usedBytes=()=>(S.st&&S.st.used_bytes)||0;
+const pending=()=>S.q.filter(i=>i.state==="wait").reduce((a,i)=>a+i.size,0);
+const availLeft=()=>Math.max(0,leftBytes()-pending());
+function canUpload(){return S.role==="cam"?!!(S.st&&S.st.on!==false):!!(S.st&&S.st.ok)}
+function uploadBlock(){
+  if(canUpload())return"";
+  if(S.role==="cam")return"Photo uploads are switched off right now. The admin will turn them on for the event.";
+  const e=S.stErr;return e==="PHOTOS_OFF"?"Photo uploads are switched off right now. You can still view photos.":e==="NOT_PRESENT"?"Uploading opens once you have checked in at the gate. You can still view photos.":P.say(e)}
+function mkItem(f){return{id:rid(),owner:ownerId(),file:f,name:f.name||"photo",size:f.size,type:f.type,lm:f.lastModified||0,state:"",p:0,err:"",on:true,bad:"",url:null}}
+function checkItem(it){const e=extOf(it.file);
+  if(!EXT_OK[S.role].includes(e))return"Not a photo type we can keep";
+  if(!it.size)return"Empty file";
+  if(maxBytes()&&it.size>maxBytes())return"Over the "+P.mb(maxBytes())+" limit for one photo";return""}
+const dropUrl=it=>{if(it.url){try{URL.revokeObjectURL(it.url)}catch(_){}it.url=null}};
+
+/* ---------- logins ---------- */
+async function boot(){
+  idb=await idbOpen();
+  const u=new URLSearchParams(location.search);if(u.get("id")){S.loginTab="pub";S.prefill=u.get("id")}
+  const ses=(await db.auth.getSession()).data.session;
+  if(ses){
+    const q=await db.from("staff").select("name,role").eq("user_id",ses.user.id).maybeSingle();
+    if(!q.error&&q.data&&(q.data.role==="camera"||q.data.role==="admin")){
+      S.role="cam";S.uid=ses.user.id;S.name=q.data.name;S.isAdmin=q.data.role==="admin";
+      await refreshStatus();await resume();return render();
+    }
+    await db.auth.signOut();
+  }
+  render();
+}
+async function loginCam(){
+  const em=$("#em").value.trim(),pw=$("#pw").value;
+  const r=await db.auth.signInWithPassword({email:em,password:pw});
+  if(r.error){S.msg="Wrong email or password.";return render()}
+  const q=await db.from("staff").select("name,role").eq("user_id",r.data.user.id).maybeSingle();
+  if(q.error||!q.data||(q.data.role!=="camera"&&q.data.role!=="admin")){await db.auth.signOut();S.msg="This login is not a photographer login. Ask the admin.";return render()}
+  S.msg="";S.role="cam";S.uid=r.data.user.id;S.name=q.data.name;S.isAdmin=q.data.role==="admin";
+  await refreshStatus();await resume();render();
+}
+async function loginPub(){
+  const code=($("#bid").value||"").toUpperCase().replace(/[\s-]/g,"").replace(/O/g,"0"),ph=($("#ph").value||"").replace(/\D/g,"");
+  if(code.length!==8||ph.length!==10){S.msg="Enter the 8-character Booking ID and the 10-digit phone number.";return render()}
+  const r=await db.rpc("photo_public_list",{p_code:code,p_phone:ph,p_before:null,p_limit:24});
+  if(r.error||!r.data){S.msg="Could not check right now. Check your internet and try again.";return render()}
+  if(!r.data.ok){S.msg=r.data.error==="NOT_PAID"?"This booking is not confirmed yet.":"Booking ID and phone number do not match a ticket.";return render()}
+  S.msg="";S.role="pub";S.code=code;S.phone=ph;S.name="Booking "+code;S.isAdmin=false;
+  const h=LSget("mm_hist",[]).filter(c=>c!==code);h.unshift(code);LSset("mm_hist",h.slice(0,12));   /* the Booking ID is remembered, the phone number never is */
+  S.photos=r.data.items;S.more=r.data.items.length>=r.data.page;S.vis=r.data.visibility;S.canDl=false;S.loaded=true;
+  await refreshStatus();await resume();render();
+}
+async function signOut(){S.sel.forEach(dropUrl);if(S.role==="cam")await db.auth.signOut();
+  Object.assign(S,{role:null,uid:null,isAdmin:false,st:null,stErr:"",sel:[],q:[],drafts:[],photos:[],more:false,loaded:false,lb:null,tab:"upload",phone:"",code:"",msg:"",note:""});render()}
+async function refreshStatus(){
+  if(S.role==="cam"){const r=await db.rpc("photo_camera_status");if(!r.error&&r.data){S.st=r.data;S.stErr=""}}
+  else if(S.role==="pub"){const r=await db.rpc("photo_public_status",{p_code:S.code,p_phone:S.phone});
+    if(r.error||!r.data){return}
+    S.st=r.data.ok?r.data:null;S.stErr=r.data.ok?"":r.data.error}
+}
+async function resume(){   /* photos saved on this phone by an earlier visit: queued ones continue, drafts come back */
+  const own=ownerId();
+  (await idbAll()).filter(x=>x.owner===own).forEach(x=>{const it=Object.assign(mkItem(x.file),{id:x.id,name:x.name,size:x.size,type:x.type,lm:x.lm});
+    if(x.state==="draft"){it.state="draft";S.drafts.push(it)}else{it.state="wait";S.q.push(it)}});
+  if(S.q.length){S.note="Continuing "+S.q.length+" photo"+(S.q.length>1?"s":"")+" from earlier.";pump()}
+}
+
+/* ---------- adding photos ---------- */
+async function addFiles(list){
+  S.note="";await refreshStatus();   /* other people upload too: always compare against the latest numbers */
+  const have=new Set([].concat(S.sel,S.q,S.drafts).map(i=>i.name+"|"+i.size+"|"+i.lm));
+  const items=[];let dup=0;
+  Array.prototype.forEach.call(list,f=>{const it=mkItem(f),k=it.name+"|"+it.size+"|"+it.lm;if(have.has(k)){dup++;return}have.add(k);it.bad=checkItem(it);items.push(it)});
+  const good=items.filter(i=>!i.bad),bad=items.length-good.length;
+  const warn=(dup?dup+" already added, skipped. ":"")+(bad&&S.mode!=="check"?bad+" not usable (wrong type or too big), skipped. ":"");
+  if(!items.length){S.note=warn;return render()}
+  if(S.mode==="check"){S.sel=S.sel.concat(items);S.note=warn;S.tab="upload";return render()}
+  if(S.mode==="draft"){
+    if(!good.length){S.note=warn;return render()}
+    persist();for(const it of good){it.state="draft";await idbPut(it,"draft");S.drafts.push(it)}S.note=warn+good.length+" saved as draft.";return render()}
+  /* instant */
+  if(!good.length){S.note=warn;return render()}
+  const total=good.reduce((a,i)=>a+i.size,0);
+  if(!canUpload()){S.note=uploadBlock()+" Switch to Draft to keep them on this phone.";return render()}
+  if(total>availLeft()){S.sel=S.sel.concat(items);S.note="These do not all fit in your remaining space, so choose which ones to upload.";S.tab="upload";return render()}
+  S.note=warn;await queueItems(good);render();
+}
+async function queueItems(items){
+  for(const it of items){it.state="wait";it.p=0;it.err="";dropUrl(it);await idbPut(it,"queued");S.q.push(it)}
+  pump();
+}
+
+/* ---------- the upload queue: 2 at a time ---------- */
+function pump(){while(running<2){const it=S.q.find(x=>x.state==="wait");if(!it)break;running++;runOne(it).then(()=>{running--;pump()},()=>{running--;pump()})}}
+async function runOne(it){
+  it.state="up";it.p=0;draw();
+  const who=S.role==="cam"?{kind:"camera"}:{kind:"public",code:S.code,phone:S.phone};
+  const r=await P.upload(await cfg(),who,it.file,p=>{it.p=p;soft()});
+  if(r.ok){it.state="done";it.p=1;idbDel(it.id);S.loaded=false}else{it.state="fail";it.err=r.message}
+  await refreshStatus();draw();
+}
+const soft=()=>{const n=Date.now();if(n-lastDraw<200)return;lastDraw=n;drawQueue()};
+
+/* ---------- check screen: capacity bar, tick/untick ---------- */
+const selOn=()=>S.sel.filter(i=>i.on&&!i.bad);
+const selBytes=()=>selOn().reduce((a,i)=>a+i.size,0);
+function capHTML(sel){
+  const used=usedBytes(),left=leftBytes(),total=used+left,over=sel>left,pu=total?Math.min(100,used/total*100):0,ps=total?Math.min(100-pu,sel/total*100):0;
+  return `<div class="meter ${over?"over":""}"><i style="width:${pu}%"></i><i class="sel" style="width:${ps}%"></i></div>
+  <div>${P.bytes(used)} used + <b>${P.bytes(sel)}</b> selected of ${P.bytes(total)} (${P.bytes(Math.max(0,left-sel))} left)</div>
+  ${over?`<div class="err"><b>Over by ${P.bytes(sel-left)}.</b> Untick some photos.</div>`:""}`}
+function updateCap(){
+  const c=$("#cap");if(!c)return;const sel=selBytes();c.innerHTML=capHTML(sel);
+  const n=selOn().length,b=$("#up-sel");if(b){b.textContent="Upload "+n+" photo"+(n===1?"":"s");b.disabled=!n||sel>leftBytes()||!canUpload()}
+  document.querySelectorAll("[data-tile]").forEach(t=>{const it=S.sel.find(x=>x.id===t.dataset.tile);if(it)t.classList.toggle("sel",it.on&&!it.bad)})}
+function checkHTML(){
+  if(!S.sel.length)return"";
+  const tiles=S.sel.map(it=>{it.url=it.url||URL.createObjectURL(it.file);
+    return `<label class="tile ${it.on&&!it.bad?"sel":""} ${it.bad?"bad":""}" data-tile="${it.id}"><input type="checkbox" data-tick="${it.id}" ${it.on&&!it.bad?"checked":""} ${it.bad?"disabled":""}>
+    <img src="${it.url}" alt="${esc(it.name)}" data-fb="1" loading="lazy" decoding="async"><span class="sz">${P.mb(it.size)}</span>${it.bad?`<span class="why">${esc(it.bad)}</span>`:""}</label>`}).join("");
+  return `<div class="card"><h2>Check your photos</h2><div id="cap"></div>
+  <div class="row" style="margin-top:8px"><button class="ghost sm" data-a="all">Select all</button><button class="ghost sm" data-a="none">Clear</button><button class="ghost sm" data-a="fit">Fit automatically</button></div>
+  <div class="grid">${tiles}</div>
+  <div class="row"><button class="ghost" data-a="cancelsel">Cancel</button><button id="up-sel" data-a="upsel"></button></div></div>`}
+
+/* ---------- drafts ---------- */
+function draftsHTML(){
+  if(!S.drafts.length)return"";
+  const b=S.drafts.reduce((a,i)=>a+i.size,0);
+  return `<div class="card"><h2>${S.drafts.length} draft${S.drafts.length>1?"s":""} waiting</h2>${capHTML(b)}
+  <div class="row" style="margin-top:8px"><button class="ghost" data-a="draftpick">Choose which to upload</button><button data-a="draftall" ${b>leftBytes()||!canUpload()?"disabled":""}>Upload all</button></div>
+  <button class="danger sm" style="margin-top:8px" data-a="draftdel">Delete all drafts</button>
+  <p class="note" style="margin-bottom:0">Drafts are saved on this phone, in this browser. Do not use a private or incognito tab. Uploads only run while this page is open, so come back to this page, log in, then upload.</p></div>`}
+
+/* ---------- queue list ---------- */
+function queueHTML(){
+  if(!S.q.length)return"";
+  const n={up:0,wait:0,done:0,fail:0};S.q.forEach(i=>n[i.state]++);
+  const head=[n.up+n.wait?`${n.up+n.wait} uploading`:"",n.done?`${n.done} done`:"",n.fail?`<span class="err">${n.fail} failed</span>`:""].filter(Boolean).join(" · ");
+  return `<div class="card"><div class="top"><h2>Uploads</h2><span class="note">${head}</span></div><div class="q">`+S.q.slice().reverse().map(i=>
+    `<div class="it"><b>${esc(i.name)}</b><span class="${i.state==="done"?"ok":i.state==="fail"?"err":"mute"}">${i.state==="done"?"✓ Uploaded":i.state==="fail"?"Failed":i.state==="up"?Math.round(i.p*100)+"%":"Waiting"}</span>
+    ${i.state==="up"?`<div class="bar"><i style="width:${Math.round(i.p*100)}%"></i></div>`:""}
+    ${i.state==="fail"?`<div class="err" style="grid-column:1/3;font-size:.88rem">${esc(i.err)}</div><div class="acts"><button class="ghost sm" data-retry="${i.id}">Retry</button><button class="danger sm" data-rm="${i.id}">Remove</button></div>`:""}</div>`).join("")+
+    `</div>${n.done?`<button class="ghost sm" style="margin-top:8px" data-a="clrdone">Clear finished</button>`:""}</div>`}
+function statusHTML(){
+  const st=S.st,blk=uploadBlock();
+  let h=blk?`<div class="off"><b>${esc(blk)}</b></div>`:"";
+  if(st&&(S.role==="cam"||st.ok)){
+    const used=usedBytes(),total=used+leftBytes(),p=total?Math.min(100,used/total*100):0;
+    h+=`<b>${S.role==="cam"?"Shared photographer space":"Your photo space"}</b><div class="meter"><i class="${p>=100?"full":p>=85?"low":""}" style="width:${p}%"></i></div>
+    <span>${P.bytes(leftBytes())} left</span> <span class="mute">of ${P.bytes(total)}${S.role==="cam"?" (all photographers together)":""} · biggest single photo ${P.mb(maxBytes())}</span>`}
+  return h}
+function draw(){drawQueue();const s=$("#st");if(s)s.innerHTML=statusHTML();updateCap()}
+function drawQueue(){const q=$("#q");if(q)q.innerHTML=queueHTML()}
+
+/* ---------- viewing ---------- */
+async function loadPhotos(reset){
+  if(S.loading)return;S.loading=true;if(reset){S.photos=[];S.more=false}
+  const before=S.photos.length?S.photos[S.photos.length-1].at:null;render();
+  const r=S.role==="cam"?await db.rpc("photo_camera_list",{p_before:before,p_limit:24}):await db.rpc("photo_public_list",{p_code:S.code,p_phone:S.phone,p_before:before,p_limit:24});
+  S.loading=false;
+  if(r.error||!r.data||!r.data.ok){S.loadFail=true;S.note="Could not load the photos. Check your internet and try again.";return render()}
+  S.loadFail=false;
+  S.photos=S.photos.concat(r.data.items);S.more=r.data.items.length>=r.data.page;S.vis=r.data.visibility;S.canDl=!!r.data.can_download;S.loaded=true;render();
+}
+function photosHTML(){
+  if(!S.loaded&&!S.loading&&!S.loadFail)setTimeout(()=>loadPhotos(true),0);
+  const tiles=S.photos.map((p,i)=>`<button class="tile" data-open="${i}" aria-label="Open photo">${p.thumb?`<img src="${esc(p.thumb)}" alt="" loading="lazy" decoding="async">`:`<span class="nop">No preview</span>`}<span class="sz">${P.mb(p.bytes||0)}</span>${p.mine?`<span class="mine">Yours</span>`:""}</button>`).join("");
+  return `<div class="card"><div class="top"><h2>Photos</h2><button class="ghost sm" data-a="refresh">Refresh</button></div><p class="note" style="margin:0">${esc(S.isAdmin?"As an admin you see every photo.":VIS[S.vis]||"")}</p>
+  ${S.photos.length?`<div class="grid">${tiles}</div>`:`<p class="mute">${S.loading?"Loading…":"No photos to show yet."}</p>`}
+  ${S.more?`<button class="ghost" data-a="more" ${S.loading?"disabled":""}>${S.loading?"Loading…":"Load more"}</button>`:""}</div>`}
+function lbHTML(){
+  const p=S.photos[S.lb];if(!p)return"";
+  const mine=p.mine||S.isAdmin;
+  return `<div class="lb" data-a="lbclose"><div class="cap">${p.thumb?`<img src="${esc(p.thumb)}" alt="">`:`<div class="nop">No preview for this photo</div>`}</div>
+  <div class="cap">${esc(fdt(p.at))} · ${P.mb(p.bytes||0)}${p.by?" · by "+esc(p.by):p.kind==="public"&&!p.mine?" · attendee":""}${p.mine?" · yours":""}</div>
+  <div class="row">${S.role==="cam"?`<button data-dl="${p.id}">Download original</button>`:`<button disabled>Original: shared after the event</button>`}
+  ${mine?`<button class="danger" data-del="${p.id}">Delete</button>`:""}<button data-a="lbclose">Close</button></div>
+  ${S.role==="cam"?"":`<div class="cap note">This is a small preview. Full-size copies are shared with everyone after the event.</div>`}</div>`}
+
+/* ---------- screens ---------- */
+function loginHTML(){
+  const ids=LSget("mm_mine",[]).concat(LSget("mm_hist",[])).filter((c,i,a)=>a.indexOf(c)===i).slice(0,8);
+  const pub=S.loginTab==="pub";
+  return `<h1>Meetup 2026 photos</h1><p class="mute">Take, upload and see photos from the day.</p>
+  <div class="tabs"><button class="${pub?"":"on"}" data-lt="cam">Photographers</button><button class="${pub?"on":""}" data-lt="pub">Attendees</button></div>
+  <div class="card">${pub?`<label class="l" for="bid">Booking ID</label><input id="bid" type="text" autocapitalize="characters" autocomplete="off" maxlength="14" value="${esc(S.prefill||"")}" placeholder="8 characters">
+   ${ids.length?`<div class="row" style="margin-top:6px">${ids.map(c=>`<button class="ghost sm" style="min-width:0" data-id="${esc(c)}">${esc(c)}</button>`).join("")}</div>`:""}
+   <label class="l" for="ph">Phone number used for the booking</label><input id="ph" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national" placeholder="10 digits">
+   <p class="err" role="alert">${esc(S.msg)}</p><button id="go">Continue</button>`
+  :`<label class="l" for="em">Email</label><input id="em" type="email" autocomplete="username"><label class="l" for="pw">Password</label><input id="pw" type="password" autocomplete="current-password">
+   <p class="err" role="alert">${esc(S.msg)}</p><button id="go">Log in</button>`}</div>`}
+function mainHTML(){
+  let h=`<div class="top"><div><h1>${esc(S.name)}</h1><span class="mute">${S.role==="cam"?(S.isAdmin?"Admin":"Photographer"):"Attendee"}</span></div><button class="ghost sm" data-a="out">Sign out</button></div>
+  <div class="tabs"><button class="${S.tab==="upload"?"on":""}" data-tab="upload">Upload</button><button class="${S.tab==="view"?"on":""}" data-tab="view">Photos</button></div>`;
+  if(S.note)h+=`<div class="card"><span class="warn">${esc(S.note)}</span></div>`;
+  if(S.tab==="view")return h+photosHTML();
+  h+=`<div class="card" id="st">${statusHTML()}</div>
+  <div class="card"><b>When I add photos</b><div class="seg" style="margin-top:8px">${Object.keys(MODES).map(k=>`<button class="${S.mode===k?"on":""}" data-mode="${k}">${MODES[k][0]}</button>`).join("")}</div><p class="note" style="margin:8px 0 0">${MODES[S.mode][1]}</p></div>
+  <div class="row"><label class="btn" for="f1">Take photo</label><label class="btn ghost" for="f2">Choose photos</label></div>
+  <input id="f1" type="file" accept="image/*" capture="environment"><input id="f2" type="file" accept="image/*" multiple>
+  <div class="drop" id="drop">…or drop photos here</div>
+  <p class="note" style="margin-top:10px">Photos upload at full quality, exactly as taken. Keep this page open until each photo shows a tick.</p>
+  ${checkHTML()}${draftsHTML()}<div id="q">${queueHTML()}</div>`;
+  return h}
+function render(){
+  const a=$("#app");
+  a.innerHTML=(S.role?mainHTML():loginHTML())+(S.lb!=null?lbHTML():"");
+  if(!S.role){const g=$("#go");g.onclick=S.loginTab==="pub"?loginPub:loginCam;(S.loginTab==="pub"?$("#ph"):$("#pw")).onkeydown=e=>{if(e.key==="Enter")g.click()};return}
+  if(S.tab==="upload"){updateCap();const d=$("#drop");if(d){["dragenter","dragover"].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.add("hot")}));["dragleave","drop"].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.remove("hot")}));d.addEventListener("drop",e=>{const fs=Array.from(e.dataTransfer.files).filter(f=>/^image\//.test(f.type)||EXT_OK[S.role].includes(extOf(f)));if(fs.length)addFiles(fs)})}}
+}
+
+/* ---------- events ---------- */
+document.addEventListener("change",e=>{const t=e.target;
+  if(t.id==="f1"||t.id==="f2"){const fs=Array.from(t.files);t.value="";if(fs.length)addFiles(fs);return}
+  if(t.dataset&&t.dataset.tick){const it=S.sel.find(x=>x.id===t.dataset.tick);if(it){it.on=t.checked;updateCap()}}});
+document.addEventListener("error",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.dataset.fb){const s=document.createElement("span");s.className="nop";s.textContent=t.alt||"Preview not available";t.replaceWith(s)}},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.lb!=null){S.lb=null;render()}});
+document.addEventListener("click",async e=>{
+  const t=e.target.closest("[data-a],[data-lt],[data-id],[data-tab],[data-mode],[data-open],[data-retry],[data-rm],[data-dl],[data-del]");if(!t)return;
+  const d=t.dataset;
+  if(d.lt){S.loginTab=d.lt;S.msg="";return render()}
+  if(d.id){const b=$("#bid");if(b)b.value=d.id;S.prefill=d.id;return}
+  if(d.tab){S.tab=d.tab;S.note="";S.loadFail=false;return render()}
+  if(d.mode){S.mode=d.mode;LSset("gal_mode",d.mode);S.note="";return render()}
+  if(d.open!=null){S.lb=+d.open;return render()}
+  if(d.retry){const it=S.q.find(x=>x.id===d.retry);if(it){it.state="wait";it.err="";pump();draw()}return}
+  if(d.rm){const i=S.q.findIndex(x=>x.id===d.rm);if(i>=0){idbDel(S.q[i].id);S.q.splice(i,1);draw()}return}
+  if(d.dl){const w=window.open("","_blank");const r=await P.call(await cfg(),{action:"view",id:d.dl});
+    if(r.ok){if(w)w.location=r.url;else location.href=r.url}else{if(w)w.close();S.note="Could not open the original. Try again.";S.lb=null;render()}return}
+  if(d.del){if(!confirm("Delete this photo? It is removed from storage and cannot be recovered."))return;
+    const body={action:"remove",id:d.del};if(S.role==="pub"){body.code=S.code;body.phone=S.phone}
+    const r=await P.call(await cfg(),body);
+    if(r.ok){S.photos=S.photos.filter(p=>p.id!==d.del);S.lb=null;await refreshStatus();S.note="Photo deleted."}else S.note="Could not delete that photo.";
+    return render()}
+  switch(d.a){
+    case"out":return signOut();
+    case"lbclose":S.lb=null;return render();
+    case"all":S.sel.forEach(i=>{if(!i.bad)i.on=true});return render();
+    case"none":S.sel.forEach(i=>{i.on=false});return render();
+    case"fit":{let left=leftBytes();S.sel.forEach(i=>{if(i.bad){i.on=false;return}if(i.size<=left){i.on=true;left-=i.size}else i.on=false});return render()}
+    case"cancelsel":{const keep=S.sel.filter(i=>i.state==="draft");S.sel.forEach(dropUrl);S.sel=[];S.drafts=S.drafts.concat(keep);return render()}
+    case"upsel":{const go=selOn(),rest=S.sel.filter(i=>!go.includes(i));
+      S.drafts=S.drafts.concat(rest.filter(i=>i.state==="draft"));rest.filter(i=>i.state!=="draft").forEach(dropUrl);S.sel=[];
+      await queueItems(go);return render()}
+    case"draftpick":await refreshStatus();S.sel=S.sel.concat(S.drafts);S.drafts=[];return render();
+    case"draftall":{await refreshStatus();const go=S.drafts;S.drafts=[];await queueItems(go);return render()}
+    case"draftdel":if(!confirm("Delete all "+S.drafts.length+" drafts from this phone?"))return;for(const i of S.drafts)await idbDel(i.id);S.drafts=[];return render();
+    case"clrdone":S.q=S.q.filter(i=>i.state!=="done");return render();
+    case"refresh":S.loaded=false;S.loadFail=false;S.note="";return loadPhotos(true);
+    case"more":S.loadFail=false;return loadPhotos(false);
+  }
+});
+boot();
+</script></body></html>

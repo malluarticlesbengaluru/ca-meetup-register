@@ -7,8 +7,8 @@
 //   action "confirm"  ask Storj for the file's REAL size; the database keeps it only if it is not bigger than claimed
 //                     (a bigger file is deleted). Saves the tiny preview picture.
 //   action "fail"     the upload did not happen: free the claim.
-//   action "view"     (admin) short-lived download address for one original.
-//   action "remove"   (admin) take a photo out and delete the file.
+//   action "view"     (admin or photographer) short-lived download address for one original; the database decides which.
+//   action "remove"   (admin: any photo; photographer or attendee: only their own) take a photo out and delete the file.
 //   action "export"   (admin) list stored photos (key, size) with fresh download addresses, for "download everything".
 //
 // Secrets to set (Edge Functions > Secrets): STORJ_ACCESS_KEY, STORJ_SECRET_KEY, STORJ_BUCKET. (SUPABASE_URL and
@@ -91,7 +91,8 @@ Deno.serve(async (req) => {
       if (!row) return out({ ok: false, error: "NOT_FOUND" });
       const actual = await head(row.object_key);
       if (actual === null) { await admin.rpc("photo_fail", { p_id: id }); return out({ ok: false, error: "NOT_UPLOADED" }); }
-      const thumb = typeof b.thumb === "string" && b.thumb.startsWith("data:image/") ? b.thumb : null;
+      // only a plain base64 jpeg/png/webp picture is kept as the preview (anything else could carry markup)
+      const thumb = typeof b.thumb === "string" && b.thumb.length <= 80000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.thumb) ? b.thumb : null;
       const { data, error } = await admin.rpc("photo_confirm", { p_id: id, p_actual: actual, p_thumb: thumb });
       if (error) return out({ ok: false, error: "SERVER" }, 500);
       if (!data?.ok && data?.key) await del(data.key);          // bigger than claimed, or too late: remove the file
@@ -105,26 +106,48 @@ Deno.serve(async (req) => {
       return out({ ok: true });
     }
 
-    // ---- admin only from here ----
-    const uid = await who(req);
-    if (!uid || (await role(uid)) !== "admin") return out({ ok: false, error: "NOT_ALLOWED" }, 401);
-
+    // ---- view and remove: an admin, a photographer, or (remove only) the attendee who owns the photo ----
     if (action === "view") {
-      const { data: row } = await admin.from("photos").select("object_key").eq("id", String(b.id || "")).eq("status", "stored").maybeSingle();
-      if (!row) return out({ ok: false, error: "NOT_FOUND" });
-      return out({ ok: true, url: await presign("GET", row.object_key, 600) });
+      // the database decides which original this login may download (admin: any; photographer: own, or all if the admin allows)
+      const uid = await who(req);
+      if (!uid) return out({ ok: false, error: "NOT_ALLOWED" }, 401);
+      const { data: key } = await admin.rpc("photo_original_key", { p_id: String(b.id || ""), p_user: uid });
+      if (!key) return out({ ok: false, error: "NOT_FOUND" });
+      return out({ ok: true, url: await presign("GET", String(key), 600) });
     }
 
     if (action === "remove") {
       const id = String(b.id || "");
-      // run as the admin themselves, so the database checks it and writes the Settings log entry
-      const asUser = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
-        auth: { persistSession: false }, global: { headers: { Authorization: req.headers.get("authorization") || "" } } });
-      const { data: key, error } = await asUser.rpc("admin_photo_remove", { p_id: id });
-      if (error || !key) return out({ ok: false, error: "NOT_FOUND" });
+      const uid = await who(req);
+      if (uid) {
+        const rl = await role(uid);
+        if (rl === "admin") {
+          // run as the admin themselves, so the database checks it and writes the Settings log entry
+          const asUser = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
+            auth: { persistSession: false }, global: { headers: { Authorization: req.headers.get("authorization") || "" } } });
+          const { data: key, error } = await asUser.rpc("admin_photo_remove", { p_id: id });
+          if (error || !key) return out({ ok: false, error: "NOT_FOUND" });
+          await del(String(key));
+          return out({ ok: true });
+        }
+        if (rl === "camera") {
+          const { data: key } = await admin.rpc("photo_remove_camera", { p_id: id, p_user: uid });
+          if (!key) return out({ ok: false, error: "NOT_FOUND" });
+          await del(String(key));
+          return out({ ok: true });
+        }
+        return out({ ok: false, error: "NOT_ALLOWED" }, 401);
+      }
+      // an attendee removing their own photo: Booking ID + phone, checked by the database
+      const { data: key } = await admin.rpc("photo_remove_public", { p_id: id, p_code: String(b.code || ""), p_phone: String(b.phone || "") });
+      if (!key) return out({ ok: false, error: "NOT_FOUND" });
       await del(String(key));
       return out({ ok: true });
     }
+
+    // ---- admin only from here ----
+    const uid = await who(req);
+    if (!uid || (await role(uid)) !== "admin") return out({ ok: false, error: "NOT_ALLOWED" }, 401);
 
     if (action === "export") {
       const from = Math.max(0, Math.floor(Number(b.from) || 0));

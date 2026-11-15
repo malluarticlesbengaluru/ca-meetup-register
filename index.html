@@ -1804,8 +1804,7 @@ async function phoPump(){const P=S.pho;if(P.busy)return;P.busy=true;let it;
 document.addEventListener("change",e=>{const t=e.target;if(!t||(t.id!=="pho-f1"&&t.id!=="pho-f2")||S.step!=="photos")return;
   Array.prototype.forEach.call(t.files,f=>S.pho.items.push({id:++S.pho.n,file:f,name:f.name||"photo",state:"wait",p:0,err:""}));t.value="";phoList();phoPump()});
 document.addEventListener("click",async e=>{const el=e.target.closest("button"),id=el?el.id:"";if(!el)return;const P=S.pho;
-  if(id==="go-photos"){P.code=S.tk.code||"";P.ph=S.tk.ph||"";P.ok=false;P.msg="";P.st=null;S.step="photos";render();
-    if(P.code&&P.ph){P.busy=true;const ok=await phoStatus();P.busy=false;if(ok){P.ok=true}render();if(ok){phoMeter();phoList()}}return}
+  if(id==="go-photos"){location.href="gallery/?id="+encodeURIComponent(S.tk.code||"");return}   /* photos now live on one page: /gallery/ */
   if(S.step!=="photos")return;
   if(id==="pho-take"){$("#pho-f1").click();return}
   if(id==="pho-pick"){$("#pho-f2").click();return}

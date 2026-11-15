@@ -27,6 +27,17 @@ game_messages|4|created_at|timestamp with time zone|t|now()
 game_messages|5|updated_at|timestamp with time zone|t|now()
 keepalive|1|id|integer|t|
 keepalive|2|note|text|f|
+photos|1|id|uuid|t|gen_random_uuid()
+photos|2|kind|text|t|
+photos|3|uploader|uuid|f|
+photos|4|ticket_id|uuid|f|
+photos|5|object_key|text|t|
+photos|6|bytes_claimed|bigint|t|
+photos|7|bytes_actual|bigint|f|
+photos|8|status|text|t|'reserved'::text
+photos|9|thumb|text|f|
+photos|10|created_at|timestamp with time zone|t|now()
+photos|11|confirmed_at|timestamp with time zone|f|
 reg_sessions|1|id|uuid|t|
 reg_sessions|2|started_at|timestamp with time zone|t|now()
 reg_sessions|3|last_seen|timestamp with time zone|t|now()
@@ -90,6 +101,15 @@ settings|30|contact2_name|text|f|
 settings|31|contact2_number|text|f|
 settings|32|contact3_name|text|f|
 settings|33|contact3_number|text|f|
+settings|34|photos_on|boolean|t|false
+settings|35|photo_pool_cam_mb|integer|t|10240
+settings|36|photo_pool_pub_mb|integer|t|12288
+settings|37|photo_cap_pub_mb|integer|t|90
+settings|38|photo_max_cam_mb|integer|t|25
+settings|39|photo_max_pub_mb|integer|t|15
+settings|40|photo_total_mb|integer|t|25600
+settings|41|photo_public_mode|text|t|'present'::text
+settings|42|photo_visibility|text|t|'own'::text
 settings_log|1|id|bigint|t|
 settings_log|2|at|timestamp with time zone|t|now()
 settings_log|3|changed_by|uuid|f|
@@ -151,6 +171,8 @@ transfer_buyers|10|food|text|t|
 transfer_buyers|11|consent_at|timestamp with time zone|t|
 transfer_buyers|12|status|text|t|'active'::text
 transfer_buyers|13|created_at|timestamp with time zone|t|now()
+transfer_buyers|14|occupation|text|f|
+transfer_buyers|15|occupation_detail|text|f|
 transfers|1|id|uuid|t|gen_random_uuid()
 transfers|2|kind|text|t|
 transfers|3|ticket_id|uuid|t|
@@ -207,6 +229,17 @@ game_messages | game_messages_body_check | CHECK (((char_length(body) >= 1) AND 
 game_messages | game_messages_name_check | CHECK (((char_length(name) >= 1) AND (char_length(name) <= 60)))
 game_messages | game_messages_pkey | PRIMARY KEY (id)
 keepalive | keepalive_pkey | PRIMARY KEY (id)
+photos | photos_bytes_actual_check | CHECK ((bytes_actual > 0))
+photos | photos_bytes_claimed_check | CHECK ((bytes_claimed > 0))
+photos | photos_kind_check | CHECK ((kind = ANY (ARRAY['camera'::text, 'public'::text])))
+photos | photos_object_key_key | UNIQUE (object_key)
+photos | photos_owner_chk | CHECK ((((kind = 'camera'::text) AND (uploader IS NOT NULL) AND (ticket_id IS NULL)) OR ((kind = 'public'::text) AND (ticket_id IS NOT NULL) AND (uploader IS NULL))))
+photos | photos_pkey | PRIMARY KEY (id)
+photos | photos_status_check | CHECK ((status = ANY (ARRAY['reserved'::text, 'stored'::text, 'failed'::text, 'expired'::text, 'removed'::text])))
+photos | photos_thumb_check | CHECK (((thumb IS NULL) OR (char_length(thumb) <= 80000)))
+photos | photos_thumb_format | CHECK (((thumb IS NULL) OR (thumb ~ '^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$'::text))) NOT VALID
+photos | photos_ticket_id_fkey | FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
+photos | photos_uploader_fkey | FOREIGN KEY (uploader) REFERENCES auth.users(id)
 reg_sessions | reg_sessions_pkey | PRIMARY KEY (id)
 screenshot_scans | screenshot_scans_booking_id_fkey | FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE
 screenshot_scans | screenshot_scans_pkey | PRIMARY KEY (booking_id)
@@ -223,6 +256,15 @@ settings | settings_max_group_check | CHECK (((max_group >= 1) AND (max_group <=
 settings | settings_max_resale_price_check | CHECK ((max_resale_price >= 0))
 settings | settings_pause_times_check | CHECK ((pause_close_time <> pause_open_time))
 settings | settings_payee_name_check | CHECK (((payee_name IS NULL) OR ((char_length(payee_name) >= 1) AND (char_length(payee_name) <= 60))))
+settings | settings_photo_cap_pub_mb_check | CHECK (((photo_cap_pub_mb >= 1) AND (photo_cap_pub_mb <= 100000)))
+settings | settings_photo_max_cam_mb_check | CHECK (((photo_max_cam_mb >= 1) AND (photo_max_cam_mb <= 500)))
+settings | settings_photo_max_pub_mb_check | CHECK (((photo_max_pub_mb >= 1) AND (photo_max_pub_mb <= 100)))
+settings | settings_photo_pool_cam_mb_check | CHECK (((photo_pool_cam_mb >= 0) AND (photo_pool_cam_mb <= 1000000)))
+settings | settings_photo_pool_pub_mb_check | CHECK (((photo_pool_pub_mb >= 0) AND (photo_pool_pub_mb <= 1000000)))
+settings | settings_photo_pools_check | CHECK (((photo_pool_cam_mb + photo_pool_pub_mb) <= photo_total_mb))
+settings | settings_photo_public_mode_check | CHECK ((photo_public_mode = ANY (ARRAY['present'::text, 'any'::text])))
+settings | settings_photo_total_mb_check | CHECK (((photo_total_mb >= 0) AND (photo_total_mb <= 10000000)))
+settings | settings_photo_visibility_check | CHECK ((photo_visibility = ANY (ARRAY['own'::text, 'photographers'::text, 'all'::text])))
 settings | settings_pkey | PRIMARY KEY (id)
 settings | settings_price_per_head_check | CHECK ((price_per_head > 0))
 settings | settings_upi_id_check | CHECK (((upi_id IS NULL) OR (upi_id ~ '^[A-Za-z0-9._-]{2,64}@[A-Za-z][A-Za-z0-9]{1,31}$'::text)))
@@ -231,7 +273,7 @@ settings | settings_whatsapp_check | CHECK (((whatsapp_number IS NULL) OR (whats
 settings_log | settings_log_area_check | CHECK ((area = ANY (ARRAY['settings'::text, 'staff'::text, 'transfer'::text, 'messages'::text])))
 settings_log | settings_log_pkey | PRIMARY KEY (id)
 staff | staff_pkey | PRIMARY KEY (user_id)
-staff | staff_role_check | CHECK ((role = ANY (ARRAY['admin'::text, 'gate'::text])))
+staff | staff_role_check | CHECK ((role = ANY (ARRAY['admin'::text, 'gate'::text, 'camera'::text])))
 staff | staff_user_id_fkey | FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
 ticket_activity | ticket_activity_action_check | CHECK ((action = ANY (ARRAY['view'::text, 'jpg'::text, 'pdf'::text, 'all-pdf'::text])))
 ticket_activity | ticket_activity_pkey | PRIMARY KEY (id)
@@ -266,6 +308,9 @@ transfer_buyers | transfer_buyers_email_check | CHECK ((((char_length(email) >= 
 transfer_buyers | transfer_buyers_food_check | CHECK ((food = ANY (ARRAY['Veg'::text, 'Non-veg'::text])))
 transfer_buyers | transfer_buyers_location_check | CHECK ((location = ANY (ARRAY['In Bengaluru'::text, 'Outside Bengaluru'::text])))
 transfer_buyers | transfer_buyers_name_check | CHECK (((char_length(name) >= 1) AND (char_length(name) <= 80)))
+transfer_buyers | transfer_buyers_occupation_check | CHECK (((occupation IS NULL) OR (occupation = ANY (ARRAY['Article Assistant'::text, 'Industrial Trainee'::text, 'Employee'::text, 'Student'::text, 'Others'::text]))))
+transfer_buyers | transfer_buyers_occupation_detail_check | CHECK (((occupation_detail IS NULL) OR ((char_length(occupation_detail) >= 1) AND (char_length(occupation_detail) <= 100))))
+transfer_buyers | transfer_buyers_occupation_pair_check | CHECK (((occupation IS NULL) = (occupation_detail IS NULL)))
 transfer_buyers | transfer_buyers_phone_check | CHECK ((phone ~ '^[0-9]{10}$'::text))
 transfer_buyers | transfer_buyers_pkey | PRIMARY KEY (id)
 transfer_buyers | transfer_buyers_status_check | CHECK ((status = ANY (ARRAY['active'::text, 'done'::text, 'rejected'::text, 'released'::text])))
@@ -303,6 +348,11 @@ bookings | CREATE UNIQUE INDEX bookings_submission_id_key ON public.bookings USI
 game_messages | CREATE UNIQUE INDEX game_messages_name_uq ON public.game_messages USING btree (lower(name))
 game_messages | CREATE UNIQUE INDEX game_messages_pkey ON public.game_messages USING btree (id)
 keepalive | CREATE UNIQUE INDEX keepalive_pkey ON public.keepalive USING btree (id)
+photos | CREATE INDEX photos_kind_status_idx ON public.photos USING btree (kind, status)
+photos | CREATE UNIQUE INDEX photos_object_key_key ON public.photos USING btree (object_key)
+photos | CREATE UNIQUE INDEX photos_pkey ON public.photos USING btree (id)
+photos | CREATE INDEX photos_ticket_idx ON public.photos USING btree (ticket_id) WHERE (ticket_id IS NOT NULL)
+photos | CREATE INDEX photos_uploader_idx ON public.photos USING btree (uploader) WHERE (uploader IS NOT NULL)
 reg_sessions | CREATE UNIQUE INDEX reg_sessions_pkey ON public.reg_sessions USING btree (id)
 screenshot_scans | CREATE UNIQUE INDEX screenshot_scans_pkey ON public.screenshot_scans USING btree (booking_id)
 settings | CREATE UNIQUE INDEX settings_pkey ON public.settings USING btree (id)
@@ -364,6 +414,7 @@ booking_ips : rls=true
 bookings : rls=true
 game_messages : rls=true
 keepalive : rls=true
+photos : rls=true
 reg_sessions : rls=true
 screenshot_scans : rls=true
 settings : rls=true
@@ -382,6 +433,7 @@ public.booking_ips | admin_read_booking_ips | SELECT | {authenticated} | using: 
 public.bookings | staff_read_bookings | SELECT | {authenticated} | using: is_staff() | check: -
 public.game_messages | admin_read_game_messages | SELECT | {authenticated} | using: is_admin() | check: -
 public.keepalive | anon can read keepalive | SELECT | {anon} | using: true | check: -
+public.photos | admin_read_photos | SELECT | {authenticated} | using: is_admin() | check: -
 public.screenshot_scans | staff_read_scans | SELECT | {authenticated} | using: is_staff() | check: -
 public.settings | staff_read_settings | SELECT | {authenticated} | using: is_staff() | check: -
 public.settings_log | admin_read_log | SELECT | {authenticated} | using: is_admin() | check: -
@@ -694,6 +746,62 @@ begin
     'next_close', (lc + interval '1 day') at time zone 'Asia/Kolkata');
 end $function$
 
+--- _photo_person_bytes(p_pool_mb integer, p_cap_mb integer, p_present integer) | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._photo_person_bytes(p_pool_mb integer, p_cap_mb integer, p_present integer)
+ RETURNS bigint
+ LANGUAGE sql
+ IMMUTABLE
+ SET search_path TO 'public'
+AS $function$
+  select least(p_cap_mb::numeric * 1048576, floor(p_pool_mb::numeric * 1048576 / greatest(coalesce(p_present, 0), 1)))::bigint $function$
+
+--- _photo_present() | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._photo_present()
+ RETURNS integer
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select count(*)::int from tickets t join bookings b on b.id = t.booking_id
+   where t.checked_in_at is not null and t.transferred_out_at is null and b.status = 'paid' $function$
+
+--- _photo_public_who(p_code text, p_phone text, OUT err text, OUT ids uuid[], OUT all_ids uuid[]) | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._photo_public_who(p_code text, p_phone text, OUT err text, OUT ids uuid[], OUT all_ids uuid[])
+ RETURNS record
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare c text; ph text; b bookings%rowtype; s settings%rowtype;
+begin
+  select * into s from settings where id = 1;
+  c  := replace(replace(replace(upper(coalesce(p_code, '')), 'O', '0'), ' ', ''), '-', '');
+  ph := replace(replace(coalesce(p_phone, ''), ' ', ''), '-', '');
+  if length(c) <> 8 or ph !~ '^[0-9]{10}$' then err := 'MISMATCH'; return; end if;
+  select * into b from bookings where booking_code = c;
+  if not found then err := 'MISMATCH'; return; end if;
+  select array_agg(t.id order by t.reg_seq) into all_ids
+    from tickets t where t.booking_id = b.id and t.phone = ph and t.transferred_out_at is null;
+  if all_ids is null then err := 'MISMATCH'; return; end if;
+  if b.status <> 'paid' then err := 'NOT_PAID'; all_ids := null; return; end if;
+  if s.photo_public_mode = 'present' then
+    select array_agg(t.id order by t.reg_seq) into ids from tickets t where t.id = any(all_ids) and t.checked_in_at is not null;
+    if ids is null then err := 'NOT_PRESENT'; return; end if;
+  else
+    ids := all_ids;
+  end if;
+end $function$
+
+--- _photo_used(p_kind text) | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._photo_used(p_kind text)
+ RETURNS bigint
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0)::bigint from photos
+   where kind = p_kind and (status = 'stored' or (status = 'reserved' and created_at > now() - interval '20 minutes')) $function$
+
 --- _public_state(s settings, p_session uuid) | execute rights: {postgres=X/postgres}
 CREATE OR REPLACE FUNCTION public._public_state(s settings, p_session uuid)
  RETURNS jsonb
@@ -953,6 +1061,52 @@ begin
                where l.area = 'settings' and l.at = r.at and l.field in ('upi_id', 'payee_name', 'whatsapp_number', 'contact1_name', 'contact2_name', 'contact2_number', 'contact3_name', 'contact3_number')));
 end $function$
 
+--- admin_photo_remove(p_id uuid) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_photo_remove(p_id uuid)
+ RETURNS text
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare r photos%rowtype;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  select * into r from photos where id = p_id for update;
+  if not found or r.status <> 'stored' then raise exception 'NOT_FOUND'; end if;
+  update photos set status = 'removed', thumb = null where id = p_id;
+  insert into settings_log (changed_by, who, area, field, old_value, new_value)
+  values (auth.uid(), _actor(), 'settings', 'photo removed', left(r.object_key, 300), null);
+  return r.object_key;
+end $function$
+
+--- admin_photo_summary() | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_photo_summary()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; present int; per bigint;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  select * into s from settings where id = 1;
+  present := _photo_present();
+  per := _photo_person_bytes(s.photo_pool_pub_mb, s.photo_cap_pub_mb, present);
+  return jsonb_build_object(
+    'on', s.photos_on, 'mode', s.photo_public_mode, 'present', present, 'person_bytes', per,
+    'total_bytes', s.photo_total_mb::bigint * 1048576,
+    'cam', jsonb_build_object('pool_bytes', s.photo_pool_cam_mb::bigint * 1048576, 'used_bytes', _photo_used('camera'),
+             'count', (select count(*) from photos where kind = 'camera' and status = 'stored')),
+    'pub', jsonb_build_object('pool_bytes', s.photo_pool_pub_mb::bigint * 1048576, 'used_bytes', _photo_used('public'),
+             'count', (select count(*) from photos where kind = 'public' and status = 'stored'),
+             'people', (select count(distinct ticket_id) from photos where kind = 'public' and status = 'stored')),
+    'by_camera', coalesce((select jsonb_agg(jsonb_build_object('name', x.name, 'count', x.n, 'bytes', x.b) order by x.b desc)
+       from (select coalesce(st.name, 'removed login') as name, count(*) as n, sum(p.bytes_actual) as b
+               from photos p left join staff st on st.user_id = p.uploader
+              where p.kind = 'camera' and p.status = 'stored' group by 1) x), '[]'::jsonb),
+    'unfinished', (select count(*) from photos where status in ('reserved', 'failed', 'expired')));
+end $function$
+
 --- admin_preview_approval(p_ids uuid[]) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.admin_preview_approval(p_ids uuid[])
  RETURNS jsonb
@@ -1154,6 +1308,49 @@ begin
   update settings set upi_id = u, payee_name = n, whatsapp_number = w where id = 1;
 end $function$
 
+--- admin_set_photo_settings(p_on boolean, p_pool_cam_mb integer, p_pool_pub_mb integer, p_cap_pub_mb integer, p_max_cam_mb integer, p_max_pub_mb integer, p_total_mb integer, p_mode text) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_set_photo_settings(p_on boolean DEFAULT NULL::boolean, p_pool_cam_mb integer DEFAULT NULL::integer, p_pool_pub_mb integer DEFAULT NULL::integer, p_cap_pub_mb integer DEFAULT NULL::integer, p_max_cam_mb integer DEFAULT NULL::integer, p_max_pub_mb integer DEFAULT NULL::integer, p_total_mb integer DEFAULT NULL::integer, p_mode text DEFAULT NULL::text)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; cam int; pub int; tot int;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  if p_pool_cam_mb is not null and p_pool_cam_mb not between 0 and 1000000 then raise exception 'INVALID_POOL'; end if;
+  if p_pool_pub_mb is not null and p_pool_pub_mb not between 0 and 1000000 then raise exception 'INVALID_POOL'; end if;
+  if p_cap_pub_mb is not null and p_cap_pub_mb not between 1 and 100000 then raise exception 'INVALID_CAP'; end if;
+  if p_max_cam_mb is not null and p_max_cam_mb not between 1 and 500 then raise exception 'INVALID_MAX'; end if;
+  if p_max_pub_mb is not null and p_max_pub_mb not between 1 and 100 then raise exception 'INVALID_MAX'; end if;
+  if p_total_mb is not null and p_total_mb not between 0 and 10000000 then raise exception 'INVALID_TOTAL'; end if;
+  if p_mode is not null and p_mode not in ('present', 'any') then raise exception 'INVALID_MODE'; end if;
+  select * into s from settings where id = 1 for update;
+  cam := coalesce(p_pool_cam_mb, s.photo_pool_cam_mb); pub := coalesce(p_pool_pub_mb, s.photo_pool_pub_mb); tot := coalesce(p_total_mb, s.photo_total_mb);
+  if cam + pub > tot then raise exception 'POOLS_TOO_BIG'; end if;
+  update settings set
+    photos_on         = coalesce(p_on, photos_on),
+    photo_pool_cam_mb = cam, photo_pool_pub_mb = pub, photo_total_mb = tot,
+    photo_cap_pub_mb  = coalesce(p_cap_pub_mb, photo_cap_pub_mb),
+    photo_max_cam_mb  = coalesce(p_max_cam_mb, photo_max_cam_mb),
+    photo_max_pub_mb  = coalesce(p_max_pub_mb, photo_max_pub_mb),
+    photo_public_mode = coalesce(p_mode, photo_public_mode)
+  where id = 1;
+end $function$
+
+--- admin_set_photo_visibility(p_value text) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_set_photo_visibility(p_value text)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  if p_value is null or p_value not in ('own', 'photographers', 'all') then raise exception 'INVALID_VISIBILITY'; end if;
+  update settings set photo_visibility = p_value where id = 1;
+end $function$
+
 --- admin_set_prizes(p_tickets uuid[], p_body text, p_heading text) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.admin_set_prizes(p_tickets uuid[], p_body text, p_heading text DEFAULT NULL::text)
  RETURNS integer
@@ -1281,9 +1478,9 @@ begin
   select * into bk from bookings where id = bu.booking_id for update;
   if bk.kind <> 'transfer' or bk.status <> 'pending' then raise exception 'BUYER_BOOKING_INVALID'; end if;
   old_lbl := _ticket_label(t.kind, t.ticket_no, t.coord_no);
-  insert into tickets (secret, booking_id, name, phone, location, attendance, food, kind, transferred_from)
+  insert into tickets (secret, booking_id, name, phone, location, attendance, food, kind, transferred_from, occupation, occupation_detail)
   values (substr(replace(gen_random_uuid()::text, '-', ''), 1, 12), bk.id, bu.name, bu.phone,
-          bu.location, bu.attendance, bu.food, 'guest', t.id)
+          bu.location, bu.attendance, bu.food, 'guest', t.id, bu.occupation, bu.occupation_detail)
   returning * into nt;
   if bu.email is not null then insert into ticket_emails (ticket_id, email) values (nt.id, bu.email); end if;   -- email stays in the admin-only table
   update tickets set transferred_out_at = now() where id = t.id;
@@ -1620,6 +1817,16 @@ AS $function$
                  where c.num is not null))
   from settings where id = 1 $function$
 
+--- get_photos_info() | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.get_photos_info()
+ RETURNS jsonb
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select jsonb_build_object('on', s.photos_on, 'mode', s.photo_public_mode, 'max_bytes', s.photo_max_pub_mb::bigint * 1048576)
+    from settings s where s.id = 1 $function$
+
 --- get_public_status(p_session uuid) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.get_public_status(p_session uuid DEFAULT NULL::uuid)
  RETURNS jsonb
@@ -1669,13 +1876,23 @@ CREATE OR REPLACE FUNCTION public.is_admin()
  SET search_path TO 'public'
 AS $function$ select exists (select 1 from public.staff where user_id = auth.uid() and role = 'admin') $function$
 
+--- is_camera() | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.is_camera()
+ RETURNS boolean
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select exists (select 1 from public.staff where user_id = auth.uid() and role = 'camera') $function$
+
 --- is_staff() | execute rights: {postgres=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.is_staff()
  RETURNS boolean
  LANGUAGE sql
  STABLE SECURITY DEFINER
  SET search_path TO 'public'
-AS $function$ select exists (select 1 from public.staff where user_id = auth.uid()) $function$
+AS $function$
+  select exists (select 1 from public.staff where user_id = auth.uid() and role in ('admin', 'gate')) $function$
 
 --- log_ticket_activity(p_code text, p_phone text, p_action text, p_tickets text[]) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.log_ticket_activity(p_code text, p_phone text, p_action text, p_tickets text[] DEFAULT NULL::text[])
@@ -1768,6 +1985,242 @@ begin
   end if;
   return jsonb_build_object('found', true, 'kind', b.kind, 'booking_code', b.booking_code, 'status', b.status,
                             'people_count', b.people_count, 'amount_expected', b.amount_expected, 'tickets', tk);
+end $function$
+
+--- photo_camera_list(p_before timestamp with time zone, p_limit integer) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_camera_list(p_before timestamp with time zone DEFAULT NULL::timestamp with time zone, p_limit integer DEFAULT 24)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; adm boolean; lim integer; items jsonb;
+begin
+  if not (is_camera() or is_admin()) then raise exception 'NOT_ALLOWED'; end if;
+  select * into s from settings where id = 1;
+  adm := is_admin();
+  lim := least(greatest(coalesce(p_limit, 24), 1), 48);
+  select coalesce(jsonb_agg(jsonb_build_object('id', q.id, 'kind', q.kind, 'bytes', q.bytes_actual, 'thumb', q.thumb,
+                                                'at', q.created_at, 'mine', q.mine, 'by', q.by) order by q.created_at desc), '[]'::jsonb)
+    into items
+    from (select p.id, p.kind, p.bytes_actual, p.thumb, p.created_at,
+                 (p.kind = 'camera' and p.uploader = auth.uid()) as mine,
+                 case when p.kind = 'camera' then st.name end as by
+            from photos p left join staff st on st.user_id = p.uploader
+           where p.status = 'stored'
+             and (p_before is null or p.created_at < p_before)
+             and (adm or s.photo_visibility in ('photographers', 'all') or (p.kind = 'camera' and p.uploader = auth.uid()))
+           order by p.created_at desc limit lim) q;
+  return jsonb_build_object('ok', true, 'items', items, 'page', lim, 'visibility', s.photo_visibility, 'can_download', true);
+end $function$
+
+--- photo_camera_status() | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_camera_status()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; pool bigint; used bigint; mine record;
+begin
+  if not (is_camera() or is_admin()) then raise exception 'NOT_ALLOWED'; end if;
+  select * into s from settings where id = 1;
+  pool := s.photo_pool_cam_mb::bigint * 1048576; used := _photo_used('camera');
+  select count(*)::int as n, coalesce(sum(bytes_actual), 0)::bigint as b into mine
+    from photos where kind = 'camera' and uploader = auth.uid() and status = 'stored';
+  return jsonb_build_object('on', s.photos_on, 'pool_bytes', pool, 'used_bytes', used, 'left_bytes', greatest(0, pool - used),
+           'max_bytes', s.photo_max_cam_mb::bigint * 1048576, 'my_count', mine.n, 'my_bytes', mine.b);
+end $function$
+
+--- photo_confirm(p_id uuid, p_actual bigint, p_thumb text) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_confirm(p_id uuid, p_actual bigint, p_thumb text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; r photos%rowtype;
+begin
+  select * into s from settings where id = 1 for update;            -- same lock as photo_reserve, so the totals stay exact
+  select * into r from photos where id = p_id for update;
+  if not found then return jsonb_build_object('ok', false, 'error', 'NOT_FOUND'); end if;
+  if r.status = 'stored' then return jsonb_build_object('ok', true, 'already', true); end if;
+  if r.status <> 'reserved' then return jsonb_build_object('ok', false, 'error', 'NOT_RESERVED'); end if;
+  if r.created_at < now() - interval '20 minutes' then
+    update photos set status = 'expired' where id = p_id;
+    return jsonb_build_object('ok', false, 'error', 'EXPIRED', 'key', r.object_key);
+  end if;
+  if p_actual is null or p_actual <= 0 or p_actual > r.bytes_claimed then
+    update photos set status = 'failed' where id = p_id;
+    return jsonb_build_object('ok', false, 'error', 'SIZE_MISMATCH', 'key', r.object_key);
+  end if;
+  update photos set status = 'stored', bytes_actual = p_actual, confirmed_at = now(),
+         thumb = case when p_thumb is not null and char_length(p_thumb) <= 80000 then p_thumb end
+   where id = p_id;
+  return jsonb_build_object('ok', true);
+end $function$
+
+--- photo_fail(p_id uuid) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_fail(p_id uuid)
+ RETURNS void
+ LANGUAGE sql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  update photos set status = 'failed' where id = p_id and status = 'reserved' $function$
+
+--- photo_original_key(p_id uuid, p_user uuid) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_original_key(p_id uuid, p_user uuid)
+ RETURNS text
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare r photos%rowtype; s settings%rowtype; rl text;
+begin
+  select role into rl from staff where user_id = p_user;
+  if rl is null or rl not in ('admin', 'camera') then return null; end if;
+  select * into r from photos where id = p_id and status = 'stored';
+  if not found then return null; end if;
+  select * into s from settings where id = 1;
+  if rl = 'admin' or s.photo_visibility in ('photographers', 'all') or (r.kind = 'camera' and r.uploader = p_user) then
+    return r.object_key;
+  end if;
+  return null;
+end $function$
+
+--- photo_public_list(p_code text, p_phone text, p_before timestamp with time zone, p_limit integer) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_public_list(p_code text, p_phone text, p_before timestamp with time zone DEFAULT NULL::timestamp with time zone, p_limit integer DEFAULT 24)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; w record; lim integer; items jsonb;
+begin
+  select * into s from settings where id = 1;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.all_ids is null then return jsonb_build_object('ok', false, 'error', coalesce(w.err, 'MISMATCH')); end if;
+  lim := least(greatest(coalesce(p_limit, 24), 1), 48);
+  select coalesce(jsonb_agg(jsonb_build_object('id', q.id, 'kind', q.kind, 'bytes', q.bytes_actual, 'thumb', q.thumb,
+                                                'at', q.created_at, 'mine', q.mine, 'by', q.by) order by q.created_at desc), '[]'::jsonb)
+    into items
+    from (select p.id, p.kind, p.bytes_actual, p.thumb, p.created_at,
+                 (p.kind = 'public' and p.ticket_id = any (w.all_ids)) as mine,
+                 case when p.kind = 'camera' then st.name end as by
+            from photos p left join staff st on st.user_id = p.uploader
+           where p.status = 'stored'
+             and (p_before is null or p.created_at < p_before)
+             and (s.photo_visibility = 'all' or (p.kind = 'public' and p.ticket_id = any (w.all_ids)))
+           order by p.created_at desc limit lim) q;
+  return jsonb_build_object('ok', true, 'items', items, 'page', lim, 'visibility', s.photo_visibility, 'can_download', false);
+end $function$
+
+--- photo_public_status(p_code text, p_phone text) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_public_status(p_code text, p_phone text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; w record; present int; per bigint; lim bigint; mine bigint; pool bigint; pused bigint;
+begin
+  select * into s from settings where id = 1;
+  if not s.photos_on then return jsonb_build_object('ok', false, 'error', 'PHOTOS_OFF'); end if;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.err is not null then return jsonb_build_object('ok', false, 'error', w.err); end if;
+  present := _photo_present();
+  per  := _photo_person_bytes(s.photo_pool_pub_mb, s.photo_cap_pub_mb, present);
+  lim  := per * array_length(w.ids, 1);
+  select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0)::bigint into mine from photos
+   where ticket_id = any(w.all_ids) and (status = 'stored' or (status = 'reserved' and created_at > now() - interval '20 minutes'));
+  pool := s.photo_pool_pub_mb::bigint * 1048576; pused := _photo_used('public');
+  return jsonb_build_object('ok', true, 'limit_bytes', lim, 'used_bytes', mine,
+           'left_bytes', greatest(0, least(lim - mine, pool - pused)),
+           'pool_left_bytes', greatest(0, pool - pused),
+           'max_bytes', s.photo_max_pub_mb::bigint * 1048576, 'present', present);
+end $function$
+
+--- photo_remove_camera(p_id uuid, p_user uuid) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_remove_camera(p_id uuid, p_user uuid)
+ RETURNS text
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare r photos%rowtype;
+begin
+  if not exists (select 1 from staff where user_id = p_user and role in ('admin', 'camera')) then return null; end if;
+  select * into r from photos where id = p_id for update;
+  if not found or r.status <> 'stored' or r.kind <> 'camera' or r.uploader is distinct from p_user then return null; end if;
+  update photos set status = 'removed', thumb = null where id = p_id;
+  insert into settings_log (changed_by, who, area, field, old_value, new_value)
+  values (p_user, 'photographer', 'settings', 'photo removed (own)', left(r.object_key, 300), null);
+  return r.object_key;
+end $function$
+
+--- photo_remove_public(p_id uuid, p_code text, p_phone text) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_remove_public(p_id uuid, p_code text, p_phone text)
+ RETURNS text
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare r photos%rowtype; w record;
+begin
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.all_ids is null then return null; end if;
+  select * into r from photos where id = p_id for update;
+  if not found or r.status <> 'stored' or r.kind <> 'public' or not (r.ticket_id = any (w.all_ids)) then return null; end if;
+  update photos set status = 'removed', thumb = null where id = p_id;
+  insert into settings_log (changed_by, who, area, field, old_value, new_value)
+  values (null, 'attendee', 'settings', 'photo removed (own)', left(r.object_key, 300), null);
+  return r.object_key;
+end $function$
+
+--- photo_reserve(p_kind text, p_user uuid, p_code text, p_phone text, p_bytes bigint, p_ext text) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_reserve(p_kind text, p_user uuid, p_code text, p_phone text, p_bytes bigint, p_ext text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; ext text; pid uuid := gen_random_uuid(); k text; pool bigint; used bigint; mine bigint;
+        w record; present int; per bigint; lim bigint; owner uuid;
+begin
+  select * into s from settings where id = 1 for update;            -- one claim at a time: the totals can never be beaten by a race
+  ext := lower(coalesce(p_ext, ''));
+  if p_kind not in ('camera', 'public') then return jsonb_build_object('ok', false, 'error', 'BAD_KIND'); end if;
+  if p_bytes is null or p_bytes <= 0 then return jsonb_build_object('ok', false, 'error', 'BAD_SIZE'); end if;
+  if not s.photos_on then return jsonb_build_object('ok', false, 'error', 'PHOTOS_OFF'); end if;
+  if p_kind = 'camera' then
+    if p_user is null or not exists (select 1 from staff where user_id = p_user and role in ('camera', 'admin')) then
+      return jsonb_build_object('ok', false, 'error', 'NOT_ALLOWED'); end if;
+    if ext not in ('jpg', 'jpeg', 'png', 'heic', 'heif', 'webp', 'dng') then return jsonb_build_object('ok', false, 'error', 'BAD_TYPE'); end if;
+    if p_bytes > s.photo_max_cam_mb::bigint * 1048576 then return jsonb_build_object('ok', false, 'error', 'TOO_BIG'); end if;
+    pool := s.photo_pool_cam_mb::bigint * 1048576; used := _photo_used('camera');
+    if used + p_bytes > pool then return jsonb_build_object('ok', false, 'error', 'POOL_FULL'); end if;
+    k := 'camera/' || p_user::text || '/' || pid::text || '.' || ext;
+    insert into photos (id, kind, uploader, object_key, bytes_claimed) values (pid, 'camera', p_user, k, p_bytes);
+    return jsonb_build_object('ok', true, 'id', pid, 'key', k, 'left_bytes', pool - used - p_bytes);
+  end if;
+  -- public
+  if ext not in ('jpg', 'jpeg', 'png', 'heic', 'heif', 'webp') then return jsonb_build_object('ok', false, 'error', 'BAD_TYPE'); end if;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.err is not null then return jsonb_build_object('ok', false, 'error', w.err); end if;
+  if p_bytes > s.photo_max_pub_mb::bigint * 1048576 then return jsonb_build_object('ok', false, 'error', 'TOO_BIG'); end if;
+  present := _photo_present();
+  per  := _photo_person_bytes(s.photo_pool_pub_mb, s.photo_cap_pub_mb, present);
+  lim  := per * array_length(w.ids, 1);
+  select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0)::bigint into mine from photos
+   where ticket_id = any(w.all_ids) and (status = 'stored' or (status = 'reserved' and created_at > now() - interval '20 minutes'));
+  if mine + p_bytes > lim then return jsonb_build_object('ok', false, 'error', 'PERSON_FULL'); end if;
+  pool := s.photo_pool_pub_mb::bigint * 1048576; used := _photo_used('public');
+  if used + p_bytes > pool then return jsonb_build_object('ok', false, 'error', 'POOL_FULL'); end if;
+  owner := w.ids[1];
+  k := 'public/' || owner::text || '/' || pid::text || '.' || ext;
+  insert into photos (id, kind, ticket_id, object_key, bytes_claimed) values (pid, 'public', owner, k, p_bytes);
+  return jsonb_build_object('ok', true, 'id', pid, 'key', k, 'left_bytes', least(lim - mine - p_bytes, pool - used - p_bytes));
 end $function$
 
 --- private_sell(p_booking_code text, p_ticket text, p_phone text) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
@@ -2193,7 +2646,7 @@ CREATE OR REPLACE FUNCTION public.transfer_submit(p_code text, p_submission_id u
  SET search_path TO 'public'
 AS $function$
 declare s settings%rowtype; c text; x transfers%rowtype; t tickets%rowtype; sb bookings%rowtype; bu transfer_buyers%rowtype;
-        bk bookings%rowtype; bcode text; v_food text; v_email text; v_name text;
+        bk bookings%rowtype; bcode text; v_food text; v_email text; v_name text; v_occ text; v_occd text;
 begin
   if p_submission_id is null then return jsonb_build_object('ok', false, 'error', 'INVALID_DATA'); end if;
   -- the same submission again: give back the same answer (a retry after a bad connection)
@@ -2215,6 +2668,9 @@ begin
   v_email := case when s.ask_email then lower(trim(coalesce(p_buyer->>'email', ''))) else null end;
   if length(v_name) not between 1 and 80 then return jsonb_build_object('ok', false, 'error', 'INVALID_NAME'); end if;
   if coalesce(p_buyer->>'phone', '') !~ '^[0-9]{10}$' then return jsonb_build_object('ok', false, 'error', 'INVALID_PHONE'); end if;
+  v_occ := coalesce(p_buyer->>'occ', ''); v_occd := trim(coalesce(p_buyer->>'occ_detail', ''));   -- same two questions and rules as the registration form
+  if v_occ not in ('Article Assistant', 'Industrial Trainee', 'Employee', 'Student', 'Others') then return jsonb_build_object('ok', false, 'error', 'INVALID_OCCUPATION'); end if;
+  if length(v_occd) not between 1 and 100 then return jsonb_build_object('ok', false, 'error', 'INVALID_OCCUPATION_DETAIL'); end if;
   if s.ask_email and (length(v_email) not between 5 and 120 or v_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$') then return jsonb_build_object('ok', false, 'error', 'INVALID_EMAIL'); end if;
   if coalesce(p_buyer->>'loc', '') not in ('In Bengaluru', 'Outside Bengaluru') then return jsonb_build_object('ok', false, 'error', 'INVALID_LOCATION'); end if;
   if coalesce(p_buyer->>'att', '') not in ('Surely', 'Most probably') then return jsonb_build_object('ok', false, 'error', 'INVALID_ATTENDANCE'); end if;
@@ -2237,8 +2693,8 @@ begin
     end loop;
     insert into bookings (booking_code, submission_id, people_count, amount_expected, screenshot_path, kind)
     values (bcode, p_submission_id, 1, 0, null, 'transfer') returning * into bk;
-    insert into transfer_buyers (transfer_id, submission_id, booking_id, name, phone, email, location, attendance, food, consent_at)
-    values (x.id, p_submission_id, bk.id, v_name, p_buyer->>'phone', v_email, p_buyer->>'loc', p_buyer->>'att', v_food, now());
+    insert into transfer_buyers (transfer_id, submission_id, booking_id, name, phone, email, location, attendance, food, consent_at, occupation, occupation_detail)
+    values (x.id, p_submission_id, bk.id, v_name, p_buyer->>'phone', v_email, p_buyer->>'loc', p_buyer->>'att', v_food, now(), v_occ, v_occd);
   exception when unique_violation then
     return jsonb_build_object('ok', false, 'error', 'TRY_AGAIN');
   end;
@@ -2292,6 +2748,7 @@ booking_ips : {postgres=arwdDxtm/postgres,authenticated=r/postgres}
 bookings : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 game_messages : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 keepalive : {postgres=arwdDxtm/postgres,anon=rDxtm/postgres,authenticated=Dxtm/postgres,service_role=Dxtm/postgres}
+photos : {postgres=arwdDxtm/postgres,service_role=rDxtm/postgres,authenticated=r/postgres}
 reg_sessions : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres}
 report : {postgres=arwdDxtm/postgres,anon=Dxtm/postgres,authenticated=rDxtm/postgres,service_role=Dxtm/postgres}
 screenshot_scans : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}

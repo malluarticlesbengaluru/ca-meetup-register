@@ -479,3 +479,9 @@ Photographers (staff role `camera`, page `/camera/`) and attendees (ticket page 
 
 ## Transfer buyers are asked the registration questions (r2_21)
 A person taking over a ticket is asked "What best describes you?" and the follow-up (firm / company / exam / what they do), both required, same rules as registration. Stored on `transfer_buyers`, copied onto the new ticket by `admin_transfer_approve`, shown on the admin transfer card. Applications made before this have no answers and still approve (the ticket has no role). SQL: `sql/r2_21_transfer_buyer_details.sql`. Tests: `scratch-db/test_r2_21.py`, `mutate_r2_21.py`.
+
+## Photo gallery page (r2_22), branch `gallery-page`
+- `gallery/index.html` is the one page for photographers and attendees; `camera/` redirects to it. SQL `sql/r2_22_photo_gallery.sql` (tests `scratch-db/test_r2_22.py`, 71 checks; `mutate_r2_22.py`, 16 deliberate breakages all caught) adds the `photo_visibility` setting, `photo_camera_list` / `photo_public_list`, `photo_original_key`, `photo_remove_camera` / `photo_remove_public`, and a check that a preview picture is a plain base64 jpeg/png/webp.
+- Edge Function: `view` now works for photographers (database decides which), `remove` also for a photographer or attendee's own photo; previews are validated before saving.
+- Security fix: preview pictures were put unescaped into `src="..."` (admin card and gallery); now escaped, and validated in the Edge Function and the database.
+- Decisions (owner, 14 Nov): admin chooses visibility; delete = admin + own; originals only for admin and photographers; attendees get previews only until the full-size link is shared; one shared photographer pool, photographers count as Present.

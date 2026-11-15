@@ -231,7 +231,7 @@ async function boot(){
   if(!session){S.staff=null;return view()}
   const{data,error}=await db.from("staff").select("name,role").eq("user_id",session.user.id).maybeSingle();
   if(error||!data){S.staff=null;S.msg="This account is not set up as an organiser yet. Ask the admin to add it.";await db.auth.signOut();return view()}
-  if(data.role==="camera"){S.staff=null;S.msg="This is a photographer login. Please use the camera page (…/camera/) instead.";await db.auth.signOut();return view()}
+  if(data.role==="camera"){S.staff=null;S.msg="This is a photographer login. Please use the photos page (…/gallery/) instead.";await db.auth.signOut();return view()}
   S.staff=data;
   if(data.role==="admin"){await load();if(location.hash==="#gate")S.tab="gate"}else{S.tab="gate";await gLoad()}
   try{history.replaceState({tab:S.tab,sheets:[],y:0},"")}catch(_){}
@@ -719,7 +719,7 @@ function vSettings(){const s=S.settings;
   const tb=$("#top");if(tb)document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px");phLoad()}
 
 /* ---------- Photos: the Settings card (limits, usage, gallery, download links). Photos live in Storj; this page only shows numbers and tiny previews. ---------- */
-Object.assign(TERR,{POOLS_TOO_BIG:"The two pools together are bigger than the total space. Lower a pool or raise the total.",INVALID_POOL:"A pool must be a number of GB between 0 and 1000.",INVALID_CAP:"The per-person limit must be at least 1 MB.",INVALID_MAX:"The biggest single photo size is not allowed (photographers: 1 to 500 MB, public: 1 to 100 MB).",INVALID_TOTAL:"The total space is not a valid number.",INVALID_MODE:"Choose who can upload."});
+Object.assign(TERR,{INVALID_VISIBILITY:"That choice is not valid.",POOLS_TOO_BIG:"The two pools together are bigger than the total space. Lower a pool or raise the total.",INVALID_POOL:"A pool must be a number of GB between 0 and 1000.",INVALID_CAP:"The per-person limit must be at least 1 MB.",INVALID_MAX:"The biggest single photo size is not allowed (photographers: 1 to 500 MB, public: 1 to 100 MB).",INVALID_TOTAL:"The total space is not a valid number.",INVALID_MODE:"Choose who can upload."});
 S.ph=null;S.phPics=[];
 const phGB=mb=>(mb/1024).toFixed(1).replace(/\.0$/,""),phB=n=>PhotoUp.bytes(n||0);
 async function phFn(body){const ses=(await db.auth.getSession()).data.session;return PhotoUp.call({url:CFG.url,key:CFG.key,token:ses&&ses.access_token},body)}
@@ -748,10 +748,11 @@ function phDraw(){
    <div><label for="phmc">Biggest photo, photographers (MB)</label><input id="phmc" type="number" min="1" max="500" value="${s.photo_max_cam_mb}"></div>
    <div><label for="phmp">Biggest photo, public (MB)</label><input id="phmp" type="number" min="1" max="100" value="${s.photo_max_pub_mb}"></div></div>
   <label for="phmode">Who can upload (public)</label><select id="phmode"><option value="present" ${d.mode==="present"?"selected":""}>Only people marked Present at the gate</option><option value="any" ${d.mode==="any"?"selected":""}>Anyone with a valid Booking ID and phone</option></select>
+  ${s.photo_visibility!==undefined?`<label for="phvis">Who sees which photos in the gallery</label><select id="phvis"><option value="own" ${s.photo_visibility==="own"?"selected":""}>Everyone sees only their own photos (admins see all)</option><option value="photographers" ${s.photo_visibility==="photographers"?"selected":""}>Photographers see all photos; attendees see their own</option><option value="all" ${s.photo_visibility==="all"?"selected":""}>Everyone logged in sees all photos</option></select><p class="mute" style="margin-top:4px">Attendees only ever get small previews. Full-size originals are for admins and photographers; everyone else gets a download link after you have saved the originals to a safe drive.</p>`:""}
   <p id="phprev" class="mute"></p>
   <p><button id="phsave">Save photo settings</button></p>
   <details style="margin-top:10px"><summary><b>Gallery</b> (latest ${S.phPics.length}) and download</summary>
-   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:10px 0">${S.phPics.map(x=>`<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">${x.thumb?`<img src="${x.thumb}" alt="" style="width:100%;height:90px;object-fit:cover;display:block">`:`<div style="height:90px;display:flex;align-items:center;justify-content:center" class="mute">no preview</div>`}<div style="padding:4px 6px;font-size:.78rem" class="mute">${x.kind==="camera"?"Photographer":"Public"} · ${phB(x.bytes_actual)}</div><div style="display:flex;gap:4px;padding:0 6px 6px"><button class="sm ghost" data-phview="${x.id}">Open</button><button class="sm ghost" data-phrm="${x.id}">Remove</button></div></div>`).join("")||'<span class="mute">No photos yet.</span>'}</div>
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:10px 0">${S.phPics.map(x=>`<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">${x.thumb?`<img src="${esc(x.thumb)}" alt="" style="width:100%;height:90px;object-fit:cover;display:block">`:`<div style="height:90px;display:flex;align-items:center;justify-content:center" class="mute">no preview</div>`}<div style="padding:4px 6px;font-size:.78rem" class="mute">${x.kind==="camera"?"Photographer":"Public"} · ${phB(x.bytes_actual)}</div><div style="display:flex;gap:4px;padding:0 6px 6px"><button class="sm ghost" data-phview="${x.id}">Open</button><button class="sm ghost" data-phrm="${x.id}">Remove</button></div></div>`).join("")||'<span class="mute">No photos yet.</span>'}</div>
    <p class="mute" style="margin:0 0 6px">Your free Storj trial deletes everything after 30 days. Before that, download the originals: this makes a text file of download links (each works for 1 hour) that you can open or paste into a download manager.</p>
    <p><button class="ghost" id="phexp">Make download links file</button></p></details>`;
   const det=c.querySelector("details");if(det&&open)det.open=true;
@@ -761,7 +762,9 @@ function phDraw(){
   $("#phsave").onclick=async()=>{const g=i=>+$(i).value;
     if(Math.round((g("#phcam")+g("#phpub"))*1024)>Math.round(g("#phtot")*1024))return toast("The two pools together are bigger than the total space.",6000);
     const r=await db.rpc("admin_set_photo_settings",{p_on:$("#phon").checked,p_pool_cam_mb:Math.round(g("#phcam")*1024),p_pool_pub_mb:Math.round(g("#phpub")*1024),p_cap_pub_mb:Math.round(g("#phcap")),p_max_cam_mb:Math.round(g("#phmc")),p_max_pub_mb:Math.round(g("#phmp")),p_total_mb:Math.round(g("#phtot")*1024),p_mode:$("#phmode").value});
-    if(r.error)return toast(terr(r.error),6000);toast("Photo settings saved");await sync("core","log");S.ph=null;view();};
+    if(r.error)return toast(terr(r.error),6000);
+    const pv=$("#phvis");if(pv&&pv.value!==(s.photo_visibility||"own")){const r2=await db.rpc("admin_set_photo_visibility",{p_value:pv.value});if(r2.error)return toast(terr(r2.error),6000)}
+    toast("Photo settings saved");await sync("core","log");S.ph=null;view();};
   $("#phon").onchange=async()=>{const r=await db.rpc("admin_set_photo_settings",{p_on:$("#phon").checked});if(r.error)return toast(terr(r.error),6000);toast($("#phon").checked?"Photo uploads are ON":"Photo uploads are OFF");await sync("core","log");S.ph=null;view()};
   c.querySelectorAll("[data-phview]").forEach(b=>b.onclick=async()=>{const r=await phFn({action:"view",id:b.dataset.phview});if(r.ok)window.open(r.url,"_blank","noopener");else toast("Could not open that photo.",5000)});
   c.querySelectorAll("[data-phrm]").forEach(b=>b.onclick=async()=>{if(!await ask({title:"Remove this photo?",text:"It is deleted from storage and cannot be recovered.",danger:true,ok:"Remove"}))return;

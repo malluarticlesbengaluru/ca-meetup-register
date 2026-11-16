@@ -485,3 +485,46 @@ A person taking over a ticket is asked "What best describes you?" and the follow
 - Edge Function: `view` now works for photographers (database decides which), `remove` also for a photographer or attendee's own photo; previews are validated before saving.
 - Security fix: preview pictures were put unescaped into `src="..."` (admin card and gallery); now escaped, and validated in the Edge Function and the database.
 - Decisions (owner, 14 Nov): admin chooses visibility; delete = admin + own; originals only for admin and photographers; attendees get previews only until the full-size link is shared; one shared photographer pool, photographers count as Present.
+
+## 16 Nov 2026: photos go live (what was done, in order) - added by Claude
+
+Everything below is on `main` (merged by the owner) unless it says otherwise. Written from the session itself; "owner confirmed" means the owner said so in chat, nothing more.
+
+### A. Page changes earlier in the session
+- **Contact-organizer WhatsApp messages** (`index.html`): every auto-filled message now carries what the organiser needs (name, Booking ID, mode public/private, seller's name where relevant, time in IST). Helpers `waInfo(o)` and `istNow(d)`. A transfer buyer's message is matched to the admin Transfers card by Booking ID + name + time.
+- **Transfer buyers are asked Occupation and Firm/Company** (r2_21, section above); shown on the admin transfer card.
+- **Gallery page** `gallery/index.html` (r2_22): see the section "Photo gallery page (r2_22)". `camera/` is only a redirect. The old in-page photo step in `index.html` is dead code (the "Event photos" button now goes to `gallery/?id=<code>`).
+
+### B. SQL run in Supabase, in this order (all safe to run twice, all in `sql/changes.sql`)
+1. `r2_20_photos.sql` (the photos table and rules) - it had NOT been run before 16 Nov; r2_22 failed with "relation photos does not exist" until it was.
+2. `r2_21_transfer_buyer_details.sql`
+3. `r2_22_photo_gallery.sql`
+4. `r2_23_photos_service_read.sql`: `grant select on public.photos to service_role;`. On this project the role the Edge Function runs as could not READ the new table, so every upload ended `NOT_FOUND` after the file had reached Storj. **Rule: any table the Edge Function reads directly needs an explicit grant to `service_role`** (newer Supabase projects do not grant new tables automatically). Test `scratch-db/test_r2_23.py` (9 checks), `mutate_r2_23.py` (6).
+5. `r2_24_originals_admin_only.sql`: `photo_original_key` answers only for admins; `photo_camera_list` returns `can_download`. Test 24 checks, mutations 8.
+6. `r2_25_download_allowlist.sql`: new column `staff.photo_download` (default false for everyone) and `photo_may_download(user)`; `photo_original_key` and `photo_camera_list.can_download` now depend on it. **Only an admin whose switch is on can download originals** (Download button, admin gallery "Open", "Make download links file"). The switch can only be changed in the Supabase SQL Editor (`staff` has RLS and no policies, so the website cannot touch it). The owner ran the update for their own admin login on 16 Nov (and once, by mistake, for the photographer test login; set back to false; a photographer with the switch on still gets nothing because the role must be admin). Test 23 checks, mutations 10.
+The Database Snapshot was run on 16 Nov after r2_23 (snapshot contains the r2_22 functions); r2_24 and r2_25 are in `changes.sql` and need a fresh snapshot run if not done yet.
+
+### C. Edge Function and storage
+- The Edge Function was never deployed before 16 Nov. It was created in the Supabase dashboard with the random address **`smooth-responder`** (the dashboard does not let you change the address, only a label). The page calls `.../functions/v1/smooth-responder` (`assets/photo-upload.js`); do not rename in the page without redeploying under the new name (only possible with the Supabase command-line tool). **Verify JWT is OFF** (attendees have no Supabase login).
+- **Two Storj accounts** (owner's decision 16 Nov, 25 GB free trial each, 30 days from creation, everything is deleted when a trial ends): photographers' account uses secrets `STORJ_ACCESS_KEY`, `STORJ_SECRET_KEY`, `STORJ_BUCKET`; the public's account uses `STORJ_PUB_ACCESS_KEY`, `STORJ_PUB_SECRET_KEY`, `STORJ_PUB_BUCKET` (project "Ehsaas public page" in Storj). The function picks the account from the photo's key (`camera/...` or `public/...`); if the `STORJ_PUB_*` secrets are missing everything uses the first account. Space in Admin > Settings > Photos: total 50 GB, photographers 23, public 23 (leaves about 2 GB spare in each; the two pools may not exceed the total).
+- The owner first tested on a personal Storj account and meant to move to Mallu Articles Bengaluru's own accounts a day or two before the event (the trial clock starts at creation). Changing accounts = replacing the secrets only; photos already stored stay in the old account.
+- CORS on the Storj bucket was NOT needed (preflight and upload both returned 200).
+
+### D. Bugs found and fixed on the way
+- Admin **Photos card stuck on "Loading..."**: the section jump bar gave every card the id `s-N`, overwriting the Photos card's own id (`photocard`). Fixed (PR #62). The settings browser suite `scratch-db/browser/run_settings.py` has 2 failures that were there before this fix (cause not investigated).
+- Stored-XSS risk in preview pictures: escaped in the gallery and admin card, validated in the Edge Function and by a database check (`photos_thumb_format`).
+- Earlier claim that the Tickets page limits wrong guesses was wrong: `lookup_tickets` has no rate limit, and neither do the photo calls (attendees send Booking ID + phone each time; Booking ID is 8 characters).
+
+### E. Decisions (owner)
+Visibility is an admin setting (`own` / `photographers` / `all`, default `own`); delete = admin any, photographer/attendee their own; **originals only for admins the owner switches on** (changed from "admins and photographers" on 16 Nov); attendees get small previews only and the full-size link is shared after the event once everything is saved to a safe drive; one shared photographer pool; photographers count as Present; native camera app and picker (no in-page camera); three modes Instant / Check & upload / Draft.
+
+### F. Verified and NOT verified (16 Nov)
+- Owner confirmed working: photographer login and upload (laptop), attendee login and upload (phone, 3.1 MB photo), thumbnails, admin "Open" of an original, attendee delete, admin Photos card with the visibility dropdown, "All working" after a phone test. The attendee phone screen "Original: shared after the event" is deliberate.
+- NOT verified: iPhone; drag-and-drop on a laptop; drafts surviving a closed browser; the Edge Function's new refusal for admins/photographers who are not switched on (never executed by Claude, syntax-checked only); routing to the second Storj account with real accounts (owner said the setup was done but gave no test result); the real Mallu Articles Bengaluru Storj accounts (not created yet as of this note).
+
+### G. Still to do before Sun 22 Nov
+Create the five real photographer logins (Supabase user with Auto Confirm + a `staff` row with role `camera`); create the organisation's Storj accounts and replace the secrets, then test one upload each way; set "Who can upload (public)" and mark people Present at the Gate; clear test photos; after the event use "Make download links file" and save all originals to a drive the owner owns before the trials end. Optional: Remove button clipped in the admin gallery drawer; delete branch `transfer-occupation` and any other merged branches.
+
+### H. Tooling notes
+- The "unpushed commits" stop-hook message is a false alarm when the local copy has no link to the GitHub branch: check `git ls-remote origin <branch>` and run `git fetch origin +refs/heads/<b>:refs/remotes/origin/<b>`.
+- `scratch-db/build.sql` is generated by `python3 scratch-db/build.py`; never commit it (add it to `.git/info/exclude`) and do not delete it, the test library reads it.

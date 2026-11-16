@@ -65,6 +65,18 @@ Each free Storj trial gives 25 GB storage and its own download allowance, so the
 Decision: only the organiser (an admin login) downloads originals. Steps: (1) run `sql/r2_24_originals_admin_only.sql` in Supabase, (2) redeploy the Edge Function with the new `index.ts` (its `view` action now refuses anyone who is not an admin), (3) merge the page, (4) paste the SQL into `sql/changes.sql` and run Actions > Database Snapshot. Until step 1 is run, photographers still get a Download button that the new function refuses.
 NOT verified on the real project: the new refusal in the Edge Function (never executed; only syntax-checked) and the page on a phone.
 
+## 5f. Only the admins YOU choose can download (r2_25, 16 Nov) - run AFTER r2_24
+r2_25 adds a switch per admin (`staff.photo_download`, everyone starts OFF). Only an admin whose switch is on gets the Download button, the "Open" button in the admin gallery, and "Make download links file". Run `sql/r2_25_download_allowlist.sql`, redeploy the Edge Function, merge, snapshot. Then choose people in the Supabase SQL Editor (the website cannot change this switch):
+```sql
+-- who are the admins, and who may download now?
+select s.name, u.email, s.photo_download from staff s join auth.users u on u.id = s.user_id where s.role = 'admin';
+-- allow one (replace the email)
+update staff set photo_download = true where user_id = (select id from auth.users where email = 'PUT-THE-EMAIL-HERE');
+-- take it away again
+update staff set photo_download = false where user_id = (select id from auth.users where email = 'PUT-THE-EMAIL-HERE');
+```
+Until you turn it on for yourself nobody can download, not even you. NOT verified on the real project: the Edge Function check (never executed here, syntax-checked only).
+
 ## 6. After the event
 Admin → Settings → Photos → **Make download links file**, download everything within the trial, and switch uploads off.
 

@@ -7,9 +7,9 @@
 //   action "confirm"  ask Storj for the file's REAL size; the database keeps it only if it is not bigger than claimed
 //                     (a bigger file is deleted). Saves the tiny preview picture.
 //   action "fail"     the upload did not happen: free the claim.
-//   action "view"     (ADMIN ONLY) short-lived download address for one original. Photographers and attendees never get one.
+//   action "view"     (only the admins whose "photo_download" switch is on) short-lived download address for one original.
 //   action "remove"   (admin: any photo; photographer or attendee: only their own) take a photo out and delete the file.
-//   action "export"   (admin) list stored photos (key, size) with fresh download addresses, for "download everything".
+//   action "export"   (same admins) list stored photos (key, size) with fresh download addresses, for "download everything".
 //
 // Secrets to set (Edge Functions > Secrets): STORJ_ACCESS_KEY, STORJ_SECRET_KEY, STORJ_BUCKET (photographers' account) and, if the
 // public gets its own Storj account, STORJ_PUB_ACCESS_KEY, STORJ_PUB_SECRET_KEY, STORJ_PUB_BUCKET. (SUPABASE_URL and
@@ -60,6 +60,10 @@ async function who(req: Request): Promise<string | null> {
   if (!t) return null;
   const { data, error } = await admin.auth.getUser(t);
   return error || !data?.user ? null : data.user.id;
+}
+async function mayDownload(uid: string): Promise<boolean> {
+  const { data } = await admin.rpc("photo_may_download", { p_user: uid });
+  return data === true;
 }
 async function role(uid: string): Promise<string | null> {
   const { data } = await admin.from("staff").select("role").eq("user_id", uid).maybeSingle();
@@ -115,10 +119,10 @@ Deno.serve(async (req) => {
 
     // ---- view (admin only) and remove (an admin, or a photographer / attendee for their own photo) ----
     if (action === "view") {
-      // only an admin may download an original (checked here and again inside photo_original_key)
+      // only an admin whose photo_download switch is on may download an original (checked here and again inside photo_original_key)
       const uid = await who(req);
       if (!uid) return out({ ok: false, error: "NOT_ALLOWED" }, 401);
-      if ((await role(uid)) !== "admin") return out({ ok: false, error: "NOT_ALLOWED" }, 403);
+      if (!(await mayDownload(uid))) return out({ ok: false, error: "NOT_ALLOWED" }, 403);
       const { data: key } = await admin.rpc("photo_original_key", { p_id: String(b.id || ""), p_user: uid });
       if (!key) return out({ ok: false, error: "NOT_FOUND" });
       return out({ ok: true, url: await presign("GET", String(key), 600) });
@@ -153,9 +157,9 @@ Deno.serve(async (req) => {
       return out({ ok: true });
     }
 
-    // ---- admin only from here ----
+    // ---- "download everything": only admins whose photo_download switch is on ----
     const uid = await who(req);
-    if (!uid || (await role(uid)) !== "admin") return out({ ok: false, error: "NOT_ALLOWED" }, 401);
+    if (!uid || !(await mayDownload(uid))) return out({ ok: false, error: "NOT_ALLOWED" }, 401);
 
     if (action === "export") {
       const from = Math.max(0, Math.floor(Number(b.from) || 0));

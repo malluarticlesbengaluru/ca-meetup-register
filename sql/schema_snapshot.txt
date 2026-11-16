@@ -121,6 +121,7 @@ settings_log|8|new_value|text|f|
 staff|1|user_id|uuid|t|
 staff|2|name|text|t|
 staff|3|role|text|t|
+staff|4|photo_download|boolean|t|false
 ticket_activity|1|id|bigint|t|
 ticket_activity|2|ticket_id|uuid|t|
 ticket_activity|3|action|text|t|
@@ -2011,7 +2012,8 @@ begin
              and (p_before is null or p.created_at < p_before)
              and (adm or s.photo_visibility in ('photographers', 'all') or (p.kind = 'camera' and p.uploader = auth.uid()))
            order by p.created_at desc limit lim) q;
-  return jsonb_build_object('ok', true, 'items', items, 'page', lim, 'visibility', s.photo_visibility, 'can_download', true);
+  return jsonb_build_object('ok', true, 'items', items, 'page', lim, 'visibility', s.photo_visibility,
+                            'can_download', photo_may_download(auth.uid()));
 end $function$
 
 --- photo_camera_status() | execute rights: {postgres=X/postgres,authenticated=X/postgres}
@@ -2069,6 +2071,16 @@ CREATE OR REPLACE FUNCTION public.photo_fail(p_id uuid)
 AS $function$
   update photos set status = 'failed' where id = p_id and status = 'reserved' $function$
 
+--- photo_may_download(p_user uuid) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.photo_may_download(p_user uuid)
+ RETURNS boolean
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select exists (select 1 from staff where user_id = p_user and role = 'admin' and photo_download)
+$function$
+
 --- photo_original_key(p_id uuid, p_user uuid) | execute rights: {postgres=X/postgres,service_role=X/postgres}
 CREATE OR REPLACE FUNCTION public.photo_original_key(p_id uuid, p_user uuid)
  RETURNS text
@@ -2076,17 +2088,12 @@ CREATE OR REPLACE FUNCTION public.photo_original_key(p_id uuid, p_user uuid)
  STABLE SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
-declare r photos%rowtype; s settings%rowtype; rl text;
+declare r photos%rowtype;
 begin
-  select role into rl from staff where user_id = p_user;
-  if rl is null or rl not in ('admin', 'camera') then return null; end if;
+  if not photo_may_download(p_user) then return null; end if;
   select * into r from photos where id = p_id and status = 'stored';
   if not found then return null; end if;
-  select * into s from settings where id = 1;
-  if rl = 'admin' or s.photo_visibility in ('photographers', 'all') or (r.kind = 'camera' and r.uploader = p_user) then
-    return r.object_key;
-  end if;
-  return null;
+  return r.object_key;
 end $function$
 
 --- photo_public_list(p_code text, p_phone text, p_before timestamp with time zone, p_limit integer) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}

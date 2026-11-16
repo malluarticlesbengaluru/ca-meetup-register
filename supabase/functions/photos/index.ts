@@ -11,18 +11,25 @@
 //   action "remove"   (admin: any photo; photographer or attendee: only their own) take a photo out and delete the file.
 //   action "export"   (admin) list stored photos (key, size) with fresh download addresses, for "download everything".
 //
-// Secrets to set (Edge Functions > Secrets): STORJ_ACCESS_KEY, STORJ_SECRET_KEY, STORJ_BUCKET. (SUPABASE_URL and
+// Secrets to set (Edge Functions > Secrets): STORJ_ACCESS_KEY, STORJ_SECRET_KEY, STORJ_BUCKET (photographers' account) and, if the
+// public gets its own Storj account, STORJ_PUB_ACCESS_KEY, STORJ_PUB_SECRET_KEY, STORJ_PUB_BUCKET. (SUPABASE_URL and
 // SUPABASE_SERVICE_ROLE_KEY are provided by Supabase automatically.)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { AwsClient } from "https://esm.sh/aws4fetch@1.0.20";
 
 const ENDPOINT = Deno.env.get("STORJ_ENDPOINT") || "https://gateway.storjshare.io";
-const BUCKET = Deno.env.get("STORJ_BUCKET") || "";
-const aws = new AwsClient({
-  accessKeyId: Deno.env.get("STORJ_ACCESS_KEY") || "",
-  secretAccessKey: Deno.env.get("STORJ_SECRET_KEY") || "",
-  service: "s3", region: "us-1",
+// Two storage accounts are supported: the photographers' one (STORJ_*) and, optionally, a separate one for the public
+// (STORJ_PUB_*). A photo's place is told by its key: "camera/..." goes to the photographers' account, "public/..." to the
+// public account. If the STORJ_PUB_* secrets are not set, everything uses the photographers' account (one account only).
+type Acct = { bucket: string; aws: AwsClient };
+const mk = (bucket: string, id: string, secret: string): Acct => ({
+  bucket, aws: new AwsClient({ accessKeyId: id, secretAccessKey: secret, service: "s3", region: "us-1" }),
 });
+const CAM: Acct = mk(Deno.env.get("STORJ_BUCKET") || "", Deno.env.get("STORJ_ACCESS_KEY") || "", Deno.env.get("STORJ_SECRET_KEY") || "");
+const PUB: Acct = Deno.env.get("STORJ_PUB_BUCKET") && Deno.env.get("STORJ_PUB_ACCESS_KEY") && Deno.env.get("STORJ_PUB_SECRET_KEY")
+  ? mk(Deno.env.get("STORJ_PUB_BUCKET")!, Deno.env.get("STORJ_PUB_ACCESS_KEY")!, Deno.env.get("STORJ_PUB_SECRET_KEY")!)
+  : CAM;
+const acct = (key: string): Acct => (key.startsWith("public/") ? PUB : CAM);
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
 
 const CORS = {
@@ -32,20 +39,20 @@ const CORS = {
 };
 const out = (o: unknown, status = 200) => new Response(JSON.stringify(o), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
-const objUrl = (key: string) => `${ENDPOINT}/${BUCKET}/${key.split("/").map(encodeURIComponent).join("/")}`;
+const objUrl = (key: string) => `${ENDPOINT}/${acct(key).bucket}/${key.split("/").map(encodeURIComponent).join("/")}`;
 async function presign(method: string, key: string, secs: number) {
   const u = new URL(objUrl(key));
   u.searchParams.set("X-Amz-Expires", String(secs));
-  const s = await aws.sign(u.toString(), { method, aws: { signQuery: true } });
+  const s = await acct(key).aws.sign(u.toString(), { method, aws: { signQuery: true } });
   return s.url;
 }
 async function head(key: string): Promise<number | null> {
-  const r = await aws.fetch(objUrl(key), { method: "HEAD" });
+  const r = await acct(key).aws.fetch(objUrl(key), { method: "HEAD" });
   if (!r.ok) return null;
   const n = Number(r.headers.get("content-length"));
   return Number.isFinite(n) && n > 0 ? n : null;
 }
-async function del(key: string) { try { await aws.fetch(objUrl(key), { method: "DELETE" }); } catch (_) { /* the database already forgot it */ } }
+async function del(key: string) { try { await acct(key).aws.fetch(objUrl(key), { method: "DELETE" }); } catch (_) { /* the database already forgot it */ } }
 
 // who is calling? returns the user id of a signed-in login, or null
 async function who(req: Request): Promise<string | null> {
@@ -62,7 +69,7 @@ async function role(uid: string): Promise<string | null> {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
   if (req.method !== "POST") return out({ ok: false, error: "BAD_METHOD" }, 405);
-  if (!BUCKET) return out({ ok: false, error: "NOT_CONFIGURED" }, 500);
+  if (!CAM.bucket) return out({ ok: false, error: "NOT_CONFIGURED" }, 500);
   let b: any; try { b = await req.json(); } catch { return out({ ok: false, error: "BAD_JSON" }, 400); }
   const action = String(b.action || "");
 

@@ -247,9 +247,9 @@ function lbHTML(){
   const mine=p.mine||S.isAdmin;
   return `<div class="lb" data-a="lbclose"><div class="cap">${p.thumb?`<img src="${esc(p.thumb)}" alt="">`:`<div class="nop">No preview for this photo</div>`}</div>
   <div class="cap">${esc(fdt(p.at))} · ${P.mb(p.bytes||0)}${p.by?" · by "+esc(p.by):p.kind==="public"&&!p.mine?" · attendee":""}${p.mine?" · yours":""}</div>
-  <div class="row">${S.role==="cam"?`<button data-dl="${p.id}">Download original</button>`:`<button disabled>Original: shared after the event</button>`}
+  <div class="row">${S.role==="cam"&&S.canDl?`<button data-dl="${p.id}">Download original</button>`:`<button disabled>Original: shared after the event</button>`}
   ${mine?`<button class="danger" data-del="${p.id}">Delete</button>`:""}<button data-a="lbclose">Close</button></div>
-  ${S.role==="cam"?"":`<div class="cap note">This is a small preview. Full-size copies are shared with everyone after the event.</div>`}</div>`}
+  ${S.role==="cam"&&S.canDl?"":`<div class="cap note">This is a small preview. Full-size copies are kept by the organiser and shared with everyone after the event.</div>`}</div>`}
 
 /* ---------- screens ---------- */
 function loginHTML(){

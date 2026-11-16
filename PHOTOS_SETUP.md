@@ -45,7 +45,7 @@ Merge the pull request (pages go live). In Admin → Settings → Photos check t
 One page now serves everyone: photographers (their own login) and attendees (Booking ID + phone). `/camera/` and the "Event photos" button on the ticket page both lead there.
 - **Run `sql/r2_22_photo_gallery.sql` in Supabase** (after r2_20 and r2_21), then **redeploy the `photos` Edge Function** (paste the new `supabase/functions/photos/index.ts`). Then paste the SQL into `sql/changes.sql` and run Actions -> Database Snapshot. Merge the page only after both.
 - **Who sees what** is an admin choice: Admin -> Settings -> Photos -> "Who sees which photos in the gallery" (own only by default; photographers see all; or everyone sees all). The database applies it, not the page.
-- **Originals**: only admins and photographers can download them (a photographer: their own, or all if the admin allows). Attendees only get small previews; share the full-size drive link after the event.
+- **Originals**: ONLY admins can download them (changed 16 Nov by r2_24: photographers can no longer). Photographers and attendees get small previews only, and photographers can still delete their own photos; share the full-size drive link after the event.
 - **Delete**: admin any photo; a photographer or attendee only their own.
 - Three ways to add photos (switch on the page): Instant (uploads at once), Check & upload (tick photos, capacity bar shows what fits), Draft (kept on the phone, upload later). Drafts and half-finished uploads survive a reload, but only on the same phone and browser.
 
@@ -60,6 +60,10 @@ Each free Storj trial gives 25 GB storage and its own download allowance, so the
 - After redeploying the function, set the space in Admin > Settings > Photos: Total 50 GB, Photographers 23 GB, Public 23 GB (leaves about 2 GB spare in each account). The database allows this; nothing to run in Supabase.
 - Photos already uploaded under `public/` before the switch stay in the old account and become unreachable. Remove the test photos first.
 - NOT verified on the real service: the routing was tested only with a stand-in for the storage client (right account and bucket for each key), not with real Storj accounts. Test one upload as a photographer and one as an attendee after the switch. Check Storj's terms for running two free trials.
+
+## 5e. Originals are admin-only (r2_24, 16 Nov)
+Decision: only the organiser (an admin login) downloads originals. Steps: (1) run `sql/r2_24_originals_admin_only.sql` in Supabase, (2) redeploy the Edge Function with the new `index.ts` (its `view` action now refuses anyone who is not an admin), (3) merge the page, (4) paste the SQL into `sql/changes.sql` and run Actions > Database Snapshot. Until step 1 is run, photographers still get a Download button that the new function refuses.
+NOT verified on the real project: the new refusal in the Edge Function (never executed; only syntax-checked) and the page on a phone.
 
 ## 6. After the event
 Admin → Settings → Photos → **Make download links file**, download everything within the trial, and switch uploads off.

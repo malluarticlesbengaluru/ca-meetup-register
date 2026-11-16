@@ -7,7 +7,7 @@
 //   action "confirm"  ask Storj for the file's REAL size; the database keeps it only if it is not bigger than claimed
 //                     (a bigger file is deleted). Saves the tiny preview picture.
 //   action "fail"     the upload did not happen: free the claim.
-//   action "view"     (admin or photographer) short-lived download address for one original; the database decides which.
+//   action "view"     (ADMIN ONLY) short-lived download address for one original. Photographers and attendees never get one.
 //   action "remove"   (admin: any photo; photographer or attendee: only their own) take a photo out and delete the file.
 //   action "export"   (admin) list stored photos (key, size) with fresh download addresses, for "download everything".
 //
@@ -113,11 +113,12 @@ Deno.serve(async (req) => {
       return out({ ok: true });
     }
 
-    // ---- view and remove: an admin, a photographer, or (remove only) the attendee who owns the photo ----
+    // ---- view (admin only) and remove (an admin, or a photographer / attendee for their own photo) ----
     if (action === "view") {
-      // the database decides which original this login may download (admin: any; photographer: own, or all if the admin allows)
+      // only an admin may download an original (checked here and again inside photo_original_key)
       const uid = await who(req);
       if (!uid) return out({ ok: false, error: "NOT_ALLOWED" }, 401);
+      if ((await role(uid)) !== "admin") return out({ ok: false, error: "NOT_ALLOWED" }, 403);
       const { data: key } = await admin.rpc("photo_original_key", { p_id: String(b.id || ""), p_user: uid });
       if (!key) return out({ ok: false, error: "NOT_FOUND" });
       return out({ ok: true, url: await presign("GET", String(key), 600) });

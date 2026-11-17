@@ -26,22 +26,31 @@ window.PhotoUp = (function () {
   }
   function mb(n) { return n >= 1048576 * 100 ? Math.round(n / 1048576) + " MB" : (n / 1048576).toFixed(n >= 1048576 * 10 ? 0 : 1) + " MB"; }
   function bytes(n) { return n >= 1073741824 ? (n / 1073741824).toFixed(2) + " GB" : mb(n); }
-  /* a tiny preview picture for the admin gallery; skipped quietly if the browser cannot decode the file */
-  function thumb(file) {
+  /* Two pictures made from one decode of the file: a tiny one (saved in the database, for the lists) and a sharp preview
+     (long side 1600 px, JPEG, kept in storage next to the original, for the big view). Either is null if the browser cannot
+     decode the file (for example an iPhone HEIC on Android); the upload itself still works. */
+  function previews(file) {
     return new Promise(function (res) {
-      var url; try { url = URL.createObjectURL(file); } catch (e) { return res(null); }
+      var url; try { url = URL.createObjectURL(file); } catch (e) { return res({ thumb: null, preview: null }); }
       var img = new Image(); var done = false;
       function fin(v) { if (done) return; done = true; try { URL.revokeObjectURL(url); } catch (e) {} res(v); }
-      img.onerror = function () { fin(null); };
+      function draw(side) {
+        var s = side / Math.max(img.naturalWidth, img.naturalHeight); if (s > 1) s = 1;
+        var c = document.createElement("canvas"); c.width = Math.max(1, Math.round(img.naturalWidth * s)); c.height = Math.max(1, Math.round(img.naturalHeight * s));
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); return c;
+      }
+      img.onerror = function () { fin({ thumb: null, preview: null }); };
       img.onload = function () {
+        var th = null;
+        try { var d = draw(360).toDataURL("image/jpeg", 0.6); th = d.length < 70000 ? d : null; } catch (e) {}
         try {
-          var s = 360 / Math.max(img.naturalWidth, img.naturalHeight); if (s > 1) s = 1;
-          var c = document.createElement("canvas"); c.width = Math.max(1, Math.round(img.naturalWidth * s)); c.height = Math.max(1, Math.round(img.naturalHeight * s));
-          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-          var d = c.toDataURL("image/jpeg", 0.6); fin(d.length < 70000 ? d : null);
-        } catch (e) { fin(null); }
+          draw(1600).toBlob(function (b) {
+            /* keep it only if it is a real, smaller JPEG; otherwise the page just shows the tiny one */
+            fin({ thumb: th, preview: b && b.type === "image/jpeg" && b.size > 0 && b.size <= 2097152 && b.size < file.size ? b : null });
+          }, "image/jpeg", 0.82);
+        } catch (e) { fin({ thumb: th, preview: null }); }
       };
-      setTimeout(function () { fin(null); }, 8000);
+      setTimeout(function () { fin({ thumb: null, preview: null }); }, 15000);
       img.src = url;
     });
   }
@@ -65,22 +74,27 @@ window.PhotoUp = (function () {
      Resolves {ok:true, left_bytes} or {ok:false, error, message}. */
   function upload(cfg, who, file, onProg) {
     var fail = function (e) { return { ok: false, error: e, message: say(e) }; };
-    var th = thumb(file);
-    var body = { action: "reserve", kind: who.kind, bytes: file.size, ext: extOf(file) };
-    if (who.kind === "public") { body.code = who.code; body.phone = who.phone; }
-    return call(cfg, body).then(function (r) {
-      if (!r.ok) return fail(r.error);
-      var attempt = function (n) {
-        return put(r.url, file, onProg).then(function (ok) {
-          if (ok) return true; if (n >= 2) return false;
-          return new Promise(function (w) { setTimeout(w, 1500 * (n + 1)); }).then(function () { return attempt(n + 1); });
-        });
-      };
-      return attempt(0).then(function (ok) {
-        if (!ok) { call(cfg, { action: "fail", id: r.id }); return fail("NETWORK"); }
-        return th.then(function (t) {
-          return call(cfg, { action: "confirm", id: r.id, thumb: t }).then(function (c) {
-            return c.ok ? { ok: true, left_bytes: r.left_bytes } : fail(c.error);
+    return previews(file).then(function (pv) {
+      var pb = pv.preview ? pv.preview.size : 0;
+      /* the sharp preview takes space too, so it is claimed together with the photo */
+      var body = { action: "reserve", kind: who.kind, bytes: file.size + pb, pbytes: pb, ext: extOf(file) };
+      if (who.kind === "public") { body.code = who.code; body.phone = who.phone; }
+      return call(cfg, body).then(function (r) {
+        if (!r.ok) return fail(r.error);
+        var attempt = function (n) {
+          return put(r.url, file, onProg).then(function (ok) {
+            if (ok) return true; if (n >= 2) return false;
+            return new Promise(function (w) { setTimeout(w, 1500 * (n + 1)); }).then(function () { return attempt(n + 1); });
+          });
+        };
+        return attempt(0).then(function (ok) {
+          if (!ok) { call(cfg, { action: "fail", id: r.id }); return fail("NETWORK"); }
+          /* the sharp preview is a bonus: if it does not go through, the photo is still kept (with the tiny preview) */
+          var sendPv = pv.preview && r.preview_url ? put(r.preview_url, pv.preview).then(function (x) { return x || put(r.preview_url, pv.preview); }) : Promise.resolve(false);
+          return sendPv.then(function () {
+            return call(cfg, { action: "confirm", id: r.id, thumb: pv.thumb }).then(function (c) {
+              return c.ok ? { ok: true, left_bytes: r.left_bytes } : fail(c.error);
+            });
           });
         });
       });

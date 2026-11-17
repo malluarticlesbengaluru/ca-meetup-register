@@ -7,6 +7,8 @@
 //   action "confirm"  ask Storj for the file's REAL size; the database keeps it only if it is not bigger than claimed
 //                     (a bigger file is deleted). Saves the tiny preview picture.
 //   action "fail"     the upload did not happen: free the claim.
+//   action "preview"  short-lived address of the SHARP preview (about 1600 pixels, saved next to the photo as "<key>.p.jpg") for one
+//                     photo, only if the database says this login may see that photo. Originals are never given out here.
 //   action "view"     (only the admins whose "photo_download" switch is on) short-lived download address for one original.
 //   action "remove"   (admin: any photo; photographer or attendee: only their own) take a photo out and delete the file.
 //   action "export"   (same admins) list stored photos (key, size) with fresh download addresses, for "download everything".
@@ -52,7 +54,12 @@ async function head(key: string): Promise<number | null> {
   const n = Number(r.headers.get("content-length"));
   return Number.isFinite(n) && n > 0 ? n : null;
 }
-async function del(key: string) { try { await acct(key).aws.fetch(objUrl(key), { method: "DELETE" }); } catch (_) { /* the database already forgot it */ } }
+const PV = ".p.jpg";              // the sharp preview of a photo lives at <photo key> + PV
+const PV_MAX = 2097152;           // a preview over 2 MB is not kept
+// deletes the photo and its sharp preview (deleting a preview that does not exist is harmless)
+async function del(key: string) {
+  for (const k of [key, key + PV]) { try { await acct(k).aws.fetch(objUrl(k), { method: "DELETE" }); } catch (_) { /* the database already forgot it */ } }
+}
 
 // who is calling? returns the user id of a signed-in login, or null
 async function who(req: Request): Promise<string | null> {
@@ -93,7 +100,10 @@ Deno.serve(async (req) => {
       if (error) return out({ ok: false, error: "SERVER" }, 500);
       if (!data?.ok) return out(data);
       const url = await presign("PUT", data.key, 1200);
-      return out({ ok: true, id: data.id, url, left_bytes: data.left_bytes });
+      // the page may also send a sharp preview; its size (pbytes) was already counted inside bytes
+      const pb = Math.floor(Number(b.pbytes));
+      const preview_url = pb > 0 && pb <= PV_MAX && pb < bytes ? await presign("PUT", data.key + PV, 1200) : null;
+      return out({ ok: true, id: data.id, url, preview_url, left_bytes: data.left_bytes });
     }
 
     if (action === "confirm") {
@@ -104,7 +114,10 @@ Deno.serve(async (req) => {
       if (actual === null) { await admin.rpc("photo_fail", { p_id: id }); return out({ ok: false, error: "NOT_UPLOADED" }); }
       // only a plain base64 jpeg/png/webp picture is kept as the preview (anything else could carry markup)
       const thumb = typeof b.thumb === "string" && b.thumb.length <= 80000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.thumb) ? b.thumb : null;
-      const { data, error } = await admin.rpc("photo_confirm", { p_id: id, p_actual: actual, p_thumb: thumb });
+      // the sharp preview is optional: use it only if it really arrived and is small enough; it counts toward the space used
+      let pv = await head(row.object_key + PV);
+      if (pv !== null && pv > PV_MAX) { try { await acct(row.object_key + PV).aws.fetch(objUrl(row.object_key + PV), { method: "DELETE" }); } catch (_) { /* ignore */ } pv = null; }
+      const { data, error } = await admin.rpc("photo_confirm", { p_id: id, p_actual: actual + (pv ?? 0), p_thumb: thumb, p_preview: pv });
       if (error) return out({ ok: false, error: "SERVER" }, 500);
       if (!data?.ok && data?.key) await del(data.key);          // bigger than claimed, or too late: remove the file
       return out(data);
@@ -115,6 +128,17 @@ Deno.serve(async (req) => {
       const { data: row } = await admin.from("photos").select("object_key,status").eq("id", id).maybeSingle();
       if (row && row.status === "reserved") { await admin.rpc("photo_fail", { p_id: id }); await del(row.object_key); }
       return out({ ok: true });
+    }
+
+    // ---- preview: the sharp picture, for whoever the database says may see this photo ----
+    if (action === "preview") {
+      const id = String(b.id || "");
+      const uid = await who(req);
+      const { data: key } = uid
+        ? await admin.rpc("photo_preview_key", { p_id: id, p_user: uid, p_code: null, p_phone: null })
+        : await admin.rpc("photo_preview_key", { p_id: id, p_user: null, p_code: String(b.code || ""), p_phone: String(b.phone || "") });
+      if (!key) return out({ ok: false, error: "NOT_FOUND" });
+      return out({ ok: true, url: await presign("GET", String(key), 600) });
     }
 
     // ---- view (admin only) and remove (an admin, or a photographer / attendee for their own photo) ----

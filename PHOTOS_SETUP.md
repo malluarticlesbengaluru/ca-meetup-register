@@ -77,6 +77,20 @@ update staff set photo_download = false where user_id = (select id from auth.use
 ```
 Until you turn it on for yourself nobody can download, not even you. NOT verified on the real project: the Edge Function check (never executed here, syntax-checked only).
 
+## 5g. Sharp previews (r2_26, 17 Nov)
+Run `sql/r2_26_photo_previews.sql`, redeploy the Edge Function, merge. The page now also makes a sharp 1600-pixel preview of each photo and stores it next to the original as `<name>.p.jpg`. Originals stay locked to the admins you switched on.
+
+## 5h. Attendee videos (r2_27, 17 Nov) - third Storj account
+Only attendees upload videos (same Booking ID + phone login as photos). Nobody plays or downloads a video on the site: the page shows a sharp still picture (made in the phone). The original video goes only to the admins whose download switch is on.
+1. Make a third Storj account (videos only). Make a bucket and an access grant that can read, write and delete in it (same way as 5d).
+2. In Supabase > Edge Functions > Secrets add `STORJ_VID_BUCKET`, `STORJ_VID_ACCESS_KEY`, `STORJ_VID_SECRET_KEY`.
+3. In the SQL Editor run `sql/r2_27_videos.sql` (safe to run twice).
+4. Redeploy the Edge Function (`supabase/functions/photos/index.ts`).
+5. Admin > Settings > Videos: set the video space (GB), the biggest video (MB) and the space per person (MB), then tick "Video uploads on". Suggested: 20 GB, 150 MB, 160 MB.
+6. Test: log in as an attendee marked Present, Videos tab, Choose video, check the still appears, open it, delete it. Test once on a real phone (iPhone and Android).
+If the third account is not set up, video uploads answer "not set up yet" and nothing else is affected.
+After the event: Admin > Settings > Videos > "Make video download links file" (admins with the download switch on), then save the videos before the Storj trial ends.
+
 ## 6. After the event
 Admin → Settings → Photos → **Make download links file**, download everything within the trial, and switch uploads off.
 
@@ -87,3 +101,5 @@ Admin → Settings → Photos → **Make download links file**, download everyth
 - The /gallery/ page on a real phone: the camera hand-off, drafts surviving a reload, drag-and-drop on a laptop. It was tested in a desktop browser against a pretend server only (login, uploads, check screen, drafts, resume, viewing, delete).
 - Attendees stay "logged in" only by sending the Booking ID and phone with every request (no session token), the same as the Tickets page. Neither the Tickets lookup nor the photo calls limit wrong guesses; the 8-character Booking ID is what makes guessing impractical.
 - How HEIC photos look in the admin gallery: some browsers cannot make a preview of them (the photo is still saved; the gallery shows "no preview").
+- Videos (r2_27): never tried on a real phone. A phone may record a video format the browser cannot read a still frame from (then the video is saved with a plain "Video" tile and no still). A slow connection may need more than 20 minutes for a 150 MB video, and then the upload is refused as too late.
+- The admin Videos card was never opened in a real browser (only syntax-checked).

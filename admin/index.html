@@ -713,10 +713,11 @@ function vSettings(){const s=S.settings;
   ${advCard(s)}
   ${afterCard(s)}
   <div class="card" id="photocard"><h2>Photos</h2><p class="mute">Loading…</p></div>
+  <div class="card" id="videocard"><h2>Videos</h2><p class="mute">Loading…</p></div>
   ${logCard()}</div>`;
-  const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Launch readiness":"Readiness","Advanced":"Advanced","After the event":"After event","Photos":"Photos","Settings log":"Log"};
+  const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Launch readiness":"Readiness","Advanced":"Advanced","After the event":"After event","Photos":"Photos","Videos":"Videos","Settings log":"Log"};
   $("#snav").innerHTML=[...document.querySelectorAll(".sgrid>.card")].map((c,i)=>{if(!c.id)c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="${c.id}">${esc(SH[h]||h)}</button>`}).join("");
-  const tb=$("#top");if(tb)document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px");phLoad()}
+  const tb=$("#top");if(tb)document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px");phLoad();vidLoad()}
 
 /* ---------- Photos: the Settings card (limits, usage, gallery, download links). Photos live in Storj; this page only shows numbers and tiny previews. ---------- */
 Object.assign(TERR,{INVALID_VISIBILITY:"That choice is not valid.",POOLS_TOO_BIG:"The two pools together are bigger than the total space. Lower a pool or raise the total.",INVALID_POOL:"A pool must be a number of GB between 0 and 1000.",INVALID_CAP:"The per-person limit must be at least 1 MB.",INVALID_MAX:"The biggest single photo size is not allowed (photographers: 1 to 500 MB, public: 1 to 100 MB).",INVALID_TOTAL:"The total space is not a valid number.",INVALID_MODE:"Choose who can upload."});
@@ -772,6 +773,39 @@ function phDraw(){
   $("#phexp").onclick=async()=>{let from=0,lines=[],n=0;toast("Preparing the list…");
     for(let i=0;i<200;i++){const r=await phFn({action:"export",from});if(!r.ok)return toast("Could not prepare the list.",5000);r.items.forEach(x=>{n++;lines.push(x.key+"\t"+x.bytes+"\t"+x.url)});if(r.next==null)break;from=r.next}
     const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["path\tbytes\tdownload link (valid 1 hour)\n"+lines.join("\n")],{type:"text/plain"}));a.download="photo-download-links.txt";a.click();toast(n+" photos listed")};
+}
+
+/* ---------- Videos: the Settings card (on/off, limits, usage, download links). Attendees upload; nobody plays a video on the site. ---------- */
+S.vid=null;
+const VERR={INVALID_POOL:"Video space must be a number of GB between 0 and 10000.",INVALID_MAX:"The biggest video must be between 1 and 2000 MB.",INVALID_CAP:"The space per person must be at least 1 MB."};
+const vterr=e=>{const m=((e&&e.message)||"").match(/[A-Z][A-Z_]{4,}/);return VERR[m&&m[0]]||terr(e)};
+async function vidLoad(){
+  if(S.tab!=="settings")return;
+  if(S.vid)vidDraw();
+  const a=await db.rpc("admin_video_summary");
+  if(a.error){const c=$("#videocard");if(c)c.innerHTML="<h2>Videos</h2><p class=\"err\">Videos are not set up yet (the database update r2_27 has not been run).</p>";return}
+  S.vid=a.data;vidDraw()}
+function vidDraw(){
+  const c=$("#videocard");if(!c||!S.vid)return;const d=S.vid,mb=b=>Math.round(b/1048576);
+  const p=d.pool_bytes?Math.min(100,d.used_bytes/d.pool_bytes*100):0;
+  c.innerHTML=`<h2>Videos</h2>
+  <label><input type="checkbox" id="vdon" ${d.on?"checked":""}> Video uploads on</label>
+  <p class="mute" style="margin-top:0">Off by default. Only attendees upload videos (same login as photos). Nobody plays a video on the site: people see a still picture. The videos go to the third Storj account.</p>
+  <div class="meter"><i class="m1" style="width:${p}%"></i></div><span class="mute">${phB(d.used_bytes)} used of ${phB(d.pool_bytes)} (${p.toFixed(0)}%)</span>
+  <p class="mute" style="margin:2px 0 8px">${d.count} videos from ${d.people} people${d.unfinished?` · ${d.unfinished} unfinished uploads`:""}</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+   <div><label for="vdpool">Video space (GB)</label><input id="vdpool" type="number" min="0" step="0.5" value="${phGB(mb(d.pool_bytes))}"></div>
+   <div><label for="vdmax">Biggest video (MB)</label><input id="vdmax" type="number" min="1" max="2000" value="${mb(d.max_bytes)}"></div>
+   <div><label for="vdcap">Space per person (MB)</label><input id="vdcap" type="number" min="1" value="${mb(d.cap_bytes)}"></div></div>
+  <p class="mute">Nothing is deleted when you lower a limit. The video space should fit inside the third Storj account (25 GB on the free trial).</p>
+  <p><button id="vdsave">Save video settings</button> <button class="ghost" id="vdexp">Make video download links file</button></p>`;
+  $("#vdsave").onclick=async()=>{const g=i=>+$(i).value;
+    const r=await db.rpc("admin_set_video_settings",{p_on:$("#vdon").checked,p_pool_mb:Math.round(g("#vdpool")*1024),p_max_mb:Math.round(g("#vdmax")),p_cap_mb:Math.round(g("#vdcap"))});
+    if(r.error)return toast(vterr(r.error),6000);toast("Video settings saved");await sync("core","log");S.vid=null;view()};
+  $("#vdon").onchange=async()=>{const r=await db.rpc("admin_set_video_settings",{p_on:$("#vdon").checked});if(r.error)return toast(vterr(r.error),6000);toast($("#vdon").checked?"Video uploads are ON":"Video uploads are OFF");await sync("core","log");S.vid=null;view()};
+  $("#vdexp").onclick=async()=>{let from=0,lines=[],n=0;toast("Preparing the list…");
+    for(let i=0;i<200;i++){const r=await phFn({action:"vexport",from});if(!r.ok)return toast(r.error==="NOT_ALLOWED"?"Only admins with the download switch on can do this.":"Could not prepare the list.",5000);r.items.forEach(x=>{n++;lines.push(x.key+"\t"+x.bytes+"\t"+x.url)});if(r.next==null)break;from=r.next}
+    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["path\tbytes\tdownload link (valid 1 hour)\n"+lines.join("\n")],{type:"text/plain"}));a.download="video-download-links.txt";a.click();toast(n+" videos listed")};
 }
 
 /* ---------- Messages (game activity): the Messages tab, the Settings switch, one message per person ---------- */

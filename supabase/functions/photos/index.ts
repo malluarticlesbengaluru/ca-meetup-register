@@ -9,6 +9,9 @@
 //   action "fail"     the upload did not happen: free the claim.
 //   action "preview"  short-lived address of the SHARP preview (about 1600 pixels, saved next to the photo as "<key>.p.jpg") for one
 //                     photo, only if the database says this login may see that photo. Originals are never given out here.
+//   actions "vreserve", "vconfirm", "vfail", "vpreview", "vview", "vremove", "vexport": the same for ATTENDEE VIDEOS, kept in a third
+//                     Storj account (STORJ_VID_*), under "video/...". Nobody plays a video on the site: "vpreview" gives only the sharp
+//                     still picture, "vview" (the original) only to the admins whose photo_download switch is on.
 //   action "view"     (only the admins whose "photo_download" switch is on) short-lived download address for one original.
 //   action "remove"   (admin: any photo; photographer or attendee: only their own) take a photo out and delete the file.
 //   action "export"   (same admins) list stored photos (key, size) with fresh download addresses, for "download everything".
@@ -23,6 +26,7 @@ const ENDPOINT = Deno.env.get("STORJ_ENDPOINT") || "https://gateway.storjshare.i
 // Two storage accounts are supported: the photographers' one (STORJ_*) and, optionally, a separate one for the public
 // (STORJ_PUB_*). A photo's place is told by its key: "camera/..." goes to the photographers' account, "public/..." to the
 // public account. If the STORJ_PUB_* secrets are not set, everything uses the photographers' account (one account only).
+// Videos use a third account (STORJ_VID_ACCESS_KEY, STORJ_VID_SECRET_KEY, STORJ_VID_BUCKET); without those secrets, video actions answer NOT_CONFIGURED.
 type Acct = { bucket: string; aws: AwsClient };
 const mk = (bucket: string, id: string, secret: string): Acct => ({
   bucket, aws: new AwsClient({ accessKeyId: id, secretAccessKey: secret, service: "s3", region: "us-1" }),
@@ -31,7 +35,13 @@ const CAM: Acct = mk(Deno.env.get("STORJ_BUCKET") || "", Deno.env.get("STORJ_ACC
 const PUB: Acct = Deno.env.get("STORJ_PUB_BUCKET") && Deno.env.get("STORJ_PUB_ACCESS_KEY") && Deno.env.get("STORJ_PUB_SECRET_KEY")
   ? mk(Deno.env.get("STORJ_PUB_BUCKET")!, Deno.env.get("STORJ_PUB_ACCESS_KEY")!, Deno.env.get("STORJ_PUB_SECRET_KEY")!)
   : CAM;
-const acct = (key: string): Acct => (key.startsWith("public/") ? PUB : CAM);
+const VID: Acct | null = Deno.env.get("STORJ_VID_BUCKET") && Deno.env.get("STORJ_VID_ACCESS_KEY") && Deno.env.get("STORJ_VID_SECRET_KEY")
+  ? mk(Deno.env.get("STORJ_VID_BUCKET")!, Deno.env.get("STORJ_VID_ACCESS_KEY")!, Deno.env.get("STORJ_VID_SECRET_KEY")!)
+  : null;
+const acct = (key: string): Acct => {
+  if (key.startsWith("video/")) { if (!VID) throw new Error("NO_VIDEO_ACCOUNT"); return VID; }   // a video never lands in a photo account
+  return key.startsWith("public/") ? PUB : CAM;
+};
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
 
 const CORS = {
@@ -128,6 +138,91 @@ Deno.serve(async (req) => {
       const { data: row } = await admin.from("photos").select("object_key,status").eq("id", id).maybeSingle();
       if (row && row.status === "reserved") { await admin.rpc("photo_fail", { p_id: id }); await del(row.object_key); }
       return out({ ok: true });
+    }
+
+    // ---- attendee videos (third Storj account) ----
+    if (action.startsWith("v") && action !== "view") {
+      if (!VID) return out({ ok: false, error: "NOT_CONFIGURED" }, 500);
+      const code = String(b.code || ""), phone = String(b.phone || "");
+
+      if (action === "vreserve") {
+        const bytes = Math.floor(Number(b.bytes));
+        const { data, error } = await admin.rpc("video_reserve", { p_code: code, p_phone: phone, p_bytes: bytes, p_ext: String(b.ext || "") });
+        if (error) return out({ ok: false, error: "SERVER" }, 500);
+        if (!data?.ok) return out(data);
+        const url = await presign("PUT", data.key, 1800);
+        const pb = Math.floor(Number(b.pbytes));
+        const preview_url = pb > 0 && pb <= PV_MAX && pb < bytes ? await presign("PUT", data.key + PV, 1800) : null;
+        return out({ ok: true, id: data.id, url, preview_url, left_bytes: data.left_bytes });
+      }
+
+      if (action === "vconfirm") {
+        const id = String(b.id || "");
+        const { data: row } = await admin.from("videos").select("object_key,status").eq("id", id).maybeSingle();
+        if (!row) return out({ ok: false, error: "NOT_FOUND" });
+        const actual = await head(row.object_key);
+        if (actual === null) { await admin.rpc("video_fail", { p_id: id }); return out({ ok: false, error: "NOT_UPLOADED" }); }
+        const thumb = typeof b.thumb === "string" && b.thumb.length <= 80000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.thumb) ? b.thumb : null;
+        let pv = await head(row.object_key + PV);
+        if (pv !== null && pv > PV_MAX) { try { await acct(row.object_key + PV).aws.fetch(objUrl(row.object_key + PV), { method: "DELETE" }); } catch (_) { /* ignore */ } pv = null; }
+        const { data, error } = await admin.rpc("video_confirm", { p_id: id, p_actual: actual + (pv ?? 0), p_thumb: thumb, p_preview: pv });
+        if (error) return out({ ok: false, error: "SERVER" }, 500);
+        if (!data?.ok && data?.key) await del(data.key);
+        return out(data);
+      }
+
+      if (action === "vfail") {
+        const id = String(b.id || "");
+        const { data: row } = await admin.from("videos").select("object_key,status").eq("id", id).maybeSingle();
+        if (row && row.status === "reserved") { await admin.rpc("video_fail", { p_id: id }); await del(row.object_key); }
+        return out({ ok: true });
+      }
+
+      if (action === "vpreview") {
+        const id = String(b.id || "");
+        const uid = await who(req);
+        const { data: key } = uid
+          ? await admin.rpc("video_preview_key", { p_id: id, p_user: uid, p_code: null, p_phone: null })
+          : await admin.rpc("video_preview_key", { p_id: id, p_user: null, p_code: code, p_phone: phone });
+        if (!key) return out({ ok: false, error: "NOT_FOUND" });
+        return out({ ok: true, url: await presign("GET", String(key), 600) });
+      }
+
+      if (action === "vremove") {
+        const id = String(b.id || "");
+        const uid = await who(req);
+        if (uid) {
+          if ((await role(uid)) !== "admin") return out({ ok: false, error: "NOT_ALLOWED" }, 401);
+          const asUser = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
+            auth: { persistSession: false }, global: { headers: { Authorization: req.headers.get("authorization") || "" } } });
+          const { data: key, error } = await asUser.rpc("admin_video_remove", { p_id: id });
+          if (error || !key) return out({ ok: false, error: "NOT_FOUND" });
+          await del(String(key));
+          return out({ ok: true });
+        }
+        const { data: key } = await admin.rpc("video_remove_public", { p_id: id, p_code: code, p_phone: phone });
+        if (!key) return out({ ok: false, error: "NOT_FOUND" });
+        await del(String(key));
+        return out({ ok: true });
+      }
+
+      // the rest: only admins whose photo_download switch is on
+      const uid = await who(req);
+      if (!uid || !(await mayDownload(uid))) return out({ ok: false, error: "NOT_ALLOWED" }, 401);
+      if (action === "vview") {
+        const { data: key } = await admin.rpc("video_original_key", { p_id: String(b.id || ""), p_user: uid });
+        if (!key) return out({ ok: false, error: "NOT_FOUND" });
+        return out({ ok: true, url: await presign("GET", String(key), 600) });
+      }
+      if (action === "vexport") {
+        const from = Math.max(0, Math.floor(Number(b.from) || 0));
+        const { data: rows } = await admin.from("videos").select("id,object_key,bytes_actual,created_at")
+          .eq("status", "stored").order("created_at").range(from, from + 49);
+        const list = [];
+        for (const r of rows || []) list.push({ id: r.id, kind: "video", key: r.object_key, bytes: r.bytes_actual, url: await presign("GET", r.object_key, 3600) });
+        return out({ ok: true, items: list, next: (rows || []).length === 50 ? from + 50 : null });
+      }
+      return out({ ok: false, error: "BAD_ACTION" }, 400);
     }
 
     // ---- preview: the sharp picture, for whoever the database says may see this photo ----

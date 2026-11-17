@@ -10,12 +10,14 @@ window.PhotoUp = (function () {
     TOO_BIG: "This photo is bigger than the allowed size for one photo.",
     PERSON_FULL: "You have used your full photo space.",
     POOL_FULL: "The shared photo space is full.",
-    BAD_TYPE: "This file type is not allowed. Use a normal photo.",
+    BAD_TYPE: "This file type is not allowed. Use a normal photo or video.",
     BAD_SIZE: "This file looks empty.",
     NOT_UPLOADED: "The upload did not finish. Check your internet and try again.",
     SIZE_MISMATCH: "The uploaded file was bigger than expected, so it was not kept.",
     EXPIRED: "This took too long. Try again.",
     NETWORK: "No internet or a weak signal. Try again.",
+    VIDEOS_OFF: "Video uploads are switched off right now.",
+    NOT_CONFIGURED: "Video upload is not set up yet. Ask the organiser.",
     SERVER: "Something went wrong on our side. Try again in a moment."
   };
   function say(code) { return MSG[code] || "Could not upload. Try again."; }
@@ -54,6 +56,35 @@ window.PhotoUp = (function () {
       img.src = url;
     });
   }
+  /* the same two pictures for a VIDEO: a frame from about the 1-second mark. The video itself is never decoded for playback on the
+     site; if the browser cannot read this video format, both are null and the upload still works (the page then shows a plain tile). */
+  function frames(file) {
+    return new Promise(function (res) {
+      var url; try { url = URL.createObjectURL(file); } catch (e) { return res({ thumb: null, preview: null }); }
+      var v = document.createElement("video"); var done = false;
+      v.muted = true; v.playsInline = true; v.preload = "auto"; v.setAttribute("playsinline", ""); v.setAttribute("muted", "");
+      function fin(x) { if (done) return; done = true; try { v.removeAttribute("src"); v.load(); URL.revokeObjectURL(url); } catch (e) {} res(x); }
+      function draw(side) {
+        var w = v.videoWidth, h = v.videoHeight; if (!w || !h) throw new Error("no size");
+        var s = side / Math.max(w, h); if (s > 1) s = 1;
+        var c = document.createElement("canvas"); c.width = Math.max(1, Math.round(w * s)); c.height = Math.max(1, Math.round(h * s));
+        c.getContext("2d").drawImage(v, 0, 0, c.width, c.height); return c;
+      }
+      function grab() {
+        var th = null;
+        try { var d = draw(360).toDataURL("image/jpeg", 0.6); th = d.length < 70000 ? d : null; } catch (e) { return fin({ thumb: null, preview: null }); }
+        try { draw(1600).toBlob(function (b) { fin({ thumb: th, preview: b && b.type === "image/jpeg" && b.size > 0 && b.size <= 2097152 && b.size < file.size ? b : null }); }, "image/jpeg", 0.82); }
+        catch (e) { fin({ thumb: th, preview: null }); }
+      }
+      v.onerror = function () { fin({ thumb: null, preview: null }); };
+      v.onloadeddata = function () {
+        v.onseeked = grab;
+        try { var t = isFinite(v.duration) && v.duration > 0 ? Math.min(1, v.duration / 2) : 0; if (t > 0) v.currentTime = t; else grab(); } catch (e) { grab(); }
+      };
+      setTimeout(function () { fin({ thumb: null, preview: null }); }, 20000);
+      v.src = url;
+    });
+  }
   function call(cfg, body) {
     var h = { "Content-Type": "application/json", "apikey": cfg.key };
     if (cfg.token) h["Authorization"] = "Bearer " + cfg.token;
@@ -72,12 +103,12 @@ window.PhotoUp = (function () {
   }
   /* cfg: {url, key, token?}   who: {kind:"camera"} or {kind:"public", code, phone}.
      Resolves {ok:true, left_bytes} or {ok:false, error, message}. */
-  function upload(cfg, who, file, onProg) {
+  function run(cfg, who, file, onProg, maker, A) {
     var fail = function (e) { return { ok: false, error: e, message: say(e) }; };
-    return previews(file).then(function (pv) {
+    return maker(file).then(function (pv) {
       var pb = pv.preview ? pv.preview.size : 0;
       /* the sharp preview takes space too, so it is claimed together with the photo */
-      var body = { action: "reserve", kind: who.kind, bytes: file.size + pb, pbytes: pb, ext: extOf(file) };
+      var body = { action: A.reserve, kind: who.kind, bytes: file.size + pb, pbytes: pb, ext: extOf(file) };
       if (who.kind === "public") { body.code = who.code; body.phone = who.phone; }
       return call(cfg, body).then(function (r) {
         if (!r.ok) return fail(r.error);
@@ -88,11 +119,11 @@ window.PhotoUp = (function () {
           });
         };
         return attempt(0).then(function (ok) {
-          if (!ok) { call(cfg, { action: "fail", id: r.id }); return fail("NETWORK"); }
+          if (!ok) { call(cfg, { action: A.fail, id: r.id }); return fail("NETWORK"); }
           /* the sharp preview is a bonus: if it does not go through, the photo is still kept (with the tiny preview) */
           var sendPv = pv.preview && r.preview_url ? put(r.preview_url, pv.preview).then(function (x) { return x || put(r.preview_url, pv.preview); }) : Promise.resolve(false);
           return sendPv.then(function () {
-            return call(cfg, { action: "confirm", id: r.id, thumb: pv.thumb }).then(function (c) {
+            return call(cfg, { action: A.confirm, id: r.id, thumb: pv.thumb }).then(function (c) {
               return c.ok ? { ok: true, left_bytes: r.left_bytes } : fail(c.error);
             });
           });
@@ -100,5 +131,7 @@ window.PhotoUp = (function () {
       });
     });
   }
-  return { upload: upload, say: say, mb: mb, bytes: bytes, call: call };
+  function upload(cfg, who, file, onProg) { return run(cfg, who, file, onProg, previews, { reserve: "reserve", confirm: "confirm", fail: "fail" }); }
+  function uploadVideo(cfg, who, file, onProg) { return run(cfg, { kind: "public", code: who.code, phone: who.phone }, file, onProg, frames, { reserve: "vreserve", confirm: "vconfirm", fail: "vfail" }); }
+  return { upload: upload, uploadVideo: uploadVideo, say: say, mb: mb, bytes: bytes, call: call };
 })();

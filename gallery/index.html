@@ -3,40 +3,87 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" type="image/png" href="../assets/icon-192.png"><link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
-<title>Photos · Meetup 2026</title>
+<meta name="theme-color" content="#1A040C">
+<title>Photos · Ehsaas'26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,500&family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light;--bg:#F2F4F9;--card:#fff;--ink:#0E1730;--mute:#5A6584;--brand:#2447F0;--line:#DCE1EE;--err:#B8312A;--ok:#0F7B57;--warn:#A85F00;--on:#fff;--field:#fff}
-@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0A0F1F;--card:#121A31;--ink:#E9EDFA;--mute:#96A2C4;--brand:#7D95FF;--line:#232D4D;--err:#FF8A80;--ok:#4FD6A0;--warn:#FFB454;--on:#0A0F1F;--field:#0B1226}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 16px calc(28px + env(safe-area-inset-bottom))}
-main{max-width:640px;margin:0 auto}h1{font-size:1.4rem;margin:18px 0 4px}h2{font-size:1.05rem;margin:0 0 6px}.mute{color:var(--mute)}.err{color:var(--err)}.ok{color:var(--ok)}.warn{color:var(--warn)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 12px}
-label.l{display:block;font-weight:700;margin:10px 0 4px}
-input[type=email],input[type=password],input[type=text],input[type=tel]{width:100%;font:inherit;padding:11px;min-height:46px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink)}
-button,.btn{font:inherit;font-weight:700;border-radius:14px;padding:12px 16px;min-height:52px;border:1px solid var(--brand);background:var(--brand);color:var(--on);cursor:pointer;display:flex;align-items:center;justify-content:center;width:100%;text-align:center}
-button.ghost,.btn.ghost{background:transparent;color:var(--brand)}button.danger{background:transparent;color:var(--err);border-color:var(--err)}button:disabled{opacity:.45;cursor:default}
-button.sm{min-height:38px;width:auto;padding:6px 12px;font-size:.9rem}
-.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:120px}.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.tabs{display:flex;gap:6px;margin:12px 0}.tabs button{min-height:44px;background:transparent;color:var(--mute);border-color:var(--line)}.tabs button.on{background:var(--brand);color:var(--on);border-color:var(--brand)}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.seg button{min-height:46px;font-size:.92rem;background:transparent;color:var(--brand);padding:6px}.seg button.on{background:var(--brand);color:var(--on)}
-.meter{height:14px;border-radius:99px;background:var(--bg);border:1px solid var(--line);overflow:hidden;margin:8px 0;display:flex}.meter i{display:block;height:100%;background:var(--brand)}.meter i.sel{background:var(--ok)}.meter.over i.sel{background:var(--err)}.meter i.low{background:var(--warn)}.meter i.full{background:var(--err)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin:10px 0}
-.tile{position:relative;aspect-ratio:1;border:2px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg);cursor:pointer;display:block;padding:0;min-height:0}
+/* Ehsaas'26 photo page: BURGUNDY theme, the same palette and fonts as the public pages (wine, burgundy, rose, blush, cream, gold; Poppins and Lora italic).
+   Look only: no ids, data attributes or Supabase calls are defined here. To tweak colours, change the first rule. */
+:root{color-scheme:dark;--bg:#1A040C;--card:#3A0B1D;--ink:#F6D7C6;--mute:#CBA49B;--brand:#8C1838;--brand-d:#6E1230;--accent:#E9B24C;--line:rgba(255,179,192,.16);--line2:rgba(255,179,192,.26);
+--err:#FF9A8F;--ok:#8DE5B0;--warn:#F3C766;--on:#F6D7C6;--field:rgba(26,4,12,.6);--wine:#1A040C;--deep:#4A0A1F;--burg:#8C1838;--rose:#CF736A;--blush:#FFB3C0;--cream:#F6D7C6;--gold:#E9B24C;--ember:#F08A3C;
+--glass:rgba(140,24,56,.30);--glass-b:rgba(255,179,192,.22);--sans:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;--serif:"Lora",Georgia,serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--sans);-webkit-font-smoothing:antialiased;padding:0 16px calc(96px + env(safe-area-inset-bottom));min-height:100dvh}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(140,24,56,.75),transparent 70%),radial-gradient(ellipse 70% 40% at 100% 55%,rgba(110,16,46,.55),transparent 70%),radial-gradient(ellipse 70% 40% at 0 85%,rgba(110,16,46,.5),transparent 70%)}
+::selection{background:rgba(233,178,76,.35)}
+.hdr{position:sticky;top:0;z-index:15;margin:0 -16px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:rgba(26,4,12,.82);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--glass-b)}
+.hdr div{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:10px}.hdr img{height:32px;width:auto;display:block}
+.hdr b{font:800 .74rem/1.15 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--cream)}.hdr small{display:block;font:600 .58rem/1.15 var(--sans);letter-spacing:.2em;color:var(--gold)}
+main{max-width:640px;margin:0 auto;padding-top:6px}
+h1{font:900 clamp(1.9rem,8.5vw,2.6rem)/1.06 var(--sans);letter-spacing:-.035em;color:var(--cream);margin:22px 0 6px}
+h2{font:800 1.12rem/1.2 var(--sans);letter-spacing:-.01em;color:var(--cream);margin:0 0 6px}
+.lead{font:italic 500 1.02rem/1.55 var(--serif);color:rgba(246,215,198,.88);margin:0 0 16px}
+.mute{color:var(--mute)}.err{color:var(--err)}.ok{color:var(--ok)}.warn{color:var(--warn)}
+.card{background:linear-gradient(160deg,rgba(140,24,56,.42),rgba(74,10,31,.6));border:1px solid var(--glass-b);border-radius:22px;padding:18px;margin:0 0 14px;box-shadow:0 24px 50px -30px rgba(0,0,0,.8)}
+.card h2{display:flex;align-items:center;gap:10px}.card h2:before{content:"";flex:none;width:5px;height:20px;border-radius:3px;background:var(--gold)}
+label.l{display:block;font-weight:600;margin:14px 0 6px;color:var(--cream);font-size:.95rem}
+input[type=email],input[type=password],input[type=text],input[type=tel]{width:100%;font:inherit;padding:12px 14px;min-height:50px;border:1px solid var(--line2);border-radius:14px;background:var(--field);color:var(--ink);transition:border-color .2s,box-shadow .2s}
+input::placeholder{color:rgba(246,215,198,.42)}
+input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(233,178,76,.2);outline:none}
+input:-webkit-autofill{-webkit-text-fill-color:var(--ink);box-shadow:0 0 0 1000px #3A0B1D inset;caret-color:var(--ink)}
+button,.btn{font:800 1rem/1.2 var(--sans);border-radius:99px;padding:14px 18px;min-height:54px;border:1.5px solid transparent;background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember));color:var(--wine);box-shadow:0 10px 30px rgba(233,178,76,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;width:100%;text-align:center;transition:transform .15s,box-shadow .2s}
+button:active,.btn:active{transform:scale(.98)}
+button:focus-visible,.btn:focus-visible,input:focus-visible{outline:3px solid var(--blush);outline-offset:2px}
+button.ghost,.btn.ghost{background:transparent;color:var(--cream);border:1.5px solid rgba(246,215,198,.4);box-shadow:none}
+button.danger{background:transparent;color:var(--err);border:1.5px solid rgba(255,154,143,.55);box-shadow:none}
+button:disabled{opacity:1;cursor:default;box-shadow:none;background:rgba(246,215,198,.08);color:var(--mute);border:1.5px solid var(--line)}
+button.sm{min-height:40px;width:auto;padding:7px 15px;font-size:.88rem}
+button svg,.btn svg{width:22px;height:22px;flex:none}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:130px}.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.who{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 10px}.who b{display:block;font:800 1.15rem/1.2 var(--sans);color:var(--cream);overflow-wrap:anywhere}
+.chip{display:inline-block;font:700 .68rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--wine);background:var(--gold);border-radius:99px;padding:4px 9px;margin-top:4px}
+.seg2{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:99px;background:rgba(26,4,12,.55);border:1px solid var(--line);margin:4px 0 14px}
+.seg2 button{min-height:44px;background:transparent;color:var(--mute);box-shadow:none;padding:8px}.seg2 button.on{background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember));color:var(--wine)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:99px;background:rgba(26,4,12,.55);border:1px solid var(--line)}
+.seg button{min-height:42px;font-size:.88rem;background:transparent;color:var(--cream);box-shadow:none;padding:6px}.seg button.on{background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember));color:var(--wine)}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:14;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(26,4,12,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--glass-b)}
+.bar div{max-width:640px;margin:0 auto;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
+.bar button{flex-direction:column;gap:3px;min-height:56px;padding:6px 4px;border-radius:16px;font:600 .72rem/1.1 var(--sans);background:transparent;color:var(--mute);box-shadow:none}
+.bar button svg{width:24px;height:24px}.bar button.on{color:var(--wine);background:linear-gradient(135deg,#F3C766,var(--gold) 55%,var(--ember))}
+.meter{height:12px;border-radius:99px;background:rgba(26,4,12,.6);border:1px solid var(--line);overflow:hidden;margin:8px 0;display:flex}.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--rose),var(--blush))}.meter i.sel{background:var(--gold)}.meter.over i.sel{background:var(--err)}.meter i.low{background:var(--warn)}.meter i.full{background:var(--err)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0}
+@media (min-width:520px){.grid{grid-template-columns:repeat(4,1fr);gap:8px}}
+.tile{position:relative;aspect-ratio:1;border:2px solid transparent;border-radius:14px;overflow:hidden;background:rgba(26,4,12,.6);cursor:pointer;display:block;padding:0;min-height:0;width:auto;box-shadow:none}
 .tile img{width:100%;height:100%;object-fit:cover;display:block}.tile .nop{display:flex;align-items:center;justify-content:center;height:100%;padding:6px;font-size:.75rem;text-align:center;color:var(--mute);word-break:break-all}
-.tile .sz{position:absolute;left:4px;bottom:4px;background:#000a;color:#fff;font-size:.72rem;padding:1px 6px;border-radius:8px}
-.tile .mine{position:absolute;right:4px;top:4px;background:var(--brand);color:var(--on);font-size:.68rem;padding:1px 6px;border-radius:8px}
-.tile input{position:absolute;left:6px;top:6px;width:24px;height:24px;margin:0;accent-color:var(--brand)}
-.tile.sel{border-color:var(--brand)}.tile.bad{opacity:.5}.tile .why{position:absolute;left:0;right:0;top:34px;text-align:center;font-size:.7rem;color:#fff;background:#B8312Ad0;padding:1px 4px}
-.q{display:grid;gap:6px;margin-top:10px}.it{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;font-size:.92rem;align-items:center}
-.it b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.it .bar{grid-column:1/3;height:6px;border-radius:9px;background:var(--bg);overflow:hidden}.it .bar i{display:block;height:100%;width:0;background:var(--brand)}
-.it .acts{grid-column:1/3;display:flex;gap:8px}
-.drop{border:2px dashed var(--line);border-radius:14px;padding:14px;text-align:center;color:var(--mute);margin-top:10px;display:none}.drop.hot{border-color:var(--brand);color:var(--brand)}
+.tile .sz{position:absolute;left:5px;bottom:5px;background:rgba(26,4,12,.78);color:var(--cream);font-size:.68rem;padding:1px 7px;border-radius:8px}
+.tile .mine{position:absolute;right:5px;top:5px;background:var(--gold);color:var(--wine);font-weight:700;font-size:.64rem;padding:1px 7px;border-radius:8px}
+.tile input{position:absolute;left:7px;top:7px;width:26px;height:26px;margin:0;accent-color:var(--gold)}
+.tile.sel{border-color:var(--gold)}.tile.bad{opacity:.5}.tile .why{position:absolute;left:0;right:0;top:38px;text-align:center;font-size:.7rem;color:#fff;background:rgba(160,40,40,.85);padding:1px 4px}
+.q{display:grid;gap:8px;margin-top:10px}.it{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(26,4,12,.4);font-size:.92rem;align-items:center}
+.it b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}.it .bar2{grid-column:1/3;height:6px;border-radius:9px;background:rgba(26,4,12,.7);overflow:hidden;margin-top:4px}.it .bar2 i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--ember))}
+.it .acts{grid-column:1/3;display:flex;gap:8px;margin-top:4px}
+.drop{border:2px dashed var(--line2);border-radius:16px;padding:14px;text-align:center;color:var(--mute);margin-top:10px;display:none}.drop.hot{border-color:var(--gold);color:var(--gold)}
 @media (hover:hover) and (pointer:fine){.drop{display:block}}
-input[type=file]{display:none}.off{background:#0003;border-radius:12px;padding:10px}
-.lb{position:fixed;inset:0;background:#000d;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px}
-.lb img{max-width:100%;max-height:62vh;border-radius:10px;object-fit:contain;background:#111}.lb .cap{color:#fff;text-align:center;font-size:.92rem}.lb .nop{color:#fff;padding:40px}
-.lb .row{width:100%;max-width:420px}.lb button{background:var(--card);color:var(--ink);border-color:var(--line)}.lb button.danger{color:var(--err)}
-.note{font-size:.9rem;color:var(--mute)}
-</style></head><body><main id="app"></main>
+input[type=file]{display:none}.off{background:rgba(26,4,12,.6);border:1px solid var(--line2);border-radius:14px;padding:12px;margin-bottom:10px;color:var(--cream)}
+.act{display:grid;gap:10px;margin:14px 0 6px}.act .btn{min-height:62px;font-size:1.08rem}
+.empty{text-align:center;padding:28px 10px;color:var(--mute)}.empty svg{width:46px;height:46px;color:var(--rose);margin-bottom:6px}.empty b{display:block;color:var(--cream);font-size:1.02rem}
+.skel{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0}.skel i{aspect-ratio:1;border-radius:14px;background:linear-gradient(110deg,rgba(255,179,192,.06) 30%,rgba(255,179,192,.14) 50%,rgba(255,179,192,.06) 70%);background-size:200% 100%;animation:sk 1.3s linear infinite}
+@keyframes sk{to{background-position:-200% 0}}@media (prefers-reduced-motion:reduce){.skel i{animation:none}}
+.banner{display:flex;gap:10px;align-items:flex-start;background:rgba(233,178,76,.14);border:1px solid rgba(233,178,76,.5);color:var(--cream);border-radius:16px;padding:12px 14px;margin:0 0 14px;font-size:.93rem}
+.note{font-size:.88rem;color:var(--mute)}
+.lb{position:fixed;inset:0;background:#0E0207;z-index:30;display:flex;flex-direction:column;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));gap:10px}
+.lbtop{width:100%;max-width:720px;display:flex;align-items:center;justify-content:space-between;color:var(--cream);font-weight:600}
+.lbtop button.x{width:46px;min-height:46px;padding:0;border-radius:50%;background:rgba(246,215,198,.14);color:var(--cream);box-shadow:none;font-size:1.2rem}
+.stage{position:relative;flex:1;min-height:0;width:100%;max-width:720px;display:flex;align-items:center;justify-content:center}
+.stage img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain;background:#1A040C;touch-action:pan-y}
+.stage .nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;min-height:46px;height:46px;padding:0;border-radius:50%;background:rgba(26,4,12,.7);color:var(--cream);border:1px solid var(--line2);box-shadow:none;font-size:1.5rem}
+.stage .nav.l{left:2px}.stage .nav.r{right:2px}.stage .nop{color:var(--cream);padding:40px;text-align:center}
+.lbinfo{color:var(--cream);text-align:center;font-size:.9rem;max-width:720px}
+.lbact{width:100%;max-width:520px;display:flex;gap:10px;flex-wrap:wrap}.lbact>*{flex:1;min-width:140px}.lbact button{min-height:50px}
+.lb .note{text-align:center;max-width:520px;margin:0}
+</style></head><body><header class="hdr"><div><img src="../assets/burg-logo.png" alt="" width="48" height="32"><b>Ehsaas'26<small>PHOTOS</small></b></div></header><main id="app"></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="../assets/photo-upload.js"></script>
 <script>
@@ -52,7 +99,7 @@ const LSset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}};
 const EXT_OK={cam:["jpg","jpeg","png","heic","heif","webp","dng"],pub:["jpg","jpeg","png","heic","heif","webp"]};
 const MODES={instant:["Instant","Each photo uploads as soon as you take or choose it."],check:["Check & upload","Look at your photos first, untick any, then upload."],draft:["Draft","Save photos on this phone now, upload later."]};
 const VIS={own:"You can see the photos you uploaded.",photographers:"Photographers can see every photo. Attendees see their own.",all:"Everyone who is logged in can see every photo."};
-const S={role:null,uid:null,isAdmin:false,name:"",code:"",phone:"",st:null,stErr:"",tab:"upload",mode:LSget("gal_mode","instant"),loginTab:"cam",msg:"",note:"",
+const S={role:null,uid:null,isAdmin:false,name:"",code:"",phone:"",st:null,stErr:"",tab:"upload",mode:LSget("gal_mode","instant"),loginTab:"pub",msg:"",note:"",
   sel:[],q:[],drafts:[],photos:[],more:false,loading:false,lb:null,vis:"own",canDl:false,loaded:false};
 if(!MODES[S.mode])S.mode="instant";
 let idb=null,running=0,lastDraw=0;
@@ -66,6 +113,9 @@ const idbAll=()=>idbDo("readonly",s=>s.getAll()).then(r=>Array.isArray(r)?r:[]);
 function persist(){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}}
 
 /* ---------- small helpers ---------- */
+const svg=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC={cam:svg('<path d="M4 8h3l1.6-2.4h6.8L17 8h3v11H4z"/><circle cx="12" cy="13.5" r="3.6"/>'),img:svg('<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.7"/><path d="M4 17l5-4.5 4 3.5 3-2.5 4 3.5"/>'),
+  vid:svg('<rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3z"/>'),up:svg('<path d="M12 16V5"/><path d="M7.5 9.5L12 5l4.5 4.5"/><path d="M5 19h14"/>'),grid:svg('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>')};
 const ownerId=()=>S.role==="cam"?"cam:"+S.uid:"pub:"+S.code;
 const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 function extOf(f){const m=/\.([a-z0-9]+)$/i.exec(f.name||"");let e=m?m[1].toLowerCase():"";if(!e){const t=(f.type||"").split("/")[1]||"";e=t==="jpeg"?"jpg":t}return e}
@@ -212,7 +262,7 @@ function queueHTML(){
   const head=[n.up+n.wait?`${n.up+n.wait} uploading`:"",n.done?`${n.done} done`:"",n.fail?`<span class="err">${n.fail} failed</span>`:""].filter(Boolean).join(" · ");
   return `<div class="card"><div class="top"><h2>Uploads</h2><span class="note">${head}</span></div><div class="q">`+S.q.slice().reverse().map(i=>
     `<div class="it"><b>${esc(i.name)}</b><span class="${i.state==="done"?"ok":i.state==="fail"?"err":"mute"}">${i.state==="done"?"✓ Uploaded":i.state==="fail"?"Failed":i.state==="up"?Math.round(i.p*100)+"%":"Waiting"}</span>
-    ${i.state==="up"?`<div class="bar"><i style="width:${Math.round(i.p*100)}%"></i></div>`:""}
+    ${i.state==="up"?`<div class="bar2"><i style="width:${Math.round(i.p*100)}%"></i></div>`:""}
     ${i.state==="fail"?`<div class="err" style="grid-column:1/3;font-size:.88rem">${esc(i.err)}</div><div class="acts"><button class="ghost sm" data-retry="${i.id}">Retry</button><button class="danger sm" data-rm="${i.id}">Remove</button></div>`:""}</div>`).join("")+
     `</div>${n.done?`<button class="ghost sm" style="margin-top:8px" data-a="clrdone">Clear finished</button>`:""}</div>`}
 function statusHTML(){
@@ -240,7 +290,7 @@ function photosHTML(){
   if(!S.loaded&&!S.loading&&!S.loadFail)setTimeout(()=>loadPhotos(true),0);
   const tiles=S.photos.map((p,i)=>`<button class="tile" data-open="${i}" aria-label="Open photo">${p.thumb?`<img src="${esc(p.thumb)}" alt="" loading="lazy" decoding="async">`:`<span class="nop">No preview</span>`}<span class="sz">${P.mb(p.bytes||0)}</span>${p.mine?`<span class="mine">Yours</span>`:""}</button>`).join("");
   return `<div class="card"><div class="top"><h2>Photos</h2><button class="ghost sm" data-a="refresh">Refresh</button></div><p class="note" style="margin:0">${esc(S.isAdmin?"As an admin you see every photo.":VIS[S.vis]||"")}</p>
-  ${S.photos.length?`<div class="grid">${tiles}</div>`:`<p class="mute">${S.loading?"Loading…":"No photos to show yet."}</p>`}
+  ${S.photos.length?`<div class="grid">${tiles}</div>`:S.loading?`<div class="skel"><i></i><i></i><i></i><i></i><i></i><i></i></div>`:`<div class="empty">${IC.img}<b>No photos to show yet</b>New photos appear here. Pull Refresh to check again.</div>`}
   ${S.more?`<button class="ghost" data-a="more" ${S.loading?"disabled":""}>${S.loading?"Loading…":"Load more"}</button>`:""}</div>`}
 /* the sharp preview address is short-lived (10 min), so it is kept for 8 and then asked for again */
 const sharpOk=p=>!!(p&&p.sharp&&Date.now()-p.sharpAt<480000);
@@ -250,37 +300,43 @@ async function loadSharp(id){
   const r=await P.call(await cfg(),body);if(!r.ok||!r.url)return;
   const im=new Image();im.onload=()=>{p.sharp=r.url;p.sharpAt=Date.now();const cur=S.photos[S.lb];const el=$("#lbimg");if(cur&&cur.id===id&&el)el.src=r.url};
   im.onerror=()=>{};im.src=r.url}
+function lbShell(i,n,body,info,acts,note,close,prev,next){
+  return `<div class="lb" data-a="${close}"><div class="lbtop"><span>${i+1} / ${n}</span><button class="x" data-a="${close}" aria-label="Close">✕</button></div>
+  <div class="stage" data-a="noop">${i>0?`<button class="nav l" data-a="${prev}" aria-label="Previous">‹</button>`:""}${body}${i<n-1?`<button class="nav r" data-a="${next}" aria-label="Next">›</button>`:""}</div>
+  <div class="lbinfo">${info}</div><div class="lbact">${acts}</div>${note?`<p class="note">${note}</p>`:""}</div>`}
 function lbHTML(){
   const p=S.photos[S.lb];if(!p)return"";
-  const mine=p.mine||S.isAdmin;
-  return `<div class="lb" data-a="lbclose"><div class="cap">${p.thumb||sharpOk(p)?`<img id="lbimg" src="${esc(sharpOk(p)?p.sharp:p.thumb)}" alt="">`:`<div class="nop">No preview for this photo</div>`}</div>
-  <div class="cap">${esc(fdt(p.at))} · ${P.mb(p.bytes||0)}${p.by?" · by "+esc(p.by):p.kind==="public"&&!p.mine?" · attendee":""}${p.mine?" · yours":""}</div>
-  <div class="row">${S.role==="cam"&&S.canDl?`<button data-dl="${p.id}">Download original</button>`:`<button disabled>Original: shared after the event</button>`}
-  ${mine?`<button class="danger" data-del="${p.id}">Delete</button>`:""}<button data-a="lbclose">Close</button></div>
-  ${S.role==="cam"&&S.canDl?"":`<div class="cap note">${p.pv?"This is a screen-size preview.":"This is a small preview."} Full-size copies are kept by the organiser and shared with everyone after the event.</div>`}</div>`}
+  const mine=p.mine||S.isAdmin,dl=S.role==="cam"&&S.canDl;
+  return lbShell(S.lb,S.photos.length,p.thumb||sharpOk(p)?`<img id="lbimg" src="${esc(sharpOk(p)?p.sharp:p.thumb)}" alt="">`:`<div class="nop">No preview for this photo</div>`,
+    `${esc(fdt(p.at))} · ${P.mb(p.bytes||0)}${p.by?" · by "+esc(p.by):p.kind==="public"&&!p.mine?" · attendee":""}${p.mine?" · yours":""}`,
+    `${dl?`<button data-dl="${p.id}">Download original</button>`:`<button disabled>Original: shared after the event</button>`}${mine?`<button class="danger" data-del="${p.id}">Delete</button>`:""}<button class="ghost" data-a="lbclose">Close</button>`,
+    dl?"":`${p.pv?"This is a screen-size preview.":"This is a small preview."} Full-size copies are kept by the organiser and shared with everyone after the event.`,"lbclose","lbprev","lbnext")}
 
 /* ---------- screens ---------- */
 function loginHTML(){
   const ids=LSget("mm_mine",[]).concat(LSget("mm_hist",[])).filter((c,i,a)=>a.indexOf(c)===i).slice(0,8);
   const pub=S.loginTab==="pub";
-  return `<h1>Meetup 2026 photos</h1><p class="mute">Take, upload and see photos from the day.</p>
-  <div class="tabs"><button class="${pub?"":"on"}" data-lt="cam">Photographers</button><button class="${pub?"on":""}" data-lt="pub">Attendees</button></div>
+  return `<h1>Ehsaas'26 photos</h1><p class="lead">Take, upload and see photos from the day.</p>
+  <div class="seg2"><button class="${pub?"on":""}" data-lt="pub">Attendees</button><button class="${pub?"":"on"}" data-lt="cam">Photographers</button></div>
   <div class="card">${pub?`<label class="l" for="bid">Booking ID</label><input id="bid" type="text" autocapitalize="characters" autocomplete="off" maxlength="14" value="${esc(S.prefill||"")}" placeholder="8 characters">
    ${ids.length?`<div class="row" style="margin-top:6px">${ids.map(c=>`<button class="ghost sm" style="min-width:0" data-id="${esc(c)}">${esc(c)}</button>`).join("")}</div>`:""}
    <label class="l" for="ph">Phone number used for the booking</label><input id="ph" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national" placeholder="10 digits">
-   <p class="err" role="alert">${esc(S.msg)}</p><button id="go">Continue</button>`
+   <p class="err" role="alert">${esc(S.msg)}</p><button id="go">Continue</button><p class="note" style="margin:12px 0 0">Use the Booking ID from your ticket and the phone number you booked with.</p>`
   :`<label class="l" for="em">Email</label><input id="em" type="email" autocomplete="username"><label class="l" for="pw">Password</label><input id="pw" type="password" autocomplete="current-password">
    <p class="err" role="alert">${esc(S.msg)}</p><button id="go">Log in</button>`}</div>`}
 function mainHTML(){
-  let h=`<div class="top"><div><h1>${esc(S.name)}</h1><span class="mute">${S.role==="cam"?(S.isAdmin?"Admin":"Photographer"):"Attendee"}</span></div><button class="ghost sm" data-a="out">Sign out</button></div>
-  <div class="tabs"><button class="${S.tab==="upload"?"on":""}" data-tab="upload">Upload</button><button class="${S.tab==="view"?"on":""}" data-tab="view">Photos</button>${canVideo()?`<button class="${S.tab==="videos"?"on":""}" data-tab="videos">Videos</button>`:""}</div>`;
-  if(S.note)h+=`<div class="card"><span class="warn">${esc(S.note)}</span></div>`;
+  const tb=(k,ic,t)=>`<button class="${S.tab===k?"on":""}" data-tab="${k}" aria-label="${t}">${ic}${t}</button>`;
+  return `<div class="who"><div><b>${esc(S.name)}</b><span class="chip">${S.role==="cam"?(S.isAdmin?"Admin":"Photographer"):"Attendee"}</span></div><button class="ghost sm" data-a="out">Sign out</button></div>`+mainInner()+
+  `<nav class="bar"><div>${tb("upload",IC.up,"Upload")}${tb("view",IC.grid,"Photos")}${canVideo()?tb("videos",IC.vid,"Videos"):""}</div></nav>`}
+function mainInner(){
+  let h="";
+  if(S.note)h+=`<div class="banner" role="status"><span>${esc(S.note)}</span></div>`;
   if(S.tab==="view")return h+photosHTML();
   if(S.tab==="videos"&&canVideo())return h+videosHTML();
-  h+=`<div class="card" id="st">${statusHTML()}</div>
-  <div class="card"><b>When I add photos</b><div class="seg" style="margin-top:8px">${Object.keys(MODES).map(k=>`<button class="${S.mode===k?"on":""}" data-mode="${k}">${MODES[k][0]}</button>`).join("")}</div><p class="note" style="margin:8px 0 0">${MODES[S.mode][1]}</p></div>
-  <div class="row"><label class="btn" for="f1">Take photo</label><label class="btn ghost" for="f2">Choose photos</label></div>
+  h+=`<div class="card" id="st">${statusHTML()}</div>`;
+  h+=`<div class="act"><label class="btn" for="f1">${IC.cam}Take photo</label><label class="btn ghost" for="f2">${IC.img}Choose photos</label></div>
   <input id="f1" type="file" accept="image/*" capture="environment"><input id="f2" type="file" accept="image/*" multiple>
+  <div class="card"><b>When I add photos</b><div class="seg" style="margin-top:8px">${Object.keys(MODES).map(k=>`<button class="${S.mode===k?"on":""}" data-mode="${k}">${MODES[k][0]}</button>`).join("")}</div><p class="note" style="margin:8px 0 0">${MODES[S.mode][1]}</p></div>
   <div class="drop" id="drop">…or drop photos here</div>
   <p class="note" style="margin-top:10px">Photos upload at full quality, exactly as taken. Keep this page open until each photo shows a tick.</p>
   ${checkHTML()}${draftsHTML()}<div id="q">${queueHTML()}</div>`;
@@ -314,7 +370,7 @@ function videosHTML(){
   let up="";
   if(S.role==="pub"){
     if(SV.st){const st=SV.st;up=`<p class="note" style="margin:0">Space for videos: ${P.bytes(st.used_bytes)} used of ${P.bytes(st.limit_bytes)}. One video can be up to ${P.bytes(st.max_bytes)}.</p>
-      <div class="row" style="margin-top:8px"><label class="btn" for="v1">Record video</label><label class="btn ghost" for="v2">Choose video</label></div>
+      <div class="act"><label class="btn" for="v1">${IC.vid}Record video</label><label class="btn ghost" for="v2">${IC.img}Choose a video</label></div>
       <input id="v1" type="file" accept="video/*" capture="environment"><input id="v2" type="file" accept="video/*">
       <p class="note" id="vprog" style="margin-top:8px">${SV.busy?vProgText():"Keep this page open while a video uploads. Short clips upload faster."}</p>`}
     else if(SV.err)up=`<p class="warn">${esc(SV.err==="VIDEOS_OFF"?"Video uploads are not open right now.":SV.err==="NOT_PRESENT"?"Video upload opens once you have checked in at the gate.":P.say(SV.err))}</p>`;
@@ -322,7 +378,7 @@ function videosHTML(){
   return `<div class="card"><div class="top"><h2>Videos</h2><button class="ghost sm" data-a="vrefresh">Refresh</button></div>${up}
   <p class="note">Videos are not played on this page. You see a still picture of each one; the organiser keeps the videos.</p>
   ${SV.note?`<span class="warn">${esc(SV.note)}</span>`:""}
-  ${SV.items.length?`<div class="grid">${tiles}</div>`:`<p class="mute">${SV.loading?"Loading…":"No videos to show yet."}</p>`}
+  ${SV.items.length?`<div class="grid">${tiles}</div>`:SV.loading?`<div class="skel"><i></i><i></i><i></i></div>`:`<div class="empty">${IC.vid}<b>No videos to show yet</b>Record a short clip and it appears here.</div>`}
   ${SV.more?`<button class="ghost" data-a="vmore" ${SV.loading?"disabled":""}>${SV.loading?"Loading…":"Load more"}</button>`:""}</div>`}
 const vProgText=()=>SV.busy?`Uploading ${esc(SV.busy.name)}… ${Math.round((SV.busy.p||0)*100)}%`:"";
 async function uploadOneVideo(file){
@@ -338,11 +394,10 @@ async function loadSharpV(id){
 function vlbHTML(){
   const p=SV.items[SV.lb];if(!p)return"";
   const mine=p.mine||S.isAdmin;
-  return `<div class="lb" data-a="vlbclose"><div class="cap">${p.thumb||sharpV(p)?`<img id="vlbimg" src="${esc(sharpV(p)?p.sharp:p.thumb)}" alt="">`:`<div class="nop">No preview for this video</div>`}</div>
-  <div class="cap">${esc(fdt(p.at))} · ${P.mb(p.bytes||0)}${p.by?" · "+esc(p.by):""}${p.mine?" · yours":""}</div>
-  <div class="row">${S.role==="cam"&&SV.canDl?`<button data-vdl="${p.id}">Download original</button>`:`<button disabled>Original: kept by the organiser</button>`}
-  ${mine?`<button class="danger" data-vdel="${p.id}">Delete</button>`:""}<button data-a="vlbclose">Close</button></div>
-  <div class="cap note">This is a still picture. Videos are not played on this page.</div></div>`}
+  return lbShell(SV.lb,SV.items.length,p.thumb||sharpV(p)?`<img id="vlbimg" src="${esc(sharpV(p)?p.sharp:p.thumb)}" alt="">`:`<div class="nop">No preview for this video</div>`,
+    `${esc(fdt(p.at))} · ${P.mb(p.bytes||0)}${p.by?" · "+esc(p.by):""}${p.mine?" · yours":""}`,
+    `${S.role==="cam"&&SV.canDl?`<button data-vdl="${p.id}">Download original</button>`:`<button disabled>Original: kept by the organiser</button>`}${mine?`<button class="danger" data-vdel="${p.id}">Delete</button>`:""}<button class="ghost" data-a="vlbclose">Close</button>`,
+    "This is a still picture. Videos are not played on this page.","vlbclose","vlbprev","vlbnext")}
 
 /* ---------- events ---------- */
 document.addEventListener("change",e=>{const t=e.target;
@@ -350,7 +405,8 @@ document.addEventListener("change",e=>{const t=e.target;
   if(t.id==="f1"||t.id==="f2"){const fs=Array.from(t.files);t.value="";if(fs.length)addFiles(fs);return}
   if(t.dataset&&t.dataset.tick){const it=S.sel.find(x=>x.id===t.dataset.tick);if(it){it.on=t.checked;updateCap()}}});
 document.addEventListener("error",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.dataset.fb){const s=document.createElement("span");s.className="nop";s.textContent=t.alt||"Preview not available";t.replaceWith(s)}},true);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(S.lb!=null||SV.lb!=null)){S.lb=null;SV.lb=null;render()}});
+document.addEventListener("keydown",e=>{
+  if((e.key==="ArrowLeft"||e.key==="ArrowRight")&&(S.lb!=null||SV.lb!=null)){const b=document.querySelector(".lb .nav."+(e.key==="ArrowLeft"?"l":"r"));if(b)b.click();return}if(e.key==="Escape"&&(S.lb!=null||SV.lb!=null)){S.lb=null;SV.lb=null;render()}});
 document.addEventListener("click",async e=>{
   const t=e.target.closest("[data-a],[data-lt],[data-id],[data-tab],[data-mode],[data-open],[data-retry],[data-rm],[data-dl],[data-del],[data-vopen],[data-vdl],[data-vdel]");if(!t)return;
   const d=t.dataset;
@@ -378,7 +434,10 @@ document.addEventListener("click",async e=>{
     return render()}
   switch(d.a){
     case"out":return signOut();
+    case"noop":return;
     case"lbclose":S.lb=null;return render();
+    case"lbprev":case"lbnext":{const n=S.lb+(d.a==="lbnext"?1:-1);if(n<0||n>=S.photos.length)return;S.lb=n;render();loadSharp(S.photos[n].id);return}
+    case"vlbprev":case"vlbnext":{const n=SV.lb+(d.a==="vlbnext"?1:-1);if(n<0||n>=SV.items.length)return;SV.lb=n;render();loadSharpV(SV.items[n].id);return}
     case"vlbclose":SV.lb=null;return render();
     case"vrefresh":SV.loaded=false;SV.fail=false;SV.note="";await vStatus();return loadVideos(true);
     case"vmore":SV.fail=false;return loadVideos(false);
@@ -397,5 +456,9 @@ document.addEventListener("click",async e=>{
     case"more":S.loadFail=false;return loadPhotos(false);
   }
 });
+/* swipe left or right in the viewer to move to the next or previous picture */
+let sx=null;
+document.addEventListener("touchstart",e=>{sx=e.target.closest&&e.target.closest(".lb")?e.touches[0].clientX:null},{passive:true});
+document.addEventListener("touchend",e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)<60)return;const b=document.querySelector(".lb .nav."+(dx>0?"l":"r"));if(b)b.click()},{passive:true});
 boot();
 </script></body></html>

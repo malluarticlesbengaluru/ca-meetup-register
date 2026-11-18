@@ -10,6 +10,7 @@ Admin > Settings. Do it the day before, not on the day.
 - [ ] Space sharing card: **On** (default).
 - [ ] Storj: the 3 trial accounts last 30 days from creation. Check none ends before the event or before you have downloaded everything.
 - [ ] The 5 real photographer logins work (try each once). Delete test photos and test videos.
+- [ ] **Moving to new Storj accounts?** Order matters: (1) in Supabase > Edge Functions > Secrets put the new keys, bucket and endpoint in `STORJ_*`, `STORJ_PUB_*` and `STORJ_VID_*`; (2) add the same CORS setting to the new buckets; (3) test one photo and one video upload; (4) ONLY THEN run `sql/clear_photo_video_data.sql` in the SQL Editor (deletes all photo and video records, gifts and QR codes; keeps tickets, settings and limits; counts at the end must be 0). Old files stay in the old Storj accounts: download what you need first, then delete those buckets.
 - [ ] Check in two test attendees as Present, upload a photo and a short video on a real phone (iPhone and Android), and give 10 MB to a friend by QR.
 - [ ] Tell attendees: allow the camera for the QR, and keep the page open until the video shows "uploaded".
 After the event: Settings > Make download links file (photos and videos), download everything, then switch uploads off.

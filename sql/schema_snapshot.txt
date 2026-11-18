@@ -111,6 +111,11 @@ settings|39|photo_max_pub_mb|integer|t|15
 settings|40|photo_total_mb|integer|t|25600
 settings|41|photo_public_mode|text|t|'present'::text
 settings|42|photo_visibility|text|t|'own'::text
+settings|43|videos_on|boolean|t|false
+settings|44|video_pool_mb|integer|t|20480
+settings|45|video_max_mb|integer|t|150
+settings|46|video_cap_mb|integer|t|160
+settings|47|space_sharing_on|boolean|t|true
 settings_log|1|id|bigint|t|
 settings_log|2|at|timestamp with time zone|t|now()
 settings_log|3|changed_by|uuid|f|
@@ -119,6 +124,18 @@ settings_log|5|area|text|t|
 settings_log|6|field|text|t|
 settings_log|7|old_value|text|f|
 settings_log|8|new_value|text|f|
+space_codes|1|token|text|t|
+space_codes|2|ticket_id|uuid|t|
+space_codes|3|created_at|timestamp with time zone|t|now()
+space_codes|4|expires_at|timestamp with time zone|t|
+space_transfers|1|id|uuid|t|gen_random_uuid()
+space_transfers|2|kind|text|t|
+space_transfers|3|from_key|uuid|t|
+space_transfers|4|to_key|uuid|t|
+space_transfers|5|mb|integer|t|
+space_transfers|6|status|text|t|'active'::text
+space_transfers|7|created_at|timestamp with time zone|t|now()
+space_transfers|8|returned_at|timestamp with time zone|f|
 staff|1|user_id|uuid|t|
 staff|2|name|text|t|
 staff|3|role|text|t|
@@ -209,6 +226,16 @@ transfers|31|return_due|boolean|t|false
 transfers|32|returned_at|timestamp with time zone|f|
 transfers|33|returned_by|uuid|f|
 transfers|34|return_reference|text|f|
+videos|1|id|uuid|t|gen_random_uuid()
+videos|2|ticket_id|uuid|t|
+videos|3|object_key|text|t|
+videos|4|bytes_claimed|bigint|t|
+videos|5|bytes_actual|bigint|f|
+videos|6|preview_bytes|bigint|f|
+videos|7|status|text|t|'reserved'::text
+videos|8|thumb|text|f|
+videos|9|created_at|timestamp with time zone|t|now()
+videos|10|confirmed_at|timestamp with time zone|f|
 === CONSTRAINTS ===
 booking_feedback | booking_feedback_booking_id_fkey | FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE
 booking_feedback | booking_feedback_check | CHECK (((rating IS NOT NULL) OR (comment IS NOT NULL)))
@@ -272,9 +299,22 @@ settings | settings_pkey | PRIMARY KEY (id)
 settings | settings_price_per_head_check | CHECK ((price_per_head > 0))
 settings | settings_upi_id_check | CHECK (((upi_id IS NULL) OR (upi_id ~ '^[A-Za-z0-9._-]{2,64}@[A-Za-z][A-Za-z0-9]{1,31}$'::text)))
 settings | settings_venue_len | CHECK (((char_length(btrim(venue)) >= 1) AND (char_length(btrim(venue)) <= 120)))
+settings | settings_video_cap_mb_check | CHECK (((video_cap_mb >= 1) AND (video_cap_mb <= 100000)))
+settings | settings_video_max_mb_check | CHECK (((video_max_mb >= 1) AND (video_max_mb <= 2000)))
+settings | settings_video_pool_mb_check | CHECK (((video_pool_mb >= 0) AND (video_pool_mb <= 10000000)))
 settings | settings_whatsapp_check | CHECK (((whatsapp_number IS NULL) OR (whatsapp_number ~ '^[0-9]{11,15}$'::text)))
 settings_log | settings_log_area_check | CHECK ((area = ANY (ARRAY['settings'::text, 'staff'::text, 'transfer'::text, 'messages'::text])))
 settings_log | settings_log_pkey | PRIMARY KEY (id)
+space_codes | space_codes_pkey | PRIMARY KEY (token)
+space_codes | space_codes_ticket_id_fkey | FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
+space_codes | space_codes_token_check | CHECK ((token ~ '^[A-Z2-9]{10}$'::text))
+space_transfers | space_transfers_check | CHECK ((from_key <> to_key))
+space_transfers | space_transfers_from_key_fkey | FOREIGN KEY (from_key) REFERENCES tickets(id) ON DELETE CASCADE
+space_transfers | space_transfers_kind_check | CHECK ((kind = ANY (ARRAY['photo'::text, 'video'::text])))
+space_transfers | space_transfers_mb_check | CHECK (((mb >= 1) AND (mb <= 100000)))
+space_transfers | space_transfers_pkey | PRIMARY KEY (id)
+space_transfers | space_transfers_status_check | CHECK ((status = ANY (ARRAY['active'::text, 'returned'::text])))
+space_transfers | space_transfers_to_key_fkey | FOREIGN KEY (to_key) REFERENCES tickets(id) ON DELETE CASCADE
 staff | staff_pkey | PRIMARY KEY (user_id)
 staff | staff_role_check | CHECK ((role = ANY (ARRAY['admin'::text, 'gate'::text, 'camera'::text])))
 staff | staff_user_id_fkey | FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
@@ -341,6 +381,14 @@ transfers | transfers_seller_phone_check | CHECK ((seller_phone ~ '^[0-9]{10}$':
 transfers | transfers_seller_upi_check | CHECK (((seller_upi IS NULL) OR (seller_upi ~ '^([0-9]{10}|[A-Za-z0-9._-]{2,64}@[A-Za-z][A-Za-z0-9]{1,31})$'::text)))
 transfers | transfers_status_check | CHECK ((status = ANY (ARRAY['code_active'::text, 'pending_admin'::text, 'done'::text, 'rejected'::text, 'withdrawn'::text, 'replaced'::text])))
 transfers | transfers_ticket_id_fkey | FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
+videos | videos_bytes_actual_check | CHECK ((bytes_actual > 0))
+videos | videos_bytes_claimed_check | CHECK ((bytes_claimed > 0))
+videos | videos_object_key_key | UNIQUE (object_key)
+videos | videos_pkey | PRIMARY KEY (id)
+videos | videos_preview_bytes_check | CHECK (((preview_bytes IS NULL) OR ((preview_bytes >= 1) AND (preview_bytes <= 2097152))))
+videos | videos_status_check | CHECK ((status = ANY (ARRAY['reserved'::text, 'stored'::text, 'failed'::text, 'expired'::text, 'removed'::text])))
+videos | videos_thumb_check | CHECK (((thumb IS NULL) OR ((char_length(thumb) <= 80000) AND (thumb ~ '^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$'::text))))
+videos | videos_ticket_id_fkey | FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
 === INDEXES ===
 booking_feedback | CREATE UNIQUE INDEX booking_feedback_pkey ON public.booking_feedback USING btree (booking_id)
 booking_ips | CREATE INDEX booking_ips_ip_idx ON public.booking_ips USING btree (ip)
@@ -361,6 +409,11 @@ screenshot_scans | CREATE UNIQUE INDEX screenshot_scans_pkey ON public.screensho
 settings | CREATE UNIQUE INDEX settings_pkey ON public.settings USING btree (id)
 settings_log | CREATE INDEX settings_log_at_idx ON public.settings_log USING btree (at DESC)
 settings_log | CREATE UNIQUE INDEX settings_log_pkey ON public.settings_log USING btree (id)
+space_codes | CREATE UNIQUE INDEX space_codes_pkey ON public.space_codes USING btree (token)
+space_codes | CREATE INDEX space_codes_ticket_idx ON public.space_codes USING btree (ticket_id)
+space_transfers | CREATE INDEX space_transfers_from_idx ON public.space_transfers USING btree (from_key)
+space_transfers | CREATE UNIQUE INDEX space_transfers_pkey ON public.space_transfers USING btree (id)
+space_transfers | CREATE INDEX space_transfers_to_idx ON public.space_transfers USING btree (to_key)
 staff | CREATE UNIQUE INDEX staff_pkey ON public.staff USING btree (user_id)
 ticket_activity | CREATE UNIQUE INDEX ticket_activity_pkey ON public.ticket_activity USING btree (id)
 ticket_activity | CREATE INDEX ticket_activity_ticket_idx ON public.ticket_activity USING btree (ticket_id, created_at DESC)
@@ -383,6 +436,10 @@ transfers | CREATE UNIQUE INDEX transfers_code_active_uq ON public.transfers USI
 transfers | CREATE UNIQUE INDEX transfers_one_open_per_ticket ON public.transfers USING btree (ticket_id) WHERE (status = ANY (ARRAY['code_active'::text, 'pending_admin'::text]))
 transfers | CREATE UNIQUE INDEX transfers_payment_submission_id_key ON public.transfers USING btree (payment_submission_id)
 transfers | CREATE UNIQUE INDEX transfers_pkey ON public.transfers USING btree (id)
+videos | CREATE UNIQUE INDEX videos_object_key_key ON public.videos USING btree (object_key)
+videos | CREATE UNIQUE INDEX videos_pkey ON public.videos USING btree (id)
+videos | CREATE INDEX videos_status_idx ON public.videos USING btree (status)
+videos | CREATE INDEX videos_ticket_idx ON public.videos USING btree (ticket_id)
 === VIEWS ===
 report
  SELECT t.ticket_no AS sl_no,
@@ -422,6 +479,8 @@ reg_sessions : rls=true
 screenshot_scans : rls=true
 settings : rls=true
 settings_log : rls=true
+space_codes : rls=true
+space_transfers : rls=true
 staff : rls=true
 ticket_activity : rls=true
 ticket_emails : rls=true
@@ -430,6 +489,7 @@ ticket_prizes : rls=true
 tickets : rls=true
 transfer_buyers : rls=true
 transfers : rls=true
+videos : rls=true
 === POLICIES (public tables and storage) ===
 public.booking_feedback | admin_read_booking_feedback | SELECT | {authenticated} | using: is_admin() | check: -
 public.booking_ips | admin_read_booking_ips | SELECT | {authenticated} | using: is_admin() | check: -
@@ -440,6 +500,7 @@ public.photos | admin_read_photos | SELECT | {authenticated} | using: is_admin()
 public.screenshot_scans | staff_read_scans | SELECT | {authenticated} | using: is_staff() | check: -
 public.settings | staff_read_settings | SELECT | {authenticated} | using: is_staff() | check: -
 public.settings_log | admin_read_log | SELECT | {authenticated} | using: is_admin() | check: -
+public.space_transfers | admin_read_space_transfers | SELECT | {authenticated} | using: is_admin() | check: -
 public.staff | staff_read_staff | SELECT | {authenticated} | using: ((user_id = auth.uid()) OR is_admin()) | check: -
 public.ticket_activity | admin_read_ticket_activity | SELECT | {authenticated} | using: is_admin() | check: -
 public.ticket_emails | admin_read_ticket_emails | SELECT | {authenticated} | using: is_admin() | check: -
@@ -448,6 +509,7 @@ public.ticket_prizes | admin_read_ticket_prizes | SELECT | {authenticated} | usi
 public.tickets | staff_read_tickets | SELECT | {authenticated} | using: is_staff() | check: -
 public.transfer_buyers | admin_read_transfer_buyers | SELECT | {authenticated} | using: is_admin() | check: -
 public.transfers | admin_read_transfers | SELECT | {authenticated} | using: is_admin() | check: -
+public.videos | admin_read_videos | SELECT | {authenticated} | using: is_admin() | check: -
 storage.objects | proofs_staff_read | SELECT | {authenticated} | using: ((bucket_id = 'payment-proofs'::text) AND is_staff()) | check: -
 storage.objects | proofs_upload | INSERT | {anon,authenticated} | using: - | check: (bucket_id = 'payment-proofs'::text)
 === FUNCTIONS (with who is allowed to run them) ===
@@ -848,6 +910,67 @@ begin
   begin return h::jsonb; exception when others then return '{}'::jsonb; end;
 end $function$
 
+--- _space_code_all(p_token text) | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._space_code_all(p_token text)
+ RETURNS uuid[]
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare tk text := upper(regexp_replace(coalesce(p_token, ''), '[^A-Za-z0-9]', '', 'g')); tid uuid; res uuid[];
+begin
+  select ticket_id into tid from space_codes where token = tk and expires_at > now();
+  if tid is null then return null; end if;
+  select array_agg(t.id order by t.reg_seq) into res from tickets t
+   where t.booking_id = (select booking_id from tickets where id = tid) and t.phone = (select phone from tickets where id = tid)
+     and t.transferred_out_at is null and exists (select 1 from bookings b where b.id = t.booking_id and b.status = 'paid');
+  return res;
+end $function$
+
+--- _space_left(p_kind text, p_ids uuid[], p_all uuid[]) | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._space_left(p_kind text, p_ids uuid[], p_all uuid[])
+ RETURNS bigint
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; lim bigint; mine bigint;
+begin
+  select * into s from settings where id = 1;
+  if p_kind = 'photo' then
+    lim := _photo_person_bytes(s.photo_pool_pub_mb, s.photo_cap_pub_mb, _photo_present()) * coalesce(array_length(p_ids, 1), 0) + _space_net('photo', p_all[1]);
+    select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0)::bigint into mine from photos
+     where ticket_id = any(p_all) and (status = 'stored' or (status = 'reserved' and created_at > now() - interval '20 minutes'));
+  else
+    lim := s.video_cap_mb::bigint * 1048576 * coalesce(array_length(p_ids, 1), 0) + _space_net('video', p_all[1]);
+    select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0)::bigint into mine from videos
+     where ticket_id = any(p_all) and (status = 'stored' or (status = 'reserved' and created_at > now() - interval '20 minutes'));
+  end if;
+  return lim - mine;
+end $function$
+
+--- _space_net(p_kind text, p_key uuid) | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._space_net(p_kind text, p_key uuid)
+ RETURNS bigint
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select coalesce(sum(case when to_key = p_key then mb else -mb end), 0)::bigint * 1048576
+    from space_transfers where kind = p_kind and status = 'active' and (to_key = p_key or from_key = p_key) $function$
+
+--- _space_token() | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._space_token()
+ RETURNS text
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
+declare alpha constant text := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; h text := replace(gen_random_uuid()::text, '-', ''); t text := ''; i int;
+begin
+  for i in 0..9 loop t := t || substr(alpha, 1 + (('x' || substr(h, 1 + i * 2, 2))::bit(8)::int % 32), 1); end loop;
+  return t;
+end $function$
+
 --- _ticket_label(p_kind text, p_ticket_no integer, p_coord_no integer) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public._ticket_label(p_kind text, p_ticket_no integer, p_coord_no integer)
  RETURNS text
@@ -867,6 +990,16 @@ CREATE OR REPLACE FUNCTION public._tlog(p_field text, p_old text, p_new text)
 AS $function$
   insert into settings_log (changed_by, who, area, field, old_value, new_value)
   values (auth.uid(), _actor(), 'transfer', p_field, p_old, p_new) $function$
+
+--- _video_used() | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._video_used()
+ RETURNS bigint
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0)::bigint from videos
+   where status = 'stored' or (status = 'reserved' and created_at > now() - interval '20 minutes') $function$
 
 --- admin_approve_bookings(p_ids uuid[], p_expected_next integer) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.admin_approve_bookings(p_ids uuid[], p_expected_next integer DEFAULT NULL::integer)
@@ -1406,6 +1539,18 @@ begin
   update settings set show_messages = p_show where id = 1;
 end $function$
 
+--- admin_set_space_sharing(p_on boolean) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_set_space_sharing(p_on boolean)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  update settings set space_sharing_on = coalesce(p_on, space_sharing_on) where id = 1;
+end $function$
+
 --- admin_set_transfer_settings(p_open boolean, p_cutoff timestamp with time zone, p_clear_cutoff boolean, p_food_locked boolean, p_code_hours integer, p_ip_threshold integer) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.admin_set_transfer_settings(p_open boolean DEFAULT NULL::boolean, p_cutoff timestamp with time zone DEFAULT NULL::timestamp with time zone, p_clear_cutoff boolean DEFAULT false, p_food_locked boolean DEFAULT NULL::boolean, p_code_hours integer DEFAULT NULL::integer, p_ip_threshold integer DEFAULT NULL::integer)
  RETURNS void
@@ -1431,6 +1576,44 @@ begin
     private_code_hours   = coalesce(p_code_hours, private_code_hours),
     ip_flag_threshold    = coalesce(p_ip_threshold, ip_flag_threshold)
   where id = 1;
+end $function$
+
+--- admin_set_video_settings(p_on boolean, p_pool_mb integer, p_max_mb integer, p_cap_mb integer) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_set_video_settings(p_on boolean DEFAULT NULL::boolean, p_pool_mb integer DEFAULT NULL::integer, p_max_mb integer DEFAULT NULL::integer, p_cap_mb integer DEFAULT NULL::integer)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  if p_pool_mb is not null and p_pool_mb not between 0 and 10000000 then raise exception 'INVALID_POOL'; end if;
+  if p_max_mb is not null and p_max_mb not between 1 and 2000 then raise exception 'INVALID_MAX'; end if;
+  if p_cap_mb is not null and p_cap_mb not between 1 and 100000 then raise exception 'INVALID_CAP'; end if;
+  update settings set videos_on = coalesce(p_on, videos_on), video_pool_mb = coalesce(p_pool_mb, video_pool_mb),
+         video_max_mb = coalesce(p_max_mb, video_max_mb), video_cap_mb = coalesce(p_cap_mb, video_cap_mb) where id = 1;
+end $function$
+
+--- admin_space_transfers(p_limit integer) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_space_transfers(p_limit integer DEFAULT 100)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare items jsonb; s settings%rowtype;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  select * into s from settings where id = 1;
+  select coalesce(jsonb_agg(jsonb_build_object('id', x.id, 'kind', x.kind, 'mb', x.mb, 'status', x.status, 'at', x.created_at, 'returned_at', x.returned_at,
+           'from', ft.name, 'from_code', fb.booking_code, 'to', tt.name, 'to_code', tb.booking_code) order by x.created_at desc), '[]'::jsonb)
+    into items
+    from (select * from space_transfers order by created_at desc limit least(greatest(coalesce(p_limit, 100), 1), 500)) x
+    join tickets ft on ft.id = x.from_key join bookings fb on fb.id = ft.booking_id
+    join tickets tt on tt.id = x.to_key join bookings tb on tb.id = tt.booking_id;
+  return jsonb_build_object('ok', true, 'on', s.space_sharing_on, 'items', items,
+    'active_mb_photo', (select coalesce(sum(mb), 0) from space_transfers where kind = 'photo' and status = 'active'),
+    'active_mb_video', (select coalesce(sum(mb), 0) from space_transfers where kind = 'video' and status = 'active'));
 end $function$
 
 --- admin_ticket_activity() | execute rights: {postgres=X/postgres,authenticated=X/postgres}
@@ -1699,6 +1882,63 @@ begin
   where id = 1;
 end $function$
 
+--- admin_video_list(p_before timestamp with time zone, p_limit integer) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_video_list(p_before timestamp with time zone DEFAULT NULL::timestamp with time zone, p_limit integer DEFAULT 24)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare lim integer; items jsonb;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  lim := least(greatest(coalesce(p_limit, 24), 1), 48);
+  select coalesce(jsonb_agg(jsonb_build_object('id', q.id, 'bytes', q.bytes_actual, 'thumb', q.thumb, 'at', q.created_at,
+                                                'mine', false, 'pv', q.pv, 'by', q.by) order by q.created_at desc), '[]'::jsonb)
+    into items
+    from (select v.id, v.bytes_actual, v.thumb, v.created_at, (v.preview_bytes is not null) as pv,
+                 (select t.name from tickets t where t.id = v.ticket_id) as by
+            from videos v where v.status = 'stored' and (p_before is null or v.created_at < p_before)
+           order by v.created_at desc limit lim) q;
+  return jsonb_build_object('ok', true, 'items', items, 'page', lim, 'can_download', photo_may_download(auth.uid()));
+end $function$
+
+--- admin_video_remove(p_id uuid) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_video_remove(p_id uuid)
+ RETURNS text
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare r videos%rowtype;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  select * into r from videos where id = p_id for update;
+  if not found or r.status <> 'stored' then raise exception 'NOT_FOUND'; end if;
+  update videos set status = 'removed', thumb = null where id = p_id;
+  insert into settings_log (changed_by, who, area, field, old_value, new_value)
+  values (auth.uid(), _actor(), 'settings', 'video removed', left(r.object_key, 300), null);
+  return r.object_key;
+end $function$
+
+--- admin_video_summary() | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_video_summary()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  select * into s from settings where id = 1;
+  return jsonb_build_object('on', s.videos_on, 'pool_bytes', s.video_pool_mb::bigint * 1048576, 'used_bytes', _video_used(),
+    'max_bytes', s.video_max_mb::bigint * 1048576, 'cap_bytes', s.video_cap_mb::bigint * 1048576,
+    'count', (select count(*) from videos where status = 'stored'),
+    'people', (select count(distinct ticket_id) from videos where status = 'stored'),
+    'unfinished', (select count(*) from videos where status in ('reserved', 'failed', 'expired')));
+end $function$
+
 --- admit_ticket(p_ticket_no integer, p_secret text, p_approve boolean, p_coord boolean, p_id uuid) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.admit_ticket(p_ticket_no integer DEFAULT NULL::integer, p_secret text DEFAULT NULL::text, p_approve boolean DEFAULT false, p_coord boolean DEFAULT false, p_id uuid DEFAULT NULL::uuid)
  RETURNS jsonb
@@ -1870,6 +2110,15 @@ AS $function$
     'server_now',    now())
   from settings s where s.id = 1
 $function$
+
+--- get_videos_info() | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.get_videos_info()
+ RETURNS jsonb
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select jsonb_build_object('on', s.videos_on, 'max_bytes', s.video_max_mb::bigint * 1048576) from settings s where s.id = 1 $function$
 
 --- is_admin() | execute rights: {postgres=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.is_admin()
@@ -2169,7 +2418,7 @@ begin
   if w.err is not null then return jsonb_build_object('ok', false, 'error', w.err); end if;
   present := _photo_present();
   per  := _photo_person_bytes(s.photo_pool_pub_mb, s.photo_cap_pub_mb, present);
-  lim  := per * array_length(w.ids, 1);
+  lim  := per * array_length(w.ids, 1) + _space_net('photo', w.all_ids[1]);
   select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0)::bigint into mine from photos
    where ticket_id = any(w.all_ids) and (status = 'stored' or (status = 'reserved' and created_at > now() - interval '20 minutes'));
   pool := s.photo_pool_pub_mb::bigint * 1048576; pused := _photo_used('public');
@@ -2249,7 +2498,7 @@ begin
   if p_bytes > s.photo_max_pub_mb::bigint * 1048576 then return jsonb_build_object('ok', false, 'error', 'TOO_BIG'); end if;
   present := _photo_present();
   per  := _photo_person_bytes(s.photo_pool_pub_mb, s.photo_cap_pub_mb, present);
-  lim  := per * array_length(w.ids, 1);
+  lim  := per * array_length(w.ids, 1) + _space_net('photo', w.all_ids[1]);
   select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0)::bigint into mine from photos
    where ticket_id = any(w.all_ids) and (status = 'stored' or (status = 'reserved' and created_at > now() - interval '20 minutes'));
   if mine + p_bytes > lim then return jsonb_build_object('ok', false, 'error', 'PERSON_FULL'); end if;
@@ -2480,6 +2729,159 @@ begin
   select * into t from tickets where id = t.id;
   return jsonb_build_object('id', t.id, 'kind', t.kind, 'ticket_no', t.ticket_no,
                             'label', _ticket_label(t.kind, t.ticket_no, t.coord_no));
+end $function$
+
+--- space_code_peek(p_token text) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.space_code_peek(p_token text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare a uuid[] := _space_code_all(p_token);
+begin
+  if a is null then return jsonb_build_object('ok', false, 'error', 'CODE_INVALID'); end if;
+  return jsonb_build_object('ok', true, 'name', (select name from tickets where id = a[1]));
+end $function$
+
+--- space_give(p_code text, p_phone text, p_to_code text, p_to_phone text, p_kind text, p_mb integer) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.space_give(p_code text, p_phone text, p_to_code text, p_to_phone text, p_kind text, p_mb integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; w record; r record; me uuid; other uuid; left_b bigint; tid uuid; n1 text; n2 text;
+begin
+  select * into s from settings where id = 1 for update;             -- same lock as the upload checks, so nothing can slip in between
+  if p_kind not in ('photo', 'video') then return jsonb_build_object('ok', false, 'error', 'BAD_KIND'); end if;
+  if p_mb is null or p_mb < 1 or p_mb > 100000 then return jsonb_build_object('ok', false, 'error', 'BAD_AMOUNT'); end if;
+  if not s.space_sharing_on then return jsonb_build_object('ok', false, 'error', 'SHARING_OFF'); end if;
+  if (p_kind = 'photo' and not s.photos_on) or (p_kind = 'video' and not s.videos_on) then return jsonb_build_object('ok', false, 'error', 'FEATURE_OFF'); end if;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.err is not null then return jsonb_build_object('ok', false, 'error', w.err); end if;
+  select * into r from _photo_public_who(p_to_code, p_to_phone);
+  if r.all_ids is null then return jsonb_build_object('ok', false, 'error', case when r.err = 'NOT_PAID' then 'TO_NOT_PAID' else 'TO_MISMATCH' end); end if;
+  me := w.all_ids[1]; other := r.all_ids[1];
+  if me = other or w.all_ids && r.all_ids then return jsonb_build_object('ok', false, 'error', 'SAME_PERSON'); end if;
+  left_b := _space_left(p_kind, w.ids, w.all_ids);
+  if p_mb::bigint * 1048576 > left_b then return jsonb_build_object('ok', false, 'error', 'TOO_MUCH', 'give_bytes', greatest(0, left_b)); end if;
+  insert into space_transfers (kind, from_key, to_key, mb) values (p_kind, me, other, p_mb) returning id into tid;
+  select name into n1 from tickets where id = me; select name into n2 from tickets where id = other;
+  insert into settings_log (changed_by, who, area, field, old_value, new_value)
+  values (null, 'attendee', 'settings', 'space given (' || p_kind || 's)', left(coalesce(n1, '?') || ' > ' || coalesce(n2, '?'), 300), p_mb || ' MB');
+  return jsonb_build_object('ok', true, 'id', tid);
+end $function$
+
+--- space_give_token(p_code text, p_phone text, p_token text, p_kind text, p_mb integer) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.space_give_token(p_code text, p_phone text, p_token text, p_kind text, p_mb integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; w record; oall uuid[]; me uuid; other uuid; left_b bigint; tid uuid; n1 text; n2 text;
+begin
+  select * into s from settings where id = 1 for update;             -- same lock as the upload checks
+  if p_kind not in ('photo', 'video') then return jsonb_build_object('ok', false, 'error', 'BAD_KIND'); end if;
+  if p_mb is null or p_mb < 1 or p_mb > 100000 then return jsonb_build_object('ok', false, 'error', 'BAD_AMOUNT'); end if;
+  if not s.space_sharing_on then return jsonb_build_object('ok', false, 'error', 'SHARING_OFF'); end if;
+  if (p_kind = 'photo' and not s.photos_on) or (p_kind = 'video' and not s.videos_on) then return jsonb_build_object('ok', false, 'error', 'FEATURE_OFF'); end if;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.err is not null then return jsonb_build_object('ok', false, 'error', w.err); end if;
+  oall := _space_code_all(p_token);
+  if oall is null then return jsonb_build_object('ok', false, 'error', 'CODE_INVALID'); end if;
+  me := w.all_ids[1]; other := oall[1];
+  if me = other or w.all_ids && oall then return jsonb_build_object('ok', false, 'error', 'SAME_PERSON'); end if;
+  left_b := _space_left(p_kind, w.ids, w.all_ids);
+  if p_mb::bigint * 1048576 > left_b then return jsonb_build_object('ok', false, 'error', 'TOO_MUCH', 'give_bytes', greatest(0, left_b)); end if;
+  insert into space_transfers (kind, from_key, to_key, mb) values (p_kind, me, other, p_mb) returning id into tid;
+  select name into n1 from tickets where id = me; select name into n2 from tickets where id = other;
+  insert into settings_log (changed_by, who, area, field, old_value, new_value)
+  values (null, 'attendee', 'settings', 'space given (' || p_kind || 's)', left(coalesce(n1, '?') || ' > ' || coalesce(n2, '?') || ' (QR)', 300), p_mb || ' MB');
+  return jsonb_build_object('ok', true, 'id', tid);
+end $function$
+
+--- space_make_code(p_code text, p_phone text) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.space_make_code(p_code text, p_phone text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; w record; me uuid; tok text; exp timestamptz;
+begin
+  select * into s from settings where id = 1;
+  if not s.space_sharing_on then return jsonb_build_object('ok', false, 'error', 'SHARING_OFF'); end if;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.all_ids is null then return jsonb_build_object('ok', false, 'error', coalesce(w.err, 'MISMATCH')); end if;
+  me := w.all_ids[1];
+  delete from space_codes where expires_at < now() - interval '1 day';
+  select token, expires_at into tok, exp from space_codes where ticket_id = me and expires_at > now() + interval '10 minutes' order by expires_at desc limit 1;
+  if tok is null then
+    loop
+      tok := _space_token(); exp := now() + interval '30 minutes';
+      begin insert into space_codes (token, ticket_id, expires_at) values (tok, me, exp); exit;
+      exception when unique_violation then null; end;
+    end loop;
+  end if;
+  return jsonb_build_object('ok', true, 'token', tok, 'expires_at', exp);
+end $function$
+
+--- space_overview(p_code text, p_phone text) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.space_overview(p_code text, p_phone text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; w record; me uuid; ph bigint; vd bigint; items jsonb;
+begin
+  select * into s from settings where id = 1;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.err is not null then return jsonb_build_object('ok', false, 'error', w.err); end if;
+  me := w.all_ids[1];
+  ph := greatest(0, _space_left('photo', w.ids, w.all_ids)); vd := greatest(0, _space_left('video', w.ids, w.all_ids));
+  select coalesce(jsonb_agg(jsonb_build_object('id', q.id, 'kind', q.kind, 'mb', q.mb, 'dir', q.dir, 'other', q.other, 'status', q.status, 'at', q.created_at,
+           'can_return', q.dir = 'out' and q.status = 'active'
+              and _space_left(q.kind, (select array_agg(t.id order by t.reg_seq) from tickets t where t.booking_id = (select booking_id from tickets where id = q.other_key) and t.phone = (select phone from tickets where id = q.other_key) and t.transferred_out_at is null),
+                                      (select array_agg(t.id order by t.reg_seq) from tickets t where t.booking_id = (select booking_id from tickets where id = q.other_key) and t.phone = (select phone from tickets where id = q.other_key) and t.transferred_out_at is null))
+                  >= q.mb::bigint * 1048576) order by q.created_at desc), '[]'::jsonb)
+    into items
+    from (select x.id, x.kind, x.mb, x.status, x.created_at, case when x.from_key = me then 'out' else 'in' end as dir,
+                 case when x.from_key = me then x.to_key else x.from_key end as other_key,
+                 (select t.name from tickets t where t.id = case when x.from_key = me then x.to_key else x.from_key end) as other
+            from space_transfers x where x.from_key = me or x.to_key = me order by x.created_at desc limit 40) q;
+  return jsonb_build_object('ok', true, 'sharing_on', s.space_sharing_on,
+    'photo', jsonb_build_object('on', s.photos_on, 'give_bytes', ph, 'net_bytes', _space_net('photo', me)),
+    'video', jsonb_build_object('on', s.videos_on, 'give_bytes', vd, 'net_bytes', _space_net('video', me)),
+    'items', items);
+end $function$
+
+--- space_return(p_code text, p_phone text, p_id uuid) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.space_return(p_code text, p_phone text, p_id uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; w record; x space_transfers%rowtype; oids uuid[]; n1 text; n2 text;
+begin
+  select * into s from settings where id = 1 for update;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.err is not null then return jsonb_build_object('ok', false, 'error', w.err); end if;
+  select * into x from space_transfers where id = p_id for update;
+  if not found or x.from_key <> w.all_ids[1] then return jsonb_build_object('ok', false, 'error', 'NOT_FOUND'); end if;
+  if x.status <> 'active' then return jsonb_build_object('ok', false, 'error', 'ALREADY'); end if;
+  select array_agg(t.id order by t.reg_seq) into oids from tickets t
+   where t.booking_id = (select booking_id from tickets where id = x.to_key) and t.phone = (select phone from tickets where id = x.to_key) and t.transferred_out_at is null;
+  if oids is null or oids[1] <> x.to_key or _space_left(x.kind, oids, oids) < x.mb::bigint * 1048576 then
+    return jsonb_build_object('ok', false, 'error', 'TAKEN'); end if;
+  update space_transfers set status = 'returned', returned_at = now() where id = p_id;
+  select name into n1 from tickets where id = x.from_key; select name into n2 from tickets where id = x.to_key;
+  insert into settings_log (changed_by, who, area, field, old_value, new_value)
+  values (null, 'attendee', 'settings', 'space taken back (' || x.kind || 's)', left(coalesce(n1, '?') || ' < ' || coalesce(n2, '?'), 300), x.mb || ' MB');
+  return jsonb_build_object('ok', true);
 end $function$
 
 --- submit_booking(p_submission_id uuid, p_people jsonb, p_screenshot_path text) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
@@ -2768,6 +3170,180 @@ begin
   if n = 0 then raise exception 'INVALID_TICKET'; end if;
 end $function$
 
+--- video_confirm(p_id uuid, p_actual bigint, p_thumb text, p_preview bigint) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.video_confirm(p_id uuid, p_actual bigint, p_thumb text, p_preview bigint DEFAULT NULL::bigint)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; r videos%rowtype;
+begin
+  select * into s from settings where id = 1 for update;
+  select * into r from videos where id = p_id for update;
+  if not found then return jsonb_build_object('ok', false, 'error', 'NOT_FOUND'); end if;
+  if r.status = 'stored' then return jsonb_build_object('ok', true, 'already', true); end if;
+  if r.status <> 'reserved' then return jsonb_build_object('ok', false, 'error', 'NOT_RESERVED'); end if;
+  if r.created_at < now() - interval '20 minutes' then
+    update videos set status = 'expired' where id = p_id;
+    return jsonb_build_object('ok', false, 'error', 'EXPIRED', 'key', r.object_key);
+  end if;
+  if p_actual is null or p_actual <= 0 or p_actual > r.bytes_claimed then
+    update videos set status = 'failed' where id = p_id;
+    return jsonb_build_object('ok', false, 'error', 'SIZE_MISMATCH', 'key', r.object_key);
+  end if;
+  update videos set status = 'stored', bytes_actual = p_actual, confirmed_at = now(),
+         thumb = case when p_thumb is not null and char_length(p_thumb) <= 80000 and p_thumb ~ '^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$' then p_thumb end,
+         preview_bytes = case when p_preview is not null and p_preview between 1 and 2097152 and p_preview < p_actual then p_preview end
+   where id = p_id;
+  return jsonb_build_object('ok', true);
+end $function$
+
+--- video_fail(p_id uuid) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.video_fail(p_id uuid)
+ RETURNS void
+ LANGUAGE sql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  update videos set status = 'failed' where id = p_id and status = 'reserved' $function$
+
+--- video_key(p_id uuid) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.video_key(p_id uuid)
+ RETURNS text
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ select object_key from videos where id = p_id $function$
+
+--- video_original_key(p_id uuid, p_user uuid) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.video_original_key(p_id uuid, p_user uuid)
+ RETURNS text
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare k text;
+begin
+  if not photo_may_download(p_user) then return null; end if;
+  select object_key into k from videos where id = p_id and status = 'stored';
+  return k;
+end $function$
+
+--- video_preview_key(p_id uuid, p_user uuid, p_code text, p_phone text) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.video_preview_key(p_id uuid, p_user uuid, p_code text, p_phone text)
+ RETURNS text
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare r videos%rowtype; s settings%rowtype; w record;
+begin
+  select * into r from videos where id = p_id and status = 'stored' and preview_bytes is not null;
+  if not found then return null; end if;
+  select * into s from settings where id = 1;
+  if p_user is not null then
+    if exists (select 1 from staff where user_id = p_user and role = 'admin') then return r.object_key || '.p.jpg'; end if;
+    return null;
+  end if;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.all_ids is null then return null; end if;
+  if s.photo_visibility = 'all' or r.ticket_id = any (w.all_ids) then return r.object_key || '.p.jpg'; end if;
+  return null;
+end $function$
+
+--- video_public_list(p_code text, p_phone text, p_before timestamp with time zone, p_limit integer) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.video_public_list(p_code text, p_phone text, p_before timestamp with time zone DEFAULT NULL::timestamp with time zone, p_limit integer DEFAULT 24)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; w record; lim integer; items jsonb;
+begin
+  select * into s from settings where id = 1;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.all_ids is null then return jsonb_build_object('ok', false, 'error', coalesce(w.err, 'MISMATCH')); end if;
+  lim := least(greatest(coalesce(p_limit, 24), 1), 48);
+  select coalesce(jsonb_agg(jsonb_build_object('id', q.id, 'bytes', q.bytes_actual, 'thumb', q.thumb, 'at', q.created_at,
+                                                'mine', q.mine, 'pv', q.pv) order by q.created_at desc), '[]'::jsonb)
+    into items
+    from (select v.id, v.bytes_actual, v.thumb, v.created_at, (v.preview_bytes is not null) as pv, (v.ticket_id = any (w.all_ids)) as mine
+            from videos v
+           where v.status = 'stored' and (p_before is null or v.created_at < p_before)
+             and (s.photo_visibility = 'all' or v.ticket_id = any (w.all_ids))
+           order by v.created_at desc limit lim) q;
+  return jsonb_build_object('ok', true, 'items', items, 'page', lim, 'can_download', false);
+end $function$
+
+--- video_public_status(p_code text, p_phone text) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.video_public_status(p_code text, p_phone text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; w record; lim bigint; mine bigint; pool bigint; pused bigint;
+begin
+  select * into s from settings where id = 1;
+  if not s.videos_on then return jsonb_build_object('ok', false, 'error', 'VIDEOS_OFF'); end if;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.err is not null then return jsonb_build_object('ok', false, 'error', w.err); end if;
+  lim := s.video_cap_mb::bigint * 1048576 * array_length(w.ids, 1) + _space_net('video', w.all_ids[1]);
+  select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0)::bigint into mine from videos
+   where ticket_id = any(w.all_ids) and (status = 'stored' or (status = 'reserved' and created_at > now() - interval '20 minutes'));
+  pool := s.video_pool_mb::bigint * 1048576; pused := _video_used();
+  return jsonb_build_object('ok', true, 'limit_bytes', lim, 'used_bytes', mine,
+           'left_bytes', greatest(0, least(lim - mine, pool - pused)), 'max_bytes', s.video_max_mb::bigint * 1048576);
+end $function$
+
+--- video_remove_public(p_id uuid, p_code text, p_phone text) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.video_remove_public(p_id uuid, p_code text, p_phone text)
+ RETURNS text
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare r videos%rowtype; w record;
+begin
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.all_ids is null then return null; end if;
+  select * into r from videos where id = p_id for update;
+  if not found or r.status <> 'stored' or not (r.ticket_id = any (w.all_ids)) then return null; end if;
+  update videos set status = 'removed', thumb = null where id = p_id;
+  insert into settings_log (changed_by, who, area, field, old_value, new_value)
+  values (null, 'attendee', 'settings', 'video removed (own)', left(r.object_key, 300), null);
+  return r.object_key;
+end $function$
+
+--- video_reserve(p_code text, p_phone text, p_bytes bigint, p_ext text) | execute rights: {postgres=X/postgres,service_role=X/postgres}
+CREATE OR REPLACE FUNCTION public.video_reserve(p_code text, p_phone text, p_bytes bigint, p_ext text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; ext text; vid uuid := gen_random_uuid(); k text; w record; lim bigint; mine bigint; pool bigint; used bigint;
+begin
+  select * into s from settings where id = 1 for update;            -- one claim at a time, so a race cannot beat the totals
+  ext := lower(coalesce(p_ext, ''));
+  if p_bytes is null or p_bytes <= 0 then return jsonb_build_object('ok', false, 'error', 'BAD_SIZE'); end if;
+  if not s.videos_on then return jsonb_build_object('ok', false, 'error', 'VIDEOS_OFF'); end if;
+  if ext not in ('mp4', 'mov', 'm4v', 'webm', '3gp') then return jsonb_build_object('ok', false, 'error', 'BAD_TYPE'); end if;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.err is not null then return jsonb_build_object('ok', false, 'error', w.err); end if;
+  if p_bytes > s.video_max_mb::bigint * 1048576 then return jsonb_build_object('ok', false, 'error', 'TOO_BIG'); end if;
+  lim := s.video_cap_mb::bigint * 1048576 * array_length(w.ids, 1) + _space_net('video', w.all_ids[1]);
+  select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0)::bigint into mine from videos
+   where ticket_id = any(w.all_ids) and (status = 'stored' or (status = 'reserved' and created_at > now() - interval '20 minutes'));
+  if mine + p_bytes > lim then return jsonb_build_object('ok', false, 'error', 'PERSON_FULL'); end if;
+  pool := s.video_pool_mb::bigint * 1048576; used := _video_used();
+  if used + p_bytes > pool then return jsonb_build_object('ok', false, 'error', 'POOL_FULL'); end if;
+  k := 'video/' || w.ids[1]::text || '/' || vid::text || '.' || ext;
+  insert into videos (id, ticket_id, object_key, bytes_claimed) values (vid, w.ids[1], k, p_bytes);
+  return jsonb_build_object('ok', true, 'id', vid, 'key', k, 'left_bytes', least(lim - mine - p_bytes, pool - used - p_bytes));
+end $function$
+
 === TRIGGERS ===
 settings | CREATE TRIGGER settings_log_trg AFTER UPDATE ON public.settings FOR EACH ROW EXECUTE FUNCTION _log_settings_change()
 staff | CREATE TRIGGER staff_log_trg AFTER INSERT OR DELETE OR UPDATE ON public.staff FOR EACH ROW EXECUTE FUNCTION _log_staff_change()
@@ -2792,6 +3368,8 @@ report : {postgres=arwdDxtm/postgres,anon=Dxtm/postgres,authenticated=rDxtm/post
 screenshot_scans : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 settings : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 settings_log : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
+space_codes : {postgres=arwdDxtm/postgres,service_role=rDxtm/postgres}
+space_transfers : {postgres=arwdDxtm/postgres,service_role=rDxtm/postgres,authenticated=r/postgres}
 staff : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 ticket_activity : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 ticket_emails : {postgres=arwdDxtm/postgres,authenticated=r/postgres}
@@ -2800,5 +3378,6 @@ ticket_prizes : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authentic
 tickets : {postgres=arwdDxtm/postgres,service_role=Dxtm/postgres,authenticated=r/postgres}
 transfer_buyers : {postgres=arwdDxtm/postgres,authenticated=r/postgres}
 transfers : {postgres=arwdDxtm/postgres,authenticated=r/postgres}
+videos : {postgres=arwdDxtm/postgres,service_role=rDxtm/postgres,authenticated=r/postgres}
 === STORAGE BUCKETS ===
 === END OF SNAPSHOT ===

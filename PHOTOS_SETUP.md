@@ -2,6 +2,18 @@
 
 Do these in this order. Each step says what you should see.
 
+## BEFORE THE PROGRAM STARTS (Sun 22 Nov): tick these off
+Admin > Settings. Do it the day before, not on the day.
+- [ ] **Videos card: "Biggest video" = 100 MB.** (Slow Wi-Fi: a video that takes over 20 minutes to upload is deleted. 100 MB is safe, 150 MB is not.)
+- [ ] Videos card: switch videos **On**. Set the pool (GB) below what Storj gives free (25 GB each account).
+- [ ] Photos card: set the photo pools below the free 25 GB; "Who can upload (public)" = the mode you want (Present only is the default).
+- [ ] Space sharing card: **On** (default).
+- [ ] Storj: the 3 trial accounts last 30 days from creation. Check none ends before the event or before you have downloaded everything.
+- [ ] The 5 real photographer logins work (try each once). Delete test photos and test videos.
+- [ ] Check in two test attendees as Present, upload a photo and a short video on a real phone (iPhone and Android), and give 10 MB to a friend by QR.
+- [ ] Tell attendees: allow the camera for the QR, and keep the page open until the video shows "uploaded".
+After the event: Settings > Make download links file (photos and videos), download everything, then switch uploads off.
+
 ## 0. What this adds
 - **Photographers** sign in at `…/camera/` and upload into one shared space (default 10 GB).
 - **Attendees** open their ticket → **Upload photos** (Booking ID + phone, already filled in) and upload into a public space (default 12 GB). Each person gets the **lower of** (public space ÷ people marked Present) **and** the cap (default 90 MB).

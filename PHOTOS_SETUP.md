@@ -91,6 +91,14 @@ Only attendees upload videos (same Booking ID + phone login as photos). Nobody p
 If the third account is not set up, video uploads answer "not set up yet" and nothing else is affected.
 After the event: Admin > Settings > Videos > "Make video download links file" (admins with the download switch on), then save the videos before the Storj trial ends.
 
+## 5i. Sharing space between friends (r2_28, 18 Nov)
+An attendee can give some unused photo space or video space to a friend (the friend's Booking ID + phone). Photos and videos are separate amounts. Received space can be passed on. The giver can take a gift back (all of it) only while the friend still has that much unused space. Space only moves between people: the pools and the Storj totals never change.
+1. In the SQL Editor run `sql/r2_28_space_sharing.sql` (safe to run twice). No Edge Function change, no new secrets.
+2. Merge the pull request. The attendee page gets a "Share" tab.
+3. Admin > Settings > Space sharing: the log of who gave to whom (names, booking IDs, photo or video, MB, active or taken back) and an on/off switch. Every gift and take-back is also in the Settings log.
+4. Test with two attendees marked Present: give 10 MB of photo space from one to the other, check both status bars change, upload with the friend, try Take it back.
+NOT verified: anything on a real phone; the admin card was never opened in a real browser (syntax-checked only).
+
 ## 6. After the event
 Admin → Settings → Photos → **Make download links file**, download everything within the trial, and switch uploads off.
 

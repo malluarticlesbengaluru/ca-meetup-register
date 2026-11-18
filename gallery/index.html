@@ -124,7 +124,7 @@ async function loginPub(){
   await refreshStatus();await resume();render();
 }
 async function signOut(){S.sel.forEach(dropUrl);if(S.role==="cam")await db.auth.signOut();
-  Object.assign(S,{role:null,uid:null,isAdmin:false,st:null,stErr:"",sel:[],q:[],drafts:[],photos:[],more:false,loaded:false,lb:null,tab:"upload",phone:"",code:"",msg:"",note:""});render()}
+  Object.assign(S,{role:null,uid:null,isAdmin:false,st:null,stErr:"",sel:[],q:[],drafts:[],photos:[],more:false,loaded:false,lb:null,tab:"upload",phone:"",code:"",msg:"",note:""});resetVideos();render()}
 async function refreshStatus(){
   if(S.role==="cam"){const r=await db.rpc("photo_camera_status");if(!r.error&&r.data){S.st=r.data;S.stErr=""}}
   else if(S.role==="pub"){const r=await db.rpc("photo_public_status",{p_code:S.code,p_phone:S.phone});
@@ -273,9 +273,10 @@ function loginHTML(){
    <p class="err" role="alert">${esc(S.msg)}</p><button id="go">Log in</button>`}</div>`}
 function mainHTML(){
   let h=`<div class="top"><div><h1>${esc(S.name)}</h1><span class="mute">${S.role==="cam"?(S.isAdmin?"Admin":"Photographer"):"Attendee"}</span></div><button class="ghost sm" data-a="out">Sign out</button></div>
-  <div class="tabs"><button class="${S.tab==="upload"?"on":""}" data-tab="upload">Upload</button><button class="${S.tab==="view"?"on":""}" data-tab="view">Photos</button></div>`;
+  <div class="tabs"><button class="${S.tab==="upload"?"on":""}" data-tab="upload">Upload</button><button class="${S.tab==="view"?"on":""}" data-tab="view">Photos</button>${canVideo()?`<button class="${S.tab==="videos"?"on":""}" data-tab="videos">Videos</button>`:""}</div>`;
   if(S.note)h+=`<div class="card"><span class="warn">${esc(S.note)}</span></div>`;
   if(S.tab==="view")return h+photosHTML();
+  if(S.tab==="videos"&&canVideo())return h+videosHTML();
   h+=`<div class="card" id="st">${statusHTML()}</div>
   <div class="card"><b>When I add photos</b><div class="seg" style="margin-top:8px">${Object.keys(MODES).map(k=>`<button class="${S.mode===k?"on":""}" data-mode="${k}">${MODES[k][0]}</button>`).join("")}</div><p class="note" style="margin:8px 0 0">${MODES[S.mode][1]}</p></div>
   <div class="row"><label class="btn" for="f1">Take photo</label><label class="btn ghost" for="f2">Choose photos</label></div>
@@ -286,20 +287,81 @@ function mainHTML(){
   return h}
 function render(){
   const a=$("#app");
-  a.innerHTML=(S.role?mainHTML():loginHTML())+(S.lb!=null?lbHTML():"");
+  a.innerHTML=(S.role?mainHTML():loginHTML())+(S.lb!=null?lbHTML():"")+(SV.lb!=null?vlbHTML():"");
   if(!S.role){const g=$("#go");g.onclick=S.loginTab==="pub"?loginPub:loginCam;(S.loginTab==="pub"?$("#ph"):$("#pw")).onkeydown=e=>{if(e.key==="Enter")g.click()};return}
   if(S.tab==="upload"){updateCap();const d=$("#drop");if(d){["dragenter","dragover"].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.add("hot")}));["dragleave","drop"].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.remove("hot")}));d.addEventListener("drop",e=>{const fs=Array.from(e.dataTransfer.files).filter(f=>/^image\//.test(f.type)||EXT_OK[S.role].includes(extOf(f)));if(fs.length)addFiles(fs)})}}
 }
 
+/* ---------- videos (attendees upload; nobody plays them here; the page shows a still picture) ---------- */
+const SV={items:[],more:false,loading:false,loaded:false,fail:false,st:null,err:"",busy:null,note:"",lb:null,canDl:false};
+const canVideo=()=>S.role==="pub"||(S.role==="cam"&&S.isAdmin);
+const sharpV=p=>!!(p&&p.sharp&&Date.now()-p.sharpAt<480000);
+function resetVideos(){Object.assign(SV,{items:[],more:false,loading:false,loaded:false,fail:false,st:null,err:"",busy:null,note:"",lb:null,canDl:false})}
+async function vStatus(){
+  if(S.role!=="pub")return;
+  const r=await db.rpc("video_public_status",{p_code:S.code,p_phone:S.phone});
+  if(r.error||!r.data)return;SV.st=r.data.ok?r.data:null;SV.err=r.data.ok?"":r.data.error}
+async function loadVideos(reset){
+  if(SV.loading)return;SV.loading=true;if(reset){SV.items=[];SV.more=false}
+  const before=SV.items.length?SV.items[SV.items.length-1].at:null;render();
+  const r=S.role==="cam"?await db.rpc("admin_video_list",{p_before:before,p_limit:24}):await db.rpc("video_public_list",{p_code:S.code,p_phone:S.phone,p_before:before,p_limit:24});
+  SV.loading=false;
+  if(r.error||!r.data||!r.data.ok){SV.fail=true;SV.note="Could not load the videos. Check your internet and try again.";return render()}
+  SV.fail=false;SV.items=SV.items.concat(r.data.items);SV.more=r.data.items.length>=r.data.page;SV.canDl=!!r.data.can_download;SV.loaded=true;render()}
+function videosHTML(){
+  if(!SV.loaded&&!SV.loading&&!SV.fail){setTimeout(async()=>{await vStatus();loadVideos(true)},0)}
+  const tiles=SV.items.map((p,i)=>`<button class="tile" data-vopen="${i}" aria-label="Open video">${p.thumb?`<img src="${esc(p.thumb)}" alt="" loading="lazy" decoding="async">`:`<span class="nop">Video</span>`}<span class="sz">${P.mb(p.bytes||0)}</span>${p.mine?`<span class="mine">Yours</span>`:""}</button>`).join("");
+  let up="";
+  if(S.role==="pub"){
+    if(SV.st){const st=SV.st;up=`<p class="note" style="margin:0">Space for videos: ${P.bytes(st.used_bytes)} used of ${P.bytes(st.limit_bytes)}. One video can be up to ${P.bytes(st.max_bytes)}.</p>
+      <div class="row" style="margin-top:8px"><label class="btn" for="v1">Record video</label><label class="btn ghost" for="v2">Choose video</label></div>
+      <input id="v1" type="file" accept="video/*" capture="environment"><input id="v2" type="file" accept="video/*">
+      <p class="note" id="vprog" style="margin-top:8px">${SV.busy?vProgText():"Keep this page open while a video uploads. Short clips upload faster."}</p>`}
+    else if(SV.err)up=`<p class="warn">${esc(SV.err==="VIDEOS_OFF"?"Video uploads are not open right now.":SV.err==="NOT_PRESENT"?"Video upload opens once you have checked in at the gate.":P.say(SV.err))}</p>`;
+  }
+  return `<div class="card"><div class="top"><h2>Videos</h2><button class="ghost sm" data-a="vrefresh">Refresh</button></div>${up}
+  <p class="note">Videos are not played on this page. You see a still picture of each one; the organiser keeps the videos.</p>
+  ${SV.note?`<span class="warn">${esc(SV.note)}</span>`:""}
+  ${SV.items.length?`<div class="grid">${tiles}</div>`:`<p class="mute">${SV.loading?"Loading…":"No videos to show yet."}</p>`}
+  ${SV.more?`<button class="ghost" data-a="vmore" ${SV.loading?"disabled":""}>${SV.loading?"Loading…":"Load more"}</button>`:""}</div>`}
+const vProgText=()=>SV.busy?`Uploading ${esc(SV.busy.name)}… ${Math.round((SV.busy.p||0)*100)}%`:"";
+async function uploadOneVideo(file){
+  if(SV.busy)return;SV.note="";SV.busy={name:file.name||"video",p:0};render();
+  const r=await P.uploadVideo(await cfg(),{code:S.code,phone:S.phone},file,p=>{SV.busy.p=p;const el=$("#vprog");if(el)el.textContent=vProgText()});
+  SV.busy=null;SV.note=r.ok?"Video uploaded.":r.message;await vStatus();SV.loaded=false;SV.fail=false;render()}
+async function loadSharpV(id){
+  const p=SV.items.find(x=>x.id===id);if(!p||!p.pv||sharpV(p))return;
+  const body={action:"vpreview",id};if(S.role==="pub"){body.code=S.code;body.phone=S.phone}
+  const r=await P.call(await cfg(),body);if(!r.ok||!r.url)return;
+  const im=new Image();im.onload=()=>{p.sharp=r.url;p.sharpAt=Date.now();const cur=SV.items[SV.lb];const el=$("#vlbimg");if(cur&&cur.id===id&&el)el.src=r.url};
+  im.onerror=()=>{};im.src=r.url}
+function vlbHTML(){
+  const p=SV.items[SV.lb];if(!p)return"";
+  const mine=p.mine||S.isAdmin;
+  return `<div class="lb" data-a="vlbclose"><div class="cap">${p.thumb||sharpV(p)?`<img id="vlbimg" src="${esc(sharpV(p)?p.sharp:p.thumb)}" alt="">`:`<div class="nop">No preview for this video</div>`}</div>
+  <div class="cap">${esc(fdt(p.at))} · ${P.mb(p.bytes||0)}${p.by?" · "+esc(p.by):""}${p.mine?" · yours":""}</div>
+  <div class="row">${S.role==="cam"&&SV.canDl?`<button data-vdl="${p.id}">Download original</button>`:`<button disabled>Original: kept by the organiser</button>`}
+  ${mine?`<button class="danger" data-vdel="${p.id}">Delete</button>`:""}<button data-a="vlbclose">Close</button></div>
+  <div class="cap note">This is a still picture. Videos are not played on this page.</div></div>`}
+
 /* ---------- events ---------- */
 document.addEventListener("change",e=>{const t=e.target;
+  if(t.id==="v1"||t.id==="v2"){const f=t.files&&t.files[0];t.value="";if(f)uploadOneVideo(f);return}
   if(t.id==="f1"||t.id==="f2"){const fs=Array.from(t.files);t.value="";if(fs.length)addFiles(fs);return}
   if(t.dataset&&t.dataset.tick){const it=S.sel.find(x=>x.id===t.dataset.tick);if(it){it.on=t.checked;updateCap()}}});
 document.addEventListener("error",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.dataset.fb){const s=document.createElement("span");s.className="nop";s.textContent=t.alt||"Preview not available";t.replaceWith(s)}},true);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.lb!=null){S.lb=null;render()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(S.lb!=null||SV.lb!=null)){S.lb=null;SV.lb=null;render()}});
 document.addEventListener("click",async e=>{
-  const t=e.target.closest("[data-a],[data-lt],[data-id],[data-tab],[data-mode],[data-open],[data-retry],[data-rm],[data-dl],[data-del]");if(!t)return;
+  const t=e.target.closest("[data-a],[data-lt],[data-id],[data-tab],[data-mode],[data-open],[data-retry],[data-rm],[data-dl],[data-del],[data-vopen],[data-vdl],[data-vdel]");if(!t)return;
   const d=t.dataset;
+  if(d.vopen!=null){SV.lb=+d.vopen;render();const q=SV.items[SV.lb];if(q)loadSharpV(q.id);return}
+  if(d.vdl){const w=window.open("","_blank");const r=await P.call(await cfg(),{action:"vview",id:d.vdl});
+    if(r.ok){if(w)w.location=r.url;else location.href=r.url}else{if(w)w.close();SV.note="Could not open the original. Try again.";SV.lb=null;render()}return}
+  if(d.vdel){if(!confirm("Delete this video? It is removed from storage and cannot be recovered."))return;
+    const body={action:"vremove",id:d.vdel};if(S.role==="pub"){body.code=S.code;body.phone=S.phone}
+    const r=await P.call(await cfg(),body);
+    if(r.ok){SV.items=SV.items.filter(p=>p.id!==d.vdel);SV.lb=null;await vStatus();SV.note="Video deleted."}else SV.note="Could not delete that video.";
+    return render()}
   if(d.lt){S.loginTab=d.lt;S.msg="";return render()}
   if(d.id){const b=$("#bid");if(b)b.value=d.id;S.prefill=d.id;return}
   if(d.tab){S.tab=d.tab;S.note="";S.loadFail=false;return render()}
@@ -317,6 +379,9 @@ document.addEventListener("click",async e=>{
   switch(d.a){
     case"out":return signOut();
     case"lbclose":S.lb=null;return render();
+    case"vlbclose":SV.lb=null;return render();
+    case"vrefresh":SV.loaded=false;SV.fail=false;SV.note="";await vStatus();return loadVideos(true);
+    case"vmore":SV.fail=false;return loadVideos(false);
     case"all":S.sel.forEach(i=>{if(!i.bad)i.on=true});return render();
     case"none":S.sel.forEach(i=>{i.on=false});return render();
     case"fit":{let left=leftBytes();S.sel.forEach(i=>{if(i.bad){i.on=false;return}if(i.size<=left){i.on=true;left-=i.size}else i.on=false});return render()}

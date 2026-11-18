@@ -99,6 +99,14 @@ An attendee can give some unused photo space or video space to a friend (the fri
 4. Test with two attendees marked Present: give 10 MB of photo space from one to the other, check both status bars change, upload with the friend, try Take it back.
 NOT verified: anything on a real phone; the admin card was never opened in a real browser (syntax-checked only).
 
+## 5j. Giving space by QR code (r2_29, 19 Nov)
+On the Share tab the friend who wants space taps **Show my QR**; the giver taps **Scan friend's QR** (or scans it with the phone camera, which opens the page) and the page shows "Giving to <name>", so nobody types a Booking ID or phone. A code works for 30 minutes, can be scanned by many friends, and holds no phone number or Booking ID. The typed way still works. Gifts made by QR show "(QR)" in the admin log.
+1. In the SQL Editor run `sql/r2_29_space_qr.sql` (run r2_28 first; safe to run twice). No Edge Function change, no new secrets.
+2. Merge the pull request.
+3. Test with two phones: one taps Show my QR, the other taps Scan friend's QR and gives 10 MB.
+The scanner and the QR drawing load two small libraries from cdn.jsdelivr.net (jsQR, qrcode-generator) only when the Share tab needs them. If the camera is blocked the page says so and the typed way remains.
+NOT verified: scanning on a real iPhone or Android (tested only with a pretend camera in desktop Chrome); camera permission wording differs per phone.
+
 ## 6. After the event
 Admin → Settings → Photos → **Make download links file**, download everything within the trial, and switch uploads off.
 

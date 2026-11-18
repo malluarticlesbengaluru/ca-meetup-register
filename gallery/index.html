@@ -142,6 +142,7 @@ const dropUrl=it=>{if(it.url){try{URL.revokeObjectURL(it.url)}catch(_){}it.url=n
 async function boot(){
   idb=await idbOpen();
   const u=new URLSearchParams(location.search);if(u.get("id")){S.loginTab="pub";S.prefill=u.get("id")}
+  {const t=tokOf(u.get("to"));if(t){SH.pend=t;S.loginTab="pub";history.replaceState(null,"",location.pathname)}}
   const ses=(await db.auth.getSession()).data.session;
   if(ses){
     const q=await db.from("staff").select("name,role").eq("user_id",ses.user.id).maybeSingle();
@@ -171,7 +172,7 @@ async function loginPub(){
   S.msg="";S.role="pub";S.code=code;S.phone=ph;S.name="Booking "+code;S.isAdmin=false;
   const h=LSget("mm_hist",[]).filter(c=>c!==code);h.unshift(code);LSset("mm_hist",h.slice(0,12));   /* the Booking ID is remembered, the phone number never is */
   S.photos=r.data.items;S.more=r.data.items.length>=r.data.page;S.vis=r.data.visibility;S.canDl=false;S.loaded=true;
-  await refreshStatus();await resume();render();
+  await refreshStatus();await resume();if(SH.pend)S.tab="share";render();
 }
 async function signOut(){S.sel.forEach(dropUrl);if(S.role==="cam")await db.auth.signOut();
   Object.assign(S,{role:null,uid:null,isAdmin:false,st:null,stErr:"",sel:[],q:[],drafts:[],photos:[],more:false,loaded:false,lb:null,tab:"upload",phone:"",code:"",msg:"",note:""});resetVideos();resetShare();render()}
@@ -401,12 +402,48 @@ function vlbHTML(){
     "This is a still picture. Videos are not played on this page.","vlbclose","vlbprev","vlbnext")}
 
 /* ---------- share space (an attendee gives unused photo or video space to a friend; the database checks every rule) ---------- */
-const SH={d:null,loading:false,loaded:false,fail:false,kind:"photo",f:{bid:"",ph:"",mb:""},msg:"",ok:false,busy:false};
+const SH={d:null,loading:false,loaded:false,fail:false,kind:"photo",f:{bid:"",ph:"",mb:""},msg:"",ok:false,busy:false,to:null,pend:null,qr:null,qrBusy:false,scan:false,scanMsg:""};
 const SHMSG={SHARING_OFF:"Sharing space is switched off right now.",FEATURE_OFF:"That feature is switched off right now.",BAD_AMOUNT:"Enter a whole number of MB, 1 or more.",
   SAME_PERSON:"That is your own login. Enter your friend's Booking ID and phone number.",TO_MISMATCH:"We could not find that Booking ID with that phone number. Ask your friend to check their ticket.",
-  TO_NOT_PAID:"That booking is not paid yet.",TAKEN:"Your friend has already used or passed on that space, so it cannot be taken back.",ALREADY:"That was already taken back.",NOT_FOUND:"Could not find that."};
+  TO_NOT_PAID:"That booking is not paid yet.",TAKEN:"Your friend has already used or passed on that space, so it cannot be taken back.",ALREADY:"That was already taken back.",NOT_FOUND:"Could not find that.",CODE_INVALID:"That QR code has expired or is not valid. Ask your friend to show a new one."};
 const shSay=(code,r)=>code==="TOO_MUCH"?`You only have ${P.bytes((r&&r.give_bytes)||0)} of unused space to give.`:(SHMSG[code]||P.say(code));
-function resetShare(){Object.assign(SH,{d:null,loading:false,loaded:false,fail:false,kind:"photo",f:{bid:"",ph:"",mb:""},msg:"",ok:false,busy:false})}
+function resetShare(){scanStop();Object.assign(SH,{d:null,loading:false,loaded:false,fail:false,kind:"photo",f:{bid:"",ph:"",mb:""},msg:"",ok:false,busy:false,to:null,qr:null,qrBusy:false,scan:false,scanMsg:""})}
+/* ---- QR: libraries load only when needed ---- */
+const loadJs=(src)=>new Promise((ok,no)=>{const e=document.createElement("script");e.src=src;e.onload=ok;e.onerror=()=>no(new Error("load"));document.head.appendChild(e)});
+const needQR=async()=>{if(!window.qrcode)await loadJs("https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js")};
+const needScan=async()=>{if(!window.jsQR)await loadJs("https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js")};
+const tokOf=t=>{t=String(t||"");try{const u=new URL(t);t=u.searchParams.get("to")||""}catch(e){}t=t.toUpperCase().replace(/[^A-Z0-9]/g,"");return/^[A-HJ-NP-Z2-9]{10}$/.test(t)?t:null};
+async function shMyQR(){
+  SH.qrBusy=true;SH.msg="";render();
+  const r=await db.rpc("space_make_code",{p_code:S.code,p_phone:S.phone});
+  SH.qrBusy=false;
+  if(r.error||!r.data){SH.msg="Could not make the QR. Check your internet and try again.";SH.ok=false;return render()}
+  if(!r.data.ok){SH.msg=shSay(r.data.error,r.data);SH.ok=false;return render()}
+  try{await needQR();const q=qrcode(0,"M");q.addData(location.origin+location.pathname+"?to="+r.data.token);q.make();
+    SH.qr={token:r.data.token,svg:q.createSvgTag({cellSize:6,margin:2,scalable:true}),exp:r.data.expires_at}}
+  catch(e){SH.qr={token:r.data.token,svg:"",exp:r.data.expires_at}}
+  render()}
+async function shPeek(tok){
+  const r=await db.rpc("space_code_peek",{p_token:tok});
+  if(r.error||!r.data){SH.msg="Could not check that QR. Check your internet and try again.";SH.ok=false;return false}
+  if(!r.data.ok){SH.msg=shSay(r.data.error,r.data);SH.ok=false;return false}
+  SH.to={token:tok,name:r.data.name};SH.msg="";return true}
+let scanStream=null,scanOn=false;
+function scanStop(){scanOn=false;if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null}SH.scan=false}
+async function shScan(){
+  SH.scan=true;SH.scanMsg="Opening the camera…";SH.msg="";render();
+  try{await needScan();scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false})}
+  catch(e){const m=e&&e.message==="load"?"Could not load the scanner. Check your internet, or type the Booking ID below.":"Camera is not allowed. Allow the camera for this page, or type the Booking ID below.";scanStop();SH.msg=m;SH.ok=false;return render()}
+  const v=$("#scv");if(!v){scanStop();return}
+  v.srcObject=scanStream;v.setAttribute("playsinline","");await v.play().catch(()=>{});const m=$("#scm");if(m)m.textContent="Point the camera at your friend's QR";
+  scanOn=true;const c=document.createElement("canvas"),x=c.getContext("2d",{willReadFrequently:true});
+  const tick=async()=>{if(!scanOn)return;
+    if(v.videoWidth){const w=Math.min(640,v.videoWidth),h=Math.round(w*v.videoHeight/v.videoWidth);c.width=w;c.height=h;x.drawImage(v,0,0,w,h);
+      const q=jsQR(x.getImageData(0,0,w,h).data,w,h,{inversionAttempts:"dontInvert"});const tok=q&&tokOf(q.data);
+      if(tok){scanStop();await shPeek(tok);return render()}}
+    setTimeout(tick,200)};
+  tick()}
+function shNeedLink(){if(!SH.pend)return;const t=SH.pend;SH.pend=null;shPeek(t).then(()=>render())}
 async function loadShare(){
   if(SH.loading)return;SH.loading=true;render();
   const r=await db.rpc("space_overview",{p_code:S.code,p_phone:S.phone});
@@ -414,6 +451,7 @@ async function loadShare(){
   if(r.error||!r.data||!r.data.ok){SH.fail=true;SH.msg="Could not load. Check your internet and try again.";SH.ok=false;return render()}
   SH.fail=false;SH.d=r.data;SH.loaded=true;render()}
 function shareHTML(){
+  if(SH.pend)setTimeout(shNeedLink,0);
   if(!SH.loaded&&!SH.loading&&!SH.fail)setTimeout(loadShare,0);
   const d=SH.d;
   if(!d)return `<div class="card"><h2>Share space</h2>${SH.loading?`<div class="skel"><i></i><i></i><i></i></div>`:`<p class="warn">${esc(SH.msg||"Loading…")}</p><button class="ghost" data-a="shrefresh">Try again</button>`}</div>`;
@@ -427,24 +465,31 @@ function shareHTML(){
   ${d.sharing_on?"":`<p class="warn">Sharing space is switched off right now.</p>`}
   ${sum("Photos",d.photo)}${sum("Videos",d.video)}
   <div class="seg2" style="margin-top:12px"><button class="${k==="photo"?"on":""}" data-sk="photo" ${d.photo.on?"":"disabled"}>Photo space</button><button class="${k==="video"?"on":""}" data-sk="video" ${d.video.on?"":"disabled"}>Video space</button></div>
+  ${SH.to?`<p class="ok" style="margin:12px 0 0">Giving to <b>${esc(SH.to.name||"your friend")}</b> <button class="ghost sm" data-a="shclear">Change</button></p>`
+  :SH.scan?`<div style="margin-top:12px"><video id="scv" playsinline muted style="width:100%;border-radius:12px;background:#000;max-height:60vh"></video><p class="note" id="scm">Opening the camera…</p><button class="ghost" data-a="shscanstop">Stop scanning</button></div>`
+  :`<button data-a="shscan" style="margin-top:12px" ${!d.sharing_on?"disabled":""}>Scan friend's QR</button><p class="note" style="margin:10px 0 0">Or type your friend's details:</p>`}
+  <div ${SH.to||SH.scan?'hidden':''}>
   <label class="l" for="sbid">Your friend's Booking ID</label><input id="sbid" type="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="8 characters" value="${esc(SH.f.bid)}">
-  <label class="l" for="sph">Your friend's phone number (used for the booking)</label><input id="sph" type="tel" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="10 digits" value="${esc(SH.f.ph)}">
+  <label class="l" for="sph">Your friend's phone number (used for the booking)</label><input id="sph" type="tel" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="10 digits" value="${esc(SH.f.ph)}"></div>
   <label class="l" for="smb">How many MB to give (up to ${give})</label><input id="smb" type="tel" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="e.g. 40" value="${esc(SH.f.mb)}">
   ${SH.msg?`<p class="${SH.ok?"ok":"err"}" role="status">${esc(SH.msg)}</p>`:""}
   <button data-a="sgive" ${SH.busy||!d.sharing_on||!x.on?"disabled":""} style="margin-top:12px">${SH.busy?"Please wait…":"Give space"}</button>
   <p class="note" style="margin-bottom:0">Your friend sees it straight away. You can take it back only while your friend has not used it.</p></div>
+  <div class="card"><h2>Receive space</h2><p class="note" style="margin-top:0">Want space from friends? Show this QR. They scan it, nobody types anything. It works for 30 minutes.</p>
+  ${SH.qr?`<div class="qrbox" style="background:#fff;padding:8px;border-radius:12px;max-width:260px;margin:8px auto">${SH.qr.svg||""}</div><p style="text-align:center;font-size:20px;letter-spacing:3px;margin:4px 0"><b>${esc(SH.qr.token)}</b></p>`:""}
+  <button class="${SH.qr?"ghost":""}" data-a="shmyqr" ${SH.qrBusy||!d.sharing_on?"disabled":""}>${SH.qrBusy?"Please wait…":SH.qr?"New QR":"Show my QR"}</button></div>
   <div class="card"><h2>Shared so far</h2>${hist?`<div class="q">${hist}</div>`:`<p class="mute">Nothing shared yet.</p>`}</div>`}
 async function shGive(){
   const bid=SH.f.bid.toUpperCase().replace(/[^A-Z0-9]/g,""),ph=SH.f.ph.replace(/\D/g,""),mb=parseInt(SH.f.mb,10);
-  if(bid.length!==8||ph.length!==10){SH.msg="Enter your friend's 8-character Booking ID and 10-digit phone number.";SH.ok=false;return render()}
+  if(!SH.to&&(bid.length!==8||ph.length!==10)){SH.msg="Enter your friend's 8-character Booking ID and 10-digit phone number.";SH.ok=false;return render()}
   if(!(mb>=1)){SH.msg=SHMSG.BAD_AMOUNT;SH.ok=false;return render()}
-  if(!confirm(`Give ${mb} MB of ${SH.kind} space to booking ${bid}?`))return;
+  if(!confirm(`Give ${mb} MB of ${SH.kind} space to ${SH.to?SH.to.name:"booking "+bid}?`))return;
   SH.busy=true;SH.msg="";render();
-  const r=await db.rpc("space_give",{p_code:S.code,p_phone:S.phone,p_to_code:bid,p_to_phone:ph,p_kind:SH.kind,p_mb:mb});
+  const r=SH.to?await db.rpc("space_give_token",{p_code:S.code,p_phone:S.phone,p_token:SH.to.token,p_kind:SH.kind,p_mb:mb}):await db.rpc("space_give",{p_code:S.code,p_phone:S.phone,p_to_code:bid,p_to_phone:ph,p_kind:SH.kind,p_mb:mb});
   SH.busy=false;
   if(r.error||!r.data){SH.msg="Could not share. Check your internet and try again.";SH.ok=false;return render()}
   if(!r.data.ok){SH.msg=shSay(r.data.error,r.data);SH.ok=false;return render()}
-  SH.msg=`Done. ${mb} MB of ${SH.kind} space was given.`;SH.ok=true;SH.f.mb="";
+  SH.msg=`Done. ${mb} MB of ${SH.kind} space was given${SH.to?" to "+SH.to.name:""}.`;SH.ok=true;SH.f.mb="";
   await Promise.all([refreshStatus(),vStatus()]);SH.loaded=false;SH.fail=false;render()}
 async function shReturn(id){
   if(!confirm("Take this space back from your friend?"))return;
@@ -475,7 +520,7 @@ document.addEventListener("click",async e=>{
     return render()}
   if(d.lt){S.loginTab=d.lt;S.msg="";return render()}
   if(d.id){const b=$("#bid");if(b)b.value=d.id;S.prefill=d.id;return}
-  if(d.tab){S.tab=d.tab;S.note="";S.loadFail=false;if(d.tab==="upload"&&S.role==="pub")await refreshStatus();if(d.tab==="share"){SH.loaded=false;SH.fail=false;SH.msg=""}return render()}
+  if(d.tab){if(d.tab!=="share")scanStop();S.tab=d.tab;S.note="";S.loadFail=false;if(d.tab==="upload"&&S.role==="pub")await refreshStatus();if(d.tab==="share"){SH.loaded=false;SH.fail=false;SH.msg=""}return render()}
   if(d.sk){SH.kind=d.sk;SH.msg="";return render()}
   if(d.sret){return shReturn(d.sret)}
   if(d.mode){S.mode=d.mode;LSset("gal_mode",d.mode);S.note="";return render()}
@@ -498,6 +543,10 @@ document.addEventListener("click",async e=>{
     case"vlbclose":SV.lb=null;return render();
     case"shrefresh":SH.loaded=false;SH.fail=false;SH.msg="";return loadShare();
     case"sgive":return shGive();
+    case"shmyqr":return shMyQR();
+    case"shscan":return shScan();
+    case"shscanstop":scanStop();return render();
+    case"shclear":SH.to=null;SH.msg="";return render();
     case"vrefresh":SV.loaded=false;SV.fail=false;SV.note="";await vStatus();return loadVideos(true);
     case"vmore":SV.fail=false;return loadVideos(false);
     case"all":S.sel.forEach(i=>{if(!i.bad)i.on=true});return render();

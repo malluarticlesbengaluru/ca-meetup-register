@@ -1077,7 +1077,8 @@ function vHome(){
     brand=O.replace(/\s+Bengaluru$/i,""),
     spLogo=SPONSOR.logo?`<img class="bh-splogo" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.remove()">`:"";
   return `<div class="bhome${ret?" ret":""}" data-event="${esc(a.event)}" data-skew="${esc(a.skew)}" data-close="${esc(a.close)}">
-<header class="bh-bar"><div class="bh-w"><div class="bh-brand"><img src="assets/burg-logo.png" alt="${O} logo" width="50" height="34"><span>${esc(brand)}<small>BENGALURU</small></span></div><div class="bh-barr"><button class="bh-btn bh-gold bh-sm" id="bar-register" type="button">${ret?"View my ticket":"Register"}</button><button class="bh-menu" id="bar-menu" type="button" aria-label="Jump to a section" aria-haspopup="true" aria-expanded="false" aria-controls="bar-nav"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button><nav class="bh-nav" id="bar-nav" aria-label="Sections" hidden><button class="bh-ni" type="button" data-go="sec-date">Date, time &amp; venue</button><button class="bh-ni" type="button" data-go="sec-how">How to book</button><button class="bh-ni" type="button" data-go="home-sponsor">Our co-sponsor</button><button class="bh-ni" type="button" data-go="home-team">Meet the team</button><button class="bh-ni" type="button" data-go="moments">Past meetups</button><button class="bh-ni" type="button" data-go="home-join">About MAB</button><button class="bh-ni" type="button" data-about="r6">About R6</button></nav></div></div></header>
+<header class="bh-bar"><div class="bh-w"><div class="bh-brand"><img src="assets/burg-logo.png" alt="${O} logo" width="50" height="34"><span>${esc(brand)}<small>BENGALURU</small></span></div><div class="bh-barr"><button class="bh-btn bh-gold bh-sm" id="bar-register" type="button">${ret?"View my ticket":"Register"}</button><button class="bh-menu" id="bar-menu" type="button" aria-label="Jump to a section" aria-haspopup="true" aria-expanded="false" aria-controls="bar-nav"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button><nav class="bh-nav" id="bar-nav" aria-label="Sections" hidden><button class="bh-ni" type="button" data-go="sec-date">Date, time &amp; venue</button><button class="bh-ni" type="button" data-go="sec-how">How to book</button><button class="bh-ni" type="button" data-go="home-sponsor">Our co-sponsor</button><button class="bh-ni" type="button" data-go="home-team">Meet the team</button><button class="bh-ni" type="button" data-go="moments">Past meetups</button><button class="bh-ni" type="button" data-go="home-join">About MAB</button><button class="bh-ni" type="button" data-go="home-photos">Event photos</button>
+<button class="bh-ni" type="button" data-about="r6">About R6</button></nav></div></div></header>
 
 <section class="bh-hero" style="padding-bottom:70px"><div class="bh-w">
 <img class="bh-logo" src="assets/burg-logo.png" alt="" width="104" height="70">
@@ -1135,6 +1136,7 @@ ${ret?`<p class="bh-note">${n===1?"Your booking is saved on this device. Enter y
 <section class="bh-grand" id="bh-grand"><div class="bh-w"><div class="bh-rv"><p class="bh-eyebrow">The countdown</p><h2>Until we <i>meet.</i></h2>
 <div class="bh-cd" id="bh-cd" role="timer" aria-label="Countdown to the meetup"><div><b>00</b><span>days</span></div><div><b>00</b><span>hours</span></div><div><b>00</b><span>mins</span></div><div><b>00</b><span>secs</span></div></div>
 <p class="bh-cdwhen"><span data-ev="d">${esc(evDate())}</span> · <span data-ev="t">${esc(evTime())}</span></p></div></div></section>
+${S.photos&&S.photos.home?`<section id="home-photos" style="padding-top:0"><div class="bh-w" style="text-align:center"><div class="bh-head bh-rv"><p class="bh-eyebrow">Event photos</p><h2>Share your <i>photos.</i></h2></div><p class="bh-lede bh-rv" style="margin:0 auto 26px">Upload the pictures you took at the meetup, or browse the gallery. Photos are kept at full quality.</p><a class="bh-btn bh-gold bh-rv" href="gallery/">Open the photo gallery</a></div></section>`:""}
 
 <footer class="bh-foot"><div class="bh-w"><b>${O}</b> · ${E}${SPONSOR.name?`<br>Co-sponsored by ${esc(SPONSOR.name)}`:""}<div class="bh-flogos"><img class="bh-fm" src="assets/burg-logo.png" alt="${O} logo">${SPONSOR.logo?`<span class="bh-fsep" aria-hidden="true"></span><img class="bh-fe" src="${esc(SPONSOR.logo)}" alt="${esc(SPONSOR.name||"Co-sponsor")} logo" onerror="this.previousElementSibling.remove();this.remove()">`:""}</div></div></footer>
 </div>`;
@@ -1774,7 +1776,6 @@ function vTicket(){
     <div class="row"><button data-dl="jpg" data-i="${i}">Download JPG</button><button class="ghost" data-dl="pdf" data-i="${i}">Download PDF</button></div></div>`;
   });
   if(n>1)h+=`<div class="card"><b>Everyone in this booking</b><div class="row"><button id="dl-all-pdf">All tickets as one PDF</button><button class="ghost" id="dl-all-jpg">All tickets as JPG</button></div><p class="note">The JPG option downloads one image per person. Your browser may ask permission to download several files.</p></div>`;
-  if(S.photos&&S.photos.on&&S.tk.code)h+=`<div class="card"><b>Event photos</b><p class="note">Share your photos from the day. They are kept at full quality.</p><div class="row"><button id="go-photos">Upload photos</button></div></div>`;
   return h+`<div class="row"><button class="ghost" id="back-tickets">Back to Tickets</button><button class="ghost" id="go-home">Home</button></div>`;
 }
 
@@ -2274,5 +2275,5 @@ render();loadEvent().then(()=>{if(S.step==="home")refreshHome()});
 loadHomeStatus().then(()=>{if(S.step==="home")refreshHome()});
 loadPay().then(()=>{if(["closed","done"].includes(S.step))render()});   /* Home shows nothing from the payment details, so it is not redrawn for them */
 loadFlags().then(()=>{if(S.step==="home")refreshHome()});
-loadPhotoInfo();
+loadPhotoInfo().then(()=>{if(S.step==="home"&&S.photos&&S.photos.home)render()});
 </script></body></html>

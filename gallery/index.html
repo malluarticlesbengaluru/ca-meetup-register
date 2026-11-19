@@ -404,7 +404,7 @@ function vlbHTML(){
 /* ---------- share space (an attendee gives unused photo or video space to a friend; the database checks every rule) ---------- */
 const SH={d:null,loading:false,loaded:false,fail:false,kind:"photo",f:{bid:"",ph:"",mb:""},msg:"",ok:false,busy:false,to:null,pend:null,qr:null,qrBusy:false,scan:false,scanMsg:""};
 const SHMSG={SHARING_OFF:"Sharing space is switched off right now.",FEATURE_OFF:"That feature is switched off right now.",BAD_AMOUNT:"Enter a whole number of MB, 1 or more.",
-  SAME_PERSON:"That is your own login. Enter your friend's Booking ID and phone number.",TO_MISMATCH:"We could not find that Booking ID with that phone number. Ask your friend to check their ticket.",
+  SAME_PERSON:"That is your own booking. Enter your friend's Booking ID.",TO_NOT_FOUND:"No paid booking found with that Booking ID. Ask your friend to check their ticket.",TO_MISMATCH:"We could not find that Booking ID with that phone number. Ask your friend to check their ticket.",
   TO_NOT_PAID:"That booking is not paid yet.",TAKEN:"Your friend has already used or passed on that space, so it cannot be taken back.",ALREADY:"That was already taken back.",NOT_FOUND:"Could not find that.",CODE_INVALID:"That QR code has expired or is not valid. Ask your friend to show a new one."};
 const shSay=(code,r)=>code==="TOO_MUCH"?`You only have ${P.bytes((r&&r.give_bytes)||0)} of unused space to give.`:(SHMSG[code]||P.say(code));
 function resetShare(){scanStop();Object.assign(SH,{d:null,loading:false,loaded:false,fail:false,kind:"photo",f:{bid:"",ph:"",mb:""},msg:"",ok:false,busy:false,to:null,qr:null,qrBusy:false,scan:false,scanMsg:""})}
@@ -467,10 +467,9 @@ function shareHTML(){
   <div class="seg2" style="margin-top:12px"><button class="${k==="photo"?"on":""}" data-sk="photo" ${d.photo.on?"":"disabled"}>Photo space</button><button class="${k==="video"?"on":""}" data-sk="video" ${d.video.on?"":"disabled"}>Video space</button></div>
   ${SH.to?`<p class="ok" style="margin:12px 0 0">Giving to <b>${esc(SH.to.name||"your friend")}</b> <button class="ghost sm" data-a="shclear">Change</button></p>`
   :SH.scan?`<div style="margin-top:12px"><video id="scv" playsinline muted style="width:100%;border-radius:12px;background:#000;max-height:60vh"></video><p class="note" id="scm">Opening the camera…</p><button class="ghost" data-a="shscanstop">Stop scanning</button></div>`
-  :`<button data-a="shscan" style="margin-top:12px" ${!d.sharing_on?"disabled":""}>Scan friend's QR</button><p class="note" style="margin:10px 0 0">Or type your friend's details:</p>`}
+  :`<button data-a="shscan" style="margin-top:12px" ${!d.sharing_on?"disabled":""}>Scan friend's QR</button><p class="note" style="margin:10px 0 0">Or type your friend's Booking ID:</p>`}
   <div ${SH.to||SH.scan?'hidden':''}>
-  <label class="l" for="sbid">Your friend's Booking ID</label><input id="sbid" type="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="8 characters" value="${esc(SH.f.bid)}">
-  <label class="l" for="sph">Your friend's phone number (used for the booking)</label><input id="sph" type="tel" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="10 digits" value="${esc(SH.f.ph)}"></div>
+  <label class="l" for="sbid">Your friend's Booking ID</label><input id="sbid" type="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="8 characters" value="${esc(SH.f.bid)}"></div>
   <label class="l" for="smb">How many MB to give (up to ${give})</label><input id="smb" type="tel" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="e.g. 40" value="${esc(SH.f.mb)}">
   ${SH.msg?`<p class="${SH.ok?"ok":"err"}" role="status">${esc(SH.msg)}</p>`:""}
   <button data-a="sgive" ${SH.busy||!d.sharing_on||!x.on?"disabled":""} style="margin-top:12px">${SH.busy?"Please wait…":"Give space"}</button>
@@ -480,16 +479,21 @@ function shareHTML(){
   <button class="${SH.qr?"ghost":""}" data-a="shmyqr" ${SH.qrBusy||!d.sharing_on?"disabled":""}>${SH.qrBusy?"Please wait…":SH.qr?"New QR":"Show my QR"}</button></div>
   <div class="card"><h2>Shared so far</h2>${hist?`<div class="q">${hist}</div>`:`<p class="mute">Nothing shared yet.</p>`}</div>`}
 async function shGive(){
-  const bid=SH.f.bid.toUpperCase().replace(/[^A-Z0-9]/g,""),ph=SH.f.ph.replace(/\D/g,""),mb=parseInt(SH.f.mb,10);
-  if(!SH.to&&(bid.length!==8||ph.length!==10)){SH.msg="Enter your friend's 8-character Booking ID and 10-digit phone number.";SH.ok=false;return render()}
+  const bid=SH.f.bid.toUpperCase().replace(/[^A-Z0-9]/g,""),mb=parseInt(SH.f.mb,10);
+  if(!SH.to&&bid.length!==8){SH.msg="Enter your friend's 8-character Booking ID, or scan their QR.";SH.ok=false;return render()}
   if(!(mb>=1)){SH.msg=SHMSG.BAD_AMOUNT;SH.ok=false;return render()}
-  if(!confirm(`Give ${mb} MB of ${SH.kind} space to ${SH.to?SH.to.name:"booking "+bid}?`))return;
+  let who=SH.to&&SH.to.name;
+  if(!SH.to){const pk=await db.rpc("space_booking_peek",{p_to_code:bid});
+    if(pk.error||!pk.data){SH.msg="Could not check that Booking ID. Check your internet and try again.";SH.ok=false;return render()}
+    if(!pk.data.ok){SH.msg=shSay(pk.data.error,pk.data);SH.ok=false;return render()}
+    who=pk.data.name||"your friend"}
+  if(!confirm(`Give ${mb} MB of ${SH.kind} space to ${who}?`))return;
   SH.busy=true;SH.msg="";render();
-  const r=SH.to?await db.rpc("space_give_token",{p_code:S.code,p_phone:S.phone,p_token:SH.to.token,p_kind:SH.kind,p_mb:mb}):await db.rpc("space_give",{p_code:S.code,p_phone:S.phone,p_to_code:bid,p_to_phone:ph,p_kind:SH.kind,p_mb:mb});
+  const r=SH.to?await db.rpc("space_give_token",{p_code:S.code,p_phone:S.phone,p_token:SH.to.token,p_kind:SH.kind,p_mb:mb}):await db.rpc("space_give_booking",{p_code:S.code,p_phone:S.phone,p_to_code:bid,p_kind:SH.kind,p_mb:mb});
   SH.busy=false;
   if(r.error||!r.data){SH.msg="Could not share. Check your internet and try again.";SH.ok=false;return render()}
   if(!r.data.ok){SH.msg=shSay(r.data.error,r.data);SH.ok=false;return render()}
-  SH.msg=`Done. ${mb} MB of ${SH.kind} space was given${SH.to?" to "+SH.to.name:""}.`;SH.ok=true;SH.f.mb="";
+  SH.msg=`Done. ${mb} MB of ${SH.kind} space was given to ${who}.`;SH.ok=true;SH.f.mb="";
   await Promise.all([refreshStatus(),vStatus()]);SH.loaded=false;SH.fail=false;render()}
 async function shReturn(id){
   if(!confirm("Take this space back from your friend?"))return;
@@ -506,7 +510,7 @@ document.addEventListener("change",e=>{const t=e.target;
 document.addEventListener("error",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.dataset.fb){const s=document.createElement("span");s.className="nop";s.textContent=t.alt||"Preview not available";t.replaceWith(s)}},true);
 document.addEventListener("keydown",e=>{
   if((e.key==="ArrowLeft"||e.key==="ArrowRight")&&(S.lb!=null||SV.lb!=null)){const b=document.querySelector(".lb .nav."+(e.key==="ArrowLeft"?"l":"r"));if(b)b.click();return}if(e.key==="Escape"&&(S.lb!=null||SV.lb!=null)){S.lb=null;SV.lb=null;render()}});
-document.addEventListener("input",e=>{const t=e.target;if(t.id==="sbid")SH.f.bid=t.value;else if(t.id==="sph")SH.f.ph=t.value;else if(t.id==="smb")SH.f.mb=t.value});
+document.addEventListener("input",e=>{const t=e.target;if(t.id==="sbid")SH.f.bid=t.value;else if(t.id==="smb")SH.f.mb=t.value});
 document.addEventListener("click",async e=>{
   const t=e.target.closest("[data-a],[data-lt],[data-id],[data-tab],[data-mode],[data-open],[data-retry],[data-rm],[data-dl],[data-del],[data-vopen],[data-vdl],[data-vdel],[data-sk],[data-sret]");if(!t)return;
   const d=t.dataset;

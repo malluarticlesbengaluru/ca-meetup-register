@@ -121,6 +121,13 @@ On the Share tab the friend who wants space taps **Show my QR**; the giver taps 
 The scanner and the QR drawing load two small libraries from cdn.jsdelivr.net (jsQR, qrcode-generator) only when the Share tab needs them. If the camera is blocked the page says so and the typed way remains.
 NOT verified: scanning on a real iPhone or Android (tested only with a pretend camera in desktop Chrome); camera permission wording differs per phone.
 
+## 5k. Giving space with only the friend's Booking ID (r2_30, 19 Nov)
+On the Share tab the phone-number box is gone. The giver (logged in as an attendee, marked Present) types the friend's **Booking ID** and the MB; the page shows the friend's name ("Give 40 MB of photo space to <name>?") before confirming. If a booking has several people, the space goes to the person on the booking's oldest ticket. The QR and code work as before.
+1. In the SQL Editor run `sql/r2_30_space_by_booking.sql` (after r2_28 and r2_29; safe to run twice). No Edge Function change.
+2. Merge the pull request.
+3. Test: on one phone type another test attendee's Booking ID, give 10 MB, check the name shown and the admin Space sharing log.
+Note: anyone who knows a Booking ID can give space to that booking (the receiver only gains) and can see the name on its first ticket. The older "Booking ID + phone" function stays in the database but the page no longer uses it.
+
 ## 6. After the event
 Admin → Settings → Photos → **Make download links file**, download everything within the trial, and switch uploads off.
 

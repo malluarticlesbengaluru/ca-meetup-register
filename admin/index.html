@@ -740,6 +740,8 @@ function phDraw(){
   c.innerHTML=`<h2>Photos</h2>
   <label><input type="checkbox" id="phon" ${d.on?"checked":""}> Photo uploads on</label>
   <p class="mute" style="margin-top:0">Off by default. Turn on at the event. Photos are kept at full quality in Storj; nothing is ever deleted when you lower a limit.</p>
+  ${s.photos_home!==undefined?`<label><input type="checkbox" id="phhome" ${s.photos_home?"checked":""}> Show the photos link on the public home page</label>
+  <p class="mute" style="margin-top:0">Adds an "Event photos" section at the bottom of the home page and an item in its menu. Off by default. Separate from the uploads switch above.</p>`:""}
   <h3 style="margin:10px 0 2px">Photographers (shared space)</h3>${bar(d.cam.used_bytes,d.cam.pool_bytes)}<p class="mute" style="margin:2px 0 8px">${d.cam.count} photos${d.by_camera.length?" · "+d.by_camera.map(x=>`${esc(x.name)} ${x.count}`).join(", "):""}</p>
   <h3 style="margin:10px 0 2px">Public (everyone else)</h3>${bar(d.pub.used_bytes,d.pub.pool_bytes)}<p class="mute" style="margin:2px 0 8px">${d.pub.count} photos from ${d.pub.people} people</p>
   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
@@ -767,6 +769,7 @@ function phDraw(){
     if(r.error)return toast(terr(r.error),6000);
     const pv=$("#phvis");if(pv&&pv.value!==(s.photo_visibility||"own")){const r2=await db.rpc("admin_set_photo_visibility",{p_value:pv.value});if(r2.error)return toast(terr(r2.error),6000)}
     toast("Photo settings saved");await sync("core","log");S.ph=null;view();};
+  const phh=$("#phhome");if(phh)phh.onchange=async()=>{const r=await db.rpc("admin_set_photos_home",{p_value:phh.checked});if(r.error)return toast(terr(r.error),6000);toast(phh.checked?"Photos link is SHOWN on the home page":"Photos link is HIDDEN on the home page");await sync("core","log");S.ph=null;view()};
   $("#phon").onchange=async()=>{const r=await db.rpc("admin_set_photo_settings",{p_on:$("#phon").checked});if(r.error)return toast(terr(r.error),6000);toast($("#phon").checked?"Photo uploads are ON":"Photo uploads are OFF");await sync("core","log");S.ph=null;view()};
   c.querySelectorAll("[data-phview]").forEach(b=>b.onclick=async()=>{const r=await phFn({action:"view",id:b.dataset.phview});if(r.ok)window.open(r.url,"_blank","noopener");else toast("Could not open that photo.",5000)});
   c.querySelectorAll("[data-phrm]").forEach(b=>b.onclick=async()=>{if(!await ask({title:"Remove this photo?",text:"It is deleted from storage and cannot be recovered.",danger:true,ok:"Remove"}))return;

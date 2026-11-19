@@ -910,6 +910,41 @@ begin
   begin return h::jsonb; exception when others then return '{}'::jsonb; end;
 end $function$
 
+--- _space_booking_all(p_booking text) | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._space_booking_all(p_booking text)
+ RETURNS uuid[]
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare bc text := upper(regexp_replace(coalesce(p_booking, ''), '[^A-Za-z0-9]', '', 'g')); bid uuid; first_id uuid; ph text; res uuid[];
+begin
+  if length(bc) < 4 then return null; end if;
+  select id into bid from bookings where booking_code = bc and status = 'paid';
+  if bid is null then return null; end if;
+  select id, phone into first_id, ph from tickets where booking_id = bid and transferred_out_at is null order by reg_seq limit 1;
+  if first_id is null then return null; end if;
+  select array_agg(t.id order by t.reg_seq) into res from tickets t where t.booking_id = bid and t.phone = ph and t.transferred_out_at is null;
+  return res;
+end $function$
+
+--- _space_booking_people(p_booking text) | execute rights: {postgres=X/postgres}
+CREATE OR REPLACE FUNCTION public._space_booking_people(p_booking text)
+ RETURNS TABLE(id uuid, name text, phone text, seq bigint)
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select f.id, f.name, f.phone, f.reg_seq from (
+    select distinct on (t.phone) t.id, t.name, t.phone, t.reg_seq
+      from tickets t join bookings b on b.id = t.booking_id
+     where b.booking_code = upper(regexp_replace(coalesce(p_booking, ''), '[^A-Za-z0-9]', '', 'g'))
+       and length(regexp_replace(coalesce(p_booking, ''), '[^A-Za-z0-9]', '', 'g')) >= 4
+       and b.status = 'paid' and t.transferred_out_at is null
+     order by t.phone, t.reg_seq) f
+  order by f.reg_seq;
+$function$
+
 --- _space_code_all(p_token text) | execute rights: {postgres=X/postgres}
 CREATE OR REPLACE FUNCTION public._space_code_all(p_token text)
  RETURNS uuid[]
@@ -2731,6 +2766,20 @@ begin
                             'label', _ticket_label(t.kind, t.ticket_no, t.coord_no));
 end $function$
 
+--- space_booking_peek(p_to_code text) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.space_booking_peek(p_to_code text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare ppl jsonb;
+begin
+  select jsonb_agg(jsonb_build_object('id', p.id, 'name', p.name) order by p.seq) into ppl from _space_booking_people(p_to_code) p;
+  if ppl is null then return jsonb_build_object('ok', false, 'error', 'TO_NOT_FOUND'); end if;
+  return jsonb_build_object('ok', true, 'name', ppl->0->>'name', 'people', ppl);
+end $function$
+
 --- space_code_peek(p_token text) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.space_code_peek(p_token text)
  RETURNS jsonb
@@ -2764,6 +2813,43 @@ begin
   if r.all_ids is null then return jsonb_build_object('ok', false, 'error', case when r.err = 'NOT_PAID' then 'TO_NOT_PAID' else 'TO_MISMATCH' end); end if;
   me := w.all_ids[1]; other := r.all_ids[1];
   if me = other or w.all_ids && r.all_ids then return jsonb_build_object('ok', false, 'error', 'SAME_PERSON'); end if;
+  left_b := _space_left(p_kind, w.ids, w.all_ids);
+  if p_mb::bigint * 1048576 > left_b then return jsonb_build_object('ok', false, 'error', 'TOO_MUCH', 'give_bytes', greatest(0, left_b)); end if;
+  insert into space_transfers (kind, from_key, to_key, mb) values (p_kind, me, other, p_mb) returning id into tid;
+  select name into n1 from tickets where id = me; select name into n2 from tickets where id = other;
+  insert into settings_log (changed_by, who, area, field, old_value, new_value)
+  values (null, 'attendee', 'settings', 'space given (' || p_kind || 's)', left(coalesce(n1, '?') || ' > ' || coalesce(n2, '?'), 300), p_mb || ' MB');
+  return jsonb_build_object('ok', true, 'id', tid);
+end $function$
+
+--- space_give_booking(p_code text, p_phone text, p_to_code text, p_kind text, p_mb integer, p_to_person uuid) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.space_give_booking(p_code text, p_phone text, p_to_code text, p_kind text, p_mb integer, p_to_person uuid DEFAULT NULL::uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare s settings%rowtype; w record; oall uuid[]; me uuid; other uuid; left_b bigint; tid uuid; n1 text; n2 text; pick record;
+begin
+  select * into s from settings where id = 1 for update;             -- same lock as the upload checks
+  if p_kind not in ('photo', 'video') then return jsonb_build_object('ok', false, 'error', 'BAD_KIND'); end if;
+  if p_mb is null or p_mb < 1 or p_mb > 100000 then return jsonb_build_object('ok', false, 'error', 'BAD_AMOUNT'); end if;
+  if not s.space_sharing_on then return jsonb_build_object('ok', false, 'error', 'SHARING_OFF'); end if;
+  if (p_kind = 'photo' and not s.photos_on) or (p_kind = 'video' and not s.videos_on) then return jsonb_build_object('ok', false, 'error', 'FEATURE_OFF'); end if;
+  select * into w from _photo_public_who(p_code, p_phone);
+  if w.err is not null then return jsonb_build_object('ok', false, 'error', w.err); end if;
+  if p_to_person is null then
+    oall := _space_booking_all(p_to_code);
+  else   -- the chosen person must be one of the people of that booking
+    select * into pick from _space_booking_people(p_to_code) p where p.id = p_to_person;
+    if pick.id is not null then
+      select array_agg(t.id order by t.reg_seq) into oall from tickets t
+       where t.booking_id = (select booking_id from tickets where id = pick.id) and t.phone = pick.phone and t.transferred_out_at is null;
+    end if;
+  end if;
+  if oall is null then return jsonb_build_object('ok', false, 'error', 'TO_NOT_FOUND'); end if;
+  me := w.all_ids[1]; other := oall[1];
+  if me = other or w.all_ids && oall then return jsonb_build_object('ok', false, 'error', 'SAME_PERSON'); end if;
   left_b := _space_left(p_kind, w.ids, w.all_ids);
   if p_mb::bigint * 1048576 > left_b then return jsonb_build_object('ok', false, 'error', 'TOO_MUCH', 'give_bytes', greatest(0, left_b)); end if;
   insert into space_transfers (kind, from_key, to_key, mb) values (p_kind, me, other, p_mb) returning id into tid;

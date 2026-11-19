@@ -402,12 +402,12 @@ function vlbHTML(){
     "This is a still picture. Videos are not played on this page.","vlbclose","vlbprev","vlbnext")}
 
 /* ---------- share space (an attendee gives unused photo or video space to a friend; the database checks every rule) ---------- */
-const SH={d:null,loading:false,loaded:false,fail:false,kind:"photo",f:{bid:"",ph:"",mb:""},msg:"",ok:false,busy:false,to:null,pend:null,qr:null,qrBusy:false,scan:false,scanMsg:""};
+const SH={d:null,loading:false,loaded:false,fail:false,kind:"photo",f:{bid:"",ph:"",mb:""},msg:"",ok:false,busy:false,to:null,pend:null,qr:null,qrBusy:false,scan:false,scanMsg:"",pick:null};
 const SHMSG={SHARING_OFF:"Sharing space is switched off right now.",FEATURE_OFF:"That feature is switched off right now.",BAD_AMOUNT:"Enter a whole number of MB, 1 or more.",
   SAME_PERSON:"That is your own booking. Enter your friend's Booking ID.",TO_NOT_FOUND:"No paid booking found with that Booking ID. Ask your friend to check their ticket.",TO_MISMATCH:"We could not find that Booking ID with that phone number. Ask your friend to check their ticket.",
   TO_NOT_PAID:"That booking is not paid yet.",TAKEN:"Your friend has already used or passed on that space, so it cannot be taken back.",ALREADY:"That was already taken back.",NOT_FOUND:"Could not find that.",CODE_INVALID:"That QR code has expired or is not valid. Ask your friend to show a new one."};
 const shSay=(code,r)=>code==="TOO_MUCH"?`You only have ${P.bytes((r&&r.give_bytes)||0)} of unused space to give.`:(SHMSG[code]||P.say(code));
-function resetShare(){scanStop();Object.assign(SH,{d:null,loading:false,loaded:false,fail:false,kind:"photo",f:{bid:"",ph:"",mb:""},msg:"",ok:false,busy:false,to:null,qr:null,qrBusy:false,scan:false,scanMsg:""})}
+function resetShare(){scanStop();Object.assign(SH,{d:null,loading:false,loaded:false,fail:false,kind:"photo",f:{bid:"",ph:"",mb:""},msg:"",ok:false,busy:false,to:null,qr:null,qrBusy:false,scan:false,scanMsg:"",pick:null})}
 /* ---- QR: libraries load only when needed ---- */
 const loadJs=(src)=>new Promise((ok,no)=>{const e=document.createElement("script");e.src=src;e.onload=ok;e.onerror=()=>no(new Error("load"));document.head.appendChild(e)});
 const needQR=async()=>{if(!window.qrcode)await loadJs("https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js")};
@@ -470,6 +470,7 @@ function shareHTML(){
   :`<button data-a="shscan" style="margin-top:12px" ${!d.sharing_on?"disabled":""}>Scan friend's QR</button><p class="note" style="margin:10px 0 0">Or type your friend's Booking ID:</p>`}
   <div ${SH.to||SH.scan?'hidden':''}>
   <label class="l" for="sbid">Your friend's Booking ID</label><input id="sbid" type="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="8 characters" value="${esc(SH.f.bid)}"></div>
+  ${SH.pick?`<div style="margin:12px 0"><p class="note" style="margin:0 0 8px"><b style="color:var(--cream)">Who in this booking gets it?</b> (${SH.pick.mb} MB of ${SH.kind} space)</p>${SH.pick.people.map(q=>`<button class="ghost" style="display:block;width:100%;margin:6px 0;text-align:left" data-spick="${esc(q.id)}">${esc(q.name||"Guest")}</button>`).join("")}<button class="ghost sm" data-a="shpickno">Cancel</button></div>`:""}
   <label class="l" for="smb">How many MB to give (up to ${give})</label><input id="smb" type="tel" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="e.g. 40" value="${esc(SH.f.mb)}">
   ${SH.msg?`<p class="${SH.ok?"ok":"err"}" role="status">${esc(SH.msg)}</p>`:""}
   <button data-a="sgive" ${SH.busy||!d.sharing_on||!x.on?"disabled":""} style="margin-top:12px">${SH.busy?"Please wait…":"Give space"}</button>
@@ -480,20 +481,25 @@ function shareHTML(){
   <div class="card"><h2>Shared so far</h2>${hist?`<div class="q">${hist}</div>`:`<p class="mute">Nothing shared yet.</p>`}</div>`}
 async function shGive(){
   const bid=SH.f.bid.toUpperCase().replace(/[^A-Z0-9]/g,""),mb=parseInt(SH.f.mb,10);
+  SH.pick=null;
   if(!SH.to&&bid.length!==8){SH.msg="Enter your friend's 8-character Booking ID, or scan their QR.";SH.ok=false;return render()}
   if(!(mb>=1)){SH.msg=SHMSG.BAD_AMOUNT;SH.ok=false;return render()}
-  let who=SH.to&&SH.to.name;
-  if(!SH.to){const pk=await db.rpc("space_booking_peek",{p_to_code:bid});
-    if(pk.error||!pk.data){SH.msg="Could not check that Booking ID. Check your internet and try again.";SH.ok=false;return render()}
-    if(!pk.data.ok){SH.msg=shSay(pk.data.error,pk.data);SH.ok=false;return render()}
-    who=pk.data.name||"your friend"}
-  if(!confirm(`Give ${mb} MB of ${SH.kind} space to ${who}?`))return;
-  SH.busy=true;SH.msg="";render();
-  const r=SH.to?await db.rpc("space_give_token",{p_code:S.code,p_phone:S.phone,p_token:SH.to.token,p_kind:SH.kind,p_mb:mb}):await db.rpc("space_give_booking",{p_code:S.code,p_phone:S.phone,p_to_code:bid,p_kind:SH.kind,p_mb:mb});
+  if(SH.to)return shSend({mb,who:SH.to.name||"your friend"});
+  const pk=await db.rpc("space_booking_peek",{p_to_code:bid});
+  if(pk.error||!pk.data){SH.msg="Could not check that Booking ID. Check your internet and try again.";SH.ok=false;return render()}
+  if(!pk.data.ok){SH.msg=shSay(pk.data.error,pk.data);SH.ok=false;return render()}
+  const ppl=pk.data.people||[];
+  if(ppl.length>1){SH.pick={bid,mb,people:ppl};SH.msg="";return render()}   /* several people on this booking: ask who */
+  return shSend({mb,bid,person:ppl[0]&&ppl[0].id,who:(ppl[0]&&ppl[0].name)||"your friend"})}
+async function shSend(o){
+  const mb=o.mb;
+  if(!confirm(`Give ${mb} MB of ${SH.kind} space to ${o.who}?`))return;
+  SH.busy=true;SH.msg="";SH.pick=null;render();
+  const r=SH.to?await db.rpc("space_give_token",{p_code:S.code,p_phone:S.phone,p_token:SH.to.token,p_kind:SH.kind,p_mb:mb}):await db.rpc("space_give_booking",{p_code:S.code,p_phone:S.phone,p_to_code:o.bid,p_kind:SH.kind,p_mb:mb,p_to_person:o.person||null});
   SH.busy=false;
   if(r.error||!r.data){SH.msg="Could not share. Check your internet and try again.";SH.ok=false;return render()}
   if(!r.data.ok){SH.msg=shSay(r.data.error,r.data);SH.ok=false;return render()}
-  SH.msg=`Done. ${mb} MB of ${SH.kind} space was given to ${who}.`;SH.ok=true;SH.f.mb="";
+  SH.msg=`Done. ${mb} MB of ${SH.kind} space was given to ${o.who}.`;SH.ok=true;SH.f.mb="";
   await Promise.all([refreshStatus(),vStatus()]);SH.loaded=false;SH.fail=false;render()}
 async function shReturn(id){
   if(!confirm("Take this space back from your friend?"))return;
@@ -512,7 +518,7 @@ document.addEventListener("keydown",e=>{
   if((e.key==="ArrowLeft"||e.key==="ArrowRight")&&(S.lb!=null||SV.lb!=null)){const b=document.querySelector(".lb .nav."+(e.key==="ArrowLeft"?"l":"r"));if(b)b.click();return}if(e.key==="Escape"&&(S.lb!=null||SV.lb!=null)){S.lb=null;SV.lb=null;render()}});
 document.addEventListener("input",e=>{const t=e.target;if(t.id==="sbid")SH.f.bid=t.value;else if(t.id==="smb")SH.f.mb=t.value});
 document.addEventListener("click",async e=>{
-  const t=e.target.closest("[data-a],[data-lt],[data-id],[data-tab],[data-mode],[data-open],[data-retry],[data-rm],[data-dl],[data-del],[data-vopen],[data-vdl],[data-vdel],[data-sk],[data-sret]");if(!t)return;
+  const t=e.target.closest("[data-a],[data-lt],[data-id],[data-tab],[data-mode],[data-open],[data-retry],[data-rm],[data-dl],[data-del],[data-vopen],[data-vdl],[data-vdel],[data-sk],[data-sret],[data-spick]");if(!t)return;
   const d=t.dataset;
   if(d.vopen!=null){SV.lb=+d.vopen;render();const q=SV.items[SV.lb];if(q)loadSharpV(q.id);return}
   if(d.vdl){const w=window.open("","_blank");const r=await P.call(await cfg(),{action:"vview",id:d.vdl});
@@ -527,6 +533,7 @@ document.addEventListener("click",async e=>{
   if(d.tab){if(d.tab!=="share")scanStop();S.tab=d.tab;S.note="";S.loadFail=false;if(d.tab==="upload"&&S.role==="pub")await refreshStatus();if(d.tab==="share"){SH.loaded=false;SH.fail=false;SH.msg=""}return render()}
   if(d.sk){SH.kind=d.sk;SH.msg="";return render()}
   if(d.sret){return shReturn(d.sret)}
+  if(d.spick!=null){const k=SH.pick;if(!k)return;const q=k.people.find(x=>x.id===d.spick);if(!q)return;return shSend({mb:k.mb,bid:k.bid,person:q.id,who:q.name||"your friend"})}
   if(d.mode){S.mode=d.mode;LSset("gal_mode",d.mode);S.note="";return render()}
   if(d.open!=null){S.lb=+d.open;render();const q=S.photos[S.lb];if(q)loadSharp(q.id);return}
   if(d.retry){const it=S.q.find(x=>x.id===d.retry);if(it){it.state="wait";it.err="";pump();draw()}return}
@@ -551,6 +558,7 @@ document.addEventListener("click",async e=>{
     case"shscan":return shScan();
     case"shscanstop":scanStop();return render();
     case"shclear":SH.to=null;SH.msg="";return render();
+    case"shpickno":SH.pick=null;return render();
     case"vrefresh":SV.loaded=false;SV.fail=false;SV.note="";await vStatus();return loadVideos(true);
     case"vmore":SV.fail=false;return loadVideos(false);
     case"all":S.sel.forEach(i=>{if(!i.bad)i.on=true});return render();

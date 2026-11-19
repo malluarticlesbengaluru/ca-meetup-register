@@ -116,6 +116,7 @@ settings|44|video_pool_mb|integer|t|20480
 settings|45|video_max_mb|integer|t|150
 settings|46|video_cap_mb|integer|t|160
 settings|47|space_sharing_on|boolean|t|true
+settings|48|photos_home|boolean|t|false
 settings_log|1|id|bigint|t|
 settings_log|2|at|timestamp with time zone|t|now()
 settings_log|3|changed_by|uuid|f|
@@ -1522,6 +1523,25 @@ begin
   update settings set photo_visibility = p_value where id = 1;
 end $function$
 
+--- admin_set_photos_home(p_value boolean) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
+CREATE OR REPLACE FUNCTION public.admin_set_photos_home(p_value boolean)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare old boolean;
+begin
+  if not is_admin() then raise exception 'NOT_ALLOWED'; end if;
+  if p_value is null then raise exception 'INVALID_VALUE'; end if;
+  select photos_home into old from settings where id = 1;
+  if old is distinct from p_value then
+    update settings set photos_home = p_value where id = 1;
+    insert into settings_log (changed_by, who, area, field, old_value, new_value)
+    values (auth.uid(), _actor(), 'settings', 'photos link on home page', case when old then 'on' else 'off' end, case when p_value then 'on' else 'off' end);
+  end if;
+end $function$
+
 --- admin_set_prizes(p_tickets uuid[], p_body text, p_heading text) | execute rights: {postgres=X/postgres,authenticated=X/postgres}
 CREATE OR REPLACE FUNCTION public.admin_set_prizes(p_tickets uuid[], p_body text, p_heading text DEFAULT NULL::text)
  RETURNS integer
@@ -2102,7 +2122,7 @@ CREATE OR REPLACE FUNCTION public.get_photos_info()
  STABLE SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
-  select jsonb_build_object('on', s.photos_on, 'mode', s.photo_public_mode, 'max_bytes', s.photo_max_pub_mb::bigint * 1048576)
+  select jsonb_build_object('on', s.photos_on, 'mode', s.photo_public_mode, 'max_bytes', s.photo_max_pub_mb::bigint * 1048576, 'home', s.photos_home)
     from settings s where s.id = 1 $function$
 
 --- get_public_status(p_session uuid) | execute rights: {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres}

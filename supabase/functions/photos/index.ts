@@ -29,8 +29,8 @@ const ENDPOINT = Deno.env.get("STORJ_ENDPOINT") || "https://gateway.storjshare.i
 // Videos use a third account (STORJ_VID_ACCESS_KEY, STORJ_VID_SECRET_KEY, STORJ_VID_BUCKET); without those secrets, video actions answer NOT_CONFIGURED.
 // SHARED ATTENDEE SPACE (r2_32): when the admin switches it on, attendee photos AND videos may go to any of three attendee accounts, chosen by the
 // database (the one holding the least): key "att/1/..." = the public account (STORJ_PUB_*), "att/2/..." = the video account (STORJ_VID_*),
-// "att/3/..." = a fourth, new account (STORJ_ATT_ACCESS_KEY, STORJ_ATT_SECRET_KEY, STORJ_ATT_BUCKET). Older keys (public/, video/) keep working.
-// This function tells the database which of the three exist (accounts()), so a missing secret can never receive a file.
+// "att/3/..." = a fourth account (STORJ_ATT_ACCESS_KEY, STORJ_ATT_SECRET_KEY, STORJ_ATT_BUCKET), "att/4/..." = a fifth (STORJ_ATT2_ACCESS_KEY, STORJ_ATT2_SECRET_KEY, STORJ_ATT2_BUCKET). Older keys (public/, video/) keep working.
+// This function tells the database which of the four exist (accounts()), so a missing secret can never receive a file.
 type Acct = { bucket: string; aws: AwsClient };
 const mk = (bucket: string, id: string, secret: string): Acct => ({
   bucket, aws: new AwsClient({ accessKeyId: id, secretAccessKey: secret, service: "s3", region: "us-1" }),
@@ -45,12 +45,16 @@ const VID: Acct | null = Deno.env.get("STORJ_VID_BUCKET") && Deno.env.get("STORJ
 const ATT: Acct | null = Deno.env.get("STORJ_ATT_BUCKET") && Deno.env.get("STORJ_ATT_ACCESS_KEY") && Deno.env.get("STORJ_ATT_SECRET_KEY")
   ? mk(Deno.env.get("STORJ_ATT_BUCKET")!, Deno.env.get("STORJ_ATT_ACCESS_KEY")!, Deno.env.get("STORJ_ATT_SECRET_KEY")!)
   : null;
-// the attendee accounts that really exist, as numbers the database understands (1 = public, 2 = video, 3 = new)
-const accounts = (): number[] => [1, ...(VID ? [2] : []), ...(ATT ? [3] : [])];
+const ATT2: Acct | null = Deno.env.get("STORJ_ATT2_BUCKET") && Deno.env.get("STORJ_ATT2_ACCESS_KEY") && Deno.env.get("STORJ_ATT2_SECRET_KEY")
+  ? mk(Deno.env.get("STORJ_ATT2_BUCKET")!, Deno.env.get("STORJ_ATT2_ACCESS_KEY")!, Deno.env.get("STORJ_ATT2_SECRET_KEY")!)
+  : null;
+// the attendee accounts that really exist, as numbers the database understands (1 = public, 2 = video, 3 and 4 = the new ones)
+const accounts = (): number[] => [1, ...(VID ? [2] : []), ...(ATT ? [3] : []), ...(ATT2 ? [4] : [])];
 const acct = (key: string): Acct => {
   if (key.startsWith("att/1/")) return PUB;
   if (key.startsWith("att/2/")) { if (!VID) throw new Error("NO_VIDEO_ACCOUNT"); return VID; }
   if (key.startsWith("att/3/")) { if (!ATT) throw new Error("NO_ATT_ACCOUNT"); return ATT; }
+  if (key.startsWith("att/4/")) { if (!ATT2) throw new Error("NO_ATT2_ACCOUNT"); return ATT2; }
   if (key.startsWith("video/")) { if (!VID) throw new Error("NO_VIDEO_ACCOUNT"); return VID; }   // a video never lands in a photo account
   return key.startsWith("public/") ? PUB : CAM;
 };

@@ -50,7 +50,7 @@ t.check("2.9 now nothing is left: photo and video both refused", pres('Asha', 1)
 t.check("2.10 the per-file limits still apply (a 101 MB photo is TOO_BIG, a 151 MB video TOO_BIG) even for someone with space", pres('Carl', 101)['error'] == 'TOO_BIG' and vres('Carl', 151)['error'] == 'TOO_BIG')
 r = pres('Carl', 50, [1, 2, 3])
 t.check("2.11 a third account is used when it holds the least: Carl's photo goes to att/3/", r['ok'] and r['key'].startswith('att/3/'), r)
-t.check("2.12 only account 1 offered: att/1/; only account 3: att/3/; nonsense list: att/1/", pres('Ben', 5, [1])['key'].startswith('att/1/') and pres('Ben', 5, [3])['key'].startswith('att/3/') and pres('Ben', 5, [9])['key'].startswith('att/1/') and pres('Ben', 5, [])['key'].startswith('att/'))
+t.check("2.12 only account 1 offered: att/1/; only account 3: att/3/; nonsense list: att/1/", pres('Ben', 5, [1])['key'].startswith('att/1/') and pres('Ben', 5, [3])['key'].startswith('att/3/') and pres('Ben', 5, [9])['key'].startswith('att/1/') and pres('Ben', 5, [4])['key'].startswith('att/4/') and pres('Ben', 5, [])['key'].startswith('att/'))
 acc = rv(adm("select admin_attendee_summary()"))
 t.check("2.13 the admin summary adds the three accounts up to the pool use", sum(acc['accounts']) == acc['used_bytes'] and acc['used_bytes'] == sql("select (select coalesce(sum(coalesce(bytes_actual,bytes_claimed)),0) from photos where kind='public' and status in ('reserved','stored'))+(select coalesce(sum(coalesce(bytes_actual,bytes_claimed)),0) from videos where status in ('reserved','stored'))")[0][0], acc)
 
@@ -79,7 +79,7 @@ sql("delete from space_transfers")
 # 5. files saved under the old keys count in the account usage; photographers are unaffected
 sql("delete from photos"); sql("delete from videos")
 pres('Asha', 10); vres('Asha', 10)                          # switch is off: public/ and video/ keys
-t.check("5.1 old keys: public/ counts for account 1, video/ for account 2", rv(adm("select admin_attendee_summary()"))['accounts'] == [10*MB, 10*MB, 0])
+t.check("5.1 old keys: public/ counts for account 1, video/ for account 2", rv(adm("select admin_attendee_summary()"))['accounts'] == [10*MB, 10*MB, 0, 0])
 setp(attendee_shared=True)
 r = vres('Ben', 5, [1, 2, 3])
 t.check("5.2 a new file goes to the emptiest account (3), counting the old keys", r['ok'] and r['key'].startswith('att/3/'), r)

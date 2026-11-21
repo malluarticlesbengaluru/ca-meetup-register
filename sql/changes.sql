@@ -3260,7 +3260,7 @@ revoke all on function public.space_give_token(text, text, text, text, integer) 
 grant execute on function public.space_give_token(text, text, text, text, integer) to anon, authenticated;
 
 -- ============================================================================
--- Release 2, piece 32: ONE SHARED SPACE FOR ATTENDEES (photos and videos together), spread over up to three Storj accounts
+-- Release 2, piece 32: ONE SHARED SPACE FOR ATTENDEES (photos and videos together), spread over up to four Storj accounts
 -- Written 21 Nov 2026. Run AFTER r2_28 (and r2_29 to r2_31). Safe to run twice. Changes no photo and no video already saved.
 --
 -- Switch: settings.attendee_shared (default OFF). While it is OFF everything behaves exactly as before (separate photo pool, video pool and caps).
@@ -3270,9 +3270,9 @@ grant execute on function public.space_give_token(text, text, text, text, intege
 --     used by photos and videos together. Space received from friends (or given away) counts for both, whatever "kind" the gift was made as.
 --   * "Biggest photo" (photo_max_pub_mb) and "Biggest video" (video_max_mb) still limit one file.
 --   * The old photo_pool_pub_mb, photo_cap_pub_mb, video_pool_mb and video_cap_mb are ignored for attendees until the switch is turned off.
---   * New files are stored in the attendee Storj account that holds the least so far (keys "att/1/...", "att/2/...", "att/3/...").
---       account 1 = the "public" photo account (STORJ_PUB_*), 2 = the video account (STORJ_VID_*), 3 = the new account (STORJ_ATT_*).
---     The Edge Function tells the database which of the three exist (p_acc); files saved before keep their old keys and accounts.
+--   * New files are stored in the attendee Storj account that holds the least so far (keys "att/1/..." to "att/4/...").
+--       account 1 = the "public" photo account (STORJ_PUB_*), 2 = the video account (STORJ_VID_*), 3 = a new account (STORJ_ATT_*), 4 = another new account (STORJ_ATT2_*).
+--     The Edge Function tells the database which of the four exist (p_acc); files saved before keep their old keys and accounts.
 -- Re-created below: _space_net, _space_left, photo_public_status, photo_reserve, video_public_status, video_reserve, space_overview.
 -- New: three settings columns, _att_* helpers, admin_set_attendee_space, admin_attendee_summary.
 -- ============================================================================
@@ -3303,7 +3303,7 @@ create or replace function public._att_limit(p_count integer, p_key uuid) return
     from settings s where s.id = 1 $function$;
 revoke all on function public._att_limit(integer, uuid) from public, anon, authenticated, service_role;
 
--- bytes held by one attendee storage account (1, 2 or 3): old keys public/ (1) and video/ (2), new keys att/<n>/
+-- bytes held by one attendee storage account (1 to 4): old keys public/ (1) and video/ (2), new keys att/<n>/
 create or replace function public._att_acct_used(p_n integer) returns bigint
  language sql stable security definer set search_path to 'public' as $function$
   select (select coalesce(sum(coalesce(bytes_actual, bytes_claimed)), 0) from photos
@@ -3317,7 +3317,7 @@ revoke all on function public._att_acct_used(integer) from public, anon, authent
 -- which of the available accounts gets the next file: the one holding the least (lowest number on a tie). Unknown list = accounts 1 and 2.
 create or replace function public._att_pick(p_acc integer[]) returns integer
  language sql stable security definer set search_path to 'public' as $function$
-  select coalesce((select n from unnest(coalesce(nullif(p_acc, '{}'::integer[]), array[1, 2])) n where n in (1, 2, 3) order by _att_acct_used(n), n limit 1), 1) $function$;
+  select coalesce((select n from unnest(coalesce(nullif(p_acc, '{}'::integer[]), array[1, 2])) n where n in (1, 2, 3, 4) order by _att_acct_used(n), n limit 1), 1) $function$;
 revoke all on function public._att_pick(integer[]) from public, anon, authenticated, service_role;
 
 -- ---- gifts: while the shared pool is on, a gift counts for photos and videos together --------------------------------------------
@@ -3547,7 +3547,7 @@ begin
   return jsonb_build_object('shared', s.attendee_shared, 'pool_bytes', s.attendee_pool_mb::bigint * 1048576, 'cap_bytes', s.attendee_cap_mb::bigint * 1048576,
     'used_bytes', _att_used_all(), 'photo_bytes', _photo_used('public'), 'video_bytes', _video_used(), 'present', present,
     'per_person_bytes', _photo_person_bytes(s.attendee_pool_mb, s.attendee_cap_mb, present),
-    'accounts', jsonb_build_array(_att_acct_used(1), _att_acct_used(2), _att_acct_used(3)));
+    'accounts', jsonb_build_array(_att_acct_used(1), _att_acct_used(2), _att_acct_used(3), _att_acct_used(4)));
 end $function$;
 revoke all on function public.admin_attendee_summary() from public, anon, authenticated, service_role;
 grant execute on function public.admin_attendee_summary() to authenticated;

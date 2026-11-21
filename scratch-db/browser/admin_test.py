@@ -1,9 +1,18 @@
-import json, sys
-from playwright.sync_api import sync_playwright
+import json, sys, re
+from playwright.sync_api import sync_playwright, Page
 import os
 HTML = open(os.environ.get('ADMIN_HTML', '/home/claude/ca-meetup-register/admin/index.html'), encoding='utf-8').read()
 MOCK = open('mock_supabase.js').read(); CH = open('chart_stub.js').read()
 results = []
+# On a laptop, Settings shows one group at a time (side menu). Like a person would, these calls first tap the side-menu item of the group
+# that holds the field or button, if it is hidden. Phones and other screens are not affected (no side menu there).
+_REVEAL = "sel=>{try{const e=document.querySelector(sel),p=e&&e.closest('.spane'),m=document.querySelector('#sside');if(p&&!p.classList.contains('on')&&m&&getComputedStyle(m).display!=='none'){const b=m.querySelector('[data-sg=\"'+p.dataset.g+'\"]');b&&b.click()}}catch(_){}}"
+def _wrap(name):
+    orig = getattr(Page, name)
+    def f(self, selector, *a, **k):
+        self.evaluate(_REVEAL, selector); return orig(self, selector, *a, **k)
+    setattr(Page, name, f)
+for _n in ('click', 'fill', 'check', 'uncheck', 'select_option', 'dblclick', 'press', 'type'): _wrap(_n)
 # The page now shows its own dialogs (not the browser's confirm/prompt). This small bot answers the NEXT dialog the page shows:
 #   auto(pg)              -> press OK          auto(pg, False) -> press Cancel        auto(pg, True, value='x') -> type x, press OK
 #   dlg_msgs(pg)          -> the texts of the dialogs answered since the last call

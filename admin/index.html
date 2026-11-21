@@ -59,9 +59,18 @@ a.lnk{display:inline-flex;align-items:center;text-decoration:none;border:1px sol
 .mform{margin-top:12px}.msgrid h3,.plan h3,.mform h3{margin:14px 0 6px;font-size:1rem;font-weight:800}.uses{display:grid;gap:2px;margin-bottom:8px}.plan{margin-top:12px}
 .ros{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:6px 0}.ros summary{cursor:pointer;min-height:32px;display:flex;align-items:center;gap:8px}.rlist{display:grid;gap:4px;padding:6px 0 2px}
 @media(max-width:560px){.msgrid{grid-template-columns:minmax(0,1fr)}.mrow{flex-direction:column}.mright{justify-content:flex-start}}
-#snav{position:sticky;top:var(--tbh,60px);z-index:5;background:var(--bg);padding:8px 0;margin:0 0 6px}.sgrid>.card{scroll-margin-top:calc(var(--tbh,60px) + 60px)}.sgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));align-items:start}.sgrid>.card{margin:0}.sgrid>.slog{grid-column:1/-1}
+#snav{position:sticky;top:var(--tbh,60px);z-index:5;background:var(--bg);padding:8px 0;margin:0 0 6px}.sc>.card{margin:0}.sc{min-width:0}.sc>.card{scroll-margin-top:calc(var(--tbh,60px) + 60px)}
+.sgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));align-items:start}.spane,.scols,.scol{display:contents}.sc.sw{grid-column:1/-1}#sside{display:none}
 .sgrid label:has(>input[type=checkbox]){display:flex;gap:10px;align-items:flex-start}.sgrid label>input[type=checkbox]{flex:0 0 auto;margin:1px 0 0}
 @media(max-width:560px){.sgrid{grid-template-columns:1fr}#snav{flex-wrap:nowrap;overflow-x:auto;margin-right:-12px;padding-bottom:4px;scrollbar-width:none}#snav::-webkit-scrollbar{display:none}#snav .chip{flex:0 0 auto}}
+/* laptops: a side menu, one group of settings at a time, two columns inside a group */
+@media(min-width:900px){
+.sset{display:grid;grid-template-columns:190px minmax(0,1fr);gap:18px;align-items:start}#snav{display:none}
+#sside{display:flex;flex-direction:column;gap:6px;position:sticky;top:calc(var(--tbh,60px) + 8px)}
+.sgb{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;border-radius:12px}.sgb[aria-current]{background:var(--card2);border-color:var(--brand);font-weight:800}
+.sgn{font-size:.78rem;font-weight:800;border-radius:999px;padding:1px 8px;border:1px solid currentColor}.sgn.ok{color:var(--ok)}.sgn.bad{color:var(--err)}
+.spanes{display:block}.spane{display:none}.spane.on{display:block}.scols{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px;align-items:start}.scols.one{max-width:780px;grid-template-columns:minmax(0,1fr)}.spane.full .scols.one{max-width:none}
+.scol{display:flex;flex-direction:column;gap:12px;min-width:0}}
 .lk{background:none;border:0;border-bottom:1px dotted var(--brand);border-radius:0;color:var(--ink);padding:3px 0;min-height:0;font:inherit;font-weight:700;text-align:left;cursor:pointer}.lk:hover{filter:none;color:var(--brand)}
 .tg.lk2{cursor:pointer;color:var(--brand);border-color:var(--brand);min-height:0;padding:3px 10px;border-radius:999px;background:var(--card2);font-weight:700}
 .flash{animation:flash 1.8s ease-out}@keyframes flash{0%,40%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 3px transparent}}
@@ -689,35 +698,39 @@ const CT_ERR={FIRST_CONTACT_REQUIRED:"Contact 1 needs both a name and a WhatsApp
 const PAY_ERR={INVALID_UPI:"That UPI ID doesn't look right. It should look like name@bank.",INVALID_PAYEE:"Type the payee name (up to 60 letters).",INVALID_WHATSAPP:"The WhatsApp number needs the country code, for example 91XXXXXXXXXX.",NOT_ALLOWED:"Only admins can change this."};
 function vSettings(){const s=S.settings;
   const hm=x=>String(x||"").slice(0,5);
-  $("#v").innerHTML=regBar()+`<div class="chips" id="snav"></div><div class="sgrid"><div class="card"><h2>Registration settings</h2>
+  const regC=`<div class="card"><h2>Registration settings</h2>
   <label><input type="checkbox" id="sopen" ${s.is_open?"checked":""}> Registration open</label>
   <p class="mute" style="margin-top:0">When you switch registration off, anyone already filling the form gets 10 minutes to finish.</p>
-  <div id="pausebox" style="display:${s.is_open?"block":"none"};border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 12px">
+  <div id="pausebox" style="display:${s.is_open?"block":"none"};border:1px solid var(--line);border-radius:10px;padding:2px 12px 10px;margin:6px 0 12px">
+    <details id="pausedet" ${s.pause_enabled?"open":""}><summary style="cursor:pointer;min-height:40px;display:flex;align-items:center;gap:8px;font-weight:700">Daily pause (to check the bank balance) <span class="tg">${s.pause_enabled?"On":"Off"}</span></summary>
     <label style="margin-top:0"><input type="checkbox" id="spause" ${s.pause_enabled?"checked":""}> Pause registration every day (to check the bank balance)</label>
     <div class="grid" style="margin-top:6px">
       <div><label for="sclose" style="font-weight:400">Close at (India time)</label><input id="sclose" type="time" value="${hm(s.pause_close_time)||"23:00"}"></div>
       <div><label for="sreopen" style="font-weight:400">Reopen at (India time)</label><input id="sreopen" type="time" value="${hm(s.pause_open_time)||"00:00"}"></div>
     </div>
     <p class="mute" style="margin-bottom:0">Same times every day until the deadline. Anyone already filling the form at closing time gets a 10-minute countdown to finish; nobody new can start.</p>
+    </details>
   </div>
   <label for="scap">Cap (people)</label><input id="scap" type="number" min="0" value="${s.cap}">
   <label for="sprice">Price per person (₹)</label><input id="sprice" type="number" min="1" value="${s.price_per_head}">
   <label for="sdl">Deadline (India time)</label><input id="sdl" type="datetime-local" value="${istInput(s.deadline)}">
   <p class="mute">The form closes at the deadline or when the cap is reached, whichever comes first. Changing the price affects new bookings only.</p>
-  <p><button id="ssave">Save settings</button></p></div>
-  ${payCard(s)}
-  ${contactsCard(s)}
-  ${evCard(s)}
-  ${trCard(s)}
-  ${readyCard(s)}
-  ${advCard(s)}
-  ${afterCard(s)}
-  <div class="card" id="photocard"><h2>Photos</h2><p class="mute">Loading…</p></div>
-  <div class="card" id="videocard"><h2>Videos</h2><p class="mute">Loading…</p></div>
-  <div class="card" id="sharecard"><h2>Space sharing</h2><p class="mute">Loading…</p></div>
-  ${logCard()}</div>`;
+  <p><button id="ssave">Save settings</button></p></div>`;
+  const card=(h,n,cls)=>h?`<div class="sc${cls?" "+cls:""}" style="order:${n}">${h}</div>`:"";
+  /* legacy numbers (1 to 12) keep the old top-to-bottom order on phones and tablets; laptops show one group at a time */
+  const rf=readyFlags(s),rp=rf.filter(Boolean).length,GR=[
+    ["setup","Set-up",[[card(regC,1),card(evCard(s),4)],[card(payCard(s),2),card(contactsCard(s),3)]]],
+    ["transfers","Transfers",[[card(trCard(s),5)]]],
+    ["event","Event day",[[card('<div class="card" id="photocard"><h2>Photos</h2><p class="mute">Loading…</p></div>',9)],[card('<div class="card" id="videocard"><h2>Videos</h2><p class="mute">Loading…</p></div>',10),card('<div class="card" id="sharecard"><h2>Space sharing</h2><p class="mute">Loading…</p></div>',11)]]],
+    ["ready","Go-live check",[[card(readyCard(s),6)]]],
+    ["other","Other",[[card(advCard(s),7)],[card(afterCard(s),8)]]],
+    ["log","Log",[[card(logCard(),12,"sw")]]]
+  ].map(g=>[g[0],g[1],g[2].filter(c=>c.join("")),0]).filter(g=>g[2].length);
+  const ids=GR.map(g=>g[0]);if(!ids.includes(S.sg)){let k="";try{k=localStorage.getItem("adm_sg")||""}catch(_){}S.sg=ids.includes(k)?k:ids[0]}
+  const side=GR.map(g=>`<button class="chip sgb" data-sg="${g[0]}" ${S.sg===g[0]?'aria-current="true"':""}>${g[1]}${g[0]==="ready"?`<span class="sgn ${rp===rf.length?"ok":"bad"}">${rp===rf.length?"✓":"✗"} ${rp}/${rf.length}</span>`:""}</button>`).join("");
+  $("#v").innerHTML=regBar()+`<div class="chips" id="snav"></div><div class="sset"><nav id="sside" aria-label="Settings sections">${side}</nav><div class="spanes sgrid">${GR.map(g=>`<section class="spane${S.sg===g[0]?" on":""}${g[0]==="log"?" full":""}" data-g="${g[0]}"><div class="scols${g[2].length===1?" one":""}">${g[2].map(c=>`<div class="scol">${c.join("")}</div>`).join("")}</div></section>`).join("")}</div></div>`;
   const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Launch readiness":"Readiness","Advanced":"Advanced","After the event":"After event","Photos":"Photos","Videos":"Videos","Space sharing":"Space sharing","Settings log":"Log"};
-  $("#snav").innerHTML=[...document.querySelectorAll(".sgrid>.card")].map((c,i)=>{if(!c.id)c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="${c.id}">${esc(SH[h]||h)}</button>`}).join("");
+  $("#snav").innerHTML=[...document.querySelectorAll(".sc")].sort((x,y)=>x.style.order-y.style.order).map((w,i)=>{const c=w.firstElementChild;if(!c.id)c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="${c.id}">${esc(SH[h]||h)}</button>`}).join("");
   const tb=$("#top");if(tb)document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px");phLoad();vidLoad();shareLoad()}
 
 /* ---------- Photos: the Settings card (limits, usage, gallery, download links). Photos live in Storj; this page only shows numbers and tiny previews. ---------- */
@@ -1077,16 +1090,19 @@ function afterCard(s){
   <p class="mute" style="margin-top:0">Do this once the event is over. It cannot be undone, and the repeat-registration flags disappear.</p>
   <p style="margin-bottom:0"><button class="ghost bad" id="ipclear">Delete all stored network addresses</button></p></div>`}
 /* the readiness list is worked out from the real settings, so nothing has to be ticked by hand */
+function readyFlags(s){
+  const pay=!!(s.upi_id&&s.payee_name&&s.whatsapp_number),dl=s.deadline&&new Date(s.deadline)>new Date(),ev=!!(s.event_at&&s.venue&&new Date(s.event_at)>new Date());
+  return[pay,s.price_per_head>0,s.cap>0,!!dl,ev,!!s.is_open]}
 function readyCard(s){
-  const row=(good,t,h)=>`<li><span style="color:var(${good?"--ok":"--err"});font-weight:800">${good?"✓":"✗"}</span><div><b>${t}</b>${good?"":`<div class="mute">${h}</div>`}</div></li>`,
-    pay=!!(s.upi_id&&s.payee_name&&s.whatsapp_number),dl=s.deadline&&new Date(s.deadline)>new Date(),ev=!!(s.event_at&&s.venue&&new Date(s.event_at)>new Date());
+  const row=(good,t,h)=>`<li><span style="color:var(--${good?"ok":"err"});font-weight:800">${good?"✓":"✗"}</span><div><b>${t}</b>${good?"":`<div class="mute">${h}</div>`}</div></li>`,
+    [pay,price,cap,dl,ev,open]=readyFlags(s);
   return `<div class="card"><h2>Launch readiness</h2><p class="mute" style="margin-top:0">Worked out from your settings.</p><ul class="checks">
   ${row(pay,"Payment details are filled in","Add the UPI ID and payee name under Payment details, and Contact 1 under Contacts.")}
-  ${row(s.price_per_head>0,"Price per person is set","Set the final price under Registration settings.")}
-  ${row(s.cap>0,"Cap is set","Set how many people can register.")}
-  ${row(!!dl,"Deadline is in the future","Set the deadline under Registration settings.")}
+  ${row(price,"Price per person is set","Set the final price under Registration settings.")}
+  ${row(cap,"Cap is set","Set how many people can register.")}
+  ${row(dl,"Deadline is in the future","Set the deadline under Registration settings.")}
   ${row(ev,"Event date and venue are set","Fill in Event details.")}
-  ${row(!!s.is_open,"Registration is switched on","Switch on Registration open when you are ready to start.")}</ul>
+  ${row(open,"Registration is switched on","Switch on Registration open when you are ready to start.")}</ul>
   <p class="mute" style="margin-bottom:0">Check by hand: a small real test payment scanned in two UPI apps, all test bookings deleted and the payment-proofs storage emptied, sign-ups switched off in Supabase, and the other organiser logins created.</p></div>`}
 
 /* ===================== GATE SCANNER (a tab; gate staff see only this tab) ===================== */
@@ -1372,6 +1388,7 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
     await sync("core");view();return toast("Check-in undone");
   }
   if(id==="csv")return csv();
+  if(t.dataset.sg){S.sg=t.dataset.sg;try{localStorage.setItem("adm_sg",S.sg)}catch(_){}document.querySelectorAll("[data-sg]").forEach(x=>x.toggleAttribute("aria-current",x.dataset.sg===S.sg));document.querySelectorAll(".spane").forEach(x=>x.classList.toggle("on",x.dataset.g===S.sg));window.scrollTo(0,0);return}
   if(t.dataset.jump){document.getElementById(t.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(t.dataset.chip!==undefined){S.f.pay=t.dataset.chip;vBookings();return}
   if(t.matches&&t.matches('#dkimg img')){t.classList.toggle('z');return}
@@ -1440,7 +1457,7 @@ async function onClick(e){const t=(e.target.closest&&e.target.closest("button"))
     if(r.error)return toast("Failed: "+r.error.message);await sync("core","reg","log");view({keepForm:true});toast("Settings saved")}
 }
 document.addEventListener("click",async e=>{
-  const b=e.target.closest&&e.target.closest("button"),quick=!b||b.matches(".lk,.chip,.tg,[data-tab],.nav,#theme,#morebtn,[data-sheet],[data-sback],[data-jump],[data-gotab],[data-medit],[data-muse],[data-act],[data-pick],[data-dlg],[data-dk],[data-pview],[data-pchip],[data-gl],[data-tjump],#camtoggle");
+  const b=e.target.closest&&e.target.closest("button"),quick=!b||b.matches(".lk,.chip,.tg,[data-tab],.nav,#theme,#morebtn,[data-sheet],[data-sback],[data-jump],[data-sg],[data-gotab],[data-medit],[data-muse],[data-act],[data-pick],[data-dlg],[data-dk],[data-pview],[data-pchip],[data-gl],[data-tjump],#camtoggle");
   if(!quick&&b.dataset.run)return;   // this button is still working on the last tap
   if(!quick)b.dataset.run="1";
   try{await onClick(e)}catch(err){toast("Something went wrong: "+String((err&&err.message)||err).slice(0,120),6000)}

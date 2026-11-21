@@ -721,7 +721,7 @@ function vSettings(){const s=S.settings;
   const rf=readyFlags(s),rp=rf.filter(Boolean).length,GR=[
     ["setup","Set-up",[[card(regC,1),card(evCard(s),4)],[card(payCard(s),2),card(contactsCard(s),3)]]],
     ["transfers","Transfers",[[card(trCard(s),5)]]],
-    ["event","Event day",[[card('<div class="card" id="photocard"><h2>Photos</h2><p class="mute">Loading…</p></div>',9)],[card('<div class="card" id="videocard"><h2>Videos</h2><p class="mute">Loading…</p></div>',10),card('<div class="card" id="sharecard"><h2>Space sharing</h2><p class="mute">Loading…</p></div>',11)]]],
+    ["event","Event day",[[card('<div class="card" id="attcard"><h2>Attendee space</h2><p class="mute">Loading…</p></div>',9),card('<div class="card" id="photocard"><h2>Photos</h2><p class="mute">Loading…</p></div>',9)],[card('<div class="card" id="videocard"><h2>Videos</h2><p class="mute">Loading…</p></div>',10),card('<div class="card" id="sharecard"><h2>Space sharing</h2><p class="mute">Loading…</p></div>',11)]]],
     ["ready","Go-live check",[[card(readyCard(s),6)]]],
     ["other","Other",[[card(advCard(s),7)],[card(afterCard(s),8)]]],
     ["log","Log",[[card(logCard(),12,"sw")]]]
@@ -729,9 +729,9 @@ function vSettings(){const s=S.settings;
   const ids=GR.map(g=>g[0]);if(!ids.includes(S.sg)){let k="";try{k=localStorage.getItem("adm_sg")||""}catch(_){}S.sg=ids.includes(k)?k:ids[0]}
   const side=GR.map(g=>`<button class="chip sgb" data-sg="${g[0]}" ${S.sg===g[0]?'aria-current="true"':""}>${g[1]}${g[0]==="ready"?`<span class="sgn ${rp===rf.length?"ok":"bad"}">${rp===rf.length?"✓":"✗"} ${rp}/${rf.length}</span>`:""}</button>`).join("");
   $("#v").innerHTML=regBar()+`<div class="chips" id="snav"></div><div class="sset"><nav id="sside" aria-label="Settings sections">${side}</nav><div class="spanes sgrid">${GR.map(g=>`<section class="spane${S.sg===g[0]?" on":""}${g[0]==="log"?" full":""}" data-g="${g[0]}"><div class="scols${g[2].length===1?" one":""}">${g[2].map(c=>`<div class="scol">${c.join("")}</div>`).join("")}</div></section>`).join("")}</div></div>`;
-  const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Launch readiness":"Readiness","Advanced":"Advanced","After the event":"After event","Photos":"Photos","Videos":"Videos","Space sharing":"Space sharing","Settings log":"Log"};
+  const SH={"Registration settings":"Registration","Payment details":"Payment","Event details":"Event","Ticket transfers":"Transfers","Launch readiness":"Readiness","Advanced":"Advanced","After the event":"After event","Photos":"Photos","Videos":"Videos","Space sharing":"Space sharing","Attendee space":"Attendee space","Settings log":"Log"};
   $("#snav").innerHTML=[...document.querySelectorAll(".sc")].sort((x,y)=>x.style.order-y.style.order).map((w,i)=>{const c=w.firstElementChild;if(!c.id)c.id="s-"+i;const h=c.querySelector("h2")?.textContent||"Section";return `<button class="chip" data-jump="${c.id}">${esc(SH[h]||h)}</button>`}).join("");
-  const tb=$("#top");if(tb)document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px");phLoad();vidLoad();shareLoad()}
+  const tb=$("#top");if(tb)document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px");phLoad();vidLoad();shareLoad();attLoad()}
 
 /* ---------- Photos: the Settings card (limits, usage, gallery, download links). Photos live in Storj; this page only shows numbers and tiny previews. ---------- */
 Object.assign(TERR,{INVALID_VISIBILITY:"That choice is not valid.",POOLS_TOO_BIG:"The two pools together are bigger than the total space. Lower a pool or raise the total.",INVALID_POOL:"A pool must be a number of GB between 0 and 1000.",INVALID_CAP:"The per-person limit must be at least 1 MB.",INVALID_MAX:"The biggest single photo size is not allowed (photographers: 1 to 500 MB, public: 1 to 100 MB).",INVALID_TOTAL:"The total space is not a valid number.",INVALID_MODE:"Choose who can upload."});
@@ -824,6 +824,35 @@ function vidDraw(){
     for(let i=0;i<200;i++){const r=await phFn({action:"vexport",from});if(!r.ok)return toast(r.error==="NOT_ALLOWED"?"Only admins with the download switch on can do this.":"Could not prepare the list.",5000);r.items.forEach(x=>{n++;lines.push(x.key+"\t"+x.bytes+"\t"+x.url)});if(r.next==null)break;from=r.next}
     const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["path\tbytes\tdownload link (valid 1 hour)\n"+lines.join("\n")],{type:"text/plain"}));a.download="video-download-links.txt";a.click();toast(n+" videos listed")};
 }
+
+/* ---------- Attendee space: ONE pool for attendees' photos and videos together (r2_32). Off = the separate photo and video pools below apply. ---------- */
+S.att=null;
+async function attLoad(){
+  if(S.tab!=="settings")return;
+  if(S.att)attDraw();
+  const a=await db.rpc("admin_attendee_summary");
+  if(a.error){const c=$("#attcard");if(c)c.innerHTML="<h2>Attendee space</h2><p class=\"mute\">The shared attendee space is not set up yet (the database update r2_32 has not been run). Photos and videos keep their separate pools.</p>";return}
+  S.att=a.data;attDraw()}
+function attDraw(){
+  const c=$("#attcard");if(!c||!S.att)return;const d=S.att,mb=b=>Math.round(b/1048576),on=d.shared;
+  const p=d.pool_bytes?Math.min(100,d.used_bytes/d.pool_bytes*100):0,acc=d.accounts||[0,0,0];
+  c.innerHTML=`<h2>Attendee space</h2>
+  <label><input type="checkbox" id="atsh" ${on?"checked":""}> Photos and videos share one space for attendees</label>
+  <p class="mute" style="margin-top:0">${on?"ON: every attendee has one amount of space for photos and videos together, and the separate photo and video pools and caps below are not used for attendees.":"OFF: attendees have separate photo and video pools (the Photos and Videos cards below). Turn this on to let attendees use one shared space however they like."} Photographers are not affected. The biggest single photo and video limits still apply.</p>
+  <div class="meter"><i class="m1" style="width:${p}%"></i></div><span class="mute">${phB(d.used_bytes)} used of ${phB(d.pool_bytes)} (${p.toFixed(0)}%) · photos ${phB(d.photo_bytes)}, videos ${phB(d.video_bytes)}</span>
+  <p class="mute" style="margin:6px 0 8px">Held in each Storj account: account 1 (public photos) ${phB(acc[0])} · account 2 (videos) ${phB(acc[1])} · account 3 (new) ${phB(acc[2])}. New files go to the account holding the least. Each free trial is 25 GB, so keep the shared space a little under the total of your accounts.</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+   <div><label for="atpool">Shared space (GB)</label><input id="atpool" type="number" min="0" step="0.5" value="${phGB(mb(d.pool_bytes))}"></div>
+   <div><label for="atcap">Most per person (MB)</label><input id="atcap" type="number" min="1" value="${mb(d.cap_bytes)}"></div></div>
+  <p id="atprev" class="mute"></p>
+  <p><button id="atsave">Save attendee space</button></p>`;
+  const prev=()=>{const pool=Math.round(+$("#atpool").value*1024),cap=Math.max(1,+$("#atcap").value||1),n=Math.max(1,d.present),pp=Math.min(cap,Math.floor(pool/n));
+    $("#atprev").innerHTML=`<b>Right now:</b> ${d.present} ${d.present===1?"person is":"people are"} marked Present, so each person may use up to <b>${pp} MB</b> for photos and videos together (the lower of shared space ÷ people present, and the most per person). Friends can still give each other space.`};
+  ["#atpool","#atcap"].forEach(i=>$(i).oninput=prev);prev();
+  $("#atsave").onclick=async()=>{const r=await db.rpc("admin_set_attendee_space",{p_pool_mb:Math.round(+$("#atpool").value*1024),p_cap_mb:Math.max(1,Math.round(+$("#atcap").value))});
+    if(r.error)return toast(terr(r.error),6000);toast("Attendee space saved");await sync("core","log");S.att=null;view()};
+  $("#atsh").onchange=async()=>{const r=await db.rpc("admin_set_attendee_space",{p_shared:$("#atsh").checked});if(r.error){$("#atsh").checked=!$("#atsh").checked;return toast(terr(r.error),6000)}
+    toast($("#atsh").checked?"Attendees now share one space for photos and videos":"Photos and videos have separate pools again");await sync("core","log");S.att=null;view()}}
 
 /* ---------- Space sharing: attendees give unused photo or video space to friends. This card is the log of who gave to whom. ---------- */
 S.shr=null;

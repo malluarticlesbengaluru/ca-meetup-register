@@ -128,6 +128,26 @@ On the Share tab the phone-number box is gone. The giver (logged in as an attend
 3. Test: on one phone type another test attendee's Booking ID (try a booking with two people), give 10 MB to one of them, check the name shown and the admin Space sharing log.
 Note: anyone who knows a Booking ID can give space to that booking (the receiver only gains) and can see the names on it. The older "Booking ID + phone" function stays in the database but the page no longer uses it.
 
+## 5l. ONE shared space for attendees (r2_32, 21 Nov) - fourth Storj account
+
+Attendees get ONE pool (default 75 GB) for photos and videos together, instead of separate photo and video amounts. It is a switch in
+Admin > Settings > Event day > **Attendee space**, **OFF by default** (nothing changes until you turn it on). Photographers are not affected.
+While ON: each person may use the lower of (shared space / people marked Present) and "Most per person", for photos and videos together;
+friends' gifts count for both; "Biggest photo" and "Biggest video" still limit one file; the old photo pool/cap and video pool/cap are not used for attendees.
+New files go to whichever attendee Storj account holds the least (1 = public photos, 2 = videos, 3 = the new one). Old files stay where they are.
+
+Do it IN THIS ORDER (the order matters; the wrong order makes uploads fail):
+1. New Storj account: make a bucket, an access grant with read/write/list/delete, and set CORS on the bucket exactly as for the other accounts (step 5d).
+2. Supabase > SQL Editor: run `sql/r2_32_shared_attendee_pool.sql`. (Safe now: the switch is off and the old Edge Function keeps working.)
+3. Supabase > Edge Functions > Secrets: add `STORJ_ATT_BUCKET`, `STORJ_ATT_ACCESS_KEY`, `STORJ_ATT_SECRET_KEY` (the new account).
+4. Redeploy the `photos` Edge Function (file `supabase/functions/photos/index.ts`). It now tells the database which accounts exist.
+5. Upload `admin/index.html` and `gallery/index.html` (merge this branch).
+6. Admin > Settings > Event day > Attendee space: set the shared space (GB) a little under the total of your accounts (3 x 25 GB = 75 GB; 72 is safer,
+   because small previews add a little), set "Most per person", Save. Check the numbers, then tick **Photos and videos share one space**.
+7. Test with a Present test attendee: upload a photo and a video; the page shows "Your space (photos and videos together)"; the admin card shows
+   which account holds each. Delete the test files. To go back at any time, untick the switch: nothing is lost.
+Never delete or rename a Storj account that already holds files: its keys decide where each file is read from.
+
 ## 6. After the event
 Admin → Settings → Photos → **Make download links file**, download everything within the trial, and switch uploads off.
 

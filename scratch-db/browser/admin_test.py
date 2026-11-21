@@ -2,6 +2,7 @@ import json, sys, re
 from playwright.sync_api import sync_playwright, Page
 import os
 HTML = open(os.environ.get('ADMIN_HTML', '/home/claude/ca-meetup-register/admin/index.html'), encoding='utf-8').read()
+PHOTOUP = open(os.path.join(os.path.dirname(os.environ.get('ADMIN_HTML', '/home/claude/ca-meetup-register/admin/index.html')), '../assets/photo-upload.js'), encoding='utf-8').read()
 MOCK = open('mock_supabase.js').read(); CH = open('chart_stub.js').read()
 results = []
 # On a laptop, Settings shows one group at a time (side menu). Like a person would, these calls first tap the side-menu item of the group
@@ -86,6 +87,7 @@ def open_page(p, database, tab=None):
     b = p.chromium.launch(); pg = b.new_page(viewport={'width':1300,'height':900}); errs=[]
     pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('console', lambda m: errs.append(m.text) if m.type=='error' else None)
     pg.route('**/*', lambda r: (r.fulfill(body=HTML, content_type='text/html') if r.request.url.endswith('/admin/test.html')
+        else r.fulfill(body=PHOTOUP, content_type='text/javascript') if r.request.url.endswith('photo-upload.js')
         else r.fulfill(body='/*stub*/', content_type='text/javascript') if r.request.url.endswith('.js') or '/npm/' in r.request.url
         else r.fulfill(status=204, body='')))
     pg.add_init_script('window.__DB='+json.dumps(database)+';'); pg.add_init_script(MOCK); pg.add_init_script(CH); pg.add_init_script(DLG_BOT)

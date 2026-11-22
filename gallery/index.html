@@ -271,7 +271,7 @@ function statusHTML(){
   let h=blk?`<div class="off"><b>${esc(blk)}</b></div>`:"";
   if(st&&(S.role==="cam"||st.ok)){
     const used=usedBytes(),total=used+leftBytes(),p=total?Math.min(100,used/total*100):0;
-    h+=`<b>${S.role==="cam"?"Shared photographer space":"Your photo space"}</b><div class="meter"><i class="${p>=100?"full":p>=85?"low":""}" style="width:${p}%"></i></div>
+    h+=`<b>${S.role==="cam"?"Shared photographer space":st.shared?"Your space (photos and videos together)":"Your photo space"}</b><div class="meter"><i class="${p>=100?"full":p>=85?"low":""}" style="width:${p}%"></i></div>
     <span>${P.bytes(leftBytes())} left</span> <span class="mute">of ${P.bytes(total)}${S.role==="cam"?" (all photographers together)":""} · biggest single photo ${P.mb(maxBytes())}</span>`}
   return h}
 function draw(){drawQueue();const s=$("#st");if(s)s.innerHTML=statusHTML();updateCap()}
@@ -371,7 +371,7 @@ function videosHTML(){
   const tiles=SV.items.map((p,i)=>`<button class="tile" data-vopen="${i}" aria-label="Open video">${p.thumb?`<img src="${esc(p.thumb)}" alt="" loading="lazy" decoding="async">`:`<span class="nop">Video</span>`}<span class="sz">${P.mb(p.bytes||0)}</span>${p.mine?`<span class="mine">Yours</span>`:""}</button>`).join("");
   let up="";
   if(S.role==="pub"){
-    if(SV.st){const st=SV.st;up=`<p class="note" style="margin:0">Space for videos: ${P.bytes(st.used_bytes)} used of ${P.bytes(st.limit_bytes)}. One video can be up to ${P.bytes(st.max_bytes)}.</p>
+    if(SV.st){const st=SV.st;up=`<p class="note" style="margin:0">${st.shared?"Your space for photos and videos together":"Space for videos"}: ${P.bytes(st.used_bytes)} used of ${P.bytes(st.limit_bytes)}. One video can be up to ${P.bytes(st.max_bytes)}.</p>
       <div class="act"><label class="btn" for="v1">${IC.vid}Record video</label><label class="btn ghost" for="v2">${IC.img}Choose a video</label></div>
       <input id="v1" type="file" accept="video/*" capture="environment"><input id="v2" type="file" accept="video/*">
       <p class="note" id="vprog" style="margin-top:8px">${SV.busy?vProgText():"Keep this page open while a video uploads. Short clips upload faster."}</p>`}
@@ -455,22 +455,23 @@ function shareHTML(){
   if(!SH.loaded&&!SH.loading&&!SH.fail)setTimeout(loadShare,0);
   const d=SH.d;
   if(!d)return `<div class="card"><h2>Share space</h2>${SH.loading?`<div class="skel"><i></i><i></i><i></i></div>`:`<p class="warn">${esc(SH.msg||"Loading…")}</p><button class="ghost" data-a="shrefresh">Try again</button>`}</div>`;
-  const k=SH.kind,x=d[k],give=Math.floor((x.give_bytes||0)/1048576);
+  if(d.shared)SH.kind=d.photo.on?"photo":"video";   /* one shared space: a gift is just "space", the kind does not matter */
+  const k=SH.kind,x=d[k],give=Math.floor((x.give_bytes||0)/1048576),word=d.shared?"":(k+" ");
   const net=n=>n>0?`${P.bytes(n)} received from friends`:n<0?`${P.bytes(-n)} given to friends`:"none shared yet";
   const sum=(name,y)=>y.on?`<p class="note" style="margin:0 0 4px"><b style="color:var(--cream)">${name}:</b> you can give up to ${P.bytes(y.give_bytes)} (your unused space) · ${net(y.net_bytes)}</p>`:"";
-  const hist=d.items.map(i=>`<div class="it"><b>${i.dir==="out"?"You gave":"You received"} ${i.mb} MB ${i.kind==="video"?"video":"photo"} space ${i.dir==="out"?"to":"from"} ${esc(i.other||"a friend")}</b><span class="note">${i.status==="returned"?"taken back":""}</span>
+  const hist=d.items.map(i=>`<div class="it"><b>${i.dir==="out"?"You gave":"You received"} ${i.mb} MB ${d.shared?"":(i.kind==="video"?"video ":"photo ")}space ${i.dir==="out"?"to":"from"} ${esc(i.other||"a friend")}</b><span class="note">${i.status==="returned"?"taken back":""}</span>
     <span class="note" style="grid-column:1/3">${esc(fdt(i.at))}</span>${i.can_return?`<div class="acts"><button class="ghost sm" data-sret="${i.id}">Take it back</button></div>`:""}</div>`).join("");
   return `<div class="card"><div class="top"><h2>Share space</h2><button class="ghost sm" data-a="shrefresh">Refresh</button></div>
-  <p class="note" style="margin-top:0">Give some of your unused space to a friend, for example the friend with the best camera phone. You can give space for photos and for videos separately.</p>
+  <p class="note" style="margin-top:0">Give some of your unused space to a friend, for example the friend with the best camera phone. ${d.shared?"Your space is one amount for photos and videos together.":"You can give space for photos and for videos separately."}</p>
   ${d.sharing_on?"":`<p class="warn">Sharing space is switched off right now.</p>`}
-  ${sum("Photos",d.photo)}${sum("Videos",d.video)}
-  <div class="seg2" style="margin-top:12px"><button class="${k==="photo"?"on":""}" data-sk="photo" ${d.photo.on?"":"disabled"}>Photo space</button><button class="${k==="video"?"on":""}" data-sk="video" ${d.video.on?"":"disabled"}>Video space</button></div>
+  ${d.shared?sum("Photos and videos",d.photo):sum("Photos",d.photo)+sum("Videos",d.video)}
+  ${d.shared?"":`<div class="seg2" style="margin-top:12px"><button class="${k==="photo"?"on":""}" data-sk="photo" ${d.photo.on?"":"disabled"}>Photo space</button><button class="${k==="video"?"on":""}" data-sk="video" ${d.video.on?"":"disabled"}>Video space</button></div>`}
   ${SH.to?`<p class="ok" style="margin:12px 0 0">Giving to <b>${esc(SH.to.name||"your friend")}</b> <button class="ghost sm" data-a="shclear">Change</button></p>`
   :SH.scan?`<div style="margin-top:12px"><video id="scv" playsinline muted style="width:100%;border-radius:12px;background:#000;max-height:60vh"></video><p class="note" id="scm">Opening the camera…</p><button class="ghost" data-a="shscanstop">Stop scanning</button></div>`
   :`<button data-a="shscan" style="margin-top:12px" ${!d.sharing_on?"disabled":""}>Scan friend's QR</button><p class="note" style="margin:10px 0 0">Or type your friend's Booking ID:</p>`}
   <div ${SH.to||SH.scan?'hidden':''}>
   <label class="l" for="sbid">Your friend's Booking ID</label><input id="sbid" type="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="8 characters" value="${esc(SH.f.bid)}"></div>
-  ${SH.pick?`<div style="margin:12px 0"><p class="note" style="margin:0 0 8px"><b style="color:var(--cream)">Who in this booking gets it?</b> (${SH.pick.mb} MB of ${SH.kind} space)</p>${SH.pick.people.map(q=>`<button class="ghost" style="display:block;width:100%;margin:6px 0;text-align:left" data-spick="${esc(q.id)}">${esc(q.name||"Guest")}</button>`).join("")}<button class="ghost sm" data-a="shpickno">Cancel</button></div>`:""}
+  ${SH.pick?`<div style="margin:12px 0"><p class="note" style="margin:0 0 8px"><b style="color:var(--cream)">Who in this booking gets it?</b> (${SH.pick.mb} MB of ${d.shared?"":SH.kind+" "}space)</p>${SH.pick.people.map(q=>`<button class="ghost" style="display:block;width:100%;margin:6px 0;text-align:left" data-spick="${esc(q.id)}">${esc(q.name||"Guest")}</button>`).join("")}<button class="ghost sm" data-a="shpickno">Cancel</button></div>`:""}
   <label class="l" for="smb">How many MB to give (up to ${give})</label><input id="smb" type="tel" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="e.g. 40" value="${esc(SH.f.mb)}">
   ${SH.msg?`<p class="${SH.ok?"ok":"err"}" role="status">${esc(SH.msg)}</p>`:""}
   <button data-a="sgive" ${SH.busy||!d.sharing_on||!x.on?"disabled":""} style="margin-top:12px">${SH.busy?"Please wait…":"Give space"}</button>
@@ -493,7 +494,7 @@ async function shGive(){
   return shSend({mb,bid,person:ppl[0]&&ppl[0].id,who:(ppl[0]&&ppl[0].name)||"your friend"})}
 async function shSend(o){
   const mb=o.mb;
-  if(!confirm(`Give ${mb} MB of ${SH.kind} space to ${o.who}?`))return;
+  if(!confirm(`Give ${mb} MB of ${SH.d&&SH.d.shared?"":SH.kind+" "}space to ${o.who}?`))return;
   SH.busy=true;SH.msg="";SH.pick=null;render();
   const r=SH.to?await db.rpc("space_give_token",{p_code:S.code,p_phone:S.phone,p_token:SH.to.token,p_kind:SH.kind,p_mb:mb}):await db.rpc("space_give_booking",{p_code:S.code,p_phone:S.phone,p_to_code:o.bid,p_kind:SH.kind,p_mb:mb,p_to_person:o.person||null});
   SH.busy=false;
@@ -530,7 +531,7 @@ document.addEventListener("click",async e=>{
     return render()}
   if(d.lt){S.loginTab=d.lt;S.msg="";return render()}
   if(d.id){const b=$("#bid");if(b)b.value=d.id;S.prefill=d.id;return}
-  if(d.tab){if(d.tab!=="share")scanStop();S.tab=d.tab;S.note="";S.loadFail=false;if(d.tab==="upload"&&S.role==="pub")await refreshStatus();if(d.tab==="share"){SH.loaded=false;SH.fail=false;SH.msg=""}return render()}
+  if(d.tab){if(d.tab!=="share")scanStop();S.tab=d.tab;S.note="";S.loadFail=false;if(d.tab==="upload"&&S.role==="pub")await refreshStatus();if(d.tab==="videos"&&S.role==="pub"&&S.st&&S.st.shared)await vStatus();if(d.tab==="share"){SH.loaded=false;SH.fail=false;SH.msg=""}return render()}
   if(d.sk){SH.kind=d.sk;SH.msg="";return render()}
   if(d.sret){return shReturn(d.sret)}
   if(d.spick!=null){const k=SH.pick;if(!k)return;const q=k.people.find(x=>x.id===d.spick);if(!q)return;return shSend({mb:k.mb,bid:k.bid,person:q.id,who:q.name||"your friend"})}
